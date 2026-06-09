@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dave Michael — davemichael.postmarq</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── Reset & Base ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --glass-white:  rgba(255, 255, 255, 0.52);
+      --glass-border: rgba(255, 255, 255, 0.75);
+      --glass-shadow: 0 8px 32px rgba(120, 80, 40, 0.10), 0 2px 8px rgba(120,80,40,0.07);
+      --glass-inset:  0 1px 0 rgba(255,255,255,0.9) inset;
+
+      --amber:        #e8992a;
+      --amber-light:  #f5c462;
+      --amber-pale:   #fef3d8;
+      --teal:         #4ab5aa;
+      --lavender:     #9b8fd4;
+      --rust:         #c85c3a;
+
+      --ink:   #26180e;
+      --ink-2: #5a3e28;
+      --ink-3: #a07d60;
+      --ink-4: #c9aa90;
+
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 22px;
+      --radius-xl: 28px;
+
+      --font: 'Nunito', system-ui, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      color: var(--ink);
+      min-height: 100vh;
+      padding: 0 0 5rem;
+      background:
+        radial-gradient(ellipse at 80% 10%, rgba(195, 160, 255, 0.30) 0%, transparent 52%),
+        radial-gradient(ellipse at 10% 90%, rgba(255, 180, 90,  0.38) 0%, transparent 52%),
+        radial-gradient(ellipse at 55% 55%, rgba(255, 210, 150, 0.18) 0%, transparent 65%),
+        radial-gradient(ellipse at 30% 20%, rgba(160, 210, 255, 0.20) 0%, transparent 45%),
+        linear-gradient(158deg, #ede5f8 0%, #f8ead8 38%, #fdf4e8 62%, #f3e2cc 100%);
+      background-attachment: fixed;
+    }
+
+    .glass {
+      background: var(--glass-white);
+      backdrop-filter: blur(18px) saturate(1.6);
+      -webkit-backdrop-filter: blur(18px) saturate(1.6);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow), var(--glass-inset);
+    }
+
+    /* ─── Address Bar ─── */
+    .address-bar {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0.65rem 1rem;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(20px) saturate(1.8);
+      -webkit-backdrop-filter: blur(20px) saturate(1.8);
+      border-bottom: 1px solid rgba(255,255,255,0.6);
+      box-shadow: 0 1px 12px rgba(120,80,40,0.07);
+    }
+    .address-inner {
+      display: flex; align-items: center; gap: 0.55rem;
+      background: rgba(255,255,255,0.6);
+      border: 1px solid rgba(255,255,255,0.8);
+      border-radius: 999px;
+      padding: 0.3rem 1rem 0.3rem 0.75rem;
+      box-shadow: 0 1px 4px rgba(120,80,40,0.06) inset;
+    }
+    .address-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--amber-light), var(--amber));
+    }
+    .address-text {
+      font-size: 0.78rem; font-weight: 500; color: var(--ink-3); letter-spacing: 0.02em;
+    }
+    .address-text strong { color: var(--ink-2); font-weight: 700; }
+
+    /* ─── Page Wrapper ─── */
+    .page-wrapper {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 2rem 1.25rem 0;
+    }
+
+    /* ─── Hero Card ─── */
+    .hero-card { border-radius: var(--radius-xl); overflow: hidden; margin-bottom: 1.25rem; }
+
+    .hero-inner {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      min-height: 280px;
+    }
+
+    .hero-photo {
+      position: relative; overflow: hidden;
+      background: linear-gradient(165deg, #f5d5a0 0%, #e8aa60 40%, #c87840 100%);
+    }
+    .hero-photo img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center top;
+      display: block;
+    }
+    .hero-photo::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(to right, transparent 60%, rgba(200,180,255,0.12));
+      pointer-events: none;
+    }
+
+    .hero-info {
+      padding: 1.75rem 2rem 1.5rem;
+      display: flex; flex-direction: column; gap: 1rem;
+      background: rgba(255,255,255,0.30);
+    }
+    .hero-top {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 1rem;
+    }
+    .hero-name {
+      font-size: 2.2rem; font-weight: 800; color: var(--ink);
+      line-height: 1; letter-spacing: -0.02em;
+    }
+    .hero-tagline {
+      font-size: 0.88rem; font-weight: 400; color: var(--ink-2);
+      line-height: 1.5; margin-top: 0.4rem; max-width: 380px;
+    }
+    .location-badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: rgba(255,255,255,0.55);
+      border: 1px solid rgba(255,255,255,0.75);
+      border-radius: 999px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.78rem; font-weight: 600; color: var(--ink-2);
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .location-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); flex-shrink: 0; }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+    .tag {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      padding: 0.3rem 0.8rem; border-radius: 999px;
+      font-size: 0.78rem; font-weight: 600; letter-spacing: 0.01em;
+      border: 1px solid rgba(255,255,255,0.6); cursor: default;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .tag:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .tag-movies    { background: rgba(155,143,212,0.18); color: #6b5bb8; border-color: rgba(155,143,212,0.35); }
+    .tag-photo     { background: rgba( 74,181,170,0.15); color: #2e8a82; border-color: rgba( 74,181,170,0.35); }
+    .tag-adventure { background: rgba(232,153, 42,0.15); color: #a06010; border-color: rgba(232,153, 42,0.35); }
+    .tag-trixton   { background: rgba(200, 92, 58,0.12); color: #a03820; border-color: rgba(200, 92, 58,0.30); }
+    .tag-phoenix   { background: rgba(255,140, 60,0.14); color: #8a4010; border-color: rgba(255,140, 60,0.32); }
+
+    /* Now Playing */
+    .now-playing {
+      display: flex; align-items: center; gap: 0.75rem;
+      background: rgba(255,255,255,0.45);
+      border: 1px solid rgba(255,255,255,0.7);
+      border-radius: var(--radius-md);
+      padding: 0.65rem 1rem;
+      align-self: flex-start; cursor: default;
+    }
+    .np-art {
+      width: 38px; height: 38px; border-radius: 6px; flex-shrink: 0;
+      background: linear-gradient(135deg, #c8a8e0, #8060c0);
+      display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+    }
+    .np-text { flex: 1; min-width: 0; }
+    .np-label {
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--ink-4);
+      display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.15rem;
+    }
+    .np-pulse {
+      width: 6px; height: 6px; border-radius: 50%; background: var(--teal);
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
+    .np-song { font-size: 0.82rem; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .np-artist { font-size: 0.72rem; font-weight: 400; color: var(--ink-3); }
+    .np-bars { display: flex; align-items: flex-end; gap: 2px; height: 20px; flex-shrink: 0; }
+    .np-bar { width: 3px; border-radius: 2px; background: var(--lavender); animation: bar-bounce 1.2s ease-in-out infinite; }
+    .np-bar:nth-child(1){height:8px; animation-delay:0s}
+    .np-bar:nth-child(2){height:14px;animation-delay:.15s}
+    .np-bar:nth-child(3){height:10px;animation-delay:.3s}
+    .np-bar:nth-child(4){height:18px;animation-delay:.1s}
+    .np-bar:nth-child(5){height:7px; animation-delay:.25s}
+    @keyframes bar-bounce { 0%,100%{transform:scaleY(.4)} 50%{transform:scaleY(1)} }
+
+    /* ─── Nav Tabs ─── */
+    .nav-tabs {
+      display: flex; border-bottom: 1px solid rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.20); overflow-x: auto;
+    }
+    .nav-tabs a {
+      padding: 0.75rem 1.3rem;
+      font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; text-decoration: none; color: var(--ink-3);
+      white-space: nowrap; border-bottom: 2px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .nav-tabs a:hover { color: var(--ink); }
+    .nav-tabs a.active { color: var(--ink); border-bottom-color: var(--amber); }
+
+    /* ─── Main Layout ─── */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 1.25rem;
+      align-items: start;
+    }
+
+    /* ─── Posts Column ─── */
+    .posts-col { display: flex; flex-direction: column; gap: 1rem; }
+
+    .section-header {
+      font-size: 0.68rem; font-weight: 800; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--ink-4);
+      display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.15rem;
+    }
+    .section-header::after { content:''; flex:1; height:1px; background:rgba(255,255,255,0.5); }
+
+    /* Composer */
+    .composer { border-radius: var(--radius-lg); padding: 1.35rem 1.6rem; }
+
+    .composer-header { display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.9rem; }
+    .composer-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      overflow: hidden; border: 2px solid rgba(255,255,255,0.7); flex-shrink: 0;
+    }
+    .composer-avatar img { width:100%; height:100%; object-fit:cover; object-position:center top; }
+    .composer-who { font-size: 0.78rem; font-weight: 700; color: var(--ink-3); }
+
+    .type-row { display: flex; gap: 0.45rem; margin-bottom: 0.8rem; }
+    .type-btn {
+      padding: 0.26rem 0.78rem; border-radius: 999px;
+      font-family: var(--font); font-size: 0.72rem; font-weight: 700;
+      border: 1.5px solid rgba(255,255,255,0.6);
+      background: rgba(255,255,255,0.38); color: var(--ink-3); cursor: pointer;
+      transition: all 0.14s;
+    }
+    .type-btn:hover { background: rgba(255,255,255,0.65); color: var(--ink-2); }
+    .type-btn.active { background: var(--ink); border-color: var(--ink); color: white; }
+
+    .composer-textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.45);
+      border: 1.5px solid rgba(255,255,255,0.7);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 0.9rem;
+      font-family: var(--font); font-size: 0.9rem; font-weight: 500; color: var(--ink);
+      resize: vertical; min-height: 84px; outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .composer-textarea:focus {
+      border-color: rgba(155,143,212,0.5);
+      box-shadow: 0 0 0 3px rgba(155,143,212,0.14);
+    }
+    .composer-textarea::placeholder { color: var(--ink-4); font-style: italic; }
+
+    .media-preview-strip { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.6rem; }
+    .media-preview-strip:empty { display: none; }
+    .prev-thumb { position: relative; border-radius: 8px; overflow: hidden; border: 1.5px solid rgba(255,255,255,0.7); }
+    .prev-thumb img, .prev-thumb video { width: 80px; height: 66px; object-fit: cover; display: block; }
+    .prev-remove {
+      position: absolute; top: 3px; right: 3px;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: rgba(0,0,0,0.6); color: white; border: none;
+      font-size: 0.6rem; font-weight: 800; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .composer-toolbar {
+      display: flex; align-items: center; gap: 0.5rem;
+      margin-top: 0.75rem; flex-wrap: wrap;
+    }
+    .tool-btn {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      padding: 0.35rem 0.8rem;
+      background: rgba(255,255,255,0.42);
+      border: 1px solid rgba(255,255,255,0.65);
+      border-radius: 999px;
+      font-family: var(--font); font-size: 0.72rem; font-weight: 700; color: var(--ink-2);
+      cursor: pointer; transition: all 0.14s; white-space: nowrap;
+    }
+    .tool-btn:hover { background: rgba(255,255,255,0.72); transform: translateY(-1px); }
+    .tool-btn:disabled { opacity: 0.38; cursor: not-allowed; transform: none; }
+    .tool-count { font-size: 0.62rem; opacity: 0.65; }
+    .composer-spacer { flex: 1; }
+    .post-btn {
+      background: linear-gradient(135deg, var(--amber-light), var(--amber));
+      color: white; border: none; border-radius: 999px;
+      padding: 0.5rem 1.4rem;
+      font-family: var(--font); font-size: 0.82rem; font-weight: 800; letter-spacing: 0.02em;
+      cursor: pointer;
+      box-shadow: 0 3px 12px rgba(232,153,42,0.32);
+      transition: all 0.18s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .post-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(232,153,42,0.42); }
+    .post-btn:active { transform: scale(0.97); }
+    .file-input { display: none; }
+
+    /* ─── Quorum Post ─── */
+    .post-quorum {
+      border-radius: var(--radius-lg); overflow: hidden; position: relative;
+    }
+    .post-quorum::before {
+      content: ''; position: absolute; inset: 0; border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, rgba(255,210,130,0.25), rgba(232,153,42,0.10));
+      pointer-events: none; z-index: 0;
+    }
+    .post-quorum-inner { position: relative; z-index: 1; padding: 1.5rem 1.75rem; }
+
+    .quorum-badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: linear-gradient(135deg, var(--amber-light), var(--amber));
+      color: white; border-radius: 999px;
+      padding: 0.2rem 0.7rem;
+      font-size: 0.62rem; font-weight: 800; letter-spacing: 0.10em; text-transform: uppercase;
+      margin-bottom: 0.9rem;
+      box-shadow: 0 2px 8px rgba(232,153,42,0.35);
+    }
+    .post-body { font-size: 0.95rem; font-weight: 500; line-height: 1.7; color: var(--ink); }
+    .post-body p + p { margin-top: 0.75rem; }
+    .post-quorum .post-body { font-size: 1.05rem; font-weight: 600; }
+
+    /* ─── Regular Post Card ─── */
+    .post-card { border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; }
+
+    .post-footer {
+      display: flex; align-items: center; gap: 1rem; margin-top: 1rem;
+    }
+    .post-date { font-size: 0.72rem; font-weight: 600; color: var(--ink-4); margin-left: auto; }
+
+    .stamp-btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.4rem 0.9rem; border-radius: 999px;
+      border: 1.5px solid rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.5);
+      font-family: var(--font); font-size: 0.75rem; font-weight: 700; color: var(--ink-2);
+      cursor: pointer; transition: all 0.18s cubic-bezier(0.34,1.56,0.64,1); letter-spacing: 0.02em;
+    }
+    .stamp-btn:hover { background: rgba(255,255,255,0.75); transform: scale(1.04); }
+    .stamp-btn:active { transform: scale(0.96); }
+    .stamp-btn.stamped {
+      background: linear-gradient(135deg, rgba(232,153,42,0.18), rgba(245,196,98,0.22));
+      border-color: rgba(232,153,42,0.5); color: var(--amber);
+    }
+    .stamp-icon { font-size: 0.9rem; transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1); }
+    .stamp-btn:hover .stamp-icon { transform: rotate(-8deg) scale(1.15); }
+    .stamp-btn.stamped .stamp-icon { transform: scale(1.1); }
+    .stamp-count { font-size: 0.72rem; font-weight: 600; color: var(--ink-4); }
+
+    /* ─── Post media grid ─── */
+    .post-media-grid { display: grid; gap: 3px; margin-top: 0.85rem; border-radius: var(--radius-md); overflow: hidden; }
+    .post-media-grid.count-1 { grid-template-columns: 1fr; }
+    .post-media-grid.count-2 { grid-template-columns: 1fr 1fr; }
+    .post-media-grid.count-3 { grid-template-columns: 1fr 1fr; }
+
+    .post-media-grid.count-1 .media-item img { width:100%; height:auto; max-height:none; object-fit:unset; }
+    .post-media-grid.count-2 .media-item { aspect-ratio: 4/3; }
+    .post-media-grid.count-2 .media-item img { width:100%; height:100%; object-fit:contain; background:rgba(0,0,0,0.04); }
+    .post-media-grid.count-3 .media-item:nth-child(1) { grid-row: span 2; aspect-ratio: 4/5; }
+    .post-media-grid.count-3 .media-item:nth-child(2),
+    .post-media-grid.count-3 .media-item:nth-child(3) { aspect-ratio: 4/3; }
+    .post-media-grid.count-3 .media-item img { width:100%; height:100%; object-fit:contain; background:rgba(0,0,0,0.04); }
+
+    .media-item { position: relative; overflow: hidden; background: rgba(0,0,0,0.03); }
+    .media-item img { display:block; cursor:zoom-in; transition:transform 0.2s; }
+    .media-item img:hover { transform: scale(1.015); }
+    .media-item video { width:100%; display:block; max-height:400px; object-fit:contain; background:#000; }
+
+    /* Permanent post images */
+    .post-img-wrap { margin-top: 0.85rem; border-radius: var(--radius-md); overflow: hidden; cursor: zoom-in; }
+    .post-img-wrap img { width:100%; height:auto; display:block; transition: transform 0.2s; }
+    .post-img-wrap:hover img { transform: scale(1.01); }
+
+    /* ─── Guestbook ─── */
+    .guestbook-card { border-radius: var(--radius-lg); padding: 1.5rem 1.75rem; }
+
+    .gb-entries { display: flex; flex-direction: column; gap: 0.9rem; margin-bottom: 1.5rem; }
+    .gb-entry {
+      background: rgba(255,255,255,0.35); border: 1px solid rgba(255,255,255,0.6);
+      border-radius: var(--radius-md); padding: 0.9rem 1.1rem;
+      border-left: 3px solid var(--amber-light);
+    }
+    .gb-header { display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.35rem; }
+    .gb-author { font-size: 0.85rem; font-weight: 700; color: var(--ink); }
+    .gb-when   { font-size: 0.65rem; font-weight: 600; color: var(--ink-4); }
+    .gb-msg    { font-size: 0.83rem; font-weight: 400; line-height: 1.6; color: var(--ink-2); font-style: italic; }
+
+    .gb-form-label {
+      font-size: 0.68rem; font-weight: 800; letter-spacing: 0.10em;
+      text-transform: uppercase; color: var(--ink-4); margin-bottom: 0.65rem; display: block;
+    }
+    .gb-form textarea, .gb-form input {
+      width: 100%;
+      background: rgba(255,255,255,0.5); border: 1.5px solid rgba(255,255,255,0.7);
+      border-radius: var(--radius-sm); padding: 0.65rem 0.85rem;
+      font-family: var(--font); font-size: 0.85rem; font-weight: 500; color: var(--ink);
+      outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .gb-form textarea { resize: vertical; min-height: 76px; margin-bottom: 0.6rem; }
+    .gb-form textarea:focus, .gb-form input:focus {
+      border-color: var(--amber-light); box-shadow: 0 0 0 3px rgba(245,196,98,0.18);
+    }
+    .gb-form textarea::placeholder, .gb-form input::placeholder { color: var(--ink-4); }
+    .gb-form-row { display: flex; gap: 0.65rem; }
+    .gb-form input { flex: 1; }
+    .btn-send {
+      background: linear-gradient(135deg, var(--amber-light), var(--amber));
+      color: white; border: none; border-radius: var(--radius-sm);
+      padding: 0.6rem 1.2rem;
+      font-family: var(--font); font-size: 0.8rem; font-weight: 800; letter-spacing: 0.03em;
+      cursor: pointer; white-space: nowrap;
+      box-shadow: 0 3px 12px rgba(232,153,42,0.35);
+      transition: all 0.18s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .btn-send:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(232,153,42,0.45); }
+    .btn-send:active { transform: scale(0.97); }
+
+    /* ─── Sidebar ─── */
+    .sidebar { display: flex; flex-direction: column; gap: 1rem; }
+    .sidebar-card { border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; }
+
+    .card-title {
+      font-size: 0.68rem; font-weight: 800; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--ink-4);
+      margin-bottom: 1rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .card-title::after { content:''; flex:1; height:1px; background:rgba(255,255,255,0.55); }
+
+    .about-text { font-size: 0.85rem; line-height: 1.7; color: var(--ink-2); font-weight: 400; }
+    .about-text strong { font-weight: 700; color: var(--ink); }
+
+    .stamps-received { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.85rem; }
+    .stamps-number { font-size: 2rem; font-weight: 800; color: var(--amber); line-height: 1; }
+    .stamps-label { font-size: 0.72rem; font-weight: 600; color: var(--ink-3); line-height: 1.3; }
+
+    .stamp-avatars { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .stamp-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.8);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 700; color: white; cursor: default;
+      transition: transform 0.15s; box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+      position: relative;
+    }
+    .stamp-avatar:hover { transform: scale(1.12) translateY(-2px); z-index: 2; }
+    .stamp-avatar[title]:hover::after {
+      content: attr(title); position: absolute; bottom: calc(100% + 6px); left: 50%;
+      transform: translateX(-50%); background: var(--ink); color: rgba(255,255,255,0.9);
+      font-size: 0.65rem; font-weight: 600; padding: 0.2rem 0.5rem;
+      border-radius: 6px; white-space: nowrap; pointer-events: none; font-family: var(--font);
+    }
+    .av-1{background:linear-gradient(135deg,#9b8fd4,#6b5ab8)}
+    .av-2{background:linear-gradient(135deg,#4ab5aa,#2e8080)}
+    .av-3{background:linear-gradient(135deg,#e8a840,#c07820)}
+    .av-4{background:linear-gradient(135deg,#e08080,#b84040)}
+    .av-5{background:linear-gradient(135deg,#80b870,#488040)}
+    .av-6{background:linear-gradient(135deg,#80a8e8,#4070c0)}
+
+    .quorum-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .quorum-item { display: flex; align-items: center; gap: 0.65rem; }
+    .quorum-av {
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.8);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700; color: white; flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    }
+    .quorum-meta { flex: 1; min-width: 0; }
+    .quorum-name { font-size: 0.82rem; font-weight: 700; color: var(--ink); }
+    .quorum-handle { font-size: 0.68rem; font-weight: 500; color: var(--ink-4); }
+    .q-status { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .status-on  { background: var(--teal); box-shadow: 0 0 0 2px rgba(74,181,170,0.25); }
+    .status-off { background: var(--ink-4); }
+    .quorum-cap-bar {
+      margin-top: 0.85rem; background: rgba(255,255,255,0.35);
+      border-radius: 999px; height: 5px; overflow: hidden;
+    }
+    .quorum-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,var(--amber-light),var(--amber)); width:30%; }
+    .quorum-cap-label { font-size: 0.65rem; font-weight: 600; color: var(--ink-4); margin-top: 0.35rem; text-align: right; }
+
+    .phoenix-card { border-radius: var(--radius-lg); overflow: hidden; position: relative; }
+    .phoenix-bg { position:absolute; inset:0; background:linear-gradient(158deg,rgba(255,160,60,0.22),rgba(200,80,40,0.15)); pointer-events:none; }
+    .phoenix-inner { position:relative; padding:1.25rem 1.5rem; }
+    .phoenix-emoji { font-size:1.75rem; display:block; margin-bottom:0.4rem; }
+    .phoenix-city  { font-size:1.05rem; font-weight:800; color:var(--ink); }
+    .phoenix-state { font-size:0.78rem; font-weight:500; color:var(--ink-3); margin-bottom:0.6rem; }
+    .phoenix-desc  { font-size:0.78rem; font-weight:500; color:var(--ink-2); line-height:1.55; }
+    .square-link {
+      display:inline-flex; align-items:center; gap:0.3rem; margin-top:0.75rem;
+      font-size:0.72rem; font-weight:700; color:var(--teal); text-decoration:none; letter-spacing:0.02em;
+    }
+    .square-link:hover { text-decoration:underline; }
+
+    .interests-wrap { display:flex; flex-wrap:wrap; gap:0.4rem; }
+    .int-tag {
+      font-size:0.72rem; font-weight:600; padding:0.28rem 0.7rem;
+      border:1px solid rgba(255,255,255,0.6); border-radius:999px;
+      color:var(--ink-2); background:rgba(255,255,255,0.38);
+    }
+
+    /* ─── Lightbox ─── */
+    .lightbox {
+      position:fixed; inset:0; z-index:1000;
+      display:flex; align-items:center; justify-content:center;
+      opacity:0; pointer-events:none; transition:opacity 0.22s ease;
+    }
+    .lightbox.open { opacity:1; pointer-events:all; }
+    .lb-backdrop {
+      position:absolute; inset:0;
+      background:rgba(20,12,5,0.88);
+      backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); cursor:zoom-out;
+    }
+    .lb-wrap {
+      position:relative; z-index:1; max-width:92vw; max-height:90vh;
+      display:flex; align-items:center; justify-content:center;
+      transform:scale(0.94); transition:transform 0.22s cubic-bezier(0.34,1.3,0.64,1);
+    }
+    .lightbox.open .lb-wrap { transform:scale(1); }
+    .lb-wrap img { max-width:92vw; max-height:90vh; width:auto; height:auto; border-radius:var(--radius-lg); box-shadow:0 24px 80px rgba(0,0,0,0.5); display:block; }
+    .lb-close {
+      position:absolute; top:-14px; right:-14px;
+      width:34px; height:34px; border-radius:50%;
+      background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3);
+      color:white; font-size:0.85rem; font-weight:800; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      backdrop-filter:blur(6px); transition:background 0.15s;
+    }
+    .lb-close:hover { background:rgba(255,255,255,0.28); }
+
+    /* ─── Footer ─── */
+    .page-footer {
+      max-width:980px; margin:2rem auto 0; padding:0 1.25rem;
+      display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.75rem;
+    }
+    .footer-left  { font-size:0.78rem; font-weight:500; color:var(--ink-4); font-style:italic; }
+    .footer-right { font-size:0.7rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-4); }
+    .footer-right span { color:var(--amber); }
+
+    /* ─── Responsive ─── */
+    @media (max-width:720px) {
+      .hero-inner  { grid-template-columns:1fr; }
+      .hero-photo  { height:200px; }
+      .main-grid   { grid-template-columns:1fr; }
+      .hero-name   { font-size:1.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox">
+    <div class="lb-backdrop" onclick="lbClose(event)"></div>
+    <div class="lb-wrap">
+      <img id="lbImg" src="" alt="" />
+      <button class="lb-close" onclick="lbClose()">✕</button>
+    </div>
+  </div>
+
+  <!-- Address Bar -->
+  <div class="address-bar">
+    <div class="address-inner">
+      <div class="address-dot"></div>
+      <div class="address-text"><strong>davemichael</strong>.postmarq</div>
+    </div>
+  </div>
+
+  <div class="page-wrapper">
+
+    <!-- Hero Card -->
+    <div class="hero-card glass">
+      <div class="hero-inner">
+        <div class="hero-photo">
+          <img src="Profile Pic_01x.JPG" alt="Dave Michael" />
+        </div>
+        <div class="hero-info">
+          <div class="hero-top">
+            <div>
+              <div class="hero-name">Dave Michael</div>
+              <div class="hero-tagline">Here to make real connections while learning how to code. Welcome to Postmarq.</div>
+            </div>
+            <div class="location-badge">
+              <div class="location-dot"></div>
+              Phoenix, AZ
+            </div>
+          </div>
+          <div class="tags">
+            <span class="tag tag-movies">🎬 Movies</span>
+            <span class="tag tag-photo">📷 Photography</span>
+            <span class="tag tag-adventure">🏔 Adventure</span>
+            <span class="tag tag-trixton">🐾 Trixton</span>
+            <span class="tag tag-phoenix">☀️ Phoenix</span>
+          </div>
+          <div class="now-playing">
+            <div class="np-art">🎵</div>
+            <div class="np-text">
+              <div class="np-label"><div class="np-pulse"></div>now playing</div>
+              <div class="np-song">Cartoon</div>
+              <div class="np-artist">Vacations</div>
+            </div>
+            <div class="np-bars">
+              <div class="np-bar"></div><div class="np-bar"></div>
+              <div class="np-bar"></div><div class="np-bar"></div>
+              <div class="np-bar"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="main-grid">
+
+      <!-- Posts Column -->
+      <div class="posts-col">
+
+        <div class="section-header">Posts</div>
+
+        <!-- Composer -->
+        <div class="composer glass" id="composer">
+          <div class="composer-header">
+            <div class="composer-avatar"><img src="Profile Pic_01x.JPG" alt="Dave" /></div>
+            <span class="composer-who">New post</span>
+          </div>
+          <div class="type-row">
+            <button class="type-btn active" data-type="post"   onclick="setType(this)">Post</button>
+            <button class="type-btn"         data-type="quorum" onclick="setType(this)">⬡ Quorum</button>
+          </div>
+          <textarea class="composer-textarea" id="composerText" placeholder="What's on your mind?"></textarea>
+          <div class="media-preview-strip" id="mediaPreviews"></div>
+          <div class="composer-toolbar">
+            <button class="tool-btn" id="photoBtn" onclick="document.getElementById('photoInput').click()">
+              📷 Photo <span class="tool-count" id="photoCount"></span>
+            </button>
+            <button class="tool-btn" id="videoBtn" onclick="document.getElementById('videoInput').click()">
+              🎬 Video <span class="tool-count" id="videoCount"></span>
+            </button>
+            <div class="composer-spacer"></div>
+            <button class="post-btn" onclick="submitPost()">Post</button>
+          </div>
+          <input type="file" id="photoInput" class="file-input" accept="image/*" multiple onchange="addMedia(this,'image')" />
+          <input type="file" id="videoInput" class="file-input" accept="video/*" onchange="addMedia(this,'video')" />
+        </div>
+
+        <!-- Dynamic feed renders here -->
+        <div id="dynamicFeed"></div>
+
+        <!-- ── Permanent Post: Stamps ── -->
+        <div class="post-card glass">
+          <div class="post-body">
+            <p><strong>Stamps.</strong></p>
+            <p>Not a like. Not a metric. Not a growth tool. Not something an algorithm counts to decide who deserves to be seen.</p>
+            <p>A stamp means you stopped, decided this was worth something, and chose to send it. It's recognition. It means: <em>I saw this. It meant something to me. I wanted you to know.</em></p>
+            <p>Maybe you've been to that place. Maybe you love that movie. Maybe you just felt it. A stamp is the smallest possible way to say <em>we have something in common</em> without having to say anything at all.</p>
+            <p>No follower counts attached to it. No reach boosted because something got a lot of stamps. The number doesn't matter — who sent it does.</p>
+            <p>Over time, the people stamping your posts are the ones worth paying attention to. Not because the platform told you so — because they kept showing up, on their own, for no other reason than they wanted to. That's how your quorum finds you. Not through an algorithm. Through recognition.</p>
+            <p>That's the whole point. ⬡</p>
+          </div>
+          <div class="post-img-wrap" onclick="lbOpen('ChatGPT Image Jun 8, 2026, 01_36_39 PM.png')">
+            <img src="ChatGPT Image Jun 8, 2026, 01_36_39 PM.png" alt="Stamps" />
+          </div>
+          <div class="post-footer">
+            <button class="stamp-btn" onclick="toggleStamp(this,0)">
+              <span class="stamp-icon">⬡</span> Stamp
+            </button>
+            <span class="stamp-count">0 stamps</span>
+            <span class="post-date">June 8, 2026</span>
+          </div>
+        </div>
+
+        <!-- ── Permanent Post: First Post ── -->
+        <div class="post-card glass">
+          <div class="post-body"><p>My first post on Postmarq!</p></div>
+          <div class="post-img-wrap" onclick="lbOpen('post_01x.JPG')">
+            <img src="post_01x.JPG" alt="Dave Michael" />
+          </div>
+          <div class="post-footer">
+            <button class="stamp-btn" onclick="toggleStamp(this,0)">
+              <span class="stamp-icon">⬡</span> Stamp
+            </button>
+            <span class="stamp-count">0 stamps</span>
+            <span class="post-date">June 8, 2026</span>
+          </div>
+        </div>
+
+        <!-- Quorum Post -->
+        <div class="post-quorum glass">
+          <div class="post-quorum-inner">
+            <div class="quorum-badge">⬡ Quorum</div>
+            <div class="post-body">
+              Anyone going to see <strong>Cachemira</strong>? Looking to connect with people locally in Phoenix. Send me a stamp if you're interested.
+            </div>
+            <div class="post-footer">
+              <button class="stamp-btn" onclick="toggleStamp(this,3)">
+                <span class="stamp-icon">⬡</span> Stamp
+              </button>
+              <span class="stamp-count">3 stamps</span>
+              <span class="post-date">June 5, 2026</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Guestbook -->
+        <div class="guestbook-card glass">
+          <div class="card-title">Guestbook</div>
+          <div class="gb-entries" id="gbEntries">
+            <div class="gb-entry">
+              <div class="gb-header"><span class="gb-author">Marco R.</span><span class="gb-when">2 days ago</span></div>
+              <div class="gb-msg">"That Encanto Park shot is going to be incredible. Can't wait to see it."</div>
+            </div>
+            <div class="gb-entry">
+              <div class="gb-header"><span class="gb-author">Jess T.</span><span class="gb-when">4 days ago</span></div>
+              <div class="gb-msg">"Diner is legitimately top five. No notes. Glad you're on here."</div>
+            </div>
+            <div class="gb-entry">
+              <div class="gb-header"><span class="gb-author">Nadia F.</span><span class="gb-when">1 week ago</span></div>
+              <div class="gb-msg">"Also interested in Cachemira. Sent you a stamp. Phoenix people need to stick together."</div>
+            </div>
+          </div>
+          <div class="gb-form">
+            <label class="gb-form-label">Leave your mark</label>
+            <textarea placeholder="Say something real..."></textarea>
+            <div class="gb-form-row">
+              <input type="text" placeholder="Your handle (e.g. marco.postmarq)" />
+              <button class="btn-send" onclick="gbSubmit(this)">Send stamp</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /posts-col -->
+
+      <!-- Sidebar -->
+      <div class="sidebar">
+
+        <!-- About -->
+        <div class="sidebar-card glass">
+          <div class="card-title">About</div>
+          <div class="about-text">
+            I love movies, adventure, and thinking deeply about things that probably don't need to be thought about that deeply. I'm a photographer and I make videos — not for an agenda, just because something struck me as funny or beautiful or worth remembering.<br><br>
+            I have a dog named <strong>Trixton</strong>. He has more personality than most people I've met.<br><br>
+            I live in Phoenix. Mostly here to find people I can actually sit across from.
+          </div>
+        </div>
+
+        <!-- Stamps -->
+        <div class="sidebar-card glass">
+          <div class="card-title">Stamps</div>
+          <div class="stamps-received">
+            <div class="stamps-number">47</div>
+            <div class="stamps-label">stamps<br>received</div>
+          </div>
+          <div class="stamp-avatars">
+            <div class="stamp-avatar av-1" title="Marco R.">M</div>
+            <div class="stamp-avatar av-2" title="Jess T.">J</div>
+            <div class="stamp-avatar av-3" title="Nadia F.">N</div>
+            <div class="stamp-avatar av-4" title="Carlos V.">C</div>
+            <div class="stamp-avatar av-5" title="Sam L.">S</div>
+            <div class="stamp-avatar av-6" title="Ari K.">A</div>
+          </div>
+        </div>
+
+        <!-- Phoenix -->
+        <div class="phoenix-card glass">
+          <div class="phoenix-bg"></div>
+          <div class="phoenix-inner">
+            <div class="card-title">Neighborhood</div>
+            <span class="phoenix-emoji">☀️</span>
+            <div class="phoenix-city">Phoenix</div>
+            <div class="phoenix-state">Arizona · The Valley</div>
+            <div class="phoenix-desc">Paying attention to what's happening here. Looking to be part of something good locally.</div>
+            <a href="#" class="square-link">→ The Square · Phoenix</a>
+          </div>
+        </div>
+
+        <!-- Quorum -->
+        <div class="sidebar-card glass">
+          <div class="card-title">Quorum</div>
+          <div class="quorum-list">
+            <div class="quorum-item">
+              <div class="quorum-av av-1">M</div>
+              <div class="quorum-meta">
+                <div class="quorum-name">Marco R.</div>
+                <div class="quorum-handle">marco.postmarq</div>
+              </div>
+              <div class="q-status status-on"></div>
+            </div>
+            <div class="quorum-item">
+              <div class="quorum-av av-2">J</div>
+              <div class="quorum-meta">
+                <div class="quorum-name">Jess T.</div>
+                <div class="quorum-handle">jesst.postmarq</div>
+              </div>
+              <div class="q-status status-off"></div>
+            </div>
+            <div class="quorum-item">
+              <div class="quorum-av av-3">N</div>
+              <div class="quorum-meta">
+                <div class="quorum-name">Nadia F.</div>
+                <div class="quorum-handle">nadia.postmarq</div>
+              </div>
+              <div class="q-status status-on"></div>
+            </div>
+          </div>
+          <div class="quorum-cap-bar"><div class="quorum-fill"></div></div>
+          <div class="quorum-cap-label">3 / 10 quorum slots</div>
+        </div>
+
+        <!-- Interests -->
+        <div class="sidebar-card glass">
+          <div class="card-title">Interests</div>
+          <div class="interests-wrap">
+            <span class="int-tag">🎬 Movies</span>
+            <span class="int-tag">📷 Photography</span>
+            <span class="int-tag">🏔 Adventure</span>
+            <span class="int-tag">🐾 Trixton</span>
+            <span class="int-tag">☀️ Phoenix</span>
+          </div>
+        </div>
+
+      </div><!-- /sidebar -->
+    </div><!-- /main-grid -->
+
+    <footer class="page-footer">
+      <div class="footer-left">Your mark. Your address. Yours.</div>
+      <div class="footer-right">on <span>Postmarq</span> · davemichael.postmarq</div>
+    </footer>
+
+  </div><!-- /page-wrapper -->
+
+  <script>
+    /* ── Lightbox ── */
+    function lbOpen(src) {
+      const lb = document.getElementById('lightbox');
+      document.getElementById('lbImg').src = src;
+      lb.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function lbClose(e) {
+      if (e && e.target.closest('.lb-wrap') && !e.target.closest('.lb-close')) return;
+      document.getElementById('lightbox').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') lbClose(); });
+
+    /* ── Stamp toggle ── */
+    function toggleStamp(btn, base) {
+      const stamped = btn.classList.toggle('stamped');
+      const countEl = btn.nextElementSibling;
+      const current = base !== undefined ? base : parseInt(countEl.textContent);
+      const n = current + (stamped ? 1 : -1);
+      countEl.textContent = n + (n === 1 ? ' stamp' : ' stamps');
+      btn.querySelector('.stamp-icon').style.transform = stamped ? 'scale(1.1)' : '';
+    }
+
+    /* ── Guestbook ── */
+    function gbSubmit(btn) {
+      const form = btn.closest('.gb-form');
+      const ta   = form.querySelector('textarea');
+      const inp  = form.querySelector('input');
+      if (!ta.value.trim()) { ta.focus(); return; }
+      const entry = document.createElement('div');
+      entry.className = 'gb-entry';
+      entry.style.opacity = '0'; entry.style.transform = 'translateY(8px)';
+      entry.style.transition = 'all 0.3s ease';
+      entry.innerHTML = `
+        <div class="gb-header">
+          <span class="gb-author">${esc(inp.value.trim() || 'anonymous')}</span>
+          <span class="gb-when">just now</span>
+        </div>
+        <div class="gb-msg">"${esc(ta.value.trim())}"</div>
+      `;
+      document.getElementById('gbEntries').appendChild(entry);
+      requestAnimationFrame(() => { entry.style.opacity = '1'; entry.style.transform = 'translateY(0)'; });
+      ta.value = ''; inp.value = '';
+    }
+
+    /* ── Composer ── */
+    let mediaFiles = [];
+    let postType   = 'post';
+
+    function setType(btn) {
+      document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      postType = btn.dataset.type;
+      document.getElementById('composerText').placeholder =
+        postType === 'quorum'
+          ? 'Make a Quorum post — invite people to connect around something specific.'
+          : "What's on your mind?";
+    }
+
+    function addMedia(input, type) {
+      const files = Array.from(input.files);
+      if (type === 'video') {
+        if (mediaFiles.filter(f => f.kind === 'video').length > 0) return;
+        mediaFiles.push({ file: files[0], kind: 'video' });
+      } else {
+        const imgCount = mediaFiles.filter(f => f.kind === 'image').length;
+        files.slice(0, 3 - imgCount).forEach(f => mediaFiles.push({ file: f, kind: 'image' }));
+      }
+      renderPreviews();
+      input.value = '';
+    }
+
+    function renderPreviews() {
+      const strip    = document.getElementById('mediaPreviews');
+      const imgCount = mediaFiles.filter(f => f.kind === 'image').length;
+      const vidCount = mediaFiles.filter(f => f.kind === 'video').length;
+      document.getElementById('photoBtn').disabled = imgCount >= 3;
+      document.getElementById('videoBtn').disabled = vidCount >= 1;
+      document.getElementById('photoCount').textContent = imgCount > 0 ? imgCount + '/3' : '';
+      document.getElementById('videoCount').textContent = vidCount > 0 ? '1/1' : '';
+      strip.innerHTML = '';
+      mediaFiles.forEach((item, i) => {
+        const wrap = document.createElement('div');
+        wrap.className = 'prev-thumb';
+        const url = URL.createObjectURL(item.file);
+        const el  = document.createElement(item.kind === 'video' ? 'video' : 'img');
+        el.src = url; if (item.kind === 'video') el.muted = true;
+        wrap.appendChild(el);
+        const rm = document.createElement('button');
+        rm.className = 'prev-remove'; rm.textContent = '✕';
+        rm.onclick = () => { mediaFiles.splice(i, 1); renderPreviews(); };
+        wrap.appendChild(rm);
+        strip.appendChild(wrap);
+      });
+    }
+
+    function submitPost() {
+      const text = document.getElementById('composerText').value.trim();
+      if (!text && mediaFiles.length === 0) return;
+
+      const card = document.createElement('div');
+      card.className = 'post-card glass';
+      card.style.opacity = '0'; card.style.transform = 'translateY(10px)';
+      card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+
+      // quorum badge
+      if (postType === 'quorum') {
+        const badge = document.createElement('div');
+        badge.className = 'quorum-badge'; badge.style.marginBottom = '0.8rem';
+        badge.textContent = '⬡ Quorum'; card.appendChild(badge);
+      }
+
+      // text
+      if (text) {
+        const p = document.createElement('div');
+        p.className = 'post-body';
+        p.innerHTML = '<p>' + esc(text).replace(/\n/g, '<br>') + '</p>';
+        card.appendChild(p);
+      }
+
+      // media
+      if (mediaFiles.length > 0) {
+        const imgs = mediaFiles.filter(f => f.kind === 'image');
+        const vids = mediaFiles.filter(f => f.kind === 'video');
+        const total = imgs.length + (vids.length > 0 ? 1 : 0);
+        const grid  = document.createElement('div');
+        grid.className = 'post-media-grid count-' + Math.min(total, 3);
+        imgs.forEach(item => {
+          const url  = URL.createObjectURL(item.file);
+          const wrap = document.createElement('div'); wrap.className = 'media-item';
+          const img  = document.createElement('img'); img.src = url;
+          img.onclick = () => lbOpen(url);
+          wrap.appendChild(img); grid.appendChild(wrap);
+        });
+        vids.forEach(item => {
+          const url  = URL.createObjectURL(item.file);
+          const wrap = document.createElement('div'); wrap.className = 'media-item';
+          const vid  = document.createElement('video'); vid.src = url; vid.controls = true;
+          wrap.appendChild(vid); grid.appendChild(wrap);
+        });
+        card.appendChild(grid);
+      }
+
+      // footer
+      const footer = document.createElement('div');
+      footer.className = 'post-footer';
+      const stampBtn = document.createElement('button');
+      stampBtn.className = 'stamp-btn';
+      stampBtn.innerHTML = '<span class="stamp-icon">⬡</span> Stamp';
+      stampBtn.onclick = function() { toggleStamp(this, 0); };
+      const count = document.createElement('span');
+      count.className = 'stamp-count'; count.textContent = '0 stamps';
+      const date = document.createElement('span');
+      date.className = 'post-date';
+      date.textContent = new Date().toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
+      footer.appendChild(stampBtn); footer.appendChild(count); footer.appendChild(date);
+      card.appendChild(footer);
+
+      const feed = document.getElementById('dynamicFeed');
+      feed.insertBefore(card, feed.firstChild);
+      requestAnimationFrame(() => { card.style.opacity = '1'; card.style.transform = 'translateY(0)'; });
+
+      document.getElementById('composerText').value = '';
+      mediaFiles = []; renderPreviews();
+    }
+
+    function esc(s) {
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+  </script>
+
+</body>
+</html>
