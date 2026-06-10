@@ -851,6 +851,162 @@
     .footer-right span { color:var(--amber); }
 
     /* ─── Responsive ─── */
+    /* ─── Feed Tabs ─── */
+    .feed-tabs {
+      display: flex; gap: 0;
+      background: linear-gradient(90deg, rgba(78,58,160,0.88) 0%, rgba(50,150,142,0.88) 100%);
+      border-radius: 12px;
+      padding: 5px;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 10px rgba(60,40,120,0.18);
+    }
+    .feed-tab {
+      flex: 1; padding: 0.52rem 0.6rem;
+      font-family: inherit; font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.03em; border: none; cursor: pointer;
+      border-radius: 8px; background: transparent;
+      color: rgba(255,255,255,0.65); transition: all 0.16s ease;
+    }
+    .feed-tab:hover { color: rgba(255,255,255,0.9); background: rgba(255,255,255,0.12); }
+    .feed-tab.active {
+      background: linear-gradient(135deg, var(--amber-light), var(--amber));
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(232,153,42,0.45);
+      font-weight: 800;
+    }
+    .tab-panel { display: none; flex-direction: column; gap: 1rem; }
+    .tab-panel.active { display: flex; }
+
+    /* type tag pill */
+    .type-tag {
+      display: inline-flex; align-items: center; gap: 0.25rem;
+      font-size: 0.58rem; font-weight: 800; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 0.18rem 0.5rem;
+      border-radius: 999px; border: 1px solid transparent;
+    }
+    .type-tag.photo    { background: rgba(232,153,42,0.15); color: #a06010; border-color: rgba(232,153,42,0.3); }
+    .type-tag.video    { background: rgba(200,80,50,0.12);  color: #943020; border-color: rgba(200,80,50,0.28); }
+    .type-tag.quorum   { background: rgba(155,143,212,0.18); color: #6b5bb8; border-color: rgba(155,143,212,0.35); }
+    .type-tag.note     { background: rgba(140,130,120,0.14); color: #6a6055; border-color: rgba(140,130,120,0.28); }
+    .type-tag.marquee  { background: rgba(74,181,170,0.15); color: #2e8a82; border-color: rgba(74,181,170,0.3); }
+
+    /* ── Weekly view ── */
+    .weekly-day-group { display: flex; flex-direction: column; gap: 0.65rem; }
+    .weekly-day-label {
+      display: flex; align-items: center; gap: 0.65rem;
+      font-size: 0.62rem; font-weight: 900; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--ink-3);
+    }
+    .weekly-day-label::after { content:''; flex:1; height:1px; background:rgba(255,255,255,0.5); }
+    .weekly-row {
+      display: flex; align-items: center; gap: 0.85rem;
+      padding: 0.75rem 1rem;
+      background: rgba(255,255,255,0.52);
+      border: 1px solid rgba(255,255,255,0.7);
+      border-radius: 14px;
+      cursor: default;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      transition: background 0.14s, box-shadow 0.14s;
+    }
+    .weekly-row:hover { background: rgba(255,255,255,0.72); box-shadow: 0 4px 16px rgba(0,0,0,0.10); }
+    .weekly-thumb {
+      width: 62px; height: 78px; border-radius: 10px;
+      object-fit: cover; flex-shrink: 0;
+      background: rgba(0,0,0,0.07);
+      border: 1px solid rgba(255,255,255,0.6);
+    }
+    .weekly-thumb-wrap {
+      position: relative; width: 62px; height: 78px;
+      border-radius: 10px; overflow: hidden; flex-shrink: 0;
+      background: rgba(0,0,0,0.08);
+      border: 1px solid rgba(255,255,255,0.6);
+    }
+    .weekly-thumb-wrap video,
+    .weekly-thumb-wrap img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .weekly-thumb-wrap .video-pill {
+      top: 5px; left: 5px; font-size: 0.52rem; padding: 0.12rem 0.38rem;
+    }
+    .weekly-thumb-wrap .thumb-play {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.22);
+      font-size: 1.2rem;
+      pointer-events: none;
+    }
+    .weekly-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.25rem; }
+    .weekly-excerpt {
+      font-size: 0.82rem; font-weight: 600; color: var(--ink);
+      overflow: hidden; display: -webkit-box;
+      -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+      line-height: 1.4;
+    }
+    .weekly-meta {
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .weekly-time { font-size: 0.62rem; font-weight: 600; color: var(--ink-4); }
+    .weekly-stamps { font-size: 0.62rem; font-weight: 600; color: var(--ink-4); }
+
+    /* ── Yearbook view ── */
+    .yb-stats {
+      display: grid; grid-template-columns: repeat(4,1fr); gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .yb-stat {
+      background: rgba(255,255,255,0.45);
+      border: 1px solid rgba(255,255,255,0.6);
+      border-radius: 10px; padding: 0.7rem 0.5rem;
+      text-align: center;
+    }
+    .yb-stat-num { font-size: 1.4rem; font-weight: 900; color: var(--amber); line-height: 1; }
+    .yb-stat-lbl { font-size: 0.55rem; font-weight: 700; color: var(--ink-3); margin-top: 0.2rem; line-height: 1.3; text-transform: uppercase; letter-spacing: 0.06em; }
+    .yb-month-label {
+      display: flex; align-items: center; gap: 0.65rem;
+      font-size: 0.62rem; font-weight: 900; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--ink-3); margin-top: 0.5rem;
+    }
+    .yb-month-label::after { content:''; flex:1; height:1px; background:rgba(255,255,255,0.5); }
+    .yb-tile-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 4px; }
+    .yb-tile {
+      aspect-ratio: 4/5; border-radius: 10px;
+      border: 1px solid transparent;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; cursor: default; position: relative;
+      overflow: hidden;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .yb-tile:hover { transform: scale(1.04) translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.14); z-index: 2; }
+    .yb-tile video,
+    .yb-tile img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .yb-tile .video-pill { top: 6px; left: 6px; }
+    .yb-tile .thumb-play {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.22); font-size: 1.4rem; pointer-events: none;
+    }
+    .yb-tile-emoji {
+      position: relative; z-index: 1;
+    }
+    .yb-tile.photo   { background: rgba(232,153,42,0.22); border-color: rgba(232,153,42,0.4); }
+    .yb-tile.video   { background: rgba(200,80,50,0.18);  border-color: rgba(200,80,50,0.35); }
+    .yb-tile.quorum  { background: rgba(155,143,212,0.22); border-color: rgba(155,143,212,0.4); }
+    .yb-tile.note    { background: rgba(140,130,120,0.16); border-color: rgba(140,130,120,0.3); }
+    .yb-tile-tip {
+      display: none; position: absolute; bottom: calc(100% + 6px); left: 50%;
+      transform: translateX(-50%);
+      background: rgba(30,20,10,0.88); color: #fff;
+      font-size: 0.6rem; font-weight: 600; line-height: 1.35;
+      padding: 0.35rem 0.6rem; border-radius: 6px;
+      white-space: nowrap; max-width: 160px;
+      white-space: normal; text-align: center; width: max-content;
+      pointer-events: none; z-index: 10;
+    }
+    .yb-tile:hover .yb-tile-tip { display: block; }
+
     /* ─── Site Banner ─── */
     .site-banner {
       position: sticky; top: 0; z-index: 200;
@@ -1243,10 +1399,20 @@
 
       </div><!-- /left col -->
 
-      <!-- Right Column: Posts, Quorum, Guestbook -->
+      <!-- Right Column: Tabbed Feed -->
       <div class="sidebar">
 
         <div class="section-header">Posts</div>
+
+        <!-- ── Tab Bar ── -->
+        <div class="feed-tabs">
+          <button class="feed-tab active" onclick="switchTab('daily')">Daily</button>
+          <button class="feed-tab"        onclick="switchTab('weekly')">Weekly</button>
+          <button class="feed-tab"        onclick="switchTab('yearbook')">My Yearbook</button>
+        </div>
+
+        <!-- ══ PANEL: DAILY ══ -->
+        <div class="tab-panel active" id="panel-daily">
 
         <!-- Composer -->
         <div class="composer glass" id="composer">
@@ -1369,6 +1535,125 @@
             </div>
           </div>
         </div>
+
+        </div><!-- /panel-daily -->
+
+        <!-- ══ PANEL: WEEKLY ══ -->
+        <div class="tab-panel" id="panel-weekly">
+
+          <!-- Tuesday Jun 10 -->
+          <div class="weekly-day-group">
+            <div class="weekly-day-label">Tuesday — Jun 10</div>
+
+            <div class="weekly-row">
+              <div class="weekly-thumb-wrap"><img src="Stamp_odesza.png" alt="Stamp" /></div>
+              <div class="weekly-body">
+                <div class="weekly-excerpt">My new stamp. What it does... IDK. Need ideas!</div>
+                <div class="weekly-meta">
+                  <span class="weekly-time">today</span>
+                  <span class="weekly-stamps">⬡ 0</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="weekly-row">
+              <div class="weekly-thumb-wrap">
+                <video src="dbacks.MOV" muted preload="metadata" playsinline></video>
+                <div class="video-pill">Video</div>
+                <div class="thumb-play">▶</div>
+              </div>
+              <div class="weekly-body">
+                <div class="weekly-excerpt">D-backs win with a walk-off homerun against the Dodgers! [3-2].</div>
+                <div class="weekly-meta">
+                  <span class="weekly-time">today</span>
+                  <span class="weekly-stamps">⬡ 0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sunday Jun 8 -->
+          <div class="weekly-day-group">
+            <div class="weekly-day-label">Sunday — Jun 8</div>
+
+            <div class="weekly-row">
+              <div class="weekly-thumb-wrap"><img src="post_01x.JPG" alt="First post" /></div>
+              <div class="weekly-body">
+                <div class="weekly-excerpt">My first post on Postmarq!</div>
+                <div class="weekly-meta">
+                  <span class="weekly-time">2 days ago</span>
+                  <span class="weekly-stamps">⬡ 0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Thursday Jun 5 -->
+          <div class="weekly-day-group">
+            <div class="weekly-day-label">Thursday — Jun 5</div>
+
+            <div class="weekly-row">
+              <div class="weekly-thumb-wrap" style="background:rgba(155,143,212,0.18); border-color:rgba(155,143,212,0.3); display:flex; align-items:center; justify-content:center; font-size:1.4rem;">⬡</div>
+              <div class="weekly-body">
+                <div class="weekly-excerpt">Anyone going to see Cachemira? Looking to connect locally in Phoenix.</div>
+                <div class="weekly-meta">
+                  <span class="type-tag quorum">Quorum</span>
+                  <span class="weekly-time">5 days ago</span>
+                  <span class="weekly-stamps">⬡ 3</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /panel-weekly -->
+
+        <!-- ══ PANEL: YEARBOOK ══ -->
+        <div class="tab-panel" id="panel-yearbook">
+
+          <!-- Stats -->
+          <div class="yb-stats">
+            <div class="yb-stat">
+              <div class="yb-stat-num">47</div>
+              <div class="yb-stat-lbl">Stamps<br>Received</div>
+            </div>
+            <div class="yb-stat">
+              <div class="yb-stat-num">24</div>
+              <div class="yb-stat-lbl">Candids<br>Posted</div>
+            </div>
+            <div class="yb-stat">
+              <div class="yb-stat-num">6</div>
+              <div class="yb-stat-lbl">Films<br>Seen</div>
+            </div>
+            <div class="yb-stat">
+              <div class="yb-stat-num">1</div>
+              <div class="yb-stat-lbl">Quorums<br>Opened</div>
+            </div>
+          </div>
+
+          <!-- June 2026 -->
+          <div class="yb-month-label">June 2026</div>
+          <div class="yb-tile-grid">
+            <div class="yb-tile photo">
+              <img src="Stamp_odesza.png" alt="Stamp" />
+              <div class="yb-tile-tip">My new stamp<br>Jun 10</div>
+            </div>
+            <div class="yb-tile video">
+              <video src="dbacks.MOV" muted preload="metadata" playsinline></video>
+              <div class="video-pill">Video</div>
+              <div class="thumb-play">▶</div>
+              <div class="yb-tile-tip">D-backs walk-off<br>Jun 10</div>
+            </div>
+            <div class="yb-tile photo">
+              <img src="post_01x.JPG" alt="First post" />
+              <div class="yb-tile-tip">My first post on Postmarq!<br>Jun 8</div>
+            </div>
+            <div class="yb-tile quorum">
+              <span class="yb-tile-emoji">⬡</span>
+              <div class="yb-tile-tip">Cachemira Quorum<br>Jun 5 · 3 stamps</div>
+            </div>
+          </div>
+
+        </div><!-- /panel-yearbook -->
 
       </div><!-- /right col -->
     </div><!-- /main-grid -->
@@ -1848,6 +2133,17 @@
 
     // load saved posts on startup
     loadSavedPosts();
+
+    // ─── Tab switching ───────────────────────────
+    function switchTab(name) {
+      document.querySelectorAll('.feed-tab').forEach((btn, i) => {
+        const tabs = ['daily','weekly','yearbook'];
+        btn.classList.toggle('active', tabs[i] === name);
+      });
+      document.querySelectorAll('.tab-panel').forEach(panel => {
+        panel.classList.toggle('active', panel.id === 'panel-' + name);
+      });
+    }
 
     function esc(s) {
       return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
