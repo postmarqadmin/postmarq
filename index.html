@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
 
   <style>
     /* ─── Reset & Base ─── */
@@ -90,11 +91,19 @@
     }
     .address-text strong { color: var(--ink-2); font-weight: 700; }
 
-    /* ─── Page Wrapper ─── */
-    .page-wrapper {
+    /* ─── Page Zones ─── */
+    .zone {
+      width: 100%;
+    }
+    .zone-hero {
       max-width: 980px;
       margin: 0 auto;
       padding: 2rem 1.25rem 0;
+    }
+    .zone-feed {
+      max-width: 980px;
+      margin: 1.25rem auto 0;
+      padding: 0 1.25rem;
     }
 
     /* ─── Hero Card ─── */
@@ -517,6 +526,279 @@
       color:var(--ink-2); background:rgba(255,255,255,0.38);
     }
 
+    /* ─── The Marquee ─── */
+    .marquee-section-label {
+      font-size: 0.6rem; font-weight: 900;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--ink-4); margin-bottom: 0.5rem;
+    }
+    .marquee-row {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 8px;
+      overflow-x: scroll;
+      overflow-y: visible;
+      padding: 6px 4px 10px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(180,140,100,0.3) transparent;
+      background: linear-gradient(180deg, rgba(180,160,120,0.18) 0%, rgba(140,110,70,0.22) 100%);
+      border-bottom: 6px solid rgba(160,130,80,0.45);
+      border-radius: 0 0 4px 4px;
+    }
+    .marquee-row::-webkit-scrollbar { height: 3px; }
+    .marquee-row::-webkit-scrollbar-track { background: transparent; }
+    .marquee-row::-webkit-scrollbar-thumb { background: rgba(180,140,100,0.3); border-radius: 2px; }
+    .marquee-row + .marquee-section-label { margin-top: 1.25rem; }
+
+    /* Wrapper: poster + label stacked */
+    .tile-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      gap: 5px;
+    }
+
+    .marquee-tile {
+      position: relative;
+      width: 72px; height: 107px;
+      flex-shrink: 0;
+      border-radius: 4px;
+      overflow: visible;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+      box-shadow: -3px 3px 10px rgba(0,0,0,0.35), inset -2px 0 4px rgba(0,0,0,0.25);
+    }
+    .marquee-tile > *:not(.poster-reflection) {
+      border-radius: 4px;
+    }
+    .marquee-tile:hover {
+      transform: translateY(-4px) scale(1.04);
+      box-shadow: -3px 8px 18px rgba(0,0,0,0.4), inset -2px 0 4px rgba(0,0,0,0.25);
+      z-index: 2;
+    }
+    .marquee-tile.active-tile {
+      outline: 2px solid var(--amber);
+      outline-offset: 2px;
+    }
+
+    /* Spine shadow */
+    .marquee-tile::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 10px; height: 100%;
+      background: linear-gradient(to right, rgba(0,0,0,0.55), transparent);
+      z-index: 3;
+      border-radius: 4px 0 0 4px;
+      pointer-events: none;
+    }
+
+    /* Gloss highlight */
+    .marquee-tile::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 55%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.22), transparent);
+      z-index: 4;
+      border-radius: 4px 4px 0 0;
+      pointer-events: none;
+    }
+
+    /* Reflection */
+    .poster-reflection {
+      position: absolute;
+      top: 107px; left: 0;
+      width: 72px; height: 34px;
+      overflow: hidden;
+      pointer-events: none;
+      border-radius: 0 0 2px 2px;
+    }
+    .poster-reflection img {
+      width: 100%; height: 107px;
+      object-fit: cover;
+      transform: scaleY(-1);
+      transform-origin: top center;
+      opacity: 0.28;
+      filter: blur(1px);
+      display: none;
+    }
+    .marquee-tile.has-poster .poster-reflection img { display: block; }
+
+    /* Label below poster */
+    .tile-label {
+      width: 72px;
+      text-align: center;
+    }
+    .tile-label-title {
+      font-size: 0.52rem;
+      font-weight: 700;
+      color: var(--ink-2);
+      line-height: 1.25;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+    .tile-label-rating {
+      font-size: 0.48rem;
+      color: var(--amber);
+      margin-top: 2px;
+      letter-spacing: 0.04em;
+    }
+
+    /* Real poster — hidden until TMDB loads */
+    .marquee-tile .real-poster {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover; display: none;
+    }
+    .marquee-tile.has-poster .real-poster  { display: block; }
+    .marquee-tile.has-poster .poster-grad  { display: none; }
+
+    /* Gradient placeholder */
+    .poster-grad {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      justify-content: flex-end; padding: 0.45rem;
+    }
+    .poster-title {
+      font-size: 0.6rem; font-weight: 800;
+      color: rgba(255,255,255,0.95);
+      line-height: 1.2;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+    }
+    .poster-year {
+      font-size: 0.52rem; font-weight: 600;
+      color: rgba(255,255,255,0.6);
+      margin-top: 0.08rem;
+    }
+    .marquee-tile .poster-hover {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.4);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.16s;
+    }
+    .marquee-tile:hover .poster-hover { opacity: 1; }
+    .poster-hover-icon { font-size: 1.2rem; }
+
+    /* Spotlight panel */
+    .marquee-spotlight {
+      display: none;
+      margin-top: 1rem;
+      background: rgba(255,255,255,0.28);
+      border: 1px solid rgba(255,255,255,0.6);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .marquee-spotlight.open { display: grid; grid-template-columns: 1fr 2fr; }
+    .spotlight-poster {
+      position: relative;
+      aspect-ratio: 2/3;
+      overflow: hidden;
+    }
+    .spotlight-poster img  { width:100%; height:100%; object-fit:cover; display:none; }
+    .spotlight-poster.has-poster img { display:block; }
+    .spotlight-poster.has-poster .spotlight-grad { display:none; }
+    .spotlight-grad {
+      position:absolute; inset:0;
+      display:flex; flex-direction:column; justify-content:flex-end; padding:0.5rem;
+    }
+    .spotlight-info {
+      padding: 0.75rem 0.85rem;
+      display: flex; flex-direction: column; gap: 0.3rem;
+      justify-content: center;
+    }
+    .spotlight-status {
+      font-size: 0.55rem; font-weight: 900;
+      letter-spacing: 0.12em; text-transform: uppercase;
+    }
+    .spotlight-status.seen     { color: var(--teal); }
+    .spotlight-status.want     { color: var(--lavender); }
+    .spotlight-title-lg {
+      font-size: 0.82rem; font-weight: 800;
+      color: var(--ink); line-height: 1.2;
+    }
+    .spotlight-year-lg {
+      font-size: 0.68rem; font-weight: 600;
+      color: var(--ink-3);
+    }
+    .spotlight-rating {
+      font-size: 0.72rem; letter-spacing: 0.05em;
+      color: var(--amber); margin-top: 0.1rem;
+    }
+    .spotlight-seen {
+      font-size: 0.6rem; font-weight: 600;
+      color: var(--ink-4); letter-spacing: 0.04em;
+    }
+    .spotlight-thoughts {
+      font-size: 0.68rem; font-weight: 500;
+      color: var(--ink-2); line-height: 1.5;
+      font-style: italic; margin-top: 0.3rem;
+      border-left: 2px solid var(--amber-light);
+      padding-left: 0.5rem;
+    }
+    .spotlight-close {
+      margin-top: 0.5rem; padding: 0;
+      background: none; border: none;
+      font-family: var(--font); font-size: 0.62rem;
+      font-weight: 700; color: var(--ink-4);
+      cursor: pointer; text-align: left;
+      letter-spacing: 0.04em;
+    }
+    .spotlight-close:hover { color: var(--ink-2); }
+
+    /* ─── Candids Module ─── */
+    .candids-scroll-wrap {
+      height: 430px;
+      overflow-y: scroll;
+      overflow-x: hidden;
+      /* thin scrollbar */
+      scrollbar-width: thin;
+      scrollbar-color: rgba(180,140,100,0.35) transparent;
+    }
+    .candids-scroll-wrap::-webkit-scrollbar { width: 4px; }
+    .candids-scroll-wrap::-webkit-scrollbar-track { background: transparent; }
+    .candids-scroll-wrap::-webkit-scrollbar-thumb { background: rgba(180,140,100,0.35); border-radius: 2px; }
+
+    .candids-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3px;
+    }
+    .candid-tile {
+      position: relative;
+      aspect-ratio: 4 / 5;
+      overflow: hidden;
+      cursor: pointer;
+      background: rgba(0,0,0,0.08);
+    }
+    .candid-tile img,
+    .candid-tile video {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      transition: transform 0.28s ease;
+    }
+    .candid-tile:hover img,
+    .candid-tile:hover video { transform: scale(1.05); }
+    .candid-tile .tile-hover {
+      position: absolute; inset: 0;
+      background: rgba(15,8,2,0.28);
+      opacity: 0; transition: opacity 0.2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .candid-tile:hover .tile-hover { opacity: 1; }
+    .tile-hover-icon { font-size: 1.6rem; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4)); }
+    .video-pill {
+      position: absolute; top: 8px; left: 8px;
+      background: rgba(0,0,0,0.58); backdrop-filter: blur(4px);
+      border-radius: 6px; padding: 0.18rem 0.5rem;
+      font-size: 0.6rem; font-weight: 800; letter-spacing: 0.07em;
+      color: white; text-transform: uppercase;
+    }
+
     /* ─── Lightbox ─── */
     .lightbox {
       position:fixed; inset:0; z-index:1000;
@@ -526,16 +808,28 @@
     .lightbox.open { opacity:1; pointer-events:all; }
     .lb-backdrop {
       position:absolute; inset:0;
-      background:rgba(20,12,5,0.88);
-      backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); cursor:zoom-out;
+      background:rgba(20,12,5,0.92);
+      backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); cursor:zoom-out;
     }
     .lb-wrap {
-      position:relative; z-index:1; max-width:92vw; max-height:90vh;
-      display:flex; align-items:center; justify-content:center;
+      position:relative; z-index:1; max-width:92vw; max-height:88vh;
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.75rem;
       transform:scale(0.94); transition:transform 0.22s cubic-bezier(0.34,1.3,0.64,1);
     }
     .lightbox.open .lb-wrap { transform:scale(1); }
-    .lb-wrap img { max-width:92vw; max-height:90vh; width:auto; height:auto; border-radius:var(--radius-lg); box-shadow:0 24px 80px rgba(0,0,0,0.5); display:block; }
+    .lb-wrap img  {
+      max-width:92vw; max-height:82vh; width:auto; height:auto;
+      border-radius:var(--radius-lg); box-shadow:0 24px 80px rgba(0,0,0,0.55); display:block;
+    }
+    .lb-wrap video {
+      max-width:92vw; max-height:82vh;
+      border-radius:var(--radius-lg); box-shadow:0 24px 80px rgba(0,0,0,0.55);
+      background:#000; display:block;
+    }
+    .lb-caption {
+      font-size:0.75rem; font-weight:600; color:rgba(255,255,255,0.5);
+      letter-spacing:0.04em; text-align:center;
+    }
     .lb-close {
       position:absolute; top:-14px; right:-14px;
       width:34px; height:34px; border-radius:50%;
@@ -556,12 +850,146 @@
     .footer-right span { color:var(--amber); }
 
     /* ─── Responsive ─── */
+    /* ─── Site Banner ─── */
+    .site-banner {
+      position: sticky; top: 0; z-index: 200;
+      background: linear-gradient(90deg, rgba(78,58,160,0.97) 0%, rgba(50,150,142,0.97) 100%);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 1.5rem;
+      height: 44px;
+      box-shadow: 0 2px 12px rgba(60,40,120,0.25);
+    }
+    .site-banner-logo {
+      font-size: 1.25rem; font-weight: 900;
+      color: rgba(255,255,255,0.97);
+      letter-spacing: -0.5px;
+    }
+    .site-banner-nav {
+      display: flex; align-items: center; gap: 1.5rem;
+    }
+    .site-banner-nav a {
+      font-size: 0.72rem; font-weight: 700;
+      color: rgba(255,255,255,0.82);
+      text-decoration: none; letter-spacing: 0.04em;
+      text-transform: lowercase;
+      transition: color 0.14s;
+    }
+    .site-banner-nav a:hover { color: rgba(255,255,255,1); }
+
     @media (max-width:720px) {
       .hero-inner  { grid-template-columns:1fr; }
       .hero-photo  { height:200px; }
       .main-grid   { grid-template-columns:1fr; }
       .hero-name   { font-size:1.8rem; }
     }
+
+    /* ─── MySpace Profile Header ─── */
+    .myspace-card {
+      border-radius: 14px;
+      overflow: hidden;
+      background: linear-gradient(135deg, rgba(155,143,212,0.28) 0%, rgba(74,181,170,0.16) 100%);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.55);
+      box-shadow: 0 4px 24px rgba(80,60,140,0.10);
+      margin-bottom: 1rem;
+    }
+
+    /* — Profile section — */
+    .ms-profile {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 0;
+    }
+    .ms-photo {
+      width: 120px; height: 120px;
+      object-fit: cover;
+      display: block;
+      border-radius: 0;
+    }
+    .ms-info {
+      padding: 0.85rem 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.18rem;
+    }
+    .ms-name {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: var(--ink);
+      letter-spacing: -0.3px;
+      line-height: 1.1;
+    }
+    .ms-meta {
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--ink-3);
+      line-height: 1.6;
+    }
+    .ms-meta span {
+      color: var(--ink-2);
+      font-weight: 700;
+    }
+    .ms-divider {
+      height: 1px;
+      background: rgba(255,255,255,0.45);
+      margin: 0 0.85rem;
+    }
+    .ms-stamp-row {
+      padding: 0.55rem 1rem 0.65rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--ink-3);
+    }
+    .ms-stamp-img {
+      height: 28px;
+      width: auto;
+      display: block;
+    }
+
+    /* — Contact box — */
+    .ms-contact-header {
+      background: linear-gradient(90deg, rgba(100,80,180,0.82) 0%, rgba(74,181,170,0.72) 100%);
+      padding: 0.4rem 0.9rem;
+      font-size: 0.68rem;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.96);
+    }
+    .ms-contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    .ms-contact-item {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.48rem 0.9rem;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--ink-2);
+      cursor: pointer;
+      transition: background 0.14s;
+      border-bottom: 1px solid rgba(155,143,212,0.18);
+      text-decoration: none;
+    }
+    .ms-contact-item:nth-child(odd)  { background: rgba(155,143,212,0.08); }
+    .ms-contact-item:nth-child(even) { background: rgba(74,181,170,0.07); }
+    .ms-contact-item:hover           { background: rgba(155,143,212,0.22); color: var(--ink); }
+    .ms-contact-item i {
+      font-size: 0.95rem;
+      color: var(--lavender);
+      flex-shrink: 0;
+    }
+    /* remove bottom border from last two items */
+    .ms-contact-item:nth-last-child(-n+2) { border-bottom: none; }
   </style>
 </head>
 <body>
@@ -570,12 +998,27 @@
   <div class="lightbox" id="lightbox">
     <div class="lb-backdrop" onclick="lbClose(event)"></div>
     <div class="lb-wrap">
-      <img id="lbImg" src="" alt="" />
+      <img    id="lbImg" src="" alt="" style="display:none" />
+      <video  id="lbVid" src=""  controls style="display:none"></video>
+      <div class="lb-caption" id="lbCaption"></div>
       <button class="lb-close" onclick="lbClose()">✕</button>
     </div>
   </div>
 
   <!-- Address Bar -->
+  <!-- Site Banner -->
+  <div class="site-banner">
+    <div class="site-banner-logo">Postmarq</div>
+    <nav class="site-banner-nav">
+      <a href="#">home</a>
+      <a href="#">search</a>
+      <a href="#">browse</a>
+      <a href="#">invite</a>
+      <a href="#">help</a>
+      <a href="#">logout</a>
+    </nav>
+  </div>
+
   <div class="address-bar">
     <div class="address-inner">
       <div class="address-dot"></div>
@@ -583,54 +1026,59 @@
     </div>
   </div>
 
-  <div class="page-wrapper">
-
-    <!-- Hero Card -->
-    <div class="hero-card glass">
-      <div class="hero-inner">
-        <div class="hero-photo">
-          <img src="Profile Pic_01x.JPG" alt="Dave Michael" />
-        </div>
-        <div class="hero-info">
-          <div class="hero-top">
-            <div>
-              <div class="hero-name">Dave Michael</div>
-              <div class="hero-tagline">Here to make real connections while learning how to code. Welcome to Postmarq.</div>
-            </div>
-            <div class="location-badge">
-              <div class="location-dot"></div>
-              Phoenix, AZ
-            </div>
-          </div>
-          <div class="tags">
-            <span class="tag tag-movies">🎬 Movies</span>
-            <span class="tag tag-photo">📷 Photography</span>
-            <span class="tag tag-adventure">🏔 Adventure</span>
-            <span class="tag tag-trixton">🐾 Trixton</span>
-            <span class="tag tag-phoenix">☀️ Phoenix</span>
-          </div>
-          <div class="now-playing">
-            <div class="np-art">🎵</div>
-            <div class="np-text">
-              <div class="np-label"><div class="np-pulse"></div>now playing</div>
-              <div class="np-song">Cartoon</div>
-              <div class="np-artist">Vacations</div>
-            </div>
-            <div class="np-bars">
-              <div class="np-bar"></div><div class="np-bar"></div>
-              <div class="np-bar"></div><div class="np-bar"></div>
-              <div class="np-bar"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Main Grid -->
+  <!-- ═══ ZONE: POST FEED ═══ -->
+  <div class="zone zone-feed">
     <div class="main-grid">
 
       <!-- Posts Column -->
       <div class="posts-col">
+
+        <!-- My Post Card -->
+        <div class="myspace-card">
+
+          <!-- Profile section -->
+          <div class="ms-profile">
+            <img class="ms-photo" src="Profile Pic_01x.JPG" alt="Dave Michael" />
+            <div class="ms-info">
+              <div class="ms-name">Dave Michael</div>
+              <div class="ms-meta">
+                <span>Phoenix, AZ</span><br>
+                Last Update: <span>June 10, 2026</span><br>
+                In a Relationship: <span>1 Year</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="ms-divider"></div>
+
+          <!-- My Marq row -->
+          <div class="ms-stamp-row" style="flex-direction:column; align-items:flex-start; gap:0.15rem; padding-bottom:0.5rem;">
+            <span style="font-size:0.6rem; font-weight:900; letter-spacing:0.08em; text-transform:uppercase; color:var(--lavender);">My Marq</span>
+            <span style="font-size:0.72rem; font-weight:500; color:var(--ink-2); line-height:1.45;">Here to make real connections while learning how to code. Welcome to Postmarq.</span>
+          </div>
+
+          <div class="ms-divider"></div>
+
+          <!-- Current Stamp row -->
+          <div class="ms-stamp-row">
+            Current Stamp:
+            <img class="ms-stamp-img" src="Stamp_odesza.png" alt="Current Stamp" />
+          </div>
+
+          <div class="ms-divider"></div>
+
+          <!-- Contacting Dave box -->
+          <div class="ms-contact-header">Contacting Dave</div>
+          <div class="ms-contact-grid">
+            <a class="ms-contact-item" href="#"><i class="ti ti-mail"></i> Send Message</a>
+            <a class="ms-contact-item" href="#"><i class="ti ti-share"></i> Forward to Friend</a>
+            <a class="ms-contact-item" href="#"><i class="ti ti-user-plus"></i> Add to Friends</a>
+            <a class="ms-contact-item" href="#"><i class="ti ti-heart"></i> Add to Favorites</a>
+            <a class="ms-contact-item" href="#"><i class="ti ti-message-circle"></i> IM / Call</a>
+            <a class="ms-contact-item" href="#"><i class="ti ti-ban"></i> Block User</a>
+          </div>
+
+        </div>
 
         <div class="section-header">Posts</div>
 
@@ -663,33 +1111,10 @@
         <!-- Dynamic feed renders here -->
         <div id="dynamicFeed"></div>
 
-        <!-- ── Permanent Post: Stamps ── -->
-        <div class="post-card glass">
-          <div class="post-body">
-            <p><strong>Stamps.</strong></p>
-            <p>Not a like. Not a metric. Not a growth tool. Not something an algorithm counts to decide who deserves to be seen.</p>
-            <p>A stamp means you stopped, decided this was worth something, and chose to send it. It's recognition. It means: <em>I saw this. It meant something to me. I wanted you to know.</em></p>
-            <p>Maybe you've been to that place. Maybe you love that movie. Maybe you just felt it. A stamp is the smallest possible way to say <em>we have something in common</em> without having to say anything at all.</p>
-            <p>No follower counts attached to it. No reach boosted because something got a lot of stamps. The number doesn't matter — who sent it does.</p>
-            <p>Over time, the people stamping your posts are the ones worth paying attention to. Not because the platform told you so — because they kept showing up, on their own, for no other reason than they wanted to. That's how your quorum finds you. Not through an algorithm. Through recognition.</p>
-            <p>That's the whole point. ⬡</p>
-          </div>
-          <div class="post-img-wrap" onclick="lbOpen('ChatGPT Image Jun 8, 2026, 01_36_39 PM.png')">
-            <img src="ChatGPT Image Jun 8, 2026, 01_36_39 PM.png" alt="Stamps" />
-          </div>
-          <div class="post-footer">
-            <button class="stamp-btn" onclick="toggleStamp(this,0)">
-              <span class="stamp-icon">⬡</span> Stamp
-            </button>
-            <span class="stamp-count">0 stamps</span>
-            <span class="post-date">June 8, 2026</span>
-          </div>
-        </div>
-
         <!-- ── Permanent Post: First Post ── -->
         <div class="post-card glass">
           <div class="post-body"><p>My first post on Postmarq!</p></div>
-          <div class="post-img-wrap" onclick="lbOpen('post_01x.JPG')">
+          <div class="post-img-wrap" onclick="lbOpen('post_01x.JPG','image')">
             <img src="post_01x.JPG" alt="Dave Michael" />
           </div>
           <div class="post-footer">
@@ -750,13 +1175,140 @@
       <!-- Sidebar -->
       <div class="sidebar">
 
-        <!-- About -->
-        <div class="sidebar-card glass">
-          <div class="card-title">About</div>
-          <div class="about-text">
-            I love movies, adventure, and thinking deeply about things that probably don't need to be thought about that deeply. I'm a photographer and I make videos — not for an agenda, just because something struck me as funny or beautiful or worth remembering.<br><br>
-            I have a dog named <strong>Trixton</strong>. He has more personality than most people I've met.<br><br>
-            I live in Phoenix. Mostly here to find people I can actually sit across from.
+        <!-- Candids Wall -->
+        <div class="sidebar-card glass" style="padding:0; overflow:hidden; background: linear-gradient(135deg, rgba(74,181,170,0.22) 0%, rgba(155,143,212,0.22) 100%);">
+          <div style="padding:1.25rem 1.25rem 0.8rem; display:flex; justify-content:center;">
+            <div class="card-title" style="margin-bottom:0; font-size:1.45rem; font-weight:900; letter-spacing:-0.5px; color:#2d3a4a; text-align:center;">Candids Wall</div>
+          </div>
+          <div class="candids-scroll-wrap">
+            <div class="candids-grid">
+
+              <div class="candid-tile" onclick="lbOpen('candids/me-.jpg','image','me-.jpg')">
+                <img src="candids/me-.jpg" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_0174.jpeg','image','IMG_0174.jpeg')">
+                <img src="candids/IMG_0174.jpeg" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_0746.JPG','image','IMG_0746.JPG')">
+                <img src="candids/IMG_0746.JPG" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_1739.jpg','image','IMG_1739.jpg')">
+                <img src="candids/IMG_1739.jpg" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_1937.JPG','image','IMG_1937.JPG')">
+                <img src="candids/IMG_1937.JPG" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_1960.jpg','image','IMG_1960.jpg')">
+                <img src="candids/IMG_1960.jpg" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_2076.JPG','image','IMG_2076.JPG')">
+                <img src="candids/IMG_2076.JPG" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_2605.JPG','image','IMG_2605.JPG')">
+                <img src="candids/IMG_2605.JPG" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_4044.JPG','image','IMG_4044.JPG')">
+                <img src="candids/IMG_4044.JPG" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_5883.jpg','image','IMG_5883.jpg')">
+                <img src="candids/IMG_5883.jpg" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_5970.JPG','image','IMG_5970.JPG')">
+                <img src="candids/IMG_5970.JPG" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_6134.JPG','image','IMG_6134.JPG')">
+                <img src="candids/IMG_6134.JPG" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_6289.JPG','image','IMG_6289.JPG')">
+                <img src="candids/IMG_6289.JPG" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_6697 2.JPG','image','IMG_6697 2.JPG')">
+                <img src="candids/IMG_6697 2.JPG" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_6847.jpg','image','IMG_6847.jpg')">
+                <img src="candids/IMG_6847.jpg" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_7073.JPG','image','IMG_7073.JPG')">
+                <img src="candids/IMG_7073.JPG" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_7272.JPG','image','IMG_7272.JPG')">
+                <img src="candids/IMG_7272.JPG" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_7349.JPG','image','IMG_7349.JPG')">
+                <img src="candids/IMG_7349.JPG" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_7350.JPG','image','IMG_7350.JPG')">
+                <img src="candids/IMG_7350.JPG" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_7529.JPG','image','IMG_7529.JPG')">
+                <img src="candids/IMG_7529.JPG" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/D2FFD1AA-AA8C-4FB4-82E5-4B410A74EEC8.jpg','image','D2FFD1AA-AA8C-4FB4-82E5-4B410A74EEC8.jpg')">
+                <img src="candids/D2FFD1AA-AA8C-4FB4-82E5-4B410A74EEC8.jpg" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/ld-export-fae74027-10242025.jpg','image','ld-export-fae74027-10242025.jpg')">
+                <img src="candids/ld-export-fae74027-10242025.jpg" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/80f860e90da84dd8abea3b310afce689.mov','video','80f860e90da84dd8abea3b310afce689.mov')">
+                <video src="candids/80f860e90da84dd8abea3b310afce689.mov" muted preload="metadata"></video>
+                <div class="video-pill">Video</div>
+                <div class="tile-hover"><div class="tile-hover-icon">▶</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/87a12adb05a648069bc8156492047af4.mov','video','87a12adb05a648069bc8156492047af4.mov')">
+                <video src="candids/87a12adb05a648069bc8156492047af4.mov" muted preload="metadata"></video>
+                <div class="video-pill">Video</div>
+                <div class="tile-hover"><div class="tile-hover-icon">▶</div></div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- The Marquee -->
+        <div class="sidebar-card glass" id="theMarquee" style="background: linear-gradient(135deg, rgba(74,181,170,0.22) 0%, rgba(155,143,212,0.22) 100%);">
+          <div style="display:flex; justify-content:center; margin-bottom:0.75rem;">
+            <div class="card-title" style="margin-bottom:0; font-size:1.45rem; font-weight:900; letter-spacing:-0.5px; color:#2d3a4a; text-align:center;">The Marquee</div>
+          </div>
+          <div class="marquee-section-label">Seen</div>
+          <div class="marquee-row" id="rowSeen"></div>
+          <div class="marquee-section-label">Want to See</div>
+          <div class="marquee-row" id="rowWant"></div>
+          <div class="marquee-spotlight" id="marqueeSpotlight">
+            <div class="spotlight-poster" id="spotlightPoster">
+              <img id="spotlightImg" alt="" />
+              <div class="spotlight-grad" id="spotlightGrad"></div>
+            </div>
+            <div class="spotlight-info">
+              <div class="spotlight-status" id="spotlightStatus"></div>
+              <div class="spotlight-title-lg" id="spotlightTitle"></div>
+              <div class="spotlight-year-lg"  id="spotlightYear"></div>
+              <div class="spotlight-rating"   id="spotlightRating"></div>
+              <div class="spotlight-seen"     id="spotlightSeen"></div>
+              <div class="spotlight-thoughts" id="spotlightThoughts"></div>
+              <button class="spotlight-close" onclick="closeSpotlight()">✕ close</button>
+            </div>
           </div>
         </div>
 
@@ -777,7 +1329,7 @@
           </div>
         </div>
 
-        <!-- Phoenix -->
+        <!-- Neighborhood -->
         <div class="phoenix-card glass">
           <div class="phoenix-bg"></div>
           <div class="phoenix-inner">
@@ -790,51 +1342,6 @@
           </div>
         </div>
 
-        <!-- Quorum -->
-        <div class="sidebar-card glass">
-          <div class="card-title">Quorum</div>
-          <div class="quorum-list">
-            <div class="quorum-item">
-              <div class="quorum-av av-1">M</div>
-              <div class="quorum-meta">
-                <div class="quorum-name">Marco R.</div>
-                <div class="quorum-handle">marco.postmarq</div>
-              </div>
-              <div class="q-status status-on"></div>
-            </div>
-            <div class="quorum-item">
-              <div class="quorum-av av-2">J</div>
-              <div class="quorum-meta">
-                <div class="quorum-name">Jess T.</div>
-                <div class="quorum-handle">jesst.postmarq</div>
-              </div>
-              <div class="q-status status-off"></div>
-            </div>
-            <div class="quorum-item">
-              <div class="quorum-av av-3">N</div>
-              <div class="quorum-meta">
-                <div class="quorum-name">Nadia F.</div>
-                <div class="quorum-handle">nadia.postmarq</div>
-              </div>
-              <div class="q-status status-on"></div>
-            </div>
-          </div>
-          <div class="quorum-cap-bar"><div class="quorum-fill"></div></div>
-          <div class="quorum-cap-label">3 / 10 quorum slots</div>
-        </div>
-
-        <!-- Interests -->
-        <div class="sidebar-card glass">
-          <div class="card-title">Interests</div>
-          <div class="interests-wrap">
-            <span class="int-tag">🎬 Movies</span>
-            <span class="int-tag">📷 Photography</span>
-            <span class="int-tag">🏔 Adventure</span>
-            <span class="int-tag">🐾 Trixton</span>
-            <span class="int-tag">☀️ Phoenix</span>
-          </div>
-        </div>
-
       </div><!-- /sidebar -->
     </div><!-- /main-grid -->
 
@@ -843,18 +1350,241 @@
       <div class="footer-right">on <span>Postmarq</span> · davemichael.postmarq</div>
     </footer>
 
-  </div><!-- /page-wrapper -->
+  </div><!-- /zone-feed -->
 
   <script>
+    /* ══════════════════════════════════════════
+       THE MARQUEE — Film Data & Poster Renderer
+       ══════════════════════════════════════════
+       TO USE REAL POSTERS:
+       1. Get a free key at https://www.themoviedb.org/settings/api
+       2. Paste it into TMDB_API_KEY below
+       3. Uncomment loadTMDBPosters() at the bottom
+       ══════════════════════════════════════════ */
+
+    // ─── SEEN ───────────────────────────────────
+    const FILMS_SEEN = [
+      {
+        title:  "Backrooms",
+        year:   2023,
+        rating: 4,
+        seen:   "June 6, 2026",
+        thoughts: "It's not a movie you can watch face value. You have to do some existential thinking to understand the deeper meanings of the plot."
+      },
+      {
+        title:  "Masters of the Universe",
+        year:   2025,
+        rating: 4,
+        seen:   "June 7, 2026",
+        thoughts: "A very fun movie to watch and was surprised how much I enjoyed it — mainly for the comedic relief. The movie knew what it was."
+      },
+      {
+        title:  "Obsession",
+        year:   2024,
+        rating: 4,
+        seen:   "June 1, 2026",
+        thoughts: "Suspenseful, eerie, and intriguing. It had psychological elements of addiction, obsessive thinking, and co-dependency. This movie is not for everyone."
+      },
+      {
+        title:  "Send Help",
+        year:   2025,
+        rating: 3,
+        seen:   "June 8, 2026",
+        thoughts: "Entertaining, interesting and intricate filming elements. Not a perfect movie — a lot of plot holes."
+      },
+      {
+        title:  "The Cider House Rules",
+        year:   1999,
+        rating: 4,
+        seen:   "May 24, 2026",
+        thoughts: "Slow paced, but in the end it had a beautiful story."
+      },
+      {
+        title:  "Driving Miss Daisy",
+        year:   1989,
+        rating: 3,
+        seen:   "June 1, 2026",
+        thoughts: "Good movie. How they presented the timeline as they were aging was a little skewed. You see a subtle change of their age and looks, but sometimes hard to know what point in time you are in their lives."
+      },
+    ];
+
+    // ─── WANT TO SEE ────────────────────────────
+    const FILMS_WANT = [
+      { title: "Disclosure Day"                               },
+      { title: "The Odyssey",                  year: 2025    },
+      { title: "Supergirl: Woman of Tomorrow", year: 2026    },
+      { title: "Spider-Man: Brand New Day"                   },
+    ];
+
+    // ─── Gradient palette ───────────────────────
+    const POSTER_GRADIENTS = [
+      "linear-gradient(160deg,#c87840,#2a1808)",
+      "linear-gradient(160deg,#3a6080,#0a1820)",
+      "linear-gradient(160deg,#805080,#180828)",
+      "linear-gradient(160deg,#208060,#041810)",
+      "linear-gradient(160deg,#c04030,#200808)",
+      "linear-gradient(160deg,#806020,#180e04)",
+      "linear-gradient(160deg,#204880,#060c18)",
+      "linear-gradient(160deg,#a06040,#200c04)",
+      "linear-gradient(160deg,#386858,#081410)",
+      "linear-gradient(160deg,#604888,#100818)",
+    ];
+
+    let gradIdx = 0;
+    function nextGrad() { return POSTER_GRADIENTS[gradIdx++ % POSTER_GRADIENTS.length]; }
+
+    function makeTile(film, status) {
+      const grad = nextGrad();
+      const wrap = document.createElement('div');
+      wrap.className = 'tile-wrap';
+
+      const tile = document.createElement('div');
+      tile.className = 'marquee-tile';
+      tile.dataset.title  = film.title;
+      tile.dataset.status = status;
+      tile.dataset.grad   = grad;
+      tile.innerHTML = `
+        <img class="real-poster" alt="${film.title}" />
+        <div class="poster-grad" style="background:${grad};">
+          <div class="poster-title">${film.title}</div>
+        </div>
+        <div class="poster-hover"><div class="poster-hover-icon">🎬</div></div>
+        <div class="poster-reflection"><img alt="" /></div>
+      `;
+      tile.addEventListener('click', () => openSpotlight(tile, film, status, grad));
+
+      const stars = film.rating ? '★'.repeat(film.rating) : '';
+      const label = document.createElement('div');
+      label.className = 'tile-label';
+      label.innerHTML = `
+        <div class="tile-label-title">${film.title}</div>
+        ${stars ? `<div class="tile-label-rating">${stars}</div>` : ''}
+      `;
+
+      wrap.appendChild(tile);
+      wrap.appendChild(label);
+      return wrap;
+    }
+
+    function buildMarquee() {
+      const rowSeen = document.getElementById('rowSeen');
+      const rowWant = document.getElementById('rowWant');
+      FILMS_SEEN.forEach(f => rowSeen.appendChild(makeTile(f, 'seen')));
+      FILMS_WANT.forEach(f => rowWant.appendChild(makeTile(f, 'want')));
+    }
+    buildMarquee();
+
+    // ─── Spotlight ──────────────────────────────
+    function openSpotlight(tile, film, status, grad) {
+      // clear active
+      document.querySelectorAll('.marquee-tile').forEach(t => t.classList.remove('active-tile'));
+      tile.classList.add('active-tile');
+
+      const panel   = document.getElementById('marqueeSpotlight');
+      const targetRow = status === 'seen'
+        ? document.getElementById('rowSeen')
+        : document.getElementById('rowWant');
+      targetRow.insertAdjacentElement('afterend', panel);
+      const poster  = document.getElementById('spotlightPoster');
+      const sGrad   = document.getElementById('spotlightGrad');
+      const sImg    = document.getElementById('spotlightImg');
+      const sStatus = document.getElementById('spotlightStatus');
+      const sTitle  = document.getElementById('spotlightTitle');
+      const sYear   = document.getElementById('spotlightYear');
+
+      // poster side
+      sGrad.style.background = grad;
+      sGrad.innerHTML = `<div class="poster-title" style="font-size:0.7rem;">${film.title}</div>`;
+      if (tile.classList.contains('has-poster')) {
+        sImg.src = tile.querySelector('.real-poster').src;
+        sImg.style.display = 'block';
+        poster.classList.add('has-poster');
+      } else {
+        sImg.style.display = 'none';
+        poster.classList.remove('has-poster');
+      }
+
+      // info side
+      sStatus.textContent = status === 'seen' ? '✓ Seen' : '◎ Want to See';
+      sStatus.className   = 'spotlight-status ' + (status === 'seen' ? 'seen' : 'want');
+      sTitle.textContent  = film.title;
+      sYear.textContent   = film.year || '';
+
+      const sRating   = document.getElementById('spotlightRating');
+      const sSeen     = document.getElementById('spotlightSeen');
+      const sThoughts = document.getElementById('spotlightThoughts');
+
+      sRating.textContent   = film.rating ? '★'.repeat(film.rating) + '☆'.repeat(5 - film.rating) + `  ${film.rating}/5` : '';
+      sSeen.textContent     = film.seen   ? `Seen ${film.seen}` : '';
+      sThoughts.textContent = film.thoughts || '';
+      sThoughts.style.display = film.thoughts ? 'block' : 'none';
+
+      panel.classList.add('open');
+      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function closeSpotlight() {
+      document.getElementById('marqueeSpotlight').classList.remove('open');
+      document.querySelectorAll('.marquee-tile').forEach(t => t.classList.remove('active-tile'));
+    }
+
+    // ══════════════════════════════════════════
+    // TMDB API INTEGRATION — drop your key in
+    // ══════════════════════════════════════════
+    //
+    const TMDB_API_KEY = '8aa40129d309ada1f40a0145f66c1068';
+    const TMDB_SEARCH  = 'https://api.themoviedb.org/3/search/movie';
+    const TMDB_IMG     = 'https://image.tmdb.org/t/p/w342';
+
+    async function fetchPoster(title) {
+      try {
+        const url  = `${TMDB_SEARCH}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(title)}&include_adult=false`;
+        const data = await (await fetch(url)).json();
+        const hit  = data.results?.find(r => r.poster_path);
+        return hit ? TMDB_IMG + hit.poster_path : null;
+      } catch { return null; }
+    }
+
+    async function loadTMDBPosters() {
+      for (const tile of document.querySelectorAll('.marquee-tile')) {
+        const src = await fetchPoster(tile.dataset.title);
+        if (src) {
+          const img = tile.querySelector('.real-poster');
+          img.src = src;
+          img.onload = () => {
+            tile.classList.add('has-poster');
+            const ref = tile.querySelector('.poster-reflection img');
+            if (ref) ref.src = src;
+          };
+        }
+      }
+    }
+
+    loadTMDBPosters();
+    // ══════════════════════════════════════════
+
     /* ── Lightbox ── */
-    function lbOpen(src) {
-      const lb = document.getElementById('lightbox');
-      document.getElementById('lbImg').src = src;
+    function lbOpen(src, type, caption) {
+      const lb  = document.getElementById('lightbox');
+      const img = document.getElementById('lbImg');
+      const vid = document.getElementById('lbVid');
+      const cap = document.getElementById('lbCaption');
+
+      if (type === 'video') {
+        vid.src = src; vid.style.display = 'block';
+        img.style.display = 'none'; img.src = '';
+      } else {
+        img.src = src; img.style.display = 'block';
+        vid.style.display = 'none'; vid.pause && vid.pause(); vid.src = '';
+      }
+      cap.textContent = caption || '';
       lb.classList.add('open');
       document.body.style.overflow = 'hidden';
     }
     function lbClose(e) {
       if (e && e.target.closest('.lb-wrap') && !e.target.closest('.lb-close')) return;
+      const vid = document.getElementById('lbVid');
+      vid.pause && vid.pause(); vid.src = '';
       document.getElementById('lightbox').classList.remove('open');
       document.body.style.overflow = '';
     }
