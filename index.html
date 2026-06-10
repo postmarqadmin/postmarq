@@ -228,7 +228,7 @@
     /* ─── Main Layout ─── */
     .main-grid {
       display: grid;
-      grid-template-columns: 1fr 280px;
+      grid-template-columns: 280px 1fr;
       gap: 1.25rem;
       align-items: start;
     }
@@ -380,7 +380,8 @@
     .post-media-grid.count-2 { grid-template-columns: 1fr 1fr; }
     .post-media-grid.count-3 { grid-template-columns: 1fr 1fr; }
 
-    .post-media-grid.count-1 .media-item img { width:100%; height:auto; max-height:none; object-fit:unset; }
+    .post-media-grid.count-1 .media-item img  { width:100%; height:auto; max-height:none; object-fit:unset; }
+    .post-media-grid.count-1 .media-item video { width:100%; max-height:none; height:auto; }
     .post-media-grid.count-2 .media-item { aspect-ratio: 4/3; }
     .post-media-grid.count-2 .media-item img { width:100%; height:100%; object-fit:contain; background:rgba(0,0,0,0.04); }
     .post-media-grid.count-3 .media-item:nth-child(1) { grid-row: span 2; aspect-ratio: 4/5; }
@@ -1019,18 +1020,11 @@
     </nav>
   </div>
 
-  <div class="address-bar">
-    <div class="address-inner">
-      <div class="address-dot"></div>
-      <div class="address-text"><strong>davemichael</strong>.postmarq</div>
-    </div>
-  </div>
-
   <!-- ═══ ZONE: POST FEED ═══ -->
   <div class="zone zone-feed">
     <div class="main-grid">
 
-      <!-- Posts Column -->
+      <!-- Left Column: Profile + Visual Modules -->
       <div class="posts-col">
 
         <!-- My Post Card -->
@@ -1079,101 +1073,6 @@
           </div>
 
         </div>
-
-        <div class="section-header">Posts</div>
-
-        <!-- Composer -->
-        <div class="composer glass" id="composer">
-          <div class="composer-header">
-            <div class="composer-avatar"><img src="Profile Pic_01x.JPG" alt="Dave" /></div>
-            <span class="composer-who">New post</span>
-          </div>
-          <div class="type-row">
-            <button class="type-btn active" data-type="post"   onclick="setType(this)">Post</button>
-            <button class="type-btn"         data-type="quorum" onclick="setType(this)">⬡ Quorum</button>
-          </div>
-          <textarea class="composer-textarea" id="composerText" placeholder="What's on your mind?"></textarea>
-          <div class="media-preview-strip" id="mediaPreviews"></div>
-          <div class="composer-toolbar">
-            <button class="tool-btn" id="photoBtn" onclick="document.getElementById('photoInput').click()">
-              📷 Photo <span class="tool-count" id="photoCount"></span>
-            </button>
-            <button class="tool-btn" id="videoBtn" onclick="document.getElementById('videoInput').click()">
-              🎬 Video <span class="tool-count" id="videoCount"></span>
-            </button>
-            <div class="composer-spacer"></div>
-            <button class="post-btn" onclick="submitPost()">Post</button>
-          </div>
-          <input type="file" id="photoInput" class="file-input" accept="image/*" multiple onchange="addMedia(this,'image')" />
-          <input type="file" id="videoInput" class="file-input" accept="video/*" onchange="addMedia(this,'video')" />
-        </div>
-
-        <!-- Dynamic feed renders here -->
-        <div id="dynamicFeed"></div>
-
-        <!-- ── Permanent Post: First Post ── -->
-        <div class="post-card glass">
-          <div class="post-body"><p>My first post on Postmarq!</p></div>
-          <div class="post-img-wrap" onclick="lbOpen('post_01x.JPG','image')">
-            <img src="post_01x.JPG" alt="Dave Michael" />
-          </div>
-          <div class="post-footer">
-            <button class="stamp-btn" onclick="toggleStamp(this,0)">
-              <span class="stamp-icon">⬡</span> Stamp
-            </button>
-            <span class="stamp-count">0 stamps</span>
-            <span class="post-date">June 8, 2026</span>
-          </div>
-        </div>
-
-        <!-- Quorum Post -->
-        <div class="post-quorum glass">
-          <div class="post-quorum-inner">
-            <div class="quorum-badge">⬡ Quorum</div>
-            <div class="post-body">
-              Anyone going to see <strong>Cachemira</strong>? Looking to connect with people locally in Phoenix. Send me a stamp if you're interested.
-            </div>
-            <div class="post-footer">
-              <button class="stamp-btn" onclick="toggleStamp(this,3)">
-                <span class="stamp-icon">⬡</span> Stamp
-              </button>
-              <span class="stamp-count">3 stamps</span>
-              <span class="post-date">June 5, 2026</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Guestbook -->
-        <div class="guestbook-card glass">
-          <div class="card-title">Guestbook</div>
-          <div class="gb-entries" id="gbEntries">
-            <div class="gb-entry">
-              <div class="gb-header"><span class="gb-author">Marco R.</span><span class="gb-when">2 days ago</span></div>
-              <div class="gb-msg">"That Encanto Park shot is going to be incredible. Can't wait to see it."</div>
-            </div>
-            <div class="gb-entry">
-              <div class="gb-header"><span class="gb-author">Jess T.</span><span class="gb-when">4 days ago</span></div>
-              <div class="gb-msg">"Diner is legitimately top five. No notes. Glad you're on here."</div>
-            </div>
-            <div class="gb-entry">
-              <div class="gb-header"><span class="gb-author">Nadia F.</span><span class="gb-when">1 week ago</span></div>
-              <div class="gb-msg">"Also interested in Cachemira. Sent you a stamp. Phoenix people need to stick together."</div>
-            </div>
-          </div>
-          <div class="gb-form">
-            <label class="gb-form-label">Leave your mark</label>
-            <textarea placeholder="Say something real..."></textarea>
-            <div class="gb-form-row">
-              <input type="text" placeholder="Your handle (e.g. marco.postmarq)" />
-              <button class="btn-send" onclick="gbSubmit(this)">Send stamp</button>
-            </div>
-          </div>
-        </div>
-
-      </div><!-- /posts-col -->
-
-      <!-- Sidebar -->
-      <div class="sidebar">
 
         <!-- Candids Wall -->
         <div class="sidebar-card glass" style="padding:0; overflow:hidden; background: linear-gradient(135deg, rgba(74,181,170,0.22) 0%, rgba(155,143,212,0.22) 100%);">
@@ -1342,7 +1241,136 @@
           </div>
         </div>
 
-      </div><!-- /sidebar -->
+      </div><!-- /left col -->
+
+      <!-- Right Column: Posts, Quorum, Guestbook -->
+      <div class="sidebar">
+
+        <div class="section-header">Posts</div>
+
+        <!-- Composer -->
+        <div class="composer glass" id="composer">
+          <div class="composer-header">
+            <div class="composer-avatar"><img src="Profile Pic_01x.JPG" alt="Dave" /></div>
+            <span class="composer-who">New post</span>
+          </div>
+          <div class="type-row">
+            <button class="type-btn active" data-type="post"   onclick="setType(this)">Post</button>
+            <button class="type-btn"         data-type="quorum" onclick="setType(this)">⬡ Quorum</button>
+          </div>
+          <textarea class="composer-textarea" id="composerText" placeholder="What's on your mind?"></textarea>
+          <div class="media-preview-strip" id="mediaPreviews"></div>
+          <div class="composer-toolbar">
+            <button class="tool-btn" id="photoBtn" onclick="document.getElementById('photoInput').click()">
+              📷 Photo <span class="tool-count" id="photoCount"></span>
+            </button>
+            <button class="tool-btn" id="videoBtn" onclick="document.getElementById('videoInput').click()">
+              🎬 Video <span class="tool-count" id="videoCount"></span>
+            </button>
+            <div class="composer-spacer"></div>
+            <button class="post-btn" onclick="submitPost()">Post</button>
+          </div>
+          <input type="file" id="photoInput" class="file-input" accept="image/*" multiple onchange="addMedia(this,'image')" />
+          <input type="file" id="videoInput" class="file-input" accept="video/*" onchange="addMedia(this,'video')" />
+        </div>
+
+        <!-- Dynamic feed renders here -->
+        <div id="dynamicFeed"></div>
+
+        <!-- ── Permanent Post: New stamp ── -->
+        <div class="post-card glass">
+          <div class="post-body"><p>My new stamp. What it does... IDK. Need ideas!</p></div>
+          <div class="post-media-grid count-1">
+            <div class="media-item">
+              <img src="Stamp_odesza.png" alt="Stamp" onclick="lbOpen('Stamp_odesza.png','image')" />
+            </div>
+          </div>
+          <div class="post-footer">
+            <button class="stamp-btn" onclick="toggleStamp(this,0)">
+              <span class="stamp-icon">⬡</span> Stamp
+            </button>
+            <span class="stamp-count">0 stamps</span>
+            <span class="post-date">June 10, 2026</span>
+          </div>
+        </div>
+
+        <!-- ── Permanent Post: D-backs walk-off ── -->
+        <div class="post-card glass">
+          <div class="post-body"><p>D-backs win with a walk-off homerun against the Dodgers! [3-2].</p></div>
+          <div class="post-media-grid count-1">
+            <div class="media-item">
+              <video src="dbacks.MOV" controls playsinline preload="metadata" style="width:100%; height:auto; display:block; background:#000;"></video>
+            </div>
+          </div>
+          <div class="post-footer">
+            <button class="stamp-btn" onclick="toggleStamp(this,0)">
+              <span class="stamp-icon">⬡</span> Stamp
+            </button>
+            <span class="stamp-count">0 stamps</span>
+            <span class="post-date">June 10, 2026</span>
+          </div>
+        </div>
+
+        <!-- ── Permanent Post: First Post ── -->
+        <div class="post-card glass">
+          <div class="post-body"><p>My first post on Postmarq!</p></div>
+          <div class="post-img-wrap" onclick="lbOpen('post_01x.JPG','image')">
+            <img src="post_01x.JPG" alt="Dave Michael" />
+          </div>
+          <div class="post-footer">
+            <button class="stamp-btn" onclick="toggleStamp(this,0)">
+              <span class="stamp-icon">⬡</span> Stamp
+            </button>
+            <span class="stamp-count">0 stamps</span>
+            <span class="post-date">June 8, 2026</span>
+          </div>
+        </div>
+
+        <!-- Quorum Post -->
+        <div class="post-quorum glass">
+          <div class="post-quorum-inner">
+            <div class="quorum-badge">⬡ Quorum</div>
+            <div class="post-body">
+              Anyone going to see <strong>Cachemira</strong>? Looking to connect with people locally in Phoenix. Send me a stamp if you're interested.
+            </div>
+            <div class="post-footer">
+              <button class="stamp-btn" onclick="toggleStamp(this,3)">
+                <span class="stamp-icon">⬡</span> Stamp
+              </button>
+              <span class="stamp-count">3 stamps</span>
+              <span class="post-date">June 5, 2026</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Guestbook -->
+        <div class="guestbook-card glass">
+          <div class="card-title">Guestbook</div>
+          <div class="gb-entries" id="gbEntries">
+            <div class="gb-entry">
+              <div class="gb-header"><span class="gb-author">Marco R.</span><span class="gb-when">2 days ago</span></div>
+              <div class="gb-msg">"That Encanto Park shot is going to be incredible. Can't wait to see it."</div>
+            </div>
+            <div class="gb-entry">
+              <div class="gb-header"><span class="gb-author">Jess T.</span><span class="gb-when">4 days ago</span></div>
+              <div class="gb-msg">"Diner is legitimately top five. No notes. Glad you're on here."</div>
+            </div>
+            <div class="gb-entry">
+              <div class="gb-header"><span class="gb-author">Nadia F.</span><span class="gb-when">1 week ago</span></div>
+              <div class="gb-msg">"Also interested in Cachemira. Sent you a stamp. Phoenix people need to stick together."</div>
+            </div>
+          </div>
+          <div class="gb-form">
+            <label class="gb-form-label">Leave your mark</label>
+            <textarea placeholder="Say something real..."></textarea>
+            <div class="gb-form-row">
+              <input type="text" placeholder="Your handle (e.g. marco.postmarq)" />
+              <button class="btn-send" onclick="gbSubmit(this)">Send stamp</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /right col -->
     </div><!-- /main-grid -->
 
     <footer class="page-footer">
@@ -1588,7 +1616,16 @@
       document.getElementById('lightbox').classList.remove('open');
       document.body.style.overflow = '';
     }
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') lbClose(); });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') lbClose();
+      // P — focus composer (only when not already typing in a field)
+      if (e.key === 'p' && document.activeElement.tagName !== 'TEXTAREA' && document.activeElement.tagName !== 'INPUT') {
+        e.preventDefault();
+        const ta = document.getElementById('composerText');
+        ta.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        ta.focus();
+      }
+    });
 
     /* ── Stamp toggle ── */
     function toggleStamp(btn, base) {
@@ -1673,48 +1710,64 @@
       });
     }
 
-    function submitPost() {
-      const text = document.getElementById('composerText').value.trim();
-      if (!text && mediaFiles.length === 0) return;
+    // ─── localStorage persistence ───────────────
+    const STORAGE_KEY = 'postmarq_posts_v1';
 
+    function getSavedPosts() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+      catch { return []; }
+    }
+
+    function savePosts(posts) {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(posts)); }
+      catch(e) { console.warn('localStorage full — media too large?', e); }
+    }
+
+    function deletePost(id) {
+      const posts = getSavedPosts().filter(p => p.id !== id);
+      savePosts(posts);
+      const el = document.getElementById('post-' + id);
+      if (el) { el.style.opacity = '0'; el.style.transform = 'translateY(-8px)'; setTimeout(() => el.remove(), 280); }
+    }
+
+    function buildPostCard(post, animate) {
       const card = document.createElement('div');
       card.className = 'post-card glass';
-      card.style.opacity = '0'; card.style.transform = 'translateY(10px)';
+      card.id = 'post-' + post.id;
       card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+      if (animate) { card.style.opacity = '0'; card.style.transform = 'translateY(10px)'; }
 
       // quorum badge
-      if (postType === 'quorum') {
+      if (post.type === 'quorum') {
         const badge = document.createElement('div');
         badge.className = 'quorum-badge'; badge.style.marginBottom = '0.8rem';
         badge.textContent = '⬡ Quorum'; card.appendChild(badge);
       }
 
       // text
-      if (text) {
+      if (post.text) {
         const p = document.createElement('div');
         p.className = 'post-body';
-        p.innerHTML = '<p>' + esc(text).replace(/\n/g, '<br>') + '</p>';
+        p.innerHTML = '<p>' + post.text.replace(/\n/g, '<br>') + '</p>';
         card.appendChild(p);
       }
 
       // media
-      if (mediaFiles.length > 0) {
-        const imgs = mediaFiles.filter(f => f.kind === 'image');
-        const vids = mediaFiles.filter(f => f.kind === 'video');
+      if (post.media && post.media.length > 0) {
+        const imgs = post.media.filter(m => m.kind === 'image');
+        const vids = post.media.filter(m => m.kind === 'video');
         const total = imgs.length + (vids.length > 0 ? 1 : 0);
-        const grid  = document.createElement('div');
+        const grid = document.createElement('div');
         grid.className = 'post-media-grid count-' + Math.min(total, 3);
-        imgs.forEach(item => {
-          const url  = URL.createObjectURL(item.file);
+        imgs.forEach(m => {
           const wrap = document.createElement('div'); wrap.className = 'media-item';
-          const img  = document.createElement('img'); img.src = url;
-          img.onclick = () => lbOpen(url);
+          const img  = document.createElement('img'); img.src = m.data;
+          img.onclick = () => lbOpen(m.data);
           wrap.appendChild(img); grid.appendChild(wrap);
         });
-        vids.forEach(item => {
-          const url  = URL.createObjectURL(item.file);
+        vids.forEach(m => {
           const wrap = document.createElement('div'); wrap.className = 'media-item';
-          const vid  = document.createElement('video'); vid.src = url; vid.controls = true;
+          const vid  = document.createElement('video'); vid.src = m.data; vid.controls = true; vid.playsInline = true; vid.preload = 'metadata';
           wrap.appendChild(vid); grid.appendChild(wrap);
         });
         card.appendChild(grid);
@@ -1730,11 +1783,61 @@
       const count = document.createElement('span');
       count.className = 'stamp-count'; count.textContent = '0 stamps';
       const date = document.createElement('span');
-      date.className = 'post-date';
-      date.textContent = new Date().toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
-      footer.appendChild(stampBtn); footer.appendChild(count); footer.appendChild(date);
+      date.className = 'post-date'; date.textContent = post.date;
+      const del = document.createElement('button');
+      del.textContent = '✕';
+      del.title = 'Delete post';
+      del.style.cssText = 'margin-left:auto; background:none; border:none; cursor:pointer; font-size:0.7rem; color:var(--ink-4); opacity:0.5; padding:0 0.25rem;';
+      del.onmouseenter = () => del.style.opacity = '1';
+      del.onmouseleave = () => del.style.opacity = '0.5';
+      del.onclick = () => { if (confirm('Delete this post?')) deletePost(post.id); };
+      footer.appendChild(stampBtn); footer.appendChild(count); footer.appendChild(date); footer.appendChild(del);
       card.appendChild(footer);
 
+      return card;
+    }
+
+    function loadSavedPosts() {
+      const feed  = document.getElementById('dynamicFeed');
+      const posts = getSavedPosts();
+      posts.forEach(post => feed.appendChild(buildPostCard(post, false)));
+    }
+
+    async function fileToDataURL(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload  = e => resolve(e.target.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function submitPost() {
+      const text = document.getElementById('composerText').value.trim();
+      if (!text && mediaFiles.length === 0) return;
+
+      // convert files to base64 for storage
+      const media = [];
+      for (const item of mediaFiles) {
+        const data = await fileToDataURL(item.file);
+        media.push({ kind: item.kind, data });
+      }
+
+      const post = {
+        id:   Date.now(),
+        type: postType,
+        text: text ? esc(text) : '',
+        media,
+        date: new Date().toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' })
+      };
+
+      // save to localStorage
+      const posts = getSavedPosts();
+      posts.unshift(post);
+      savePosts(posts);
+
+      // render
+      const card = buildPostCard(post, true);
       const feed = document.getElementById('dynamicFeed');
       feed.insertBefore(card, feed.firstChild);
       requestAnimationFrame(() => { card.style.opacity = '1'; card.style.transform = 'translateY(0)'; });
@@ -1742,6 +1845,9 @@
       document.getElementById('composerText').value = '';
       mediaFiles = []; renderPreviews();
     }
+
+    // load saved posts on startup
+    loadSavedPosts();
 
     function esc(s) {
       return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
