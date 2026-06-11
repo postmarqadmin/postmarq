@@ -533,24 +533,41 @@
       letter-spacing: 0.12em; text-transform: uppercase;
       color: var(--ink-4); margin-bottom: 0.5rem;
     }
-    .marquee-row {
+    /* ── Marquee tab panels ── */
+    .mq-panel { display: none; flex-direction: column; gap: 0.75rem; }
+    .mq-panel.active { display: flex; }
+
+    /* ── Carousel ── */
+    .mq-carousel-wrap { position: relative; }
+    .mq-stage {
       display: flex;
-      flex-direction: row;
-      align-items: flex-start;
-      gap: 8px;
       overflow-x: scroll;
-      overflow-y: visible;
-      padding: 6px 4px 10px;
-      scrollbar-width: thin;
-      scrollbar-color: rgba(180,140,100,0.3) transparent;
-      background: linear-gradient(180deg, rgba(180,160,120,0.18) 0%, rgba(140,110,70,0.22) 100%);
-      border-bottom: 6px solid rgba(160,130,80,0.45);
-      border-radius: 0 0 4px 4px;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      gap: 14px;
+      padding: 10px 46px 10px;
+      scrollbar-width: none;
+      background: linear-gradient(180deg, rgba(180,160,120,0.14) 0%, rgba(140,110,70,0.18) 100%);
+      border-bottom: 5px solid rgba(160,130,80,0.35);
+      border-radius: 8px;
     }
-    .marquee-row::-webkit-scrollbar { height: 3px; }
-    .marquee-row::-webkit-scrollbar-track { background: transparent; }
-    .marquee-row::-webkit-scrollbar-thumb { background: rgba(180,140,100,0.3); border-radius: 2px; }
-    .marquee-row + .marquee-section-label { margin-top: 1.25rem; }
+    .mq-stage::-webkit-scrollbar { display: none; }
+
+    .mq-arrow {
+      position: absolute; top: 40%; transform: translateY(-50%);
+      z-index: 10;
+      width: 30px; height: 30px; border-radius: 50%;
+      background: rgba(255,255,255,0.78);
+      border: 1px solid rgba(255,255,255,0.9);
+      backdrop-filter: blur(6px);
+      font-size: 1.1rem; font-weight: 700; color: var(--ink-2);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background 0.14s, transform 0.14s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.14);
+    }
+    .mq-arrow:hover { background: rgba(255,255,255,0.98); transform: translateY(-50%) scale(1.08); }
+    .mq-prev { left: 7px; }
+    .mq-next { right: 7px; }
 
     /* Wrapper: poster + label stacked */
     .tile-wrap {
@@ -558,97 +575,73 @@
       flex-direction: column;
       align-items: center;
       flex-shrink: 0;
-      gap: 5px;
+      gap: 8px;
+      width: 140px;
+      scroll-snap-align: center;
     }
 
     .marquee-tile {
       position: relative;
-      width: 72px; height: 107px;
-      flex-shrink: 0;
-      border-radius: 4px;
-      overflow: visible;
+      width: 140px;
+      height: 210px;
+      border-radius: 6px;
+      overflow: hidden;
       cursor: pointer;
       transition: transform 0.18s ease, box-shadow 0.18s ease;
-      box-shadow: -3px 3px 10px rgba(0,0,0,0.35), inset -2px 0 4px rgba(0,0,0,0.25);
+      box-shadow: -4px 5px 16px rgba(0,0,0,0.4), inset -2px 0 5px rgba(0,0,0,0.28);
     }
-    .marquee-tile > *:not(.poster-reflection) {
-      border-radius: 4px;
-    }
+    .marquee-tile > *:not(.poster-reflection) { border-radius: 6px; }
     .marquee-tile:hover {
-      transform: translateY(-4px) scale(1.04);
-      box-shadow: -3px 8px 18px rgba(0,0,0,0.4), inset -2px 0 4px rgba(0,0,0,0.25);
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: -4px 12px 28px rgba(0,0,0,0.45), inset -2px 0 5px rgba(0,0,0,0.28);
       z-index: 2;
     }
     .marquee-tile.active-tile {
       outline: 2px solid var(--amber);
-      outline-offset: 2px;
+      outline-offset: 3px;
     }
 
     /* Spine shadow */
     .marquee-tile::before {
       content: '';
-      position: absolute;
-      top: 0; left: 0;
-      width: 10px; height: 100%;
+      position: absolute; top: 0; left: 0;
+      width: 14px; height: 100%;
       background: linear-gradient(to right, rgba(0,0,0,0.55), transparent);
-      z-index: 3;
-      border-radius: 4px 0 0 4px;
-      pointer-events: none;
+      z-index: 3; border-radius: 6px 0 0 6px; pointer-events: none;
     }
-
     /* Gloss highlight */
     .marquee-tile::after {
       content: '';
-      position: absolute;
-      top: 0; left: 0;
+      position: absolute; top: 0; left: 0;
       width: 100%; height: 55%;
       background: linear-gradient(to bottom, rgba(255,255,255,0.22), transparent);
-      z-index: 4;
-      border-radius: 4px 4px 0 0;
-      pointer-events: none;
+      z-index: 4; border-radius: 6px 6px 0 0; pointer-events: none;
     }
 
-    /* Reflection */
-    .poster-reflection {
-      position: absolute;
-      top: 107px; left: 0;
-      width: 72px; height: 34px;
-      overflow: hidden;
-      pointer-events: none;
-      border-radius: 0 0 2px 2px;
-    }
-    .poster-reflection img {
-      width: 100%; height: 107px;
-      object-fit: cover;
-      transform: scaleY(-1);
-      transform-origin: top center;
-      opacity: 0.28;
-      filter: blur(1px);
-      display: none;
-    }
-    .marquee-tile.has-poster .poster-reflection img { display: block; }
+    /* Reflection — hidden at carousel scale */
+    .poster-reflection { display: none; }
 
     /* Label below poster */
-    .tile-label {
-      width: 72px;
-      text-align: center;
-    }
+    .tile-label { width: 140px; text-align: center; }
     .tile-label-title {
-      font-size: 0.52rem;
-      font-weight: 700;
-      color: var(--ink-2);
-      line-height: 1.25;
-      overflow: hidden;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
+      font-size: 0.78rem; font-weight: 700; color: var(--ink-2);
+      line-height: 1.3; overflow: hidden;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
     }
     .tile-label-rating {
-      font-size: 0.48rem;
-      color: var(--amber);
-      margin-top: 2px;
-      letter-spacing: 0.04em;
+      font-size: 0.68rem; color: var(--amber);
+      margin-top: 3px; letter-spacing: 0.04em;
     }
+
+    /* Must Watch featured highlight */
+    .mq-featured .marquee-tile {
+      box-shadow: 0 0 0 2.5px var(--amber), -4px 5px 16px rgba(232,153,42,0.35), inset -2px 0 5px rgba(0,0,0,0.28);
+    }
+    .mq-featured .marquee-tile:hover {
+      box-shadow: 0 0 0 2.5px var(--amber), -4px 14px 30px rgba(232,153,42,0.45), inset -2px 0 5px rgba(0,0,0,0.28);
+    }
+    .mq-featured .tile-label-title { color: var(--amber); font-weight: 800; }
+    .spotlight-status.must { color: var(--amber); }
 
     /* Real poster — hidden until TMDB loads */
     .marquee-tile .real-poster {
@@ -798,6 +791,41 @@
       border-radius: 6px; padding: 0.18rem 0.5rem;
       font-size: 0.6rem; font-weight: 800; letter-spacing: 0.07em;
       color: white; text-transform: uppercase;
+    }
+
+    /* ─── Pick Six ─── */
+    .pick-six-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      padding: 0 1rem 1.1rem;
+    }
+    .pick-six-tile {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+    }
+    .pick-six-tile img {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 2.5px solid rgba(232,153,42,0.55);
+      box-shadow: 0 2px 10px rgba(232,153,42,0.22), 0 1px 4px rgba(0,0,0,0.13);
+      transition: transform 0.18s, box-shadow 0.18s;
+    }
+    .pick-six-tile img:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 18px rgba(232,153,42,0.45), 0 2px 6px rgba(0,0,0,0.18);
+    }
+    .pick-six-name {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #3d2a0a;
+      text-align: center;
+      line-height: 1.2;
+      text-shadow: 0 1px 2px rgba(255,255,255,0.6);
     }
 
     /* ─── Lightbox ─── */
@@ -1230,6 +1258,39 @@
 
         </div>
 
+        <!-- Pick Six -->
+        <div class="sidebar-card glass" style="padding:0; overflow:hidden; background: linear-gradient(135deg, rgba(155,143,212,0.28) 0%, rgba(74,181,170,0.16) 100%); border: 1px solid rgba(255,255,255,0.55); box-shadow: 0 4px 24px rgba(80,60,140,0.10);">
+          <div style="padding:1.1rem 1.25rem 0.75rem; display:flex; justify-content:center;">
+            <div class="card-title" style="margin-bottom:0; font-size:1.2rem; font-weight:900; letter-spacing:-0.4px; color:#3d2a0a;">My Pick Six</div>
+          </div>
+          <div class="pick-six-grid">
+            <div class="pick-six-tile">
+              <img src="friends/Charlie.JPG" alt="Charlie" />
+              <span class="pick-six-name">Charlie</span>
+            </div>
+            <div class="pick-six-tile">
+              <img src="friends/Keller.jpg" alt="Keller" />
+              <span class="pick-six-name">Keller</span>
+            </div>
+            <div class="pick-six-tile">
+              <img src="friends/Tom.jpg" alt="Tom" />
+              <span class="pick-six-name">Tom</span>
+            </div>
+            <div class="pick-six-tile">
+              <img src="friends/Trixton.JPG" alt="Trixton" />
+              <span class="pick-six-name">Trixton</span>
+            </div>
+            <div class="pick-six-tile">
+              <img src="friends/Camille Jeff.jpg" alt="Camille Jeff" />
+              <span class="pick-six-name">Camille Jeff</span>
+            </div>
+            <div class="pick-six-tile">
+              <img src="friends/Sunny Rich.jpg" alt="Sunny Rich" />
+              <span class="pick-six-name">Sunny Rich</span>
+            </div>
+          </div>
+        </div>
+
         <!-- Candids Wall -->
         <div class="sidebar-card glass" style="padding:0; overflow:hidden; background: linear-gradient(135deg, rgba(74,181,170,0.22) 0%, rgba(155,143,212,0.22) 100%);">
           <div style="padding:1.25rem 1.25rem 0.8rem; display:flex; justify-content:center;">
@@ -1346,10 +1407,42 @@
           <div style="display:flex; justify-content:center; margin-bottom:0.75rem;">
             <div class="card-title" style="margin-bottom:0; font-size:1.45rem; font-weight:900; letter-spacing:-0.5px; color:#2d3a4a; text-align:center;">The Marquee</div>
           </div>
-          <div class="marquee-section-label">Seen</div>
-          <div class="marquee-row" id="rowSeen"></div>
-          <div class="marquee-section-label">Want to See</div>
-          <div class="marquee-row" id="rowWant"></div>
+
+          <!-- Tab bar -->
+          <div class="feed-tabs" style="margin-bottom:0.75rem;">
+            <button class="feed-tab active" onclick="switchMqTab('seen')">Recently Watched</button>
+            <button class="feed-tab"        onclick="switchMqTab('want')">Watchlist</button>
+            <button class="feed-tab"        onclick="switchMqTab('must')">Must Watch</button>
+          </div>
+
+          <!-- Panel: Recently Watched -->
+          <div class="mq-panel active" id="mq-seen">
+            <div class="mq-carousel-wrap">
+              <button class="mq-arrow mq-prev" onclick="mqScroll('stageSeen',-1)">&#8249;</button>
+              <div class="mq-stage" id="stageSeen"></div>
+              <button class="mq-arrow mq-next" onclick="mqScroll('stageSeen', 1)">&#8250;</button>
+            </div>
+          </div>
+
+          <!-- Panel: Watchlist -->
+          <div class="mq-panel" id="mq-want">
+            <div class="mq-carousel-wrap">
+              <button class="mq-arrow mq-prev" onclick="mqScroll('stageWant',-1)">&#8249;</button>
+              <div class="mq-stage" id="stageWant"></div>
+              <button class="mq-arrow mq-next" onclick="mqScroll('stageWant', 1)">&#8250;</button>
+            </div>
+          </div>
+
+          <!-- Panel: Must Watch -->
+          <div class="mq-panel" id="mq-must">
+            <div class="mq-carousel-wrap">
+              <button class="mq-arrow mq-prev" onclick="mqScroll('stageMust',-1)">&#8249;</button>
+              <div class="mq-stage" id="stageMust"></div>
+              <button class="mq-arrow mq-next" onclick="mqScroll('stageMust', 1)">&#8250;</button>
+            </div>
+          </div>
+
+          <!-- Spotlight (moved by JS to active panel) -->
           <div class="marquee-spotlight" id="marqueeSpotlight">
             <div class="spotlight-poster" id="spotlightPoster">
               <img id="spotlightImg" alt="" />
@@ -1729,6 +1822,17 @@
       { title: "Spider-Man: Brand New Day"                   },
     ];
 
+    // ─── MUST WATCH ─────────────────────────────
+    const FILMS_MUST = [
+      {
+        title:    "Obsession",
+        year:     2024,
+        rating:   4,
+        thoughts: "Suspenseful, eerie, and intriguing. It had psychological elements of addiction, obsessive thinking, and co-dependency. This movie is not for everyone.",
+        featured: true
+      },
+    ];
+
     // ─── Gradient palette ───────────────────────
     const POSTER_GRADIENTS = [
       "linear-gradient(160deg,#c87840,#2a1808)",
@@ -1766,13 +1870,16 @@
       `;
       tile.addEventListener('click', () => openSpotlight(tile, film, status, grad));
 
-      const stars = film.rating ? '★'.repeat(film.rating) : '';
+      // rating only shown on Must Watch tiles
+      const showRating = status === 'must' && film.rating;
       const label = document.createElement('div');
       label.className = 'tile-label';
       label.innerHTML = `
         <div class="tile-label-title">${film.title}</div>
-        ${stars ? `<div class="tile-label-rating">${stars}</div>` : ''}
+        ${showRating ? `<div class="tile-label-rating">${'★'.repeat(film.rating)}</div>` : ''}
       `;
+
+      if (status === 'must' && film.featured) wrap.classList.add('mq-featured');
 
       wrap.appendChild(tile);
       wrap.appendChild(label);
@@ -1780,12 +1887,29 @@
     }
 
     function buildMarquee() {
-      const rowSeen = document.getElementById('rowSeen');
-      const rowWant = document.getElementById('rowWant');
-      FILMS_SEEN.forEach(f => rowSeen.appendChild(makeTile(f, 'seen')));
-      FILMS_WANT.forEach(f => rowWant.appendChild(makeTile(f, 'want')));
+      FILMS_SEEN.forEach(f => document.getElementById('stageSeen').appendChild(makeTile(f, 'seen')));
+      FILMS_WANT.forEach(f => document.getElementById('stageWant').appendChild(makeTile(f, 'want')));
+      FILMS_MUST.forEach(f => document.getElementById('stageMust').appendChild(makeTile(f, 'must')));
     }
     buildMarquee();
+
+    // ─── Marquee tab + carousel ──────────────────
+    function switchMqTab(name) {
+      document.querySelectorAll('#theMarquee .feed-tab').forEach((btn, i) => {
+        btn.classList.toggle('active', ['seen','want','must'][i] === name);
+      });
+      document.querySelectorAll('.mq-panel').forEach(p => {
+        p.classList.toggle('active', p.id === 'mq-' + name);
+      });
+      closeSpotlight();
+    }
+
+    function mqScroll(stageId, dir) {
+      const stage = document.getElementById(stageId);
+      const tile  = stage.querySelector('.tile-wrap');
+      if (!tile) return;
+      stage.scrollBy({ left: dir * (tile.getBoundingClientRect().width + 14), behavior: 'smooth' });
+    }
 
     // ─── Spotlight ──────────────────────────────
     function openSpotlight(tile, film, status, grad) {
@@ -1794,10 +1918,8 @@
       tile.classList.add('active-tile');
 
       const panel   = document.getElementById('marqueeSpotlight');
-      const targetRow = status === 'seen'
-        ? document.getElementById('rowSeen')
-        : document.getElementById('rowWant');
-      targetRow.insertAdjacentElement('afterend', panel);
+      const mqPanel = tile.closest('.mq-panel');
+      mqPanel.appendChild(panel);
       const poster  = document.getElementById('spotlightPoster');
       const sGrad   = document.getElementById('spotlightGrad');
       const sImg    = document.getElementById('spotlightImg');
@@ -1818,8 +1940,10 @@
       }
 
       // info side
-      sStatus.textContent = status === 'seen' ? '✓ Seen' : '◎ Want to See';
-      sStatus.className   = 'spotlight-status ' + (status === 'seen' ? 'seen' : 'want');
+      const statusMap = { seen: ['✓ Seen','seen'], want: ['◎ Watchlist','want'], must: ['♦ Must Watch','must'] };
+      const [statusText, statusCls] = statusMap[status] || ['',''];
+      sStatus.textContent = statusText;
+      sStatus.className   = 'spotlight-status ' + statusCls;
       sTitle.textContent  = film.title;
       sYear.textContent   = film.year || '';
 
@@ -1859,7 +1983,7 @@
     }
 
     async function loadTMDBPosters() {
-      for (const tile of document.querySelectorAll('.marquee-tile')) {
+      for (const tile of document.querySelectorAll('.mq-stage .marquee-tile')) {
         const src = await fetchPoster(tile.dataset.title);
         if (src) {
           const img = tile.querySelector('.real-poster');
