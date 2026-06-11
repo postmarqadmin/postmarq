@@ -793,6 +793,197 @@
       color: white; text-transform: uppercase;
     }
 
+    /* ─── My Q ─── */
+    .myq-wrap {
+      border-radius: 14px;
+      overflow: hidden;
+      background: rgba(26,26,31,0.90);
+      border: 0.5px solid rgba(255,255,255,0.08);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.28);
+      font-family: 'Nunito', sans-serif;
+    }
+    .myq-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 1.1rem 1.2rem 0.85rem;
+      border-bottom: 0.5px solid rgba(255,255,255,0.07);
+    }
+    .myq-date-block { display: flex; flex-direction: column; line-height: 1; gap: 2px; }
+    .myq-day-num {
+      font-size: 42px; font-weight: 900; color: #fff; line-height: 1;
+    }
+    .myq-day-name {
+      font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+      background: linear-gradient(90deg, #7F77DD, #5aafc2);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .myq-month {
+      font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.35); margin-top: 2px;
+    }
+    .myq-title-block { text-align: right; }
+    .myq-title {
+      font-size: 36px; font-weight: 900; line-height: 1;
+      background: linear-gradient(90deg, #7F77DD, #EF9F27);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .myq-subtitle {
+      font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+      color: rgba(255,255,255,0.3); margin-top: 3px;
+    }
+    .myq-list { display: flex; flex-direction: column; padding: 0.5rem 0; }
+    .myq-item {
+      display: flex; align-items: flex-start; gap: 0;
+      padding: 0.55rem 1.2rem;
+      transition: background 0.15s;
+    }
+    .myq-item:hover { background: rgba(255,255,255,0.03); }
+    .myq-accent {
+      width: 3px; border-radius: 999px; flex-shrink: 0;
+      align-self: stretch; margin-right: 10px; min-height: 28px;
+    }
+    .myq-accent.loop   { background: #7F77DD; }
+    .myq-accent.invite { background: #EF9F27; }
+    .myq-body { flex: 1; min-width: 0; }
+    .myq-item-top { display: flex; align-items: center; gap: 5px; }
+    .myq-item-title {
+      font-size: 0.82rem; font-weight: 700; color: rgba(255,255,255,0.88);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .myq-private-dot {
+      width: 16px; height: 16px; border-radius: 50%;
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 8px; font-weight: 800; color: rgba(255,255,255,0.5);
+      flex-shrink: 0;
+    }
+    .myq-item-when {
+      font-size: 0.7rem; font-weight: 500; color: rgba(255,255,255,0.38); margin-top: 1px;
+    }
+    .myq-item-remove {
+      background: none; border: none; cursor: pointer;
+      color: rgba(255,255,255,0.2); font-size: 13px; padding: 0 0 0 6px;
+      flex-shrink: 0; line-height: 1; transition: color 0.15s; align-self: center;
+    }
+    .myq-item-remove:hover { color: rgba(255,80,80,0.7); }
+    .myq-body { cursor: pointer; }
+    /* My Q detail/edit modal */
+    .myq-detail-modal {
+      background: #1e1e26; border: 0.5px solid rgba(255,255,255,0.1);
+      border-radius: 16px; padding: 1.5rem; width: 300px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    }
+    .myq-detail-type-pill {
+      display: inline-block; font-size: 0.68rem; font-weight: 800;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      border-radius: 999px; padding: 2px 10px; margin-bottom: 0.75rem;
+    }
+    .myq-detail-type-pill.loop   { background: rgba(127,119,221,0.2); color: #a09af0; border: 1px solid rgba(127,119,221,0.4); }
+    .myq-detail-type-pill.invite { background: rgba(239,159,39,0.15); color: #f0b84a; border: 1px solid rgba(239,159,39,0.4); }
+    .myq-detail-title {
+      font-size: 1.1rem; font-weight: 900; color: #fff; margin-bottom: 0.35rem; line-height: 1.25;
+    }
+    .myq-detail-when {
+      font-size: 0.8rem; font-weight: 500; color: rgba(255,255,255,0.45); margin-bottom: 0.9rem;
+    }
+    .myq-detail-details {
+      font-size: 0.78rem; color: rgba(255,255,255,0.55); line-height: 1.5;
+      margin-bottom: 1rem; white-space: pre-wrap;
+    }
+    .myq-detail-divider {
+      border: none; border-top: 0.5px solid rgba(255,255,255,0.08); margin: 0.85rem 0;
+    }
+    .myq-detail-edit-row { margin-bottom: 0.7rem; }
+    .myq-detail-actions { display: flex; gap: 8px; justify-content: space-between; margin-top: 0.5rem; }
+    .myq-delete-btn {
+      background: none; border: 1px solid rgba(255,60,60,0.25); color: rgba(255,80,80,0.55);
+      border-radius: 8px; padding: 0.4rem 0.8rem;
+      font-family: 'Nunito', sans-serif; font-size: 0.78rem; font-weight: 700; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .myq-delete-btn:hover { border-color: rgba(255,60,60,0.6); color: rgba(255,80,80,0.9); }
+    .myq-more-btn {
+      background: none; border: none; cursor: pointer;
+      font-size: 0.73rem; font-weight: 700; color: rgba(127,119,221,0.75);
+      padding: 0.3rem 1.2rem 0.6rem; text-align: left;
+      transition: color 0.15s;
+    }
+    .myq-more-btn:hover { color: #7F77DD; }
+    .myq-footer {
+      padding: 0.6rem 1.2rem 0.9rem;
+      border-top: 0.5px solid rgba(255,255,255,0.07);
+      display: flex; justify-content: flex-end;
+    }
+    .myq-add-btn {
+      background: rgba(127,119,221,0.15); border: 1px solid rgba(127,119,221,0.35);
+      color: rgba(127,119,221,0.9); border-radius: 8px;
+      font-size: 0.75rem; font-weight: 700; padding: 0.35rem 0.85rem;
+      cursor: pointer; font-family: 'Nunito', sans-serif;
+      transition: background 0.15s, color 0.15s;
+    }
+    .myq-add-btn:hover { background: rgba(127,119,221,0.28); color: #fff; }
+
+    /* My Q Modal */
+    .myq-modal-overlay {
+      position: fixed; inset: 0; z-index: 2000;
+      background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center;
+    }
+    .myq-modal-overlay.open { display: flex; }
+    .myq-modal {
+      background: #1e1e26; border: 0.5px solid rgba(255,255,255,0.1);
+      border-radius: 16px; padding: 1.5rem; width: 300px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    }
+    .myq-modal h3 {
+      font-size: 1rem; font-weight: 800; color: #fff; margin: 0 0 1rem;
+    }
+    .myq-type-toggle {
+      display: flex; gap: 8px; margin-bottom: 1rem;
+    }
+    .myq-type-btn {
+      flex: 1; padding: 0.4rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5);
+      font-family: 'Nunito', sans-serif; font-size: 0.8rem; font-weight: 700; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .myq-type-btn.sel-loop   { background: rgba(127,119,221,0.25); border-color: #7F77DD; color: #a09af0; }
+    .myq-type-btn.sel-invite { background: rgba(239,159,39,0.2);   border-color: #EF9F27; color: #f0b84a; }
+    .myq-field-label {
+      font-size: 0.7rem; font-weight: 700; color: rgba(255,255,255,0.4);
+      text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px;
+    }
+    .myq-field-wrap { margin-bottom: 0.75rem; }
+    .myq-input, .myq-textarea {
+      width: 100%; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.05); color: #fff; padding: 0.45rem 0.6rem;
+      font-family: 'Nunito', sans-serif; font-size: 0.8rem; box-sizing: border-box;
+      outline: none; transition: border-color 0.15s;
+    }
+    .myq-input:focus, .myq-textarea:focus { border-color: rgba(127,119,221,0.55); }
+    .myq-textarea { resize: vertical; min-height: 60px; }
+    .myq-vis-toggle {
+      display: flex; gap: 8px; margin-bottom: 1rem;
+    }
+    .myq-vis-btn {
+      flex: 1; padding: 0.35rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.4);
+      font-family: 'Nunito', sans-serif; font-size: 0.75rem; font-weight: 700; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .myq-vis-btn.active { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.3); color: #fff; }
+    .myq-modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 0.25rem; }
+    .myq-cancel-btn {
+      background: none; border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.4);
+      border-radius: 8px; padding: 0.4rem 0.9rem;
+      font-family: 'Nunito', sans-serif; font-size: 0.8rem; font-weight: 700; cursor: pointer;
+    }
+    .myq-save-btn {
+      background: linear-gradient(90deg, #7F77DD, #EF9F27); border: none;
+      color: #fff; border-radius: 8px; padding: 0.4rem 1rem;
+      font-family: 'Nunito', sans-serif; font-size: 0.8rem; font-weight: 800; cursor: pointer;
+    }
+
     /* ─── Pick Six ─── */
     .pick-six-grid {
       display: grid;
@@ -1220,9 +1411,10 @@
             <div class="ms-info">
               <div class="ms-name">Dave Michael</div>
               <div class="ms-meta">
-                <span>Phoenix, AZ</span><br>
-                Last Update: <span>June 10, 2026</span><br>
-                In a Relationship: <span>1 Year</span>
+                My Townsquare: <span>Phoenix, AZ</span><br>
+                My Hood: <span>Uptown PHX</span><br>
+                In a Relationship: <span>1 Year</span><br>
+                Last Update: <span>June 11, 2026</span>
               </div>
             </div>
           </div>
@@ -1256,6 +1448,105 @@
             <a class="ms-contact-item" href="#"><i class="ti ti-ban"></i> Block User</a>
           </div>
 
+        </div>
+
+        <!-- My Q -->
+        <div class="myq-wrap" id="myQWrap">
+          <div class="myq-header">
+            <div class="myq-date-block">
+              <div class="myq-day-num" id="myqDayNum"></div>
+              <div class="myq-day-name" id="myqDayName"></div>
+              <div class="myq-month" id="myqMonth"></div>
+            </div>
+            <div class="myq-title-block">
+              <div class="myq-title" id="myqModuleTitle">My Q</div>
+              <div class="myq-subtitle">my schedule</div>
+            </div>
+          </div>
+          <div class="myq-list" id="myqList"></div>
+          <button class="myq-more-btn" id="myqMoreBtn" style="display:none;"></button>
+          <div class="myq-footer">
+            <button class="myq-add-btn" onclick="myqOpenModal()">+ Add</button>
+          </div>
+        </div>
+
+        <!-- My Q Modal -->
+        <div class="myq-modal-overlay" id="myqOverlay">
+          <div class="myq-modal">
+            <h3>New item</h3>
+            <div class="myq-type-toggle">
+              <button class="myq-type-btn sel-loop" id="myqTypeLoop" onclick="myqSetType('loop')">Loop</button>
+              <button class="myq-type-btn" id="myqTypeInvite" onclick="myqSetType('invite')">Invite</button>
+            </div>
+            <div class="myq-field-wrap">
+              <div class="myq-field-label">Title</div>
+              <input class="myq-input" id="myqInputTitle" type="text" placeholder="e.g. Canal walk with Trixton" />
+            </div>
+            <div class="myq-field-wrap">
+              <div class="myq-field-label" id="myqWhenLabel">Cadence</div>
+              <input class="myq-input" id="myqInputWhen" type="text" placeholder="e.g. Tues & Thurs 5:30pm" />
+            </div>
+            <div class="myq-field-wrap">
+              <div class="myq-field-label">Details (optional)</div>
+              <textarea class="myq-textarea" id="myqInputDetails" placeholder="Anything else..."></textarea>
+            </div>
+            <div class="myq-field-wrap">
+              <div class="myq-field-label">Visibility</div>
+              <div class="myq-vis-toggle">
+                <button class="myq-vis-btn active" id="myqVisPublic" onclick="myqSetVis('public')">Public</button>
+                <button class="myq-vis-btn" id="myqVisPrivate" onclick="myqSetVis('private')">Private</button>
+              </div>
+            </div>
+            <div class="myq-modal-actions">
+              <button class="myq-cancel-btn" onclick="myqCloseModal()">Cancel</button>
+              <button class="myq-save-btn" onclick="myqSave()">Save</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- My Q Detail/Edit Modal -->
+        <div class="myq-modal-overlay" id="myqDetailOverlay">
+          <div class="myq-detail-modal">
+            <div id="myqdTypePill" class="myq-detail-type-pill"></div>
+            <div id="myqdViewMode">
+              <div class="myq-detail-title" id="myqdTitle"></div>
+              <div class="myq-detail-when" id="myqdWhen"></div>
+              <div class="myq-detail-details" id="myqdDetails" style="display:none;"></div>
+              <hr class="myq-detail-divider">
+              <div style="display:flex; gap:8px; justify-content:flex-end;">
+                <button class="myq-cancel-btn" onclick="myqDetailClose()">Close</button>
+                <button class="myq-add-btn" onclick="myqDetailSwitchEdit()">Edit</button>
+              </div>
+            </div>
+            <div id="myqdEditMode" style="display:none;">
+              <div class="myq-detail-edit-row">
+                <div class="myq-field-label">Title</div>
+                <input class="myq-input" id="myqdEditTitle" type="text" />
+              </div>
+              <div class="myq-detail-edit-row">
+                <div class="myq-field-label" id="myqdEditWhenLabel">Cadence</div>
+                <input class="myq-input" id="myqdEditWhen" type="text" />
+              </div>
+              <div class="myq-detail-edit-row">
+                <div class="myq-field-label">Details (optional)</div>
+                <textarea class="myq-textarea" id="myqdEditDetails"></textarea>
+              </div>
+              <div class="myq-detail-edit-row">
+                <div class="myq-field-label">Visibility</div>
+                <div class="myq-vis-toggle">
+                  <button class="myq-vis-btn" id="myqdEditVisPublic"  onclick="myqDetailSetVis('public')">Public</button>
+                  <button class="myq-vis-btn" id="myqdEditVisPrivate" onclick="myqDetailSetVis('private')">Private</button>
+                </div>
+              </div>
+              <div class="myq-detail-actions">
+                <button class="myq-delete-btn" onclick="myqDetailDelete()">Delete</button>
+                <div style="display:flex; gap:8px;">
+                  <button class="myq-cancel-btn" onclick="myqDetailSwitchView()">Cancel</button>
+                  <button class="myq-save-btn" onclick="myqDetailSave()">Save</button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Pick Six -->
@@ -1460,23 +1751,6 @@
           </div>
         </div>
 
-        <!-- Stamps -->
-        <div class="sidebar-card glass">
-          <div class="card-title">Stamps</div>
-          <div class="stamps-received">
-            <div class="stamps-number">47</div>
-            <div class="stamps-label">stamps<br>received</div>
-          </div>
-          <div class="stamp-avatars">
-            <div class="stamp-avatar av-1" title="Marco R.">M</div>
-            <div class="stamp-avatar av-2" title="Jess T.">J</div>
-            <div class="stamp-avatar av-3" title="Nadia F.">N</div>
-            <div class="stamp-avatar av-4" title="Carlos V.">C</div>
-            <div class="stamp-avatar av-5" title="Sam L.">S</div>
-            <div class="stamp-avatar av-6" title="Ari K.">A</div>
-          </div>
-        </div>
-
         <!-- Neighborhood -->
         <div class="phoenix-card glass">
           <div class="phoenix-bg"></div>
@@ -1499,13 +1773,13 @@
 
         <!-- ── Tab Bar ── -->
         <div class="feed-tabs">
-          <button class="feed-tab active" onclick="switchTab('daily')">Daily</button>
-          <button class="feed-tab"        onclick="switchTab('weekly')">Weekly</button>
+          <button class="feed-tab"        onclick="switchTab('daily')">Daily</button>
+          <button class="feed-tab active" onclick="switchTab('weekly')">Weekly</button>
           <button class="feed-tab"        onclick="switchTab('yearbook')">My Yearbook</button>
         </div>
 
         <!-- ══ PANEL: DAILY ══ -->
-        <div class="tab-panel active" id="panel-daily">
+        <div class="tab-panel" id="panel-daily">
 
         <!-- Composer -->
         <div class="composer glass" id="composer">
@@ -1585,54 +1859,11 @@
           </div>
         </div>
 
-        <!-- Quorum Post -->
-        <div class="post-quorum glass">
-          <div class="post-quorum-inner">
-            <div class="quorum-badge">⬡ Quorum</div>
-            <div class="post-body">
-              Anyone going to see <strong>Cachemira</strong>? Looking to connect with people locally in Phoenix. Send me a stamp if you're interested.
-            </div>
-            <div class="post-footer">
-              <button class="stamp-btn" onclick="toggleStamp(this,3)">
-                <span class="stamp-icon">⬡</span> Stamp
-              </button>
-              <span class="stamp-count">3 stamps</span>
-              <span class="post-date">June 5, 2026</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Guestbook -->
-        <div class="guestbook-card glass">
-          <div class="card-title">Guestbook</div>
-          <div class="gb-entries" id="gbEntries">
-            <div class="gb-entry">
-              <div class="gb-header"><span class="gb-author">Marco R.</span><span class="gb-when">2 days ago</span></div>
-              <div class="gb-msg">"That Encanto Park shot is going to be incredible. Can't wait to see it."</div>
-            </div>
-            <div class="gb-entry">
-              <div class="gb-header"><span class="gb-author">Jess T.</span><span class="gb-when">4 days ago</span></div>
-              <div class="gb-msg">"Diner is legitimately top five. No notes. Glad you're on here."</div>
-            </div>
-            <div class="gb-entry">
-              <div class="gb-header"><span class="gb-author">Nadia F.</span><span class="gb-when">1 week ago</span></div>
-              <div class="gb-msg">"Also interested in Cachemira. Sent you a stamp. Phoenix people need to stick together."</div>
-            </div>
-          </div>
-          <div class="gb-form">
-            <label class="gb-form-label">Leave your mark</label>
-            <textarea placeholder="Say something real..."></textarea>
-            <div class="gb-form-row">
-              <input type="text" placeholder="Your handle (e.g. marco.postmarq)" />
-              <button class="btn-send" onclick="gbSubmit(this)">Send stamp</button>
-            </div>
-          </div>
-        </div>
 
         </div><!-- /panel-daily -->
 
         <!-- ══ PANEL: WEEKLY ══ -->
-        <div class="tab-panel" id="panel-weekly">
+        <div class="tab-panel active" id="panel-weekly">
 
           <!-- Tuesday Jun 10 -->
           <div class="weekly-day-group">
@@ -1681,23 +1912,6 @@
             </div>
           </div>
 
-          <!-- Thursday Jun 5 -->
-          <div class="weekly-day-group">
-            <div class="weekly-day-label">Thursday — Jun 5</div>
-
-            <div class="weekly-row">
-              <div class="weekly-thumb-wrap" style="background:rgba(155,143,212,0.18); border-color:rgba(155,143,212,0.3); display:flex; align-items:center; justify-content:center; font-size:1.4rem;">⬡</div>
-              <div class="weekly-body">
-                <div class="weekly-excerpt">Anyone going to see Cachemira? Looking to connect locally in Phoenix.</div>
-                <div class="weekly-meta">
-                  <span class="type-tag quorum">Quorum</span>
-                  <span class="weekly-time">5 days ago</span>
-                  <span class="weekly-stamps">⬡ 3</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
         </div><!-- /panel-weekly -->
 
         <!-- ══ PANEL: YEARBOOK ══ -->
@@ -1717,10 +1931,6 @@
               <div class="yb-stat-num">6</div>
               <div class="yb-stat-lbl">Films<br>Seen</div>
             </div>
-            <div class="yb-stat">
-              <div class="yb-stat-num">1</div>
-              <div class="yb-stat-lbl">Quorums<br>Opened</div>
-            </div>
           </div>
 
           <!-- June 2026 -->
@@ -1739,10 +1949,6 @@
             <div class="yb-tile photo">
               <img src="post_01x.JPG" alt="First post" />
               <div class="yb-tile-tip">My first post on Postmarq!<br>Jun 8</div>
-            </div>
-            <div class="yb-tile quorum">
-              <span class="yb-tile-emoji">⬡</span>
-              <div class="yb-tile-tip">Cachemira Quorum<br>Jun 5 · 3 stamps</div>
             </div>
           </div>
 
@@ -2272,6 +2478,187 @@
     function esc(s) {
       return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
+
+    /* ── My Q ── */
+    const MYQ_TITLE_VAR = 'My Q'; // rename-ready variable
+    const MYQ_COLLAPSED = 3;
+
+    let myqItems = JSON.parse(localStorage.getItem('myqItems') || 'null') || [
+      { id: 1, type: 'loop',   title: 'Canal walk with Trixton', when: 'Tues & Thurs 5:30pm',         vis: 'public'  },
+      { id: 2, type: 'loop',   title: 'Zia Records browse',      when: 'Saturdays, midday',            vis: 'public'  },
+      { id: 3, type: 'invite', title: 'Game night',              when: 'Last Friday of the month',     vis: 'private' },
+      { id: 4, type: 'loop',   title: "Luci's coffee",           when: 'Most weekday mornings',        vis: 'public'  },
+      { id: 5, type: 'invite', title: 'Chase Field — Diamondbacks', when: 'Fri Jun 20, 7:05pm',       vis: 'public'  },
+    ];
+    let myqExpanded = false;
+    let myqNextId = 6;
+    let myqType = 'loop';
+    let myqVis  = 'public';
+
+    function myqSaveStorage() {
+      localStorage.setItem('myqItems', JSON.stringify(myqItems));
+    }
+
+    function myqRender() {
+      // Header date
+      const now = new Date();
+      document.getElementById('myqDayNum').textContent  = now.getDate();
+      document.getElementById('myqDayName').textContent = now.toLocaleDateString('en-US',{weekday:'long'});
+      document.getElementById('myqMonth').textContent   = now.toLocaleDateString('en-US',{month:'long', year:'numeric'});
+      document.getElementById('myqModuleTitle').textContent = MYQ_TITLE_VAR;
+
+      const list = document.getElementById('myqList');
+      list.innerHTML = '';
+      const visible = myqExpanded ? myqItems : myqItems.slice(0, MYQ_COLLAPSED);
+      visible.forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'myq-item';
+        el.innerHTML = `
+          <div class="myq-accent ${item.type}"></div>
+          <div class="myq-body" onclick="myqDetailOpen(${item.id})">
+            <div class="myq-item-top">
+              <div class="myq-item-title">${esc(item.title)}</div>
+              ${item.vis === 'private' ? '<div class="myq-private-dot">P</div>' : ''}
+            </div>
+            <div class="myq-item-when">${esc(item.when)}</div>
+          </div>
+          <button class="myq-item-remove" onclick="myqRemove(${item.id})" title="Remove">×</button>
+        `;
+        list.appendChild(el);
+      });
+
+      const moreBtn = document.getElementById('myqMoreBtn');
+      const hidden  = myqItems.length - MYQ_COLLAPSED;
+      if (myqItems.length > MYQ_COLLAPSED) {
+        moreBtn.style.display = 'block';
+        moreBtn.textContent = myqExpanded ? '− see less' : `+ see more (${hidden})`;
+        moreBtn.onclick = () => { myqExpanded = !myqExpanded; myqRender(); };
+      } else {
+        moreBtn.style.display = 'none';
+      }
+    }
+
+    function myqRemove(id) {
+      myqItems = myqItems.filter(i => i.id !== id);
+      myqSaveStorage();
+      myqRender();
+    }
+
+    function myqOpenModal() {
+      myqType = 'loop'; myqVis = 'public';
+      document.getElementById('myqInputTitle').value   = '';
+      document.getElementById('myqInputWhen').value    = '';
+      document.getElementById('myqInputDetails').value = '';
+      myqSetType('loop'); myqSetVis('public');
+      document.getElementById('myqOverlay').classList.add('open');
+    }
+    function myqCloseModal() {
+      document.getElementById('myqOverlay').classList.remove('open');
+    }
+    function myqSetType(t) {
+      myqType = t;
+      document.getElementById('myqTypeLoop').className   = 'myq-type-btn' + (t==='loop'   ? ' sel-loop'   : '');
+      document.getElementById('myqTypeInvite').className = 'myq-type-btn' + (t==='invite' ? ' sel-invite' : '');
+      document.getElementById('myqWhenLabel').textContent = t === 'loop' ? 'Cadence' : 'When';
+      document.getElementById('myqInputWhen').placeholder = t === 'loop' ? 'e.g. Tues & Thurs 5:30pm' : 'e.g. Fri Jun 20, 7:05pm — Chase Field';
+    }
+    function myqSetVis(v) {
+      myqVis = v;
+      document.getElementById('myqVisPublic').className  = 'myq-vis-btn' + (v==='public'  ? ' active' : '');
+      document.getElementById('myqVisPrivate').className = 'myq-vis-btn' + (v==='private' ? ' active' : '');
+    }
+    function myqSave() {
+      const title = document.getElementById('myqInputTitle').value.trim();
+      const when  = document.getElementById('myqInputWhen').value.trim();
+      if (!title || !when) return;
+      myqItems.push({ id: myqNextId++, type: myqType, title, when, vis: myqVis });
+      myqSaveStorage();
+      myqCloseModal();
+      myqRender();
+    }
+
+    // Close add modal on overlay click
+    document.getElementById('myqOverlay').addEventListener('click', function(e) {
+      if (e.target === this) myqCloseModal();
+    });
+
+    // Detail/edit modal
+    let myqDetailId   = null;
+    let myqDetailVis  = 'public';
+
+    function myqDetailOpen(id) {
+      const item = myqItems.find(i => i.id === id);
+      if (!item) return;
+      myqDetailId = id;
+      // pill
+      const pill = document.getElementById('myqdTypePill');
+      pill.textContent = item.type === 'loop' ? 'Loop' : 'Invite';
+      pill.className   = 'myq-detail-type-pill ' + item.type;
+      // view mode content
+      document.getElementById('myqdTitle').textContent = item.title;
+      document.getElementById('myqdWhen').textContent  = item.when;
+      const detEl = document.getElementById('myqdDetails');
+      if (item.details && item.details.trim()) {
+        detEl.textContent  = item.details;
+        detEl.style.display = 'block';
+      } else {
+        detEl.style.display = 'none';
+      }
+      myqDetailSwitchView();
+      document.getElementById('myqDetailOverlay').classList.add('open');
+    }
+    function myqDetailClose() {
+      document.getElementById('myqDetailOverlay').classList.remove('open');
+      myqDetailId = null;
+    }
+    function myqDetailSwitchView() {
+      document.getElementById('myqdViewMode').style.display = 'block';
+      document.getElementById('myqdEditMode').style.display = 'none';
+    }
+    function myqDetailSwitchEdit() {
+      const item = myqItems.find(i => i.id === myqDetailId);
+      if (!item) return;
+      document.getElementById('myqdEditTitle').value   = item.title;
+      document.getElementById('myqdEditWhen').value    = item.when;
+      document.getElementById('myqdEditDetails').value = item.details || '';
+      document.getElementById('myqdEditWhenLabel').textContent = item.type === 'loop' ? 'Cadence' : 'When';
+      myqDetailVis = item.vis;
+      myqDetailSetVis(item.vis);
+      document.getElementById('myqdViewMode').style.display = 'none';
+      document.getElementById('myqdEditMode').style.display = 'block';
+    }
+    function myqDetailSetVis(v) {
+      myqDetailVis = v;
+      document.getElementById('myqdEditVisPublic').className  = 'myq-vis-btn' + (v==='public'  ? ' active' : '');
+      document.getElementById('myqdEditVisPrivate').className = 'myq-vis-btn' + (v==='private' ? ' active' : '');
+    }
+    function myqDetailSave() {
+      const item = myqItems.find(i => i.id === myqDetailId);
+      if (!item) return;
+      const title = document.getElementById('myqdEditTitle').value.trim();
+      const when  = document.getElementById('myqdEditWhen').value.trim();
+      if (!title || !when) return;
+      item.title   = title;
+      item.when    = when;
+      item.details = document.getElementById('myqdEditDetails').value.trim();
+      item.vis     = myqDetailVis;
+      myqSaveStorage();
+      myqRender();
+      myqDetailClose();
+    }
+    function myqDetailDelete() {
+      myqItems = myqItems.filter(i => i.id !== myqDetailId);
+      myqSaveStorage();
+      myqRender();
+      myqDetailClose();
+    }
+
+    // Close detail modal on overlay click
+    document.getElementById('myqDetailOverlay').addEventListener('click', function(e) {
+      if (e.target === this) myqDetailClose();
+    });
+
+    myqRender();
   </script>
 
 </body>
