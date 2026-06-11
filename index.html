@@ -1810,6 +1810,21 @@
         <!-- Dynamic feed renders here -->
         <div id="dynamicFeed"></div>
 
+        <!-- ── Permanent Post: Introducing My Q ── -->
+        <div class="post-card glass">
+          <div class="post-body"><p>Introducing My Q</p><p>My Q is a new module on your Postmarq profile that lets people know what you're up to — and signals you're open to company.</p><p>It runs on two simple ideas:</p><p><strong>Loops</strong> are things you do regularly and wouldn't mind doing with others. Walking the canal at 5:30pm. Browsing records on Saturday. Morning coffee at your usual spot. No RSVP, no commitment — just visibility into your rhythm.</p><p><strong>Invites</strong> are specific. A movie opening night. A game at Chase Field. A dinner you're organizing. Time, place, and a seat at the table if you want it.</p><p>Both live on your profile. Your neighborhood can see what you're up to. A Stamp says I'm interested. A message says I'm in.</p><p>No algorithm. No follower count. Just people whose lives happen to overlap with yours.</p></div>
+          <div class="post-img-wrap" onclick="lbOpen('MyQ.png','image')">
+            <img src="MyQ.png" alt="My Q module" />
+          </div>
+          <div class="post-footer">
+            <button class="stamp-btn" onclick="toggleStamp(this,0)">
+              <span class="stamp-icon">⬡</span> Stamp
+            </button>
+            <span class="stamp-count">0 stamps</span>
+            <span class="post-date">June 11, 2026</span>
+          </div>
+        </div>
+
         <!-- ── Permanent Post: New stamp ── -->
         <div class="post-card glass">
           <div class="post-body"><p>My new stamp. What it does... IDK. Need ideas!</p></div>
@@ -1864,6 +1879,22 @@
 
         <!-- ══ PANEL: WEEKLY ══ -->
         <div class="tab-panel active" id="panel-weekly">
+
+          <!-- Wednesday Jun 11 -->
+          <div class="weekly-day-group">
+            <div class="weekly-day-label">Wednesday — Jun 11</div>
+
+            <div class="weekly-row">
+              <div class="weekly-thumb-wrap"><img src="MyQ.png" alt="My Q" /></div>
+              <div class="weekly-body">
+                <div class="weekly-excerpt">Introducing My Q — a new module on your profile that lets people know what you're up to.</div>
+                <div class="weekly-meta">
+                  <span class="weekly-time">today</span>
+                  <span class="weekly-stamps">⬡ 0</span>
+                </div>
+              </div>
+            </div>
+          </div>
 
           <!-- Tuesday Jun 10 -->
           <div class="weekly-day-group">
@@ -1936,6 +1967,10 @@
           <!-- June 2026 -->
           <div class="yb-month-label">June 2026</div>
           <div class="yb-tile-grid">
+            <div class="yb-tile photo">
+              <img src="MyQ.png" alt="My Q" />
+              <div class="yb-tile-tip">Introducing My Q<br>Jun 11</div>
+            </div>
             <div class="yb-tile photo">
               <img src="Stamp_odesza.png" alt="Stamp" />
               <div class="yb-tile-tip">My new stamp<br>Jun 10</div>
