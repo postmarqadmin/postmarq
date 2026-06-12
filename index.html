@@ -244,35 +244,24 @@
     .section-header::after { content:''; flex:1; height:1px; background:rgba(255,255,255,0.5); }
 
     /* Composer */
-    .composer { border-radius: var(--radius-lg); padding: 1.35rem 1.6rem; }
+    .composer { border-radius: var(--radius-lg); padding: 1rem 1.2rem; }
 
-    .composer-header { display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.9rem; }
+    .composer-header { display: flex; align-items: flex-start; gap: 0.75rem; }
     .composer-avatar {
-      width: 36px; height: 36px; border-radius: 50%;
+      width: 2.4rem; height: 2.4rem; border-radius: 50%;
       overflow: hidden; border: 2px solid rgba(255,255,255,0.7); flex-shrink: 0;
     }
     .composer-avatar img { width:100%; height:100%; object-fit:cover; object-position:center top; }
-    .composer-who { font-size: 0.78rem; font-weight: 700; color: var(--ink-3); }
-
-    .type-row { display: flex; gap: 0.45rem; margin-bottom: 0.8rem; }
-    .type-btn {
-      padding: 0.26rem 0.78rem; border-radius: 999px;
-      font-family: var(--font); font-size: 0.72rem; font-weight: 700;
-      border: 1.5px solid rgba(255,255,255,0.6);
-      background: rgba(255,255,255,0.38); color: var(--ink-3); cursor: pointer;
-      transition: all 0.14s;
-    }
-    .type-btn:hover { background: rgba(255,255,255,0.65); color: var(--ink-2); }
-    .type-btn.active { background: var(--ink); border-color: var(--ink); color: white; }
+    .composer-right { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.5rem; }
 
     .composer-textarea {
       width: 100%;
       background: rgba(255,255,255,0.45);
       border: 1.5px solid rgba(255,255,255,0.7);
       border-radius: var(--radius-sm);
-      padding: 0.75rem 0.9rem;
+      padding: 0.55rem 0.9rem;
       font-family: var(--font); font-size: 0.9rem; font-weight: 500; color: var(--ink);
-      resize: vertical; min-height: 84px; outline: none;
+      resize: none; min-height: unset; height: auto; overflow: hidden; outline: none;
       transition: border-color 0.15s, box-shadow 0.15s;
     }
     .composer-textarea:focus {
@@ -295,7 +284,7 @@
 
     .composer-toolbar {
       display: flex; align-items: center; gap: 0.5rem;
-      margin-top: 0.75rem; flex-wrap: wrap;
+      margin-top: 0.56rem; flex-wrap: wrap;
     }
     .tool-btn {
       display: inline-flex; align-items: center; gap: 0.35rem;
@@ -322,6 +311,30 @@
     .post-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(232,153,42,0.42); }
     .post-btn:active { transform: scale(0.97); }
     .file-input { display: none; }
+
+    /* ── Link Preview Card ── */
+    .link-preview-card {
+      display: flex; gap: 0.7rem; align-items: flex-start;
+      background: rgba(255,255,255,0.5); border: 1.5px solid rgba(255,255,255,0.75);
+      border-radius: var(--radius-sm); overflow: hidden; margin-top: 0.5rem;
+      text-decoration: none; color: inherit;
+      transition: background 0.15s;
+    }
+    .link-preview-card:hover { background: rgba(255,255,255,0.72); }
+    .link-preview-thumb {
+      width: 90px; min-width: 90px; height: 72px;
+      object-fit: cover; display: block;
+    }
+    .link-preview-thumb.yt { width: 112px; min-width: 112px; height: 72px; }
+    .link-preview-info { flex: 1; min-width: 0; padding: 0.5rem 0.6rem 0.5rem 0; display: flex; flex-direction: column; gap: 0.2rem; justify-content: center; }
+    .link-preview-title { font-size: 0.82rem; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .link-preview-desc { font-size: 0.72rem; color: var(--ink-3); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .link-preview-domain { font-size: 0.65rem; font-weight: 700; color: var(--ink-4); text-transform: uppercase; letter-spacing: 0.04em; }
+    .link-preview-remove {
+      align-self: flex-start; margin: 0.35rem 0.5rem 0 0; background: none; border: none;
+      cursor: pointer; font-size: 0.7rem; color: var(--ink-4); opacity: 0.55; padding: 0;
+    }
+    .link-preview-remove:hover { opacity: 1; }
 
     /* ─── Quorum Post ─── */
     .post-quorum {
@@ -1460,7 +1473,7 @@
             </div>
             <div class="myq-title-block">
               <div class="myq-title" id="myqModuleTitle">My Q</div>
-              <div class="myq-subtitle">my schedule</div>
+              <div class="myq-subtitle">loop schedule</div>
             </div>
           </div>
           <div class="myq-list" id="myqList"></div>
@@ -1769,7 +1782,33 @@
       <!-- Right Column: Tabbed Feed -->
       <div class="sidebar">
 
-        <div class="section-header">Posts</div>
+        <!-- Composer -->
+        <div class="composer glass" id="composer">
+          <div class="composer-header">
+            <div class="composer-avatar"><img src="Profile Pic_01x.JPG" alt="Dave" /></div>
+            <div class="composer-right">
+              <textarea class="composer-textarea" id="composerText" placeholder="What's on your mind?" rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+              <div class="media-preview-strip" id="mediaPreviews"></div>
+              <div id="linkPreviewBox"></div>
+              <div class="composer-toolbar">
+                <button class="tool-btn" id="photoBtn" onclick="document.getElementById('photoInput').click()">
+                  📷 Photo <span class="tool-count" id="photoCount"></span>
+                </button>
+                <button class="tool-btn" id="videoBtn" onclick="document.getElementById('videoInput').click()">
+                  🎬 Video <span class="tool-count" id="videoCount"></span>
+                </button>
+                <button class="tool-btn" id="linkBtn" onclick="toggleLinkInput()">🔗 Link</button>
+                <div class="composer-spacer"></div>
+                <button class="post-btn" onclick="submitPost()">Post</button>
+              </div>
+              <div id="linkInputRow" style="display:none; margin-top:0.4rem;">
+                <input id="linkInput" type="url" placeholder="Paste a URL…" style="width:100%; padding:0.45rem 0.75rem; border-radius:var(--radius-sm); border:1.5px solid rgba(255,255,255,0.7); background:rgba(255,255,255,0.45); font-family:var(--font); font-size:0.85rem; color:var(--ink); outline:none;" oninput="debounceLinkPreview(this.value)" />
+              </div>
+            </div>
+          </div>
+          <input type="file" id="photoInput" class="file-input" accept="image/*" multiple onchange="addMedia(this,'image')" />
+          <input type="file" id="videoInput" class="file-input" accept="video/*" onchange="addMedia(this,'video')" />
+        </div>
 
         <!-- ── Tab Bar ── -->
         <div class="feed-tabs">
@@ -1780,32 +1819,6 @@
 
         <!-- ══ PANEL: DAILY ══ -->
         <div class="tab-panel" id="panel-daily">
-
-        <!-- Composer -->
-        <div class="composer glass" id="composer">
-          <div class="composer-header">
-            <div class="composer-avatar"><img src="Profile Pic_01x.JPG" alt="Dave" /></div>
-            <span class="composer-who">New post</span>
-          </div>
-          <div class="type-row">
-            <button class="type-btn active" data-type="post"   onclick="setType(this)">Post</button>
-            <button class="type-btn"         data-type="quorum" onclick="setType(this)">⬡ Quorum</button>
-          </div>
-          <textarea class="composer-textarea" id="composerText" placeholder="What's on your mind?"></textarea>
-          <div class="media-preview-strip" id="mediaPreviews"></div>
-          <div class="composer-toolbar">
-            <button class="tool-btn" id="photoBtn" onclick="document.getElementById('photoInput').click()">
-              📷 Photo <span class="tool-count" id="photoCount"></span>
-            </button>
-            <button class="tool-btn" id="videoBtn" onclick="document.getElementById('videoInput').click()">
-              🎬 Video <span class="tool-count" id="videoCount"></span>
-            </button>
-            <div class="composer-spacer"></div>
-            <button class="post-btn" onclick="submitPost()">Post</button>
-          </div>
-          <input type="file" id="photoInput" class="file-input" accept="image/*" multiple onchange="addMedia(this,'image')" />
-          <input type="file" id="videoInput" class="file-input" accept="video/*" onchange="addMedia(this,'video')" />
-        </div>
 
         <!-- Dynamic feed renders here -->
         <div id="dynamicFeed"></div>
@@ -2423,6 +2436,26 @@
         card.appendChild(grid);
       }
 
+      // link preview
+      if (post.link) {
+        const a = document.createElement('a');
+        a.className = 'link-preview-card';
+        a.href = post.link.url; a.target = '_blank'; a.rel = 'noopener';
+        a.style.marginBottom = '0.4rem';
+        if (post.link.image) {
+          const img = document.createElement('img');
+          img.className = 'link-preview-thumb' + (post.link.ytId ? ' yt' : '');
+          img.src = post.link.image; img.alt = '';
+          a.appendChild(img);
+        }
+        const info = document.createElement('div'); info.className = 'link-preview-info';
+        if (post.link.domain) { const d = document.createElement('div'); d.className = 'link-preview-domain'; d.textContent = post.link.domain; info.appendChild(d); }
+        if (post.link.title)  { const t = document.createElement('div'); t.className = 'link-preview-title';  t.textContent = post.link.title;  info.appendChild(t); }
+        if (post.link.description) { const ds = document.createElement('div'); ds.className = 'link-preview-desc'; ds.textContent = post.link.description; info.appendChild(ds); }
+        a.appendChild(info);
+        card.appendChild(a);
+      }
+
       // footer
       const footer = document.createElement('div');
       footer.className = 'post-footer';
@@ -2462,9 +2495,94 @@
       });
     }
 
+    // ─── Link Preview ────────────────────────────
+    let pendingLink = null;
+    let linkDebounceTimer = null;
+
+    function toggleLinkInput() {
+      const row = document.getElementById('linkInputRow');
+      const visible = row.style.display !== 'none';
+      row.style.display = visible ? 'none' : 'block';
+      if (visible) { clearLink(); }
+      else { document.getElementById('linkInput').focus(); }
+    }
+
+    function clearLink() {
+      pendingLink = null;
+      document.getElementById('linkPreviewBox').innerHTML = '';
+      const inp = document.getElementById('linkInput');
+      if (inp) inp.value = '';
+    }
+
+    function debounceLinkPreview(val) {
+      clearTimeout(linkDebounceTimer);
+      if (!val.trim()) { pendingLink = null; document.getElementById('linkPreviewBox').innerHTML = ''; return; }
+      linkDebounceTimer = setTimeout(() => fetchLinkPreview(val.trim()), 600);
+    }
+
+    async function fetchLinkPreview(url) {
+      const box = document.getElementById('linkPreviewBox');
+      if (!url.startsWith('http')) url = 'https://' + url;
+
+      // YouTube shortcut
+      const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/))([A-Za-z0-9_-]{11})/);
+      if (ytMatch) {
+        const id = ytMatch[1];
+        const thumb = `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+        pendingLink = { url, title: 'YouTube Video', description: '', image: thumb, domain: 'youtube.com', ytId: id };
+        renderLinkPreview(box, pendingLink);
+        return;
+      }
+
+      box.innerHTML = '<span style="font-size:0.75rem;color:var(--ink-4);padding:0.3rem 0;display:block;">Loading preview…</span>';
+      try {
+        const api = `https://api.microlink.io/?url=${encodeURIComponent(url)}`;
+        const res = await fetch(api);
+        const json = await res.json();
+        if (json.status === 'success') {
+          const d = json.data;
+          pendingLink = {
+            url,
+            title:       d.title       || '',
+            description: d.description || '',
+            image:       d.image?.url  || '',
+            domain:      d.publisher   || new URL(url).hostname.replace('www.','')
+          };
+          renderLinkPreview(box, pendingLink);
+        } else {
+          pendingLink = { url, title: url, description: '', image: '', domain: new URL(url).hostname.replace('www.','') };
+          renderLinkPreview(box, pendingLink);
+        }
+      } catch {
+        box.innerHTML = '<span style="font-size:0.75rem;color:var(--ink-4);padding:0.3rem 0;display:block;">Could not load preview.</span>';
+      }
+    }
+
+    function renderLinkPreview(box, link) {
+      box.innerHTML = '';
+      const a = document.createElement('a');
+      a.className = 'link-preview-card';
+      a.href = link.url; a.target = '_blank'; a.rel = 'noopener';
+      if (link.image) {
+        const img = document.createElement('img');
+        img.className = 'link-preview-thumb' + (link.ytId ? ' yt' : '');
+        img.src = link.image; img.alt = '';
+        a.appendChild(img);
+      }
+      const info = document.createElement('div'); info.className = 'link-preview-info';
+      if (link.domain) { const d = document.createElement('div'); d.className = 'link-preview-domain'; d.textContent = link.domain; info.appendChild(d); }
+      if (link.title)  { const t = document.createElement('div'); t.className = 'link-preview-title'; t.textContent = link.title; info.appendChild(t); }
+      if (link.description) { const ds = document.createElement('div'); ds.className = 'link-preview-desc'; ds.textContent = link.description; info.appendChild(ds); }
+      a.appendChild(info);
+      const rm = document.createElement('button'); rm.className = 'link-preview-remove'; rm.textContent = '✕';
+      rm.onclick = e => { e.preventDefault(); e.stopPropagation(); clearLink(); document.getElementById('linkInputRow').style.display = 'none'; };
+      a.appendChild(rm);
+      box.appendChild(a);
+    }
+
     async function submitPost() {
       const text = document.getElementById('composerText').value.trim();
-      if (!text && mediaFiles.length === 0) return;
+      if (!text && mediaFiles.length === 0 && !pendingLink) return;
 
       // convert files to base64 for storage
       const media = [];
@@ -2478,6 +2596,7 @@
         type: postType,
         text: text ? esc(text) : '',
         media,
+        link: pendingLink || null,
         date: new Date().toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' })
       };
 
@@ -2493,7 +2612,10 @@
       requestAnimationFrame(() => { card.style.opacity = '1'; card.style.transform = 'translateY(0)'; });
 
       document.getElementById('composerText').value = '';
+      document.getElementById('composerText').style.height = 'auto';
       mediaFiles = []; renderPreviews();
+      clearLink();
+      document.getElementById('linkInputRow').style.display = 'none';
     }
 
     // load saved posts on startup
