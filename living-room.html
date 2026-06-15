@@ -735,7 +735,7 @@
     const frame = document.getElementById('yt-frame-'+id);
     if(placeholder) placeholder.style.display='none';
     if(frame) {
-      frame.src = `https://www.youtube.com/embed/${vid}?autoplay=1&mute=${muted?1:0}`;
+      frame.src = `https://www.youtube.com/embed/${vid}?autoplay=0`;
       frame.style.display='block';
     }
   }
@@ -809,6 +809,25 @@
 
   // ── News Feed ──────────────────────────────
   const DEFAULT_RSS = 'https://feeds.npr.org/1001/rss.xml';
+  const RSS_NAMES = {
+    'feeds.npr.org':       'NPR',
+    'theverge.com':        'The Verge',
+    'espn.com':            'ESPN',
+    'feeds.bbci.co.uk':   'BBC News',
+    'rss.nytimes.com':    'NY Times',
+    'feeds.washingtonpost.com': 'Washington Post',
+    'techcrunch.com':     'TechCrunch',
+    'wired.com':          'Wired',
+  };
+  function rssFeedName(url) {
+    try {
+      const host = new URL(url).hostname.replace(/^www\./, '');
+      for(const [key, name] of Object.entries(RSS_NAMES)) {
+        if(host.includes(key)) return name;
+      }
+      return host;
+    } catch { return url; }
+  }
   async function initNews(id) { await fetchNews(id); }
   async function fetchNews(id) {
     const inputEl = document.getElementById('ws-rss-'+id);
@@ -819,19 +838,43 @@
     if(loading) loading.style.display='';
     if(list) list.innerHTML='';
     try {
-      const url = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rss)}&count=6`;
-      const r = await fetch(url);
-      const d = await r.json();
+      // Try direct fetch via CORS proxy first
+      const proxy = `https://corsproxy.io/?${encodeURIComponent(rss)}`;
+      const r = await fetch(proxy);
+      const text = await r.text();
+      const xml = new DOMParser().parseFromString(text, 'text/xml');
+      const feedTitle = rssFeedName(rss);
+      const items = [...xml.querySelectorAll('item')].slice(0, 8);
+      if(!items.length) throw new Error('no items');
       if(loading) loading.style.display='none';
       if(!list) return;
-      if(d.status !== 'ok') throw new Error();
-      list.innerHTML = d.items.map(item=>`
-        <div class="news-item">
-          <a class="news-headline" href="${item.link}" target="_blank" rel="noopener">${item.title}</a>
-          <div class="news-meta">${d.feed.title} · ${new Date(item.pubDate).toLocaleDateString()}</div>
-        </div>`).join('');
+      list.innerHTML = items.map(item => {
+        const title = item.querySelector('title')?.textContent || '';
+        const link  = item.querySelector('link')?.textContent || item.querySelector('guid')?.textContent || '#';
+        const pub   = item.querySelector('pubDate')?.textContent;
+        const date  = pub ? new Date(pub).toLocaleDateString() : '';
+        return `<div class="news-item">
+          <a class="news-headline" href="${link}" target="_blank" rel="noopener">${title}</a>
+          <div class="news-meta">${feedTitle}${date ? ' · ' + date : ''}</div>
+        </div>`;
+      }).join('');
     } catch(e) {
-      if(loading) loading.innerHTML='<span style="color:var(--ink-3)">Failed to load feed. Try another URL in settings.</span>';
+      // Fallback to rss2json
+      try {
+        const url = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rss)}`;
+        const r2 = await fetch(url);
+        const d = await r2.json();
+        if(loading) loading.style.display='none';
+        if(!list) return;
+        if(d.status !== 'ok') throw new Error();
+        list.innerHTML = d.items.map(item=>`
+          <div class="news-item">
+            <a class="news-headline" href="${item.link}" target="_blank" rel="noopener">${item.title}</a>
+            <div class="news-meta">${rssFeedName(rss)} · ${new Date(item.pubDate).toLocaleDateString()}</div>
+          </div>`).join('');
+      } catch(e2) {
+        if(loading) loading.innerHTML='<span style="color:var(--ink-3)">Failed to load feed.</span>';
+      }
     }
   }
 
