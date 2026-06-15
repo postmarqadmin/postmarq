@@ -166,6 +166,11 @@
     body.edit-mode .widget-drag-icon { display: block; }
     .widget-type-icon { font-size: 0.8rem; color: var(--accent); flex-shrink: 0; }
     .widget-title { font-size: 0.72rem; font-weight: 700; color: var(--ink-2); letter-spacing: 0.03em; }
+    .news-header { background: linear-gradient(90deg, #7b68c8 0%, var(--teal) 100%) !important; border-bottom-color: transparent !important; }
+    .news-header .widget-title { color: #fff; }
+    .news-header .widget-type-icon { color: rgba(255,255,255,0.8); }
+    .news-header .widget-gear, .news-header .widget-close-x { color: rgba(255,255,255,0.7); }
+    .news-header .widget-gear:hover, .news-header .widget-close-x:hover { color: #fff; }
     .widget-spacer { flex: 1; }
     .widget-gear, .widget-close-x {
       display: none; align-items: center; justify-content: center;
@@ -218,12 +223,23 @@
     .widget-content.no-pad { padding: 0; display: flex; flex-direction: column; overflow: hidden; }
 
     /* ── Clock Widget ── */
-    .clock-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 0.25rem; }
-    .clock-time { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); line-height: 1; }
-    .clock-date { font-size: 0.72rem; font-weight: 600; color: var(--ink-3); text-align: center; }
-    .clock-toggle-btn { margin-top: 0.5rem; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 999px; padding: 0.2rem 0.65rem; font-size: 0.65rem; font-weight: 700; color: var(--ink-3); cursor: pointer; font-family: var(--font); }
-    .clock-toggle-btn:hover { color: var(--ink); }
-    .clock-canvas { display: none; border-radius: 50%; }
+    .clock-wrap { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+    .clock-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 0.85rem 1rem 0.7rem; border-bottom: 0.5px solid rgba(255,255,255,0.07); flex-shrink: 0; }
+    .clock-date-block { display: flex; flex-direction: column; line-height: 1; gap: 2px; }
+    .clock-day-num { font-size: 2.4rem; font-weight: 900; color: #fff; line-height: 1; }
+    .clock-day-name { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; background: linear-gradient(90deg, #7F77DD, #5aafc2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .clock-month { font-size: 0.68rem; font-weight: 500; color: rgba(255,255,255,0.35); margin-top: 2px; }
+    .clock-time-block { text-align: right; }
+    .clock-time { font-size: 2.1rem; font-weight: 900; line-height: 1; background: linear-gradient(90deg, #7F77DD, #EF9F27); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.02em; }
+    .clock-ampm { font-size: 0.65rem; font-weight: 700; color: rgba(255,255,255,0.4); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .clock-subtitle { font-size: 0.58rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-top: 1px; }
+    .clock-loops { flex: 1; overflow-y: auto; padding: 0.35rem 0; }
+    .clock-loop-item { display: flex; align-items: flex-start; gap: 0; padding: 0.4rem 1rem; }
+    .clock-loop-accent { width: 3px; border-radius: 999px; flex-shrink: 0; align-self: stretch; margin-right: 8px; min-height: 24px; background: #7F77DD; }
+    .clock-loop-accent.invite { background: #EF9F27; }
+    .clock-loop-title { font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.85); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .clock-loop-when { font-size: 0.62rem; color: rgba(255,255,255,0.35); margin-top: 1px; }
+    .clock-loop-empty { padding: 0.6rem 1rem; font-size: 0.68rem; color: rgba(255,255,255,0.2); font-style: italic; }
 
     /* ── Weather Widget ── */
     .weather-current { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
@@ -310,6 +326,19 @@
     .news-headline:hover { color: var(--accent); }
     .news-meta { font-size: 0.62rem; color: var(--ink-3); margin-top: 0.2rem; }
     .news-loading { color: var(--ink-3); font-size: 0.78rem; text-align: center; padding: 1rem; }
+
+    /* ── Reddit Widget ── */
+    .rd-item { display: flex; gap: 0.55rem; padding: 0.55rem 0; border-bottom: 1px solid var(--w-border); align-items: flex-start; }
+    .rd-item:last-child { border-bottom: none; }
+    .rd-thumb { width: 52px; height: 52px; border-radius: 6px; object-fit: cover; flex-shrink: 0; background: rgba(255,255,255,0.05); }
+    .rd-thumb-placeholder { width: 52px; height: 52px; border-radius: 6px; flex-shrink: 0; background: rgba(255,69,0,0.12); display: flex; align-items: center; justify-content: center; }
+    .rd-thumb-placeholder i { font-size: 1.3rem; color: rgba(255,69,0,0.5); }
+    .rd-body { flex: 1; min-width: 0; }
+    .rd-title { font-size: 0.72rem; font-weight: 700; color: var(--ink); line-height: 1.4; text-decoration: none; display: block; }
+    .rd-title:hover { color: #FF4500; }
+    .rd-meta { font-size: 0.6rem; color: var(--ink-3); margin-top: 0.25rem; display: flex; gap: 0.4rem; flex-wrap: wrap; }
+    .rd-sub { color: #FF4500; font-weight: 700; }
+    .rd-loading { color: var(--ink-3); font-size: 0.78rem; text-align: center; padding: 1rem; }
 
     /* ── Snake Widget ── */
     .snake-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 0.5rem; }
@@ -451,9 +480,10 @@
     snake:        { title:'Snake',              icon:'ti-device-gamepad-2',minW:4, minH:4, defaultW:4, defaultH:4, desc:'Classic Snake. Arrow keys to play.' },
     calendar:     { title:'Google Calendar',    icon:'ti-calendar',        minW:4, minH:3, defaultW:4, defaultH:4, desc:'Paste your Google Calendar embed URL.' },
     neighborhood: { title:'Neighborhood Pulse', icon:'ti-map-pin',         minW:3, minH:2, defaultW:5, defaultH:2, desc:'Live activity from your Postmarq neighborhood.' },
+    reddit:       { title:'Reddit',             icon:'ti-brand-reddit',    minW:3, minH:3, defaultW:4, defaultH:5, desc:'Hot posts from any subreddit RSS feed.' },
   };
 
-  const LAYOUT_VERSION = 2;
+  const LAYOUT_VERSION = 3;
 
   const SEED_LAYOUT = [
     { type:'clock',        x:0, y:0,  w:3, h:2 },
@@ -467,6 +497,7 @@
     { type:'newsfeed',     x:0, y:11, w:4, h:3, rss:'https://feeds.npr.org/1001/rss.xml' },
     { type:'newsfeed',     x:4, y:11, w:4, h:3, rss:'https://www.theverge.com/rss/index.xml' },
     { type:'newsfeed',     x:8, y:11, w:4, h:3, rss:'https://www.espn.com/espn/rss/news' },
+    { type:'reddit',       x:0, y:14, w:6, h:5 },
   ];
 
   /* ═══════════════════════════════════════════
@@ -474,12 +505,14 @@
   ═══════════════════════════════════════════ */
   function buildWidget(type, id) {
     const def = WIDGET_DEFS[type];
+    const isNews = type === 'newsfeed';
+    const newsTitle = isNews ? rssFeedName(localStorage.getItem('pm_lr_rss_'+id) || DEFAULT_RSS) : def.title;
     return `
       <div class="widget-wrap" data-widget-type="${type}" data-widget-id="${id}" tabindex="0">
-        <div class="widget-header">
+        <div class="widget-header${isNews ? ' news-header' : ''}">
           <i class="ti ti-grip-vertical widget-drag-icon"></i>
           <i class="ti ${def.icon} widget-type-icon"></i>
-          <span class="widget-title">${def.title}</span>
+          <span class="widget-title" id="wtitle-${id}">${newsTitle}</span>
           <span class="widget-spacer"></span>
           <button class="widget-gear" onclick="toggleSettings(this)" title="Settings"><i class="ti ti-settings"></i></button>
           <button class="widget-close-x" onclick="removeW(this)" title="Remove">✕</button>
@@ -496,6 +529,7 @@
       case 'weather':  return `<div class="settings-label">City</div><input class="settings-input" id="ws-city-${id}" placeholder="e.g. Phoenix, AZ" /><button class="settings-btn" onclick="refreshWeather('${id}')">Update</button>${close}`;
       case 'newsfeed': return `<div class="settings-label">RSS Feed URL</div><input class="settings-input" id="ws-rss-${id}" placeholder="https://feeds.npr.org/1001/rss.xml" /><button class="settings-btn" onclick="fetchNews('${id}')">Load Feed</button>${close}`;
       case 'calendar': return `<div class="settings-label">Google Calendar Embed URL</div><input class="settings-input" id="ws-cal-${id}" placeholder="https://calendar.google.com/calendar/embed?src=..." /><button class="settings-btn" onclick="loadCalendar('${id}')">Load Calendar</button>${close}`;
+      case 'reddit':  return `<div class="settings-label">Subreddit RSS URL</div><input class="settings-input" id="ws-rd-${id}" placeholder="reddit.com/r/popular/hot.rss" /><button class="settings-btn" onclick="fetchReddit('${id}')">Load Feed</button>${close}`;
       case 'youtube':  return `<div class="settings-label">Default Video URL</div><input class="settings-input" id="ws-yt-${id}" placeholder="https://youtube.com/watch?v=..." /><button class="settings-btn" onclick="loadYT('${id}',document.getElementById('ws-yt-${id}').value)">Load</button>${close}`;
       default:         return `<div class="settings-label" style="color:var(--ink-3)">No settings for this widget.</div>${close}`;
     }
@@ -505,10 +539,21 @@
     switch(type) {
       case 'clock': return `
         <div class="clock-wrap">
-          <canvas class="clock-canvas" id="cc-${id}" width="160" height="160"></canvas>
-          <div class="clock-time" id="ct-${id}">--:--:--</div>
-          <div class="clock-date" id="cd-${id}">Loading...</div>
-          <button class="clock-toggle-btn" onclick="toggleClockStyle('${id}')">Analog</button>
+          <div class="clock-header">
+            <div class="clock-date-block">
+              <div class="clock-day-num" id="cd-num-${id}">--</div>
+              <div class="clock-day-name" id="cd-day-${id}">------</div>
+              <div class="clock-month" id="cd-month-${id}">--- ----</div>
+            </div>
+            <div class="clock-time-block">
+              <div style="display:flex;align-items:flex-end;gap:0.25rem;justify-content:flex-end;">
+                <div class="clock-time" id="ct-${id}">--:--</div>
+                <div class="clock-ampm" id="ct-ampm-${id}">--</div>
+              </div>
+              <div class="clock-subtitle">Loop Schedule</div>
+            </div>
+          </div>
+          <div class="clock-loops" id="cl-loops-${id}"></div>
         </div>`;
       case 'weather': return `<div class="weather-loading" id="wl-${id}"><i class="ti ti-loader" style="animation:spin 1s linear infinite;display:inline-block;"></i> Loading weather…</div><div id="wd-${id}" style="display:none;"></div>`;
       case 'gmail': return `
@@ -553,6 +598,7 @@
         </div>
         <iframe class="cal-iframe" id="cal-frame-${id}" style="display:none;" allowfullscreen></iframe>`;
       case 'neighborhood': return `<div id="nb-${id}"></div>`;
+      case 'reddit': return `<div class="rd-loading" id="rdl-${id}"><i class="ti ti-loader" style="animation:spin 1s linear infinite;display:inline-block;"></i> Loading posts…</div><div id="rdlist-${id}"></div>`;
       default: return '<div style="padding:1rem;color:var(--ink-3)">Unknown widget</div>';
     }
   }
@@ -574,45 +620,55 @@
       case 'snake':        initSnake(id); break;
       case 'calendar':     initCalendar(id); break;
       case 'neighborhood': initNeighborhood(id); break;
+      case 'reddit':       initReddit(id); break;
     }
   }
 
   // ── Clock ──────────────────────────────────
   const clockStates = {};
   function initClock(id) {
-    clockStates[id] = { analog: false };
-    if (clockStates[id]._interval) clearInterval(clockStates[id]._interval);
+    if (clockStates[id]?._interval) clearInterval(clockStates[id]._interval);
+    clockStates[id] = {};
     function tick() {
       const now = new Date(new Date().toLocaleString('en-US', {timeZone:'America/Phoenix'}));
-      const st = clockStates[id];
-      if (st.analog) {
-        drawAnalogClock(id, now);
-      } else {
-        const te = document.getElementById('ct-'+id);
-        const de = document.getElementById('cd-'+id);
-        if (te) te.textContent = now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-        if (de) de.textContent = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
-      }
+      const dayNum  = document.getElementById('cd-num-'+id);
+      const dayName = document.getElementById('cd-day-'+id);
+      const month   = document.getElementById('cd-month-'+id);
+      const timeEl  = document.getElementById('ct-'+id);
+      const ampmEl  = document.getElementById('ct-ampm-'+id);
+      if (dayNum)  dayNum.textContent  = now.getDate();
+      if (dayName) dayName.textContent = now.toLocaleDateString('en-US',{weekday:'long'});
+      if (month)   month.textContent   = now.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+      if (timeEl)  timeEl.textContent  = now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true}).replace(/\s(AM|PM)$/,'');
+      if (ampmEl)  ampmEl.textContent  = now.toLocaleTimeString('en-US',{hour:'numeric',hour12:true}).replace(/.*\s/,'');
     }
     tick();
     clockStates[id]._interval = setInterval(tick, 1000);
+    renderClockLoops(id);
   }
-  function toggleClockStyle(id) {
-    const st = clockStates[id] || (clockStates[id] = {analog:false});
-    st.analog = !st.analog;
-    const canvas = document.getElementById('cc-'+id);
-    const timeEl = document.getElementById('ct-'+id);
-    const dateEl = document.getElementById('cd-'+id);
-    const btn = canvas?.closest('.clock-wrap')?.querySelector('.clock-toggle-btn');
-    if (canvas) canvas.style.display = st.analog ? 'block' : 'none';
-    if (timeEl) timeEl.style.display = st.analog ? 'none' : '';
-    if (dateEl) dateEl.style.display = st.analog ? 'none' : '';
-    if (btn) btn.textContent = st.analog ? 'Digital' : 'Analog';
-  }
-  function setClockStyle(id, val) {
-    const st = clockStates[id] || (clockStates[id] = {analog:false});
-    const wantAnalog = val === 'analog';
-    if (st.analog !== wantAnalog) toggleClockStyle(id);
+  function renderClockLoops(id) {
+    const el = document.getElementById('cl-loops-'+id);
+    if (!el) return;
+    const today = new Date().toLocaleDateString('en-US',{weekday:'long'}).toLowerCase();
+    let items = [];
+    try { items = JSON.parse(localStorage.getItem('myqItems') || '[]'); } catch {}
+    const todayItems = items.filter(it => {
+      if (!it) return false;
+      const when = (it.when || it.cadence || '').toLowerCase();
+      return when.includes(today) || when.includes('daily') || when.includes('every day') || it.type === 'loop';
+    });
+    if (!todayItems.length) {
+      el.innerHTML = `<div class="clock-loop-empty">No loop events today</div>`;
+      return;
+    }
+    el.innerHTML = todayItems.map(it => `
+      <div class="clock-loop-item">
+        <div class="clock-loop-accent${it.type === 'invite' ? ' invite' : ''}"></div>
+        <div>
+          <div class="clock-loop-title">${it.title || ''}</div>
+          <div class="clock-loop-when">${it.when || it.cadence || ''}</div>
+        </div>
+      </div>`).join('');
   }
   function drawAnalogClock(id, d) {
     const canvas = document.getElementById('cc-'+id);
@@ -810,14 +866,14 @@
   // ── News Feed ──────────────────────────────
   const DEFAULT_RSS = 'https://feeds.npr.org/1001/rss.xml';
   const RSS_NAMES = {
-    'feeds.npr.org':       'NPR',
-    'theverge.com':        'The Verge',
-    'espn.com':            'ESPN',
-    'feeds.bbci.co.uk':   'BBC News',
-    'rss.nytimes.com':    'NY Times',
-    'feeds.washingtonpost.com': 'Washington Post',
-    'techcrunch.com':     'TechCrunch',
-    'wired.com':          'Wired',
+    'feeds.npr.org':            'NPR News Feed',
+    'theverge.com':             'The Verge News Feed',
+    'espn.com':                 'ESPN News Feed',
+    'feeds.bbci.co.uk':        'BBC News Feed',
+    'rss.nytimes.com':         'NY Times News Feed',
+    'feeds.washingtonpost.com': 'Washington Post News Feed',
+    'techcrunch.com':          'TechCrunch News Feed',
+    'wired.com':               'Wired News Feed',
   };
   function rssFeedName(url) {
     try {
@@ -828,11 +884,59 @@
       return host;
     } catch { return url; }
   }
+  const DEFAULT_REDDIT = 'https://www.reddit.com/r/popular/hot.rss';
+  async function initReddit(id) {
+    const saved = localStorage.getItem('pm_lr_rd_'+id) || DEFAULT_REDDIT;
+    await fetchReddit(id, saved);
+  }
+  async function fetchReddit(id, urlOverride) {
+    const inputEl = document.getElementById('ws-rd-'+id);
+    let rss = urlOverride || (inputEl && inputEl.value.trim()) || localStorage.getItem('pm_lr_rd_'+id) || DEFAULT_REDDIT;
+    if (!rss.startsWith('http')) rss = 'https://' + rss;
+    if (inputEl && inputEl.value.trim()) localStorage.setItem('pm_lr_rd_'+id, rss);
+    else if (!urlOverride) localStorage.setItem('pm_lr_rd_'+id, rss);
+    const loading = document.getElementById('rdl-'+id);
+    const list    = document.getElementById('rdlist-'+id);
+    if (loading) loading.style.display = '';
+    if (list) list.innerHTML = '';
+    try {
+      const url = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rss)}`;
+      const r = await fetch(url);
+      const d = await r.json();
+      if (d.status !== 'ok') throw new Error();
+      if (loading) loading.style.display = 'none';
+      if (!list) return;
+      list.innerHTML = d.items.map(item => {
+        const sub = (item.link.match(/reddit\.com\/(r\/[^/]+)/) || [])[1] || 'reddit';
+        const author = item.author ? item.author.replace('/u/','u/') : '';
+        const date = item.pubDate ? new Date(item.pubDate).toLocaleDateString() : '';
+        const thumb = item.thumbnail && item.thumbnail !== 'self' && item.thumbnail !== 'default' && item.thumbnail.startsWith('http')
+          ? `<img class="rd-thumb" src="${item.thumbnail}" alt="" onerror="this.replaceWith(document.querySelector('.rd-thumb-placeholder').cloneNode(true))">`
+          : `<div class="rd-thumb-placeholder"><i class="ti ti-brand-reddit"></i></div>`;
+        return `<div class="rd-item">
+          ${thumb}
+          <div class="rd-body">
+            <a class="rd-title" href="${item.link}" target="_blank" rel="noopener">${item.title}</a>
+            <div class="rd-meta">
+              <span class="rd-sub">${sub}</span>
+              ${author ? `<span>· ${author}</span>` : ''}
+              ${date ? `<span>· ${date}</span>` : ''}
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    } catch(e) {
+      if (loading) loading.innerHTML = '<span style="color:var(--ink-3)">Failed to load Reddit feed.</span>';
+    }
+  }
+
   async function initNews(id) { await fetchNews(id); }
   async function fetchNews(id) {
     const inputEl = document.getElementById('ws-rss-'+id);
     const rss = (inputEl && inputEl.value.trim()) || localStorage.getItem('pm_lr_rss_'+id) || DEFAULT_RSS;
     if(inputEl && inputEl.value.trim()) localStorage.setItem('pm_lr_rss_'+id, rss);
+    const titleEl = document.getElementById('wtitle-'+id);
+    if(titleEl) titleEl.textContent = rssFeedName(rss);
     const loading = document.getElementById('nl-'+id);
     const list    = document.getElementById('nlist-'+id);
     if(loading) loading.style.display='';
@@ -994,6 +1098,7 @@
     const id = `w${++widgetCount}`;
     // Pre-seed config values before init runs
     if(opts.rss) localStorage.setItem('pm_lr_rss_'+id, opts.rss);
+    if(opts.rd)  localStorage.setItem('pm_lr_rd_'+id, opts.rd);
     const el = grid.addWidget({
       x: opts.x, y: opts.y,
       w: opts.w || def.defaultW,
