@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Living Room — davemichael.postmarq</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link href="https://cdn.jsdelivr.net/npm/gridstack@10/dist/gridstack.min.css" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0f0f14;
+      --bg2:       #1a1a22;
+      --w-bg:      #1e1e28;
+      --w-head:    #17171f;
+      --w-border:  rgba(255,255,255,0.07);
+      --w-radius:  12px;
+      --accent:    #9b8fd4;
+      --teal:      #4ab5aa;
+      --amber:     #e8992a;
+      --ink:       #e8e0f0;
+      --ink-2:     rgba(232,224,240,0.6);
+      --ink-3:     rgba(232,224,240,0.35);
+      --edit-glow: rgba(139,92,246,0.4);
+      --font:      'Nunito', system-ui, sans-serif;
+    }
+
+    html, body { height: 100%; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Address Bar ── */
+    .address-bar {
+      position: sticky; top: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0.55rem 1rem;
+      background: rgba(15,15,20,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .address-inner {
+      display: flex; align-items: center; gap: 0.55rem;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 999px; padding: 0.28rem 1rem 0.28rem 0.7rem;
+    }
+    .address-dot { width: 7px; height: 7px; border-radius: 50%; background: linear-gradient(135deg,#f5c462,#e8992a); }
+    .address-text { font-size: 0.75rem; font-weight: 500; color: var(--ink-2); letter-spacing:.02em; }
+    .address-text strong { color: var(--ink); font-weight: 700; }
+
+    /* ── Page Header ── */
+    .page-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.9rem 1.25rem 0.6rem;
+      max-width: 1800px; margin: 0 auto; width: 100%;
+    }
+    .page-header-left { display: flex; align-items: center; gap: 0.6rem; }
+    .page-title { font-size: 1.1rem; font-weight: 800; color: var(--ink); }
+    .page-subtitle { font-size: 0.72rem; font-weight: 500; color: var(--ink-3); }
+    .page-header-right { display: flex; align-items: center; gap: 0.75rem; }
+
+    /* ── Column Picker ── */
+    .col-picker { display: flex; align-items: center; gap: 0.2rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09); border-radius: 999px; padding: 0.22rem 0.35rem; }
+    .col-picker-label { font-size: 0.62rem; font-weight: 700; color: var(--ink-3); padding: 0 0.3rem 0 0.2rem; text-transform: uppercase; letter-spacing: 0.06em; }
+    .col-btn { width: 26px; height: 26px; border-radius: 999px; border: none; background: transparent; color: var(--ink-3); font-family: var(--font); font-size: 0.72rem; font-weight: 800; cursor: pointer; transition: background 0.15s, color 0.15s; display: flex; align-items: center; justify-content: center; }
+    .col-btn:hover { background: rgba(255,255,255,0.08); color: var(--ink-2); }
+    .col-btn.active { background: linear-gradient(135deg, rgba(78,58,160,0.85), rgba(50,150,142,0.85)); color: #fff; }
+
+    .btn-edit-layout {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.42rem 1rem; border-radius: 999px;
+      background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+      color: var(--ink-2); font-family: var(--font); font-size: 0.75rem; font-weight: 700;
+      cursor: pointer; transition: background 0.15s, color 0.15s;
+    }
+    .btn-edit-layout:hover { background: rgba(255,255,255,0.12); color: var(--ink); }
+    body.edit-mode .btn-edit-layout {
+      background: linear-gradient(90deg, rgba(78,58,160,0.7), rgba(50,150,142,0.7));
+      border-color: transparent; color: #fff;
+    }
+
+    .btn-add-widget {
+      display: none; align-items: center; gap: 0.4rem;
+      padding: 0.42rem 1rem; border-radius: 999px;
+      background: linear-gradient(90deg, rgba(78,58,160,0.95), rgba(50,150,142,0.95));
+      border: none; color: #fff; font-family: var(--font); font-size: 0.75rem; font-weight: 700;
+      cursor: pointer; box-shadow: 0 3px 12px rgba(78,58,160,0.3);
+      transition: opacity 0.15s;
+    }
+    .btn-add-widget:hover { opacity: 0.88; }
+    body.edit-mode .btn-add-widget { display: inline-flex; }
+
+    /* ── Room Nav ── */
+    .room-nav {
+      display: flex; border-radius: 18px; overflow: hidden;
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.08);
+      margin: 0 1.25rem 0.9rem;
+      max-width: 1800px; margin-left: auto; margin-right: auto;
+      width: calc(100% - 2.5rem);
+    }
+    .room-tab {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+      padding: 0.6rem 0.25rem 0.5rem;
+      text-decoration: none; color: var(--ink-3);
+      font-size: 0.58rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+      border-right: 1px solid rgba(255,255,255,0.06);
+      transition: background 0.15s, color 0.15s; cursor: pointer;
+    }
+    .room-tab:last-child { border-right: none; }
+    .room-tab i { font-size: 1.1rem; }
+    .room-tab:hover { background: rgba(255,255,255,0.06); color: var(--ink-2); }
+    .room-tab.active { background: linear-gradient(160deg,rgba(155,143,212,0.18),rgba(74,181,170,0.12)); color: var(--ink); }
+    .room-tab.active i { color: var(--accent); }
+
+    /* ── Grid Container ── */
+    .grid-wrap {
+      padding: 0 1rem 2rem;
+      max-width: 1800px; margin: 0 auto; width: 100%;
+    }
+    .grid-stack { background: transparent; min-height: calc(100vh - 200px); }
+    body.edit-mode .grid-stack {
+      background-image: radial-gradient(circle, rgba(139,92,246,0.12) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    /* ── GridStack Item Overrides ── */
+    .grid-stack-item-content {
+      background: var(--w-bg) !important;
+      border-radius: var(--w-radius) !important;
+      border: 1px solid var(--w-border) !important;
+      overflow: hidden !important;
+      display: flex !important;
+      flex-direction: column !important;
+      transition: box-shadow 0.2s;
+    }
+    body.edit-mode .grid-stack-item-content {
+      box-shadow: 0 0 0 1.5px var(--edit-glow), 0 0 20px rgba(139,92,246,0.08) !important;
+    }
+
+    /* ── Widget Structure ── */
+    .widget-wrap {
+      display: flex; flex-direction: column;
+      height: 100%; width: 100%; position: relative; outline: none;
+    }
+    .widget-header {
+      display: flex; align-items: center; gap: 0.45rem;
+      padding: 0 0.7rem; height: 34px; flex-shrink: 0;
+      background: var(--w-head);
+      border-bottom: 1px solid var(--w-border);
+      user-select: none;
+    }
+    body.edit-mode .widget-header { cursor: grab; }
+    body.edit-mode .widget-header:active { cursor: grabbing; }
+    .widget-drag-icon { color: var(--ink-3); font-size: 0.85rem; display: none; }
+    body.edit-mode .widget-drag-icon { display: block; }
+    .widget-type-icon { font-size: 0.8rem; color: var(--accent); flex-shrink: 0; }
+    .widget-title { font-size: 0.72rem; font-weight: 700; color: var(--ink-2); letter-spacing: 0.03em; }
+    .widget-spacer { flex: 1; }
+    .widget-gear, .widget-close-x {
+      display: none; align-items: center; justify-content: center;
+      width: 22px; height: 22px; border-radius: 5px; border: none;
+      background: rgba(255,255,255,0.05); color: var(--ink-3);
+      font-size: 0.8rem; cursor: pointer; transition: background 0.15s, color 0.15s;
+      font-family: var(--font);
+    }
+    body.edit-mode .widget-gear,
+    body.edit-mode .widget-close-x { display: flex; }
+    .widget-gear:hover { background: rgba(255,255,255,0.1); color: var(--ink); }
+    .widget-close-x:hover { background: rgba(200,50,50,0.25); color: #f88; }
+
+    /* Settings Popover */
+    .widget-settings {
+      position: absolute; top: 34px; left: 0; right: 0; bottom: 0;
+      background: #131318; border-top: 1px solid var(--w-border);
+      z-index: 10; padding: 0.9rem 1rem; overflow-y: auto;
+      display: none; flex-direction: column; gap: 0.65rem;
+    }
+    .widget-settings.open { display: flex; }
+    .settings-label { font-size: 0.65rem; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.08em; }
+    .settings-input {
+      width: 100%; padding: 0.4rem 0.65rem; border-radius: 7px;
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+      color: var(--ink); font-family: var(--font); font-size: 0.78rem; outline: none;
+    }
+    .settings-input:focus { border-color: rgba(155,143,212,0.4); }
+    .settings-btn {
+      padding: 0.38rem 0.85rem; border-radius: 7px; border: none; cursor: pointer;
+      background: linear-gradient(90deg,rgba(78,58,160,0.8),rgba(50,150,142,0.8));
+      color: #fff; font-family: var(--font); font-size: 0.75rem; font-weight: 700;
+      align-self: flex-start;
+    }
+    .settings-close {
+      padding: 0.3rem 0.7rem; border-radius: 7px; border: 1px solid rgba(255,255,255,0.1);
+      background: transparent; color: var(--ink-2); font-family: var(--font);
+      font-size: 0.72rem; font-weight: 700; cursor: pointer; margin-top: auto;
+    }
+
+    /* Widget Content */
+    .widget-content {
+      flex: 1; overflow-y: auto; overflow-x: hidden;
+      padding: 0.75rem;
+      scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent;
+    }
+    .widget-content::-webkit-scrollbar { width: 3px; }
+    .widget-content::-webkit-scrollbar-track { background: transparent; }
+    .widget-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+    .widget-content.no-pad { padding: 0; display: flex; flex-direction: column; overflow: hidden; }
+
+    /* ── Clock Widget ── */
+    .clock-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 0.25rem; }
+    .clock-time { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); line-height: 1; }
+    .clock-date { font-size: 0.72rem; font-weight: 600; color: var(--ink-3); text-align: center; }
+    .clock-toggle-btn { margin-top: 0.5rem; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 999px; padding: 0.2rem 0.65rem; font-size: 0.65rem; font-weight: 700; color: var(--ink-3); cursor: pointer; font-family: var(--font); }
+    .clock-toggle-btn:hover { color: var(--ink); }
+    .clock-canvas { display: none; border-radius: 50%; }
+
+    /* ── Weather Widget ── */
+    .weather-current { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+    .weather-icon { font-size: 2.5rem; }
+    .weather-temp { font-size: 2rem; font-weight: 800; color: var(--ink); line-height: 1; }
+    .weather-desc { font-size: 0.72rem; color: var(--ink-3); margin-top: 0.15rem; }
+    .weather-hl { font-size: 0.68rem; color: var(--ink-3); }
+    .weather-forecast { display: flex; gap: 0.5rem; }
+    .weather-day { flex: 1; background: rgba(255,255,255,0.04); border-radius: 8px; padding: 0.4rem 0.3rem; text-align: center; }
+    .weather-day-name { font-size: 0.6rem; font-weight: 700; color: var(--ink-3); text-transform: uppercase; }
+    .weather-day-icon { font-size: 1rem; margin: 0.15rem 0; }
+    .weather-day-temp { font-size: 0.65rem; font-weight: 700; color: var(--ink-2); }
+    .weather-loading { color: var(--ink-3); font-size: 0.78rem; text-align: center; padding: 1rem; }
+
+    /* ── Gmail Widget ── */
+    .gmail-header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.65rem; }
+    .gmail-unread-badge { background: #d93025; color: #fff; font-size: 0.62rem; font-weight: 800; border-radius: 999px; padding: 0.15rem 0.5rem; }
+    .gmail-open-btn { font-size: 0.65rem; font-weight: 700; color: var(--teal); text-decoration: none; }
+    .gmail-open-btn:hover { text-decoration: underline; }
+    .gmail-thread { display: flex; flex-direction: column; gap: 0.15rem; padding: 0.5rem 0; border-bottom: 1px solid var(--w-border); }
+    .gmail-thread:last-child { border-bottom: none; }
+    .gmail-thread-top { display: flex; justify-content: space-between; align-items: center; }
+    .gmail-sender { font-size: 0.75rem; font-weight: 700; color: var(--ink); }
+    .gmail-sender.read { font-weight: 500; color: var(--ink-2); }
+    .gmail-time { font-size: 0.62rem; color: var(--ink-3); }
+    .gmail-subject { font-size: 0.7rem; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .gmail-oauth-note { margin-top: 0.75rem; padding: 0.5rem 0.65rem; background: rgba(155,143,212,0.08); border-radius: 7px; border-left: 2px solid rgba(155,143,212,0.3); font-size: 0.65rem; color: var(--ink-3); line-height: 1.5; }
+
+    /* ── YouTube Widget ── */
+    .yt-wrap { display: flex; flex-direction: column; height: 100%; }
+    .yt-player { flex: 1; position: relative; background: #000; }
+    .yt-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; }
+    .yt-placeholder i { font-size: 2.8rem; color: #ff0000; opacity: 0.7; }
+    .yt-placeholder p { font-size: 0.75rem; color: var(--ink-3); text-align: center; }
+    .yt-frame { width: 100%; height: 100%; border: none; position: absolute; inset: 0; }
+    .yt-info-cover { position: absolute; top: 0; left: 0; right: 0; height: 52px; background: #000; z-index: 2; pointer-events: none; transition: opacity 0.2s; }
+    .yt-player:hover .yt-info-cover { opacity: 0; }
+    .yt-url-bar { display: flex; gap: 0.5rem; align-items: center; padding: 0.5rem 0.65rem; background: var(--w-head); border-top: 1px solid var(--w-border); flex-shrink: 0; }
+    .yt-url-bar i { color: #ff0000; font-size: 1rem; flex-shrink: 0; }
+    .yt-input { flex: 1; padding: 0.35rem 0.65rem; border-radius: 7px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: var(--ink); font-family: var(--font); font-size: 0.75rem; outline: none; }
+    .yt-input::placeholder { color: var(--ink-3); }
+    .yt-input:focus { border-color: rgba(255,0,0,0.4); background: rgba(255,255,255,0.09); }
+    .yt-load-btn { padding: 0.35rem 0.85rem; border-radius: 7px; background: #ff0000; border: none; color: #fff; font-family: var(--font); font-size: 0.72rem; font-weight: 800; cursor: pointer; white-space: nowrap; transition: opacity 0.15s; }
+    .yt-load-btn:hover { opacity: 0.85; }
+
+    /* ── Friend Feed Widget ── */
+    .ff-post { display: flex; gap: 0.65rem; padding: 0.6rem 0; border-bottom: 1px solid var(--w-border); }
+    .ff-post:last-child { border-bottom: none; }
+    .ff-avatar { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; background: linear-gradient(135deg, var(--accent), var(--teal)); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800; color: #fff; }
+    .ff-body { flex: 1; min-width: 0; }
+    .ff-name { font-size: 0.75rem; font-weight: 800; color: var(--ink); }
+    .ff-meta { font-size: 0.62rem; color: var(--ink-3); }
+    .ff-preview { font-size: 0.72rem; color: var(--ink-2); margin-top: 0.25rem; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .ff-stamp-btn { margin-top: 0.35rem; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 999px; padding: 0.18rem 0.55rem; font-size: 0.62rem; font-weight: 700; color: var(--ink-3); cursor: pointer; font-family: var(--font); transition: background 0.15s; }
+    .ff-stamp-btn:hover { background: rgba(155,143,212,0.15); color: var(--accent); }
+    .ff-stamp-btn.stamped { background: rgba(155,143,212,0.15); color: var(--accent); border-color: rgba(155,143,212,0.3); }
+
+    /* ── IM Widget ── */
+    .im-thread { display: flex; align-items: center; gap: 0.6rem; padding: 0.55rem 0; border-bottom: 1px solid var(--w-border); cursor: pointer; border-radius: 6px; transition: background 0.15s; }
+    .im-thread:last-child { border-bottom: none; }
+    .im-thread:hover { background: rgba(255,255,255,0.04); }
+    .im-thread.pulse { animation: imPulse 1.5s ease-in-out 3; }
+    @keyframes imPulse { 0%,100%{background:transparent} 50%{background:rgba(155,143,212,0.12)} }
+    .im-avatar { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; background: linear-gradient(135deg, #5a3e9d, var(--teal)); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800; color: #fff; position: relative; }
+    .im-unread-dot { position: absolute; top: -1px; right: -1px; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); border: 2px solid var(--w-bg); font-size: 0.45rem; font-weight: 800; color: #fff; display: flex; align-items: center; justify-content: center; }
+    .im-body { flex: 1; min-width: 0; }
+    .im-name { font-size: 0.75rem; font-weight: 800; color: var(--ink); }
+    .im-preview { font-size: 0.68rem; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 0.1rem; }
+    .im-time { font-size: 0.6rem; color: var(--ink-3); flex-shrink: 0; }
+    .im-open-link { display: block; text-align: center; margin-top: 0.5rem; font-size: 0.68rem; color: var(--accent); text-decoration: none; font-weight: 700; }
+
+    /* ── Quick Notes Widget ── */
+    .notes-textarea {
+      width: 100%; height: 100%; resize: none; background: transparent; border: none;
+      color: var(--ink); font-family: var(--font); font-size: 0.8rem; line-height: 1.6;
+      outline: none; min-height: 120px;
+    }
+    .notes-textarea::placeholder { color: var(--ink-3); }
+
+    /* ── News Feed Widget ── */
+    .news-item { padding: 0.5rem 0; border-bottom: 1px solid var(--w-border); }
+    .news-item:last-child { border-bottom: none; }
+    .news-headline { font-size: 0.75rem; font-weight: 700; color: var(--ink); line-height: 1.4; text-decoration: none; display: block; }
+    .news-headline:hover { color: var(--accent); }
+    .news-meta { font-size: 0.62rem; color: var(--ink-3); margin-top: 0.2rem; }
+    .news-loading { color: var(--ink-3); font-size: 0.78rem; text-align: center; padding: 1rem; }
+
+    /* ── Snake Widget ── */
+    .snake-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 0.5rem; }
+    .snake-meta { display: flex; align-items: center; gap: 1rem; }
+    .snake-score-label { font-size: 0.65rem; font-weight: 700; color: var(--ink-3); text-transform: uppercase; }
+    .snake-score { font-size: 0.85rem; font-weight: 800; color: var(--amber); }
+    .snake-canvas { border-radius: 6px; border: 1px solid rgba(255,255,255,0.07); display: block; image-rendering: pixelated; }
+    .snake-btn { padding: 0.4rem 1.2rem; border-radius: 999px; border: none; background: linear-gradient(90deg, rgba(78,58,160,0.9),rgba(50,150,142,0.9)); color: #fff; font-family: var(--font); font-size: 0.75rem; font-weight: 800; cursor: pointer; }
+
+    /* ── Calendar Widget ── */
+    .cal-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 0.6rem; text-align: center; }
+    .cal-placeholder i { font-size: 2.5rem; color: var(--ink-3); }
+    .cal-placeholder p { font-size: 0.75rem; color: var(--ink-3); max-width: 200px; line-height: 1.5; }
+    .cal-placeholder .settings-btn { font-size: 0.72rem; padding: 0.35rem 0.8rem; }
+    .cal-iframe { width: 100%; height: 100%; border: none; border-radius: 0; }
+
+    /* ── Neighborhood Pulse ── */
+    .nb-item { display: flex; align-items: center; gap: 0.55rem; padding: 0.45rem 0; border-bottom: 1px solid var(--w-border); }
+    .nb-item:last-child { border-bottom: none; }
+    .nb-avatar { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; background: linear-gradient(135deg, var(--amber), #c04020); display: flex; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: 800; color: #fff; }
+    .nb-body { flex: 1; min-width: 0; }
+    .nb-name { font-size: 0.72rem; font-weight: 800; color: var(--ink); }
+    .nb-action { font-size: 0.65rem; color: var(--ink-3); }
+    .nb-time { font-size: 0.6rem; color: var(--ink-3); flex-shrink: 0; }
+    .nb-pulse-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); flex-shrink: 0; animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* ── Widget Picker Modal ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 500;
+      background: rgba(10,10,15,0.8); backdrop-filter: blur(10px);
+      align-items: center; justify-content: center; padding: 1.5rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .picker-modal {
+      width: min(640px, 96vw); max-height: 80vh; overflow-y: auto;
+      background: #1a1a24; border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    }
+    .picker-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.07);
+      position: sticky; top: 0; background: #1a1a24;
+    }
+    .picker-title { font-size: 0.95rem; font-weight: 800; color: var(--ink); }
+    .picker-close { background: none; border: none; color: var(--ink-3); font-size: 1.1rem; cursor: pointer; }
+    .picker-close:hover { color: var(--ink); }
+    .picker-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(160px,1fr)); gap: 0.75rem; padding: 1rem 1.25rem 1.25rem; }
+    .picker-item {
+      display: flex; flex-direction: column; gap: 0.4rem;
+      padding: 0.9rem; border-radius: 12px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+      cursor: pointer; transition: background 0.15s, border-color 0.15s;
+    }
+    .picker-item:hover { background: rgba(155,143,212,0.1); border-color: rgba(155,143,212,0.3); }
+    .picker-item i { font-size: 1.5rem; color: var(--accent); }
+    .picker-item-name { font-size: 0.8rem; font-weight: 800; color: var(--ink); }
+    .picker-item-desc { font-size: 0.65rem; color: var(--ink-3); line-height: 1.4; }
+
+    /* ── GridStack Resize Handles ── */
+    .grid-stack-item > .ui-resizable-se,
+    .grid-stack-item > .ui-resizable-sw,
+    .grid-stack-item > .ui-resizable-nw,
+    .grid-stack-item > .ui-resizable-ne { display: none !important; }
+    body.edit-mode .grid-stack-item > .ui-resizable-se { display: block !important; }
+  </style>
+</head>
+<body>
+
+  <!-- Address Bar -->
+  <div class="address-bar">
+    <div class="address-inner">
+      <div class="address-dot"></div>
+      <span class="address-text"><strong>davemichael</strong>.postmarq / <strong>Living Room</strong></span>
+    </div>
+  </div>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <i class="ti ti-sofa" style="color:var(--accent);font-size:1.3rem;"></i>
+      <div>
+        <div class="page-title">Living Room</div>
+        <div class="page-subtitle">Your personal desktop — drag, arrange, make it yours</div>
+      </div>
+    </div>
+    <div class="page-header-right">
+      <div class="col-picker">
+        <span class="col-picker-label">Cols</span>
+        <button class="col-btn" id="col-btn-1" onclick="setColumns(1)" title="1 column">1</button>
+        <button class="col-btn" id="col-btn-2" onclick="setColumns(2)" title="2 columns">2</button>
+        <button class="col-btn active" id="col-btn-3" onclick="setColumns(3)" title="3 columns">3</button>
+      </div>
+      <button class="btn-add-widget" onclick="openPicker()"><i class="ti ti-plus"></i> Add Widget</button>
+      <button class="btn-edit-layout" onclick="toggleEditMode()"><i class="ti ti-layout-grid"></i> <span id="editBtnLabel">Edit Layout</span></button>
+    </div>
+  </div>
+
+  <!-- Room Nav -->
+  <nav class="room-nav" style="margin-bottom:0.75rem;">
+    <a class="room-tab" href="index.html"><i class="ti ti-home-2"></i><span>Home</span></a>
+    <a class="room-tab active" href="living-room.html"><i class="ti ti-sofa"></i><span>Living Room</span></a>
+    <a class="room-tab" href="office.html"><i class="ti ti-briefcase"></i><span>Office</span></a>
+    <a class="room-tab" href="playground.html"><i class="ti ti-assembly"></i><span>Playground</span></a>
+    <a class="room-tab" href="#" onclick="return false;"><i class="ti ti-messages"></i><span>Lounge</span></a>
+  </nav>
+
+  <!-- Grid -->
+  <div class="grid-wrap">
+    <div class="grid-stack" id="grid"></div>
+  </div>
+
+  <!-- Widget Picker Modal -->
+  <div class="modal-overlay" id="pickerOverlay">
+    <div class="picker-modal">
+      <div class="picker-header">
+        <span class="picker-title"><i class="ti ti-apps" style="margin-right:0.4rem;"></i>Add a Widget</span>
+        <button class="picker-close" onclick="closePicker()">✕</button>
+      </div>
+      <div class="picker-grid" id="pickerGrid"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gridstack@10/dist/gridstack-all.js"></script>
+  <script>
+  /* ═══════════════════════════════════════════
+     CONSTANTS
+  ═══════════════════════════════════════════ */
+  const WIDGET_DEFS = {
+    clock:        { title:'Clock',              icon:'ti-clock',           minW:2, minH:2, defaultW:3, defaultH:2, desc:'Analog or digital clock in Phoenix time.' },
+    weather:      { title:'Weather',            icon:'ti-cloud-sun',       minW:3, minH:2, defaultW:3, defaultH:3, desc:'Live conditions + 3-day forecast.' },
+    gmail:        { title:'Gmail',              icon:'ti-mail',            minW:3, minH:2, defaultW:6, defaultH:3, desc:'Unread count and recent subject lines.' },
+    youtube:      { title:'YouTube',            icon:'ti-brand-youtube',   minW:4, minH:4, defaultW:7, defaultH:5, desc:'Search and play any YouTube video.' },
+    friendfeed:   { title:'Friend Feed',        icon:'ti-users',           minW:3, minH:3, defaultW:5, defaultH:5, desc:'Recent posts from your Postmarq quorum.' },
+    im:           { title:'Messages',           icon:'ti-message-2',       minW:3, minH:3, defaultW:5, defaultH:3, desc:'AOL IM-style message thread panel.' },
+    quicknotes:   { title:'Quick Notes',        icon:'ti-notes',           minW:3, minH:3, defaultW:3, defaultH:3, desc:'Scratch pad. Auto-saves to local storage.' },
+    newsfeed:     { title:'News Feed',          icon:'ti-rss',             minW:3, minH:3, defaultW:4, defaultH:3, desc:'Live headlines from NPR or your RSS feed.' },
+    snake:        { title:'Snake',              icon:'ti-device-gamepad-2',minW:4, minH:4, defaultW:4, defaultH:4, desc:'Classic Snake. Arrow keys to play.' },
+    calendar:     { title:'Google Calendar',    icon:'ti-calendar',        minW:4, minH:3, defaultW:4, defaultH:4, desc:'Paste your Google Calendar embed URL.' },
+    neighborhood: { title:'Neighborhood Pulse', icon:'ti-map-pin',         minW:3, minH:2, defaultW:5, defaultH:2, desc:'Live activity from your Postmarq neighborhood.' },
+  };
+
+  const LAYOUT_VERSION = 2;
+
+  const SEED_LAYOUT = [
+    { type:'clock',        x:0, y:0,  w:3, h:2 },
+    { type:'weather',      x:3, y:0,  w:3, h:3 },
+    { type:'gmail',        x:6, y:0,  w:6, h:3 },
+    { type:'youtube',      x:0, y:2,  w:6, h:5 },
+    { type:'friendfeed',   x:6, y:3,  w:6, h:5 },
+    { type:'im',           x:6, y:8,  w:6, h:3 },
+    { type:'quicknotes',   x:0, y:7,  w:2, h:3 },
+    { type:'neighborhood', x:2, y:7,  w:4, h:2 },
+    { type:'newsfeed',     x:0, y:11, w:4, h:3, rss:'https://feeds.npr.org/1001/rss.xml' },
+    { type:'newsfeed',     x:4, y:11, w:4, h:3, rss:'https://www.theverge.com/rss/index.xml' },
+    { type:'newsfeed',     x:8, y:11, w:4, h:3, rss:'https://www.espn.com/espn/rss/news' },
+  ];
+
+  /* ═══════════════════════════════════════════
+     WIDGET HTML BUILDERS
+  ═══════════════════════════════════════════ */
+  function buildWidget(type, id) {
+    const def = WIDGET_DEFS[type];
+    return `
+      <div class="widget-wrap" data-widget-type="${type}" data-widget-id="${id}" tabindex="0">
+        <div class="widget-header">
+          <i class="ti ti-grip-vertical widget-drag-icon"></i>
+          <i class="ti ${def.icon} widget-type-icon"></i>
+          <span class="widget-title">${def.title}</span>
+          <span class="widget-spacer"></span>
+          <button class="widget-gear" onclick="toggleSettings(this)" title="Settings"><i class="ti ti-settings"></i></button>
+          <button class="widget-close-x" onclick="removeW(this)" title="Remove">✕</button>
+        </div>
+        <div class="widget-settings">${buildSettings(type, id)}</div>
+        <div class="widget-content${type === 'quicknotes' || type === 'youtube' || type === 'calendar' ? ' no-pad' : ''}">${buildContent(type, id)}</div>
+      </div>`;
+  }
+
+  function buildSettings(type, id) {
+    const close = `<button class="settings-close" onclick="toggleSettings(this.closest('.widget-wrap').querySelector('.widget-gear'))">✕ Close Settings</button>`;
+    switch(type) {
+      case 'clock':    return `<div class="settings-label">Clock Style</div><select class="settings-input" onchange="setClockStyle('${id}',this.value)"><option value="digital">Digital</option><option value="analog">Analog</option></select>${close}`;
+      case 'weather':  return `<div class="settings-label">City</div><input class="settings-input" id="ws-city-${id}" placeholder="e.g. Phoenix, AZ" /><button class="settings-btn" onclick="refreshWeather('${id}')">Update</button>${close}`;
+      case 'newsfeed': return `<div class="settings-label">RSS Feed URL</div><input class="settings-input" id="ws-rss-${id}" placeholder="https://feeds.npr.org/1001/rss.xml" /><button class="settings-btn" onclick="fetchNews('${id}')">Load Feed</button>${close}`;
+      case 'calendar': return `<div class="settings-label">Google Calendar Embed URL</div><input class="settings-input" id="ws-cal-${id}" placeholder="https://calendar.google.com/calendar/embed?src=..." /><button class="settings-btn" onclick="loadCalendar('${id}')">Load Calendar</button>${close}`;
+      case 'youtube':  return `<div class="settings-label">Default Video URL</div><input class="settings-input" id="ws-yt-${id}" placeholder="https://youtube.com/watch?v=..." /><button class="settings-btn" onclick="loadYT('${id}',document.getElementById('ws-yt-${id}').value)">Load</button>${close}`;
+      default:         return `<div class="settings-label" style="color:var(--ink-3)">No settings for this widget.</div>${close}`;
+    }
+  }
+
+  function buildContent(type, id) {
+    switch(type) {
+      case 'clock': return `
+        <div class="clock-wrap">
+          <canvas class="clock-canvas" id="cc-${id}" width="160" height="160"></canvas>
+          <div class="clock-time" id="ct-${id}">--:--:--</div>
+          <div class="clock-date" id="cd-${id}">Loading...</div>
+          <button class="clock-toggle-btn" onclick="toggleClockStyle('${id}')">Analog</button>
+        </div>`;
+      case 'weather': return `<div class="weather-loading" id="wl-${id}"><i class="ti ti-loader" style="animation:spin 1s linear infinite;display:inline-block;"></i> Loading weather…</div><div id="wd-${id}" style="display:none;"></div>`;
+      case 'gmail': return `
+        <div class="gmail-header-row">
+          <span class="gmail-unread-badge" id="gu-${id}">2 unread</span>
+          <a class="gmail-open-btn" href="https://mail.google.com" target="_blank" rel="noopener">Open Gmail ↗</a>
+        </div>
+        <div id="glist-${id}"></div>
+        <div class="gmail-oauth-note">⚡ Live Gmail data via OAuth is coming soon. Showing seed data.</div>`;
+      case 'youtube': return `
+        <div class="yt-wrap">
+          <div class="yt-player">
+            <div class="yt-placeholder" id="yts-${id}">
+              <i class="ti ti-brand-youtube"></i>
+              <p>Paste a YouTube URL below to start watching</p>
+            </div>
+            <iframe class="yt-frame" id="yt-frame-${id}" allow="autoplay;encrypted-media" allowfullscreen style="display:none;"></iframe>
+            <div class="yt-info-cover"></div>
+          </div>
+          <div class="yt-url-bar">
+            <i class="ti ti-brand-youtube"></i>
+            <input class="yt-input" id="yt-input-${id}" placeholder="Paste YouTube URL or video ID…" />
+            <button class="yt-load-btn" onclick="loadYT('${id}',document.getElementById('yt-input-${id}').value)">Play</button>
+          </div>
+        </div>`;
+      case 'friendfeed': return `<div id="ff-${id}"></div>`;
+      case 'im': return `
+        <div id="im-${id}"></div>
+        <a class="im-open-link" href="#" onclick="return false;">Open Den (Messages) ↗</a>`;
+      case 'quicknotes': return `<textarea class="notes-textarea" id="notes-${id}" placeholder="Jot something down…" oninput="saveNote('${id}')"></textarea>`;
+      case 'newsfeed': return `<div class="news-loading" id="nl-${id}"><i class="ti ti-loader" style="animation:spin 1s linear infinite;display:inline-block;"></i> Loading headlines…</div><div id="nlist-${id}"></div>`;
+      case 'snake': return `
+        <div class="snake-wrap">
+          <div class="snake-meta"><span class="snake-score-label">Score</span><span class="snake-score" id="sk-score-${id}">0</span></div>
+          <canvas class="snake-canvas" id="sk-${id}"></canvas>
+          <button class="snake-btn" id="sk-btn-${id}">▶ Play</button>
+        </div>`;
+      case 'calendar': return `
+        <div class="cal-placeholder" id="cal-ph-${id}">
+          <i class="ti ti-calendar"></i>
+          <p>Paste your Google Calendar embed URL in settings to display your calendar.</p>
+        </div>
+        <iframe class="cal-iframe" id="cal-frame-${id}" style="display:none;" allowfullscreen></iframe>`;
+      case 'neighborhood': return `<div id="nb-${id}"></div>`;
+      default: return '<div style="padding:1rem;color:var(--ink-3)">Unknown widget</div>';
+    }
+  }
+
+  /* ═══════════════════════════════════════════
+     WIDGET INITIALIZERS
+  ═══════════════════════════════════════════ */
+  function initWidget(type, el) {
+    const id = el.querySelector('[data-widget-id]').dataset.widgetId;
+    switch(type) {
+      case 'clock':        initClock(id); break;
+      case 'weather':      initWeather(id); break;
+      case 'gmail':        initGmail(id); break;
+      case 'youtube':      initYouTube(id); break;
+      case 'friendfeed':   initFriendFeed(id); break;
+      case 'im':           initIM(id); break;
+      case 'quicknotes':   initNotes(id); break;
+      case 'newsfeed':     initNews(id); break;
+      case 'snake':        initSnake(id); break;
+      case 'calendar':     initCalendar(id); break;
+      case 'neighborhood': initNeighborhood(id); break;
+    }
+  }
+
+  // ── Clock ──────────────────────────────────
+  const clockStates = {};
+  function initClock(id) {
+    clockStates[id] = { analog: false };
+    if (clockStates[id]._interval) clearInterval(clockStates[id]._interval);
+    function tick() {
+      const now = new Date(new Date().toLocaleString('en-US', {timeZone:'America/Phoenix'}));
+      const st = clockStates[id];
+      if (st.analog) {
+        drawAnalogClock(id, now);
+      } else {
+        const te = document.getElementById('ct-'+id);
+        const de = document.getElementById('cd-'+id);
+        if (te) te.textContent = now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+        if (de) de.textContent = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+      }
+    }
+    tick();
+    clockStates[id]._interval = setInterval(tick, 1000);
+  }
+  function toggleClockStyle(id) {
+    const st = clockStates[id] || (clockStates[id] = {analog:false});
+    st.analog = !st.analog;
+    const canvas = document.getElementById('cc-'+id);
+    const timeEl = document.getElementById('ct-'+id);
+    const dateEl = document.getElementById('cd-'+id);
+    const btn = canvas?.closest('.clock-wrap')?.querySelector('.clock-toggle-btn');
+    if (canvas) canvas.style.display = st.analog ? 'block' : 'none';
+    if (timeEl) timeEl.style.display = st.analog ? 'none' : '';
+    if (dateEl) dateEl.style.display = st.analog ? 'none' : '';
+    if (btn) btn.textContent = st.analog ? 'Digital' : 'Analog';
+  }
+  function setClockStyle(id, val) {
+    const st = clockStates[id] || (clockStates[id] = {analog:false});
+    const wantAnalog = val === 'analog';
+    if (st.analog !== wantAnalog) toggleClockStyle(id);
+  }
+  function drawAnalogClock(id, d) {
+    const canvas = document.getElementById('cc-'+id);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const cw = canvas.width, ch = canvas.height;
+    const cx = cw/2, cy = ch/2, r = Math.min(cx,cy) - 6;
+    ctx.clearRect(0,0,cw,ch);
+    ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+    ctx.fillStyle = '#12121a'; ctx.fill();
+    ctx.strokeStyle = 'rgba(155,143,212,0.25)'; ctx.lineWidth = 2; ctx.stroke();
+    for (let i=0;i<12;i++) {
+      const a = i*Math.PI/6;
+      ctx.beginPath();
+      ctx.moveTo(cx+(r-10)*Math.sin(a), cy-(r-10)*Math.cos(a));
+      ctx.lineTo(cx+r*Math.sin(a),      cy-r*Math.cos(a));
+      ctx.strokeStyle = 'rgba(155,143,212,0.4)'; ctx.lineWidth = 2; ctx.stroke();
+    }
+    const h=d.getHours()%12, m=d.getMinutes(), s=d.getSeconds();
+    hand(ctx,cx,cy,(h+m/60)*Math.PI/6, r*0.52,'rgba(232,224,240,0.9)',3);
+    hand(ctx,cx,cy,m*Math.PI/30,       r*0.72,'rgba(232,224,240,0.75)',2);
+    hand(ctx,cx,cy,s*Math.PI/30,       r*0.82,'#e8992a',1);
+    ctx.beginPath(); ctx.arc(cx,cy,3,0,Math.PI*2); ctx.fillStyle='#e8992a'; ctx.fill();
+  }
+  function hand(ctx,cx,cy,a,len,col,w) {
+    ctx.beginPath(); ctx.moveTo(cx,cy);
+    ctx.lineTo(cx+len*Math.sin(a), cy-len*Math.cos(a));
+    ctx.strokeStyle=col; ctx.lineWidth=w; ctx.lineCap='round'; ctx.stroke();
+  }
+
+  // ── Weather ────────────────────────────────
+  const WMO = {
+    0:'☀️',1:'🌤',2:'⛅',3:'☁️',45:'🌫',48:'🌫',51:'🌦',53:'🌦',55:'🌧',
+    61:'🌧',63:'🌧',65:'🌧',71:'❄️',73:'❄️',75:'❄️',80:'🌦',81:'🌧',82:'🌧',95:'⛈',96:'⛈',99:'⛈'
+  };
+  const WMO_LABEL = {
+    0:'Clear',1:'Mainly clear',2:'Partly cloudy',3:'Overcast',45:'Foggy',48:'Foggy',
+    51:'Light drizzle',53:'Drizzle',55:'Heavy drizzle',61:'Light rain',63:'Rain',65:'Heavy rain',
+    71:'Light snow',73:'Snow',75:'Heavy snow',80:'Rain showers',81:'Rain showers',82:'Heavy showers',
+    95:'Thunderstorm',96:'Thunderstorm',99:'Thunderstorm'
+  };
+  async function initWeather(id) {
+    try {
+      const lat=33.4484, lon=-112.0740;
+      const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weathercode,apparent_temperature&daily=temperature_2m_max,temperature_2m_min,weathercode&temperature_unit=fahrenheit&timezone=America%2FPhoenix&forecast_days=4`;
+      const r = await fetch(url);
+      const d = await r.json();
+      const c = d.current; const day = d.daily;
+      const code = c.weathercode;
+      const icon = WMO[code] || '🌡';
+      const label = WMO_LABEL[code] || '';
+      const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      let forecastHTML = day.time.slice(1,4).map((t,i)=>{
+        const fi = i+1;
+        const dc = day.weathercode[fi];
+        return `<div class="weather-day">
+          <div class="weather-day-name">${days[new Date(t+'T00:00:00').getDay()]}</div>
+          <div class="weather-day-icon">${WMO[dc]||'🌡'}</div>
+          <div class="weather-day-temp">${Math.round(day.temperature_2m_max[fi])}° / ${Math.round(day.temperature_2m_min[fi])}°</div>
+        </div>`;
+      }).join('');
+      const html = `
+        <div class="weather-current">
+          <div class="weather-icon">${icon}</div>
+          <div>
+            <div class="weather-temp">${Math.round(c.temperature_2m)}°F</div>
+            <div class="weather-desc">${label} · Phoenix, AZ</div>
+            <div class="weather-hl">Feels like ${Math.round(c.apparent_temperature)}°F</div>
+          </div>
+        </div>
+        <div class="weather-forecast">${forecastHTML}</div>`;
+      const ld=document.getElementById('wl-'+id), wd=document.getElementById('wd-'+id);
+      if(ld) ld.style.display='none';
+      if(wd) { wd.innerHTML=html; wd.style.display=''; }
+    } catch(e) {
+      const ld=document.getElementById('wl-'+id);
+      if(ld) ld.innerHTML='<span style="color:var(--ink-3)">Unable to load weather.</span>';
+    }
+  }
+  function refreshWeather(id) { initWeather(id); }
+
+  // ── Gmail ──────────────────────────────────
+  const GMAIL_SEED = [
+    {sender:'Heritage Team',    subject:'Weekly content review — June 16', time:'9:42 AM', unread:true},
+    {sender:'Hillsong Worship', subject:'Media assets for Sunday service',  time:'Yesterday',unread:true},
+    {sender:'Alex Rivera',      subject:'Re: Collab on the Postmarq launch?',time:'Yesterday',unread:false},
+    {sender:'Squarespace',      subject:'Your invoice is ready to view',   time:'Jun 13',  unread:false},
+  ];
+  function initGmail(id) {
+    const unread = GMAIL_SEED.filter(m=>m.unread).length;
+    const badge = document.getElementById('gu-'+id);
+    if(badge) badge.textContent = `${unread} unread`;
+    const list = document.getElementById('glist-'+id);
+    if(!list) return;
+    list.innerHTML = GMAIL_SEED.map(m=>`
+      <div class="gmail-thread">
+        <div class="gmail-thread-top">
+          <span class="gmail-sender${m.unread?'':' read'}">${m.sender}</span>
+          <span class="gmail-time">${m.time}</span>
+        </div>
+        <div class="gmail-subject">${m.subject}</div>
+      </div>`).join('');
+  }
+
+  // ── YouTube ────────────────────────────────
+  function initYouTube(id) {
+    const input = document.getElementById('yt-input-'+id);
+    if(!input) return;
+    input.addEventListener('keydown', e=>{ if(e.key==='Enter') loadYT(id, input.value); });
+    // Auto-load saved video (muted) on page open
+    const saved = localStorage.getItem('pm_yt_vid_'+id) || 'EqaDNODFIHM';
+    loadYT(id, saved, true);
+  }
+  function loadYT(id, val, muted=false) {
+    if(!val) return;
+    const vid = extractYTId(val.trim());
+    if(!vid) return;
+    localStorage.setItem('pm_yt_vid_'+id, vid);
+    const placeholder = document.getElementById('yts-'+id);
+    const frame = document.getElementById('yt-frame-'+id);
+    if(placeholder) placeholder.style.display='none';
+    if(frame) {
+      frame.src = `https://www.youtube.com/embed/${vid}?autoplay=1&mute=${muted?1:0}`;
+      frame.style.display='block';
+    }
+  }
+  function extractYTId(url) {
+    const patterns = [
+      /youtube\.com\/watch\?v=([^&\s]+)/,
+      /youtube\.com\/live\/([^?&\s]+)/,
+      /youtu\.be\/([^?\s]+)/,
+      /youtube\.com\/embed\/([^?\s]+)/,
+    ];
+    for(const p of patterns){ const m=url.match(p); if(m) return m[1]; }
+    if(/^[a-zA-Z0-9_-]{11}$/.test(url)) return url;
+    return null;
+  }
+
+  // ── Friend Feed ────────────────────────────
+  const FF_SEED = [
+    {av:'AR', name:'Alex Rivera',  handle:'alexr',  time:'2h', text:'Just got back from Sedona — the red rocks were unreal this time of year. Full set coming.',stamps:12},
+    {av:'MK', name:'Maya Kim',     handle:'mayak',  time:'4h', text:'New short film in production. Going to document the whole process here on Postmarq.',stamps:7},
+    {av:'JT', name:'Jordan T.',    handle:'jordant',time:'6h', text:'Huge shoutout to everyone at the gallery opening last night. The community showing up means everything.',stamps:24},
+    {av:'SS', name:'Sam Silva',    handle:'sams',   time:'1d', text:'Built a new post-processing workflow that cuts editing time in half. Happy to share notes.',stamps:5},
+  ];
+  function initFriendFeed(id) {
+    const el = document.getElementById('ff-'+id);
+    if(!el) return;
+    el.innerHTML = FF_SEED.map((p,i)=>`
+      <div class="ff-post">
+        <div class="ff-avatar">${p.av}</div>
+        <div class="ff-body">
+          <div class="ff-name">${p.name} <span class="ff-meta">@${p.handle} · ${p.time}</span></div>
+          <div class="ff-preview">${p.text}</div>
+          <button class="ff-stamp-btn" onclick="this.classList.toggle('stamped');this.textContent=this.classList.contains('stamped')?'✦ Stamped':'✦ Stamp'">✦ Stamp</button>
+        </div>
+      </div>`).join('');
+  }
+
+  // ── IM ─────────────────────────────────────
+  const IM_SEED = [
+    {av:'MK',name:'Maya Kim',   preview:'Hey! Did you see the event tonight?', time:'now',  unread:2},
+    {av:'JT',name:'Jordan T.',  preview:'The edit looks amazing btw 🔥',        time:'5m',   unread:0},
+    {av:'SS',name:'Sam Silva',  preview:'Let me know when you\'re free to link',time:'1h',   unread:1},
+  ];
+  function initIM(id) {
+    const el = document.getElementById('im-'+id);
+    if(!el) return;
+    el.innerHTML = IM_SEED.map(t=>`
+      <div class="im-thread">
+        <div class="im-avatar">${t.av}${t.unread?`<div class="im-unread-dot">${t.unread}</div>`:''}</div>
+        <div class="im-body">
+          <div class="im-name">${t.name}</div>
+          <div class="im-preview">${t.preview}</div>
+        </div>
+        <div class="im-time">${t.time}</div>
+      </div>`).join('');
+    setTimeout(()=>{
+      const first = el.querySelector('.im-thread');
+      if(first){ first.classList.add('pulse'); const dot=first.querySelector('.im-unread-dot'); if(dot) dot.textContent=parseInt(dot.textContent||'0')+1; }
+    }, 9000);
+  }
+
+  // ── Quick Notes ────────────────────────────
+  function initNotes(id) {
+    const ta = document.getElementById('notes-'+id);
+    if(!ta) return;
+    ta.value = localStorage.getItem('pm_lr_note_'+id) || '';
+  }
+  function saveNote(id) {
+    const ta = document.getElementById('notes-'+id);
+    if(ta) localStorage.setItem('pm_lr_note_'+id, ta.value);
+  }
+
+  // ── News Feed ──────────────────────────────
+  const DEFAULT_RSS = 'https://feeds.npr.org/1001/rss.xml';
+  async function initNews(id) { await fetchNews(id); }
+  async function fetchNews(id) {
+    const inputEl = document.getElementById('ws-rss-'+id);
+    const rss = (inputEl && inputEl.value.trim()) || localStorage.getItem('pm_lr_rss_'+id) || DEFAULT_RSS;
+    if(inputEl && inputEl.value.trim()) localStorage.setItem('pm_lr_rss_'+id, rss);
+    const loading = document.getElementById('nl-'+id);
+    const list    = document.getElementById('nlist-'+id);
+    if(loading) loading.style.display='';
+    if(list) list.innerHTML='';
+    try {
+      const url = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rss)}&count=6`;
+      const r = await fetch(url);
+      const d = await r.json();
+      if(loading) loading.style.display='none';
+      if(!list) return;
+      if(d.status !== 'ok') throw new Error();
+      list.innerHTML = d.items.map(item=>`
+        <div class="news-item">
+          <a class="news-headline" href="${item.link}" target="_blank" rel="noopener">${item.title}</a>
+          <div class="news-meta">${d.feed.title} · ${new Date(item.pubDate).toLocaleDateString()}</div>
+        </div>`).join('');
+    } catch(e) {
+      if(loading) loading.innerHTML='<span style="color:var(--ink-3)">Failed to load feed. Try another URL in settings.</span>';
+    }
+  }
+
+  // ── Snake ──────────────────────────────────
+  const snakeGames = {};
+  function initSnake(id) {
+    const canvas = document.getElementById('sk-'+id);
+    const scoreEl = document.getElementById('sk-score-'+id);
+    const btn     = document.getElementById('sk-btn-'+id);
+    if(!canvas) return;
+    const CELL=16, COLS=20, ROWS=20;
+    const SIZE = CELL*COLS;
+    canvas.width=SIZE; canvas.height=SIZE;
+    canvas.style.width=SIZE+'px'; canvas.style.height=SIZE+'px';
+    const ctx = canvas.getContext('2d');
+    let snake,dir,nextDir,food,score,loop,running=false;
+    function rnd(max){ return Math.floor(Math.random()*max); }
+    function randomFood(){ while(true){ const f={x:rnd(COLS),y:rnd(ROWS)}; if(!snake.some(s=>s.x===f.x&&s.y===f.y)) return f; } }
+    function reset(){
+      snake=[{x:10,y:10},{x:9,y:10},{x:8,y:10}];
+      dir={x:1,y:0}; nextDir={x:1,y:0};
+      food=randomFood(); score=0;
+      if(scoreEl) scoreEl.textContent='0';
+    }
+    function draw(){
+      ctx.fillStyle='#0d0d14'; ctx.fillRect(0,0,SIZE,SIZE);
+      ctx.fillStyle='#e8992a';
+      ctx.fillRect(food.x*CELL+2,food.y*CELL+2,CELL-4,CELL-4);
+      snake.forEach((s,i)=>{
+        ctx.fillStyle=i===0?'#9b8fd4':'#4ab5aa';
+        ctx.fillRect(s.x*CELL+1,s.y*CELL+1,CELL-2,CELL-2);
+      });
+    }
+    function step(){
+      dir={...nextDir};
+      const h={x:snake[0].x+dir.x,y:snake[0].y+dir.y};
+      if(h.x<0||h.x>=COLS||h.y<0||h.y>=ROWS||snake.some(s=>s.x===h.x&&s.y===h.y)){ gameOver(); return; }
+      snake.unshift(h);
+      if(h.x===food.x&&h.y===food.y){
+        score++; if(scoreEl) scoreEl.textContent=score; food=randomFood();
+      } else { snake.pop(); }
+      draw();
+    }
+    function gameOver(){
+      running=false; clearInterval(loop);
+      ctx.fillStyle='rgba(0,0,0,0.72)'; ctx.fillRect(0,0,SIZE,SIZE);
+      ctx.fillStyle='#fff'; ctx.font='bold 16px Nunito'; ctx.textAlign='center';
+      ctx.fillText('Game Over',SIZE/2,SIZE/2-12);
+      ctx.fillStyle='#e8992a'; ctx.font='bold 13px Nunito';
+      ctx.fillText(`Score: ${score}`,SIZE/2,SIZE/2+12);
+      if(btn){ btn.textContent='▶ Play Again'; btn.style.display=''; }
+    }
+    function start(){
+      reset(); running=true; if(btn) btn.style.display='none';
+      draw(); loop=setInterval(step,130); canvas.focus();
+    }
+    const wrap = canvas.closest('.widget-wrap');
+    if(wrap) wrap.addEventListener('keydown',e=>{
+      if(!running) return;
+      const map={ArrowUp:{x:0,y:-1},ArrowDown:{x:0,y:1},ArrowLeft:{x:-1,y:0},ArrowRight:{x:1,y:0}};
+      const d=map[e.key]; if(d&&!(d.x===-dir.x&&d.y===-dir.y)){ nextDir=d; e.preventDefault(); }
+    });
+    btn?.addEventListener('click',start);
+    reset(); draw();
+    snakeGames[id]={stop:()=>{ if(loop) clearInterval(loop); running=false; }};
+  }
+
+  // ── Google Calendar ────────────────────────
+  function initCalendar(id) {
+    const saved = localStorage.getItem('pm_lr_cal_'+id);
+    if(saved) loadCalendar(id, saved);
+  }
+  function loadCalendar(id, urlOverride) {
+    const inputEl = document.getElementById('ws-cal-'+id);
+    const url = urlOverride || (inputEl && inputEl.value.trim());
+    if(!url) return;
+    localStorage.setItem('pm_lr_cal_'+id, url);
+    const ph = document.getElementById('cal-ph-'+id);
+    const frame = document.getElementById('cal-frame-'+id);
+    if(ph) ph.style.display='none';
+    if(frame){ frame.src=url; frame.style.display=''; }
+    toggleSettings(document.querySelector(`[data-widget-id="${id}"] .widget-gear`));
+  }
+
+  // ── Neighborhood Pulse ─────────────────────
+  const NB_SEED = [
+    {av:'AR',name:'Alex R.',   action:'posted in Central Phoenix',    time:'15m'},
+    {av:'JS',name:'Jess S.',   action:'stamped a photo post',         time:'32m'},
+    {av:'TW',name:'Tyler W.',  action:'joined the neighborhood',      time:'1h'},
+    {av:'MM',name:'Maria M.',  action:'left a message for a neighbor',time:'2h'},
+  ];
+  function initNeighborhood(id) {
+    const el = document.getElementById('nb-'+id);
+    if(!el) return;
+    el.innerHTML = NB_SEED.map(n=>`
+      <div class="nb-item">
+        <div class="nb-pulse-dot"></div>
+        <div class="nb-avatar">${n.av}</div>
+        <div class="nb-body">
+          <div class="nb-name">${n.name}</div>
+          <div class="nb-action">${n.action}</div>
+        </div>
+        <div class="nb-time">${n.time}</div>
+      </div>`).join('');
+  }
+
+  /* ═══════════════════════════════════════════
+     GRID MANAGEMENT
+  ═══════════════════════════════════════════ */
+  let grid;
+  let editMode = false;
+  let widgetCount = 0;
+
+  function addWidget(type, opts={}) {
+    const def = WIDGET_DEFS[type];
+    if(!def) return;
+    const id = `w${++widgetCount}`;
+    // Pre-seed config values before init runs
+    if(opts.rss) localStorage.setItem('pm_lr_rss_'+id, opts.rss);
+    const el = grid.addWidget({
+      x: opts.x, y: opts.y,
+      w: opts.w || def.defaultW,
+      h: opts.h || def.defaultH,
+      minW: def.minW, minH: def.minH,
+      content: buildWidget(type, id),
+    });
+    el.dataset.widgetType = type;
+    setTimeout(()=>{ initWidget(type, el); }, 0);
+    return el;
+  }
+
+  function removeW(btn) {
+    const item = btn.closest('.grid-stack-item');
+    if(item) { grid.removeWidget(item); saveLayout(); }
+  }
+
+  function saveLayout() {
+    const items = [];
+    document.querySelectorAll('.grid-stack-item').forEach(el=>{
+      const n = el.gridstackNode;
+      if(!n) return;
+      items.push({ type: el.dataset.widgetType, x:n.x, y:n.y, w:n.w, h:n.h });
+    });
+    localStorage.setItem('pm_lr_layout', JSON.stringify(items));
+  }
+
+  function loadLayout() {
+    const saved   = localStorage.getItem('pm_lr_layout');
+    const version = parseInt(localStorage.getItem('pm_lr_layout_v') || '1');
+    const layout  = (saved && version === LAYOUT_VERSION) ? JSON.parse(saved) : SEED_LAYOUT;
+    localStorage.setItem('pm_lr_layout_v', LAYOUT_VERSION);
+    layout.forEach(item => addWidget(item.type, item));
+  }
+
+  /* ═══════════════════════════════════════════
+     EDIT MODE
+  ═══════════════════════════════════════════ */
+  // ── Column picker ──────────────────────────
+  const COL_MAP = { 1: 2, 2: 6, 3: 12 }; // user cols → gridstack columns
+
+  function setColumns(n) {
+    [1,2,3].forEach(i => {
+      document.getElementById('col-btn-'+i)?.classList.toggle('active', i === n);
+    });
+    grid.column(COL_MAP[n]);
+    localStorage.setItem('pm_lr_cols', n);
+  }
+
+  function toggleEditMode() {
+    editMode = !editMode;
+    document.body.classList.toggle('edit-mode', editMode);
+    document.getElementById('editBtnLabel').textContent = editMode ? 'Done' : 'Edit Layout';
+    grid.setStatic(!editMode);
+    if(!editMode) saveLayout();
+  }
+
+  /* ═══════════════════════════════════════════
+     WIDGET PICKER
+  ═══════════════════════════════════════════ */
+  function openPicker() {
+    const pg = document.getElementById('pickerGrid');
+    pg.innerHTML = Object.entries(WIDGET_DEFS).map(([type,def])=>`
+      <div class="picker-item" onclick="addWidget('${type}');closePicker();">
+        <i class="ti ${def.icon}"></i>
+        <div class="picker-item-name">${def.title}</div>
+        <div class="picker-item-desc">${def.desc}</div>
+      </div>`).join('');
+    document.getElementById('pickerOverlay').classList.add('open');
+  }
+  function closePicker() {
+    document.getElementById('pickerOverlay').classList.remove('open');
+  }
+  document.getElementById('pickerOverlay').addEventListener('click', e=>{
+    if(e.target===e.currentTarget) closePicker();
+  });
+
+  /* ═══════════════════════════════════════════
+     SETTINGS POPOVER
+  ═══════════════════════════════════════════ */
+  function toggleSettings(gearBtn) {
+    const wrap = gearBtn?.closest('.widget-wrap');
+    if(!wrap) return;
+    const pop = wrap.querySelector('.widget-settings');
+    if(!pop) return;
+    pop.classList.toggle('open');
+    gearBtn.style.color = pop.classList.contains('open') ? 'var(--accent)' : '';
+  }
+
+  /* ═══════════════════════════════════════════
+     INIT
+  ═══════════════════════════════════════════ */
+  // CSS animation for spinner
+  const spinStyle = document.createElement('style');
+  spinStyle.textContent = '@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';
+  document.head.appendChild(spinStyle);
+
+  grid = GridStack.init({
+    column: 12,
+    cellHeight: 70,
+    margin: 6,
+    animate: true,
+    handle: '.widget-header',
+    resizable: { handles: 'se' },
+    draggable: { handle: '.widget-header' },
+  }, '#grid');
+
+  grid.setStatic(true); // start locked; edit mode unlocks
+
+  grid.on('dragstop resizestop', saveLayout);
+
+  // Restore saved column preference
+  const savedCols = parseInt(localStorage.getItem('pm_lr_cols') || '3');
+  setColumns(savedCols);
+
+  loadLayout();
+  setTimeout(saveLayout, 100); // persist initial layout immediately
+  </script>
+</body>
+</html>

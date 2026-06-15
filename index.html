@@ -96,12 +96,12 @@
       width: 100%;
     }
     .zone-hero {
-      max-width: 980px;
+      max-width: 1400px;
       margin: 0 auto;
       padding: 2rem 1.25rem 0;
     }
     .zone-feed {
-      max-width: 980px;
+      max-width: 1400px;
       margin: 1.25rem auto 0;
       padding: 0 1.25rem;
     }
@@ -228,12 +228,38 @@
     /* ─── Main Layout ─── */
     .main-grid {
       display: grid;
-      grid-template-columns: 280px 1fr;
+      grid-template-columns: 280px 1fr 280px;
       gap: 1.25rem;
       align-items: start;
     }
 
-    /* ─── Posts Column ─── */
+    .left-col  { display: flex; flex-direction: column; gap: 1rem; grid-column: 1; }
+    .feed-col  { display: flex; flex-direction: column; gap: 1rem; grid-column: 2; }
+    .right-col { display: flex; flex-direction: column; gap: 1rem; grid-column: 3; }
+
+    /* 2-col: ≤1299px — right-col wraps under left-col */
+    @media (max-width: 1299px) {
+      .main-grid {
+        grid-template-columns: 280px 1fr;
+        grid-template-rows: auto auto;
+      }
+      .left-col  { grid-column: 1; grid-row: 1; }
+      .feed-col  { grid-column: 2; grid-row: 1 / 3; }
+      .right-col { grid-column: 1; grid-row: 2; }
+    }
+
+    /* 1-col: ≤699px — stacked */
+    @media (max-width: 699px) {
+      .main-grid { grid-template-columns: 1fr; grid-template-rows: unset; }
+      .feed-col  { grid-column: 1; grid-row: unset; order: 1; width: 100%; min-width: 0; }
+      .left-col  { grid-column: 1; grid-row: unset; order: 2; width: 100%; min-width: 0; }
+      .right-col { grid-column: 1; grid-row: unset; order: 3; width: 100%; min-width: 0; }
+      .sidebar-card, .myq-wrap, .myspace-card, .phoenix-card { width: 100%; max-width: 100%; box-sizing: border-box; }
+      .pick-six-grid { padding: 0 0.75rem 1rem; }
+      .candids-scroll-wrap { height: 360px; }
+    }
+
+    /* ─── Posts Column (legacy alias) ─── */
     .posts-col { display: flex; flex-direction: column; gap: 1rem; }
 
     .section-header {
@@ -401,6 +427,9 @@
     .post-media-grid.count-3 .media-item:nth-child(2),
     .post-media-grid.count-3 .media-item:nth-child(3) { aspect-ratio: 4/3; }
     .post-media-grid.count-3 .media-item img { width:100%; height:100%; object-fit:contain; background:rgba(0,0,0,0.04); }
+    .post-media-grid.count-6 { grid-template-columns: repeat(3, 1fr); }
+    .post-media-grid.count-6 .media-item { aspect-ratio: 4/5; }
+    .post-media-grid.count-6 .media-item img { width:100%; height:100%; object-fit:cover; }
 
     .media-item { position: relative; overflow: hidden; background: rgba(0,0,0,0.03); }
     .media-item img { display:block; cursor:zoom-in; transition:transform 0.2s; }
@@ -457,7 +486,7 @@
     .btn-send:active { transform: scale(0.97); }
 
     /* ─── Sidebar ─── */
-    .sidebar { display: flex; flex-direction: column; gap: 1rem; }
+    .sidebar, .feed-col { display: flex; flex-direction: column; gap: 1rem; }
     .sidebar-card { border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; }
 
     .card-title {
@@ -1122,6 +1151,85 @@
     .type-tag.note     { background: rgba(140,130,120,0.14); color: #6a6055; border-color: rgba(140,130,120,0.28); }
     .type-tag.marquee  { background: rgba(74,181,170,0.15); color: #2e8a82; border-color: rgba(74,181,170,0.3); }
 
+    /* ── Album Thumb ── */
+    .album-thumb-wrap {
+      position: relative; border-radius: var(--radius-md); overflow: hidden;
+      cursor: pointer; margin-top: 0.85rem;
+      aspect-ratio: 4/3; background: rgba(0,0,0,0.07);
+    }
+    .album-thumb-wrap img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      transition: transform 0.25s ease;
+    }
+    .album-thumb-wrap:hover img { transform: scale(1.04); }
+    .album-count-badge {
+      position: absolute; bottom: 0.6rem; right: 0.65rem;
+      background: rgba(20,15,8,0.72); backdrop-filter: blur(6px);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 999px; padding: 0.25rem 0.65rem;
+      font-size: 0.72rem; font-weight: 700; color: #fff;
+      display: flex; align-items: center; gap: 0.35rem;
+      pointer-events: none;
+    }
+    /* in weekly-row context, thumb is smaller */
+    .weekly-row .album-thumb-wrap {
+      width: 62px; height: 78px; aspect-ratio: unset; margin-top: 0; flex-shrink: 0;
+      border: 1px solid rgba(255,255,255,0.6);
+    }
+    .weekly-row .album-count-badge {
+      font-size: 0.58rem; padding: 0.15rem 0.45rem; bottom: 0.3rem; right: 0.3rem;
+    }
+
+    /* ── Album Modal ── */
+    .album-overlay {
+      display: none; position: fixed; inset: 0; z-index: 400;
+      background: rgba(40,30,20,0.55); backdrop-filter: blur(8px);
+      align-items: center; justify-content: center;
+      padding: 1.5rem;
+    }
+    .album-overlay.open { display: flex; }
+    .album-modal {
+      width: min(780px, 96vw); max-height: 90vh;
+      border-radius: var(--radius-xl);
+      background: linear-gradient(135deg, rgba(155,143,212,0.28) 0%, rgba(74,181,170,0.16) 100%);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.55);
+      box-shadow: 0 4px 24px rgba(80,60,140,0.10);
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .album-modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 1.25rem 0.75rem;
+      background: linear-gradient(90deg, rgba(78,58,160,0.97), rgba(50,150,142,0.97));
+      flex-shrink: 0;
+    }
+    .album-modal-title {
+      font-size: 0.95rem; font-weight: 800; color: #fff;
+      letter-spacing: 0.01em;
+    }
+    .album-modal-meta {
+      font-size: 0.72rem; font-weight: 500; color: rgba(255,255,255,0.7); margin-top: 0.1rem;
+    }
+    .album-modal-close {
+      background: none; border: none; cursor: pointer;
+      color: rgba(255,255,255,0.75); font-size: 1.1rem; line-height: 1; flex-shrink: 0;
+    }
+    .album-modal-close:hover { color: #fff; }
+    .album-modal-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
+      overflow-y: auto; padding: 4px;
+    }
+    .album-modal-grid .album-photo {
+      aspect-ratio: 4/5; overflow: hidden; cursor: pointer; border-radius: 6px;
+      background: rgba(0,0,0,0.07);
+    }
+    .album-modal-grid .album-photo img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      transition: transform 0.22s ease;
+    }
+    .album-modal-grid .album-photo:hover img { transform: scale(1.05); }
+
     /* ── Weekly view ── */
     .weekly-day-group { display: flex; flex-direction: column; gap: 0.65rem; }
     .weekly-day-label {
@@ -1267,11 +1375,90 @@
     }
     .site-banner-nav a:hover { color: rgba(255,255,255,1); }
 
-    @media (max-width:720px) {
+    @media (max-width:699px) {
       .hero-inner  { grid-template-columns:1fr; }
       .hero-photo  { height:200px; }
-      .main-grid   { grid-template-columns:1fr; }
       .hero-name   { font-size:1.8rem; }
+    }
+
+    /* ─── Room Nav Tabs ─── */
+    .room-nav {
+      display: flex;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: var(--glass-white);
+      backdrop-filter: blur(18px) saturate(1.6);
+      -webkit-backdrop-filter: blur(18px) saturate(1.6);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow), var(--glass-inset);
+    }
+    .room-tab {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 0.65rem 0.25rem 0.55rem;
+      text-decoration: none;
+      color: var(--ink-3);
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border-right: 1px solid rgba(255,255,255,0.5);
+      transition: background 0.15s, color 0.15s;
+      cursor: pointer;
+    }
+    .room-tab:last-child { border-right: none; }
+    .room-tab i { font-size: 1.2rem; }
+    .room-tab:hover { background: rgba(255,255,255,0.45); color: var(--ink); }
+    .room-tab.active {
+      background: linear-gradient(160deg, rgba(155,143,212,0.25), rgba(74,181,170,0.18));
+      color: var(--ink);
+    }
+    .room-tab.active i { color: var(--lavender); }
+
+    /* ─── Lounge Modal ─── */
+    .lounge-overlay {
+      display: none;
+      position: fixed; inset: 0; z-index: 300;
+      background: rgba(30,20,10,0.45);
+      backdrop-filter: blur(6px);
+      align-items: center; justify-content: center;
+    }
+    .lounge-overlay.open { display: flex; }
+    .lounge-modal {
+      width: min(480px, 92vw);
+      min-height: 320px;
+      border-radius: var(--radius-xl);
+      background: var(--glass-white);
+      backdrop-filter: blur(24px) saturate(1.8);
+      -webkit-backdrop-filter: blur(24px) saturate(1.8);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 24px 64px rgba(80,40,10,0.18);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .lounge-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 1.25rem 0.75rem;
+      border-bottom: 1px solid rgba(255,255,255,0.5);
+    }
+    .lounge-title {
+      font-size: 1rem; font-weight: 800; color: var(--ink);
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .lounge-title i { color: var(--lavender); font-size: 1.1rem; }
+    .lounge-close {
+      background: none; border: none; cursor: pointer;
+      color: var(--ink-3); font-size: 1rem; line-height: 1;
+    }
+    .lounge-close:hover { color: var(--ink); }
+    .lounge-body {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      padding: 2rem;
+      color: var(--ink-4); font-size: 0.85rem; font-weight: 500; text-align: center;
+      line-height: 1.6;
     }
 
     /* ─── MySpace Profile Header ─── */
@@ -1412,8 +1599,32 @@
   <div class="zone zone-feed">
     <div class="main-grid">
 
-      <!-- Left Column: Profile + Visual Modules -->
-      <div class="posts-col">
+      <!-- Left Column: Profile + My Q + Neighborhood -->
+      <div class="left-col">
+
+        <!-- Room Nav Tabs -->
+        <div class="room-nav">
+          <a class="room-tab active" href="index.html" title="Home">
+            <i class="ti ti-home-2"></i>
+            <span>Home</span>
+          </a>
+          <a class="room-tab" href="living-room.html" title="Living Room">
+            <i class="ti ti-sofa"></i>
+            <span>Living Room</span>
+          </a>
+          <a class="room-tab" href="office.html" title="Office">
+            <i class="ti ti-briefcase"></i>
+            <span>Office</span>
+          </a>
+          <a class="room-tab" href="playground.html" title="Playground">
+            <i class="ti ti-assembly"></i>
+            <span>Playground</span>
+          </a>
+          <a class="room-tab" href="#" title="Lounge" onclick="loungeOpen(event)">
+            <i class="ti ti-messages"></i>
+            <span>Lounge</span>
+          </a>
+        </div>
 
         <!-- My Post Card -->
         <div class="myspace-card">
@@ -1562,208 +1773,6 @@
           </div>
         </div>
 
-        <!-- Pick Six -->
-        <div class="sidebar-card glass" style="padding:0; overflow:hidden; background: linear-gradient(135deg, rgba(155,143,212,0.28) 0%, rgba(74,181,170,0.16) 100%); border: 1px solid rgba(255,255,255,0.55); box-shadow: 0 4px 24px rgba(80,60,140,0.10);">
-          <div style="padding:1.1rem 1.25rem 0.75rem; display:flex; justify-content:center;">
-            <div class="card-title" style="margin-bottom:0; font-size:1.2rem; font-weight:900; letter-spacing:-0.4px; color:#3d2a0a;">My Pick Six</div>
-          </div>
-          <div class="pick-six-grid">
-            <div class="pick-six-tile">
-              <img src="friends/Charlie.JPG" alt="Charlie" />
-              <span class="pick-six-name">Charlie</span>
-            </div>
-            <div class="pick-six-tile">
-              <img src="friends/Keller.jpg" alt="Keller" />
-              <span class="pick-six-name">Keller</span>
-            </div>
-            <div class="pick-six-tile">
-              <img src="friends/Tom.jpg" alt="Tom" />
-              <span class="pick-six-name">Tom</span>
-            </div>
-            <div class="pick-six-tile">
-              <img src="friends/Trixton.JPG" alt="Trixton" />
-              <span class="pick-six-name">Trixton</span>
-            </div>
-            <div class="pick-six-tile">
-              <img src="friends/Camille Jeff.jpg" alt="Camille Jeff" />
-              <span class="pick-six-name">Camille Jeff</span>
-            </div>
-            <div class="pick-six-tile">
-              <img src="friends/Sunny Rich.jpg" alt="Sunny Rich" />
-              <span class="pick-six-name">Sunny Rich</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Candids Wall -->
-        <div class="sidebar-card glass" style="padding:0; overflow:hidden; background: linear-gradient(135deg, rgba(74,181,170,0.22) 0%, rgba(155,143,212,0.22) 100%);">
-          <div style="padding:1.25rem 1.25rem 0.8rem; display:flex; justify-content:center;">
-            <div class="card-title" style="margin-bottom:0; font-size:1.45rem; font-weight:900; letter-spacing:-0.5px; color:#2d3a4a; text-align:center;">Candids Wall</div>
-          </div>
-          <div class="candids-scroll-wrap">
-            <div class="candids-grid">
-
-              <div class="candid-tile" onclick="lbOpen('candids/me-.jpg','image','me-.jpg')">
-                <img src="candids/me-.jpg" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_0174.jpeg','image','IMG_0174.jpeg')">
-                <img src="candids/IMG_0174.jpeg" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_0746.JPG','image','IMG_0746.JPG')">
-                <img src="candids/IMG_0746.JPG" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_1739.jpg','image','IMG_1739.jpg')">
-                <img src="candids/IMG_1739.jpg" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_1937.JPG','image','IMG_1937.JPG')">
-                <img src="candids/IMG_1937.JPG" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_1960.jpg','image','IMG_1960.jpg')">
-                <img src="candids/IMG_1960.jpg" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_2076.JPG','image','IMG_2076.JPG')">
-                <img src="candids/IMG_2076.JPG" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_2605.JPG','image','IMG_2605.JPG')">
-                <img src="candids/IMG_2605.JPG" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_4044.JPG','image','IMG_4044.JPG')">
-                <img src="candids/IMG_4044.JPG" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_5883.jpg','image','IMG_5883.jpg')">
-                <img src="candids/IMG_5883.jpg" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_5970.JPG','image','IMG_5970.JPG')">
-                <img src="candids/IMG_5970.JPG" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_6134.JPG','image','IMG_6134.JPG')">
-                <img src="candids/IMG_6134.JPG" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_6289.JPG','image','IMG_6289.JPG')">
-                <img src="candids/IMG_6289.JPG" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_6697 2.JPG','image','IMG_6697 2.JPG')">
-                <img src="candids/IMG_6697 2.JPG" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_6847.jpg','image','IMG_6847.jpg')">
-                <img src="candids/IMG_6847.jpg" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_7073.JPG','image','IMG_7073.JPG')">
-                <img src="candids/IMG_7073.JPG" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_7272.JPG','image','IMG_7272.JPG')">
-                <img src="candids/IMG_7272.JPG" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_7349.JPG','image','IMG_7349.JPG')">
-                <img src="candids/IMG_7349.JPG" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_7350.JPG','image','IMG_7350.JPG')">
-                <img src="candids/IMG_7350.JPG" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_7529.JPG','image','IMG_7529.JPG')">
-                <img src="candids/IMG_7529.JPG" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/D2FFD1AA-AA8C-4FB4-82E5-4B410A74EEC8.jpg','image','D2FFD1AA-AA8C-4FB4-82E5-4B410A74EEC8.jpg')">
-                <img src="candids/D2FFD1AA-AA8C-4FB4-82E5-4B410A74EEC8.jpg" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/ld-export-fae74027-10242025.jpg','image','ld-export-fae74027-10242025.jpg')">
-                <img src="candids/ld-export-fae74027-10242025.jpg" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/80f860e90da84dd8abea3b310afce689.mov','video','80f860e90da84dd8abea3b310afce689.mov')">
-                <video src="candids/80f860e90da84dd8abea3b310afce689.mov" muted preload="metadata"></video>
-                <div class="video-pill">Video</div>
-                <div class="tile-hover"><div class="tile-hover-icon">▶</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/87a12adb05a648069bc8156492047af4.mov','video','87a12adb05a648069bc8156492047af4.mov')">
-                <video src="candids/87a12adb05a648069bc8156492047af4.mov" muted preload="metadata"></video>
-                <div class="video-pill">Video</div>
-                <div class="tile-hover"><div class="tile-hover-icon">▶</div></div>
-              </div>
-
-            </div>
-          </div>
-        </div>
-
-        <!-- The Marquee -->
-        <div class="sidebar-card glass" id="theMarquee" style="background: linear-gradient(135deg, rgba(74,181,170,0.22) 0%, rgba(155,143,212,0.22) 100%);">
-          <div style="display:flex; justify-content:center; margin-bottom:0.75rem;">
-            <div class="card-title" style="margin-bottom:0; font-size:1.45rem; font-weight:900; letter-spacing:-0.5px; color:#2d3a4a; text-align:center;">The Marquee</div>
-          </div>
-
-          <!-- Tab bar -->
-          <div class="feed-tabs" style="margin-bottom:0.75rem;">
-            <button class="feed-tab active" onclick="switchMqTab('seen')">Recently Watched</button>
-            <button class="feed-tab"        onclick="switchMqTab('want')">Watchlist</button>
-            <button class="feed-tab"        onclick="switchMqTab('must')">Must Watch</button>
-          </div>
-
-          <!-- Panel: Recently Watched -->
-          <div class="mq-panel active" id="mq-seen">
-            <div class="mq-carousel-wrap">
-              <button class="mq-arrow mq-prev" onclick="mqScroll('stageSeen',-1)">&#8249;</button>
-              <div class="mq-stage" id="stageSeen"></div>
-              <button class="mq-arrow mq-next" onclick="mqScroll('stageSeen', 1)">&#8250;</button>
-            </div>
-          </div>
-
-          <!-- Panel: Watchlist -->
-          <div class="mq-panel" id="mq-want">
-            <div class="mq-carousel-wrap">
-              <button class="mq-arrow mq-prev" onclick="mqScroll('stageWant',-1)">&#8249;</button>
-              <div class="mq-stage" id="stageWant"></div>
-              <button class="mq-arrow mq-next" onclick="mqScroll('stageWant', 1)">&#8250;</button>
-            </div>
-          </div>
-
-          <!-- Panel: Must Watch -->
-          <div class="mq-panel" id="mq-must">
-            <div class="mq-carousel-wrap">
-              <button class="mq-arrow mq-prev" onclick="mqScroll('stageMust',-1)">&#8249;</button>
-              <div class="mq-stage" id="stageMust"></div>
-              <button class="mq-arrow mq-next" onclick="mqScroll('stageMust', 1)">&#8250;</button>
-            </div>
-          </div>
-
-          <!-- Spotlight (moved by JS to active panel) -->
-          <div class="marquee-spotlight" id="marqueeSpotlight">
-            <div class="spotlight-poster" id="spotlightPoster">
-              <img id="spotlightImg" alt="" />
-              <div class="spotlight-grad" id="spotlightGrad"></div>
-            </div>
-            <div class="spotlight-info">
-              <div class="spotlight-status" id="spotlightStatus"></div>
-              <div class="spotlight-title-lg" id="spotlightTitle"></div>
-              <div class="spotlight-year-lg"  id="spotlightYear"></div>
-              <div class="spotlight-rating"   id="spotlightRating"></div>
-              <div class="spotlight-seen"     id="spotlightSeen"></div>
-              <div class="spotlight-thoughts" id="spotlightThoughts"></div>
-              <button class="spotlight-close" onclick="closeSpotlight()">✕ close</button>
-            </div>
-          </div>
-        </div>
-
         <!-- Neighborhood -->
         <div class="phoenix-card glass">
           <div class="phoenix-bg"></div>
@@ -1777,10 +1786,10 @@
           </div>
         </div>
 
-      </div><!-- /left col -->
+      </div><!-- /left-col -->
 
-      <!-- Right Column: Tabbed Feed -->
-      <div class="sidebar">
+      <!-- Center Column: Tabbed Feed -->
+      <div class="feed-col">
 
         <!-- Composer -->
         <div class="composer glass" id="composer">
@@ -1822,6 +1831,26 @@
 
         <!-- Dynamic feed renders here -->
         <div id="dynamicFeed"></div>
+
+        <!-- ── Permanent Post: Payson Camping Jun 15 ── -->
+        <div class="post-card glass">
+          <div class="post-body"><p>Summer Camping and Fishing in Payson! It's nice getting off the grid once in a while.</p></div>
+          <div class="post-media-grid count-6">
+            <div class="media-item"><img src="candids/IMG_7797.jpg" alt="Payson camping" onclick="lbOpen('candids/IMG_7797.jpg','image')" /></div>
+            <div class="media-item"><img src="candids/IMG_7802.JPG" alt="Payson camping" onclick="lbOpen('candids/IMG_7802.JPG','image')" /></div>
+            <div class="media-item"><img src="candids/IMG_7812.JPG" alt="Payson fishing" onclick="lbOpen('candids/IMG_7812.JPG','image')" /></div>
+            <div class="media-item"><img src="candids/IMG_7845.jpg" alt="Payson overlook" onclick="lbOpen('candids/IMG_7845.jpg','image')" /></div>
+            <div class="media-item"><img src="candids/IMG_7848.JPG" alt="Payson fishing catch" onclick="lbOpen('candids/IMG_7848.JPG','image')" /></div>
+            <div class="media-item"><img src="candids/IMG_2847.jpeg" alt="Trixton at summit" onclick="lbOpen('candids/IMG_2847.jpeg','image')" /></div>
+          </div>
+          <div class="post-footer">
+            <button class="stamp-btn" onclick="toggleStamp(this,0)">
+              <span class="stamp-icon">⬡</span> Stamp
+            </button>
+            <span class="stamp-count">0 stamps</span>
+            <span class="post-date">June 15, 2026</span>
+          </div>
+        </div>
 
         <!-- ── Permanent Post: Postmarq Updates Jun 12 ── -->
         <div class="post-card glass">
@@ -1905,7 +1934,21 @@
         <!-- ══ PANEL: WEEKLY ══ -->
         <div class="tab-panel active" id="panel-weekly">
 
-          <!-- Thursday Jun 12 -->
+          <!-- Sunday Jun 15 -->
+          <div class="weekly-day-group">
+            <div class="weekly-day-label">Sunday — Jun 15</div>
+            <div class="weekly-row" onclick="albumOpen('payson-jun15')" style="cursor:pointer;">
+              <div class="album-thumb-wrap">
+                <img src="candids/IMG_7802.JPG" alt="Payson camping" />
+                <div class="album-count-badge"><i class="ti ti-camera"></i> 6</div>
+              </div>
+              <div class="weekly-body">
+                <div class="weekly-excerpt">Summer Camping and Fishing in Payson! It's nice getting off the grid once in a while.</div>
+                <div class="weekly-meta"><span class="type-tag photo">Photo</span> · June 15, 2026</div>
+              </div>
+            </div>
+          </div>
+
           <div class="weekly-day-group">
             <div class="weekly-day-label">Thursday — Jun 12</div>
             <div class="weekly-row">
@@ -2005,6 +2048,11 @@
           <!-- June 2026 -->
           <div class="yb-month-label">June 2026</div>
           <div class="yb-tile-grid">
+            <div class="yb-tile photo" onclick="albumOpen('payson-jun15')" style="cursor:pointer; position:relative;">
+              <img src="candids/IMG_7802.JPG" alt="Payson trip" />
+              <div class="album-count-badge" style="position:absolute;bottom:0.4rem;right:0.4rem;font-size:0.62rem;padding:0.15rem 0.45rem;"><i class="ti ti-camera"></i> 6</div>
+              <div class="yb-tile-tip">Camping in Payson<br>Jun 15</div>
+            </div>
             <div class="yb-tile photo" style="background:rgba(255,255,255,0.35);display:flex;align-items:center;justify-content:center;padding:0.5rem;text-align:center;">
               <div style="font-size:0.7rem;font-weight:700;color:var(--ink-2);line-height:1.35;">Postmarq<br>Updates</div>
               <div class="yb-tile-tip">Composer, link preview, UI tweaks<br>Jun 12</div>
@@ -2031,7 +2079,202 @@
 
         </div><!-- /panel-yearbook -->
 
-      </div><!-- /right col -->
+      </div><!-- /feed-col -->
+
+      <!-- Right Column: Pick Six + Candids + Marquee -->
+      <div class="right-col">
+
+        <!-- Pick Six -->
+        <div class="sidebar-card glass" style="padding:0; overflow:hidden; background: linear-gradient(135deg, rgba(155,143,212,0.28) 0%, rgba(74,181,170,0.16) 100%); border: 1px solid rgba(255,255,255,0.55); box-shadow: 0 4px 24px rgba(80,60,140,0.10);">
+          <div style="padding:1.1rem 1.25rem 0.75rem; display:flex; justify-content:center;">
+            <div class="card-title" style="margin-bottom:0; font-size:1.2rem; font-weight:900; letter-spacing:-0.4px; color:#3d2a0a;">My Pick Six</div>
+          </div>
+          <div class="pick-six-grid">
+            <div class="pick-six-tile">
+              <img src="friends/Charlie.JPG" alt="Charlie" />
+              <span class="pick-six-name">Charlie</span>
+            </div>
+            <div class="pick-six-tile">
+              <img src="friends/Keller.jpg" alt="Keller" />
+              <span class="pick-six-name">Keller</span>
+            </div>
+            <div class="pick-six-tile">
+              <img src="friends/Tom.jpg" alt="Tom" />
+              <span class="pick-six-name">Tom</span>
+            </div>
+            <div class="pick-six-tile">
+              <img src="friends/Trixton.JPG" alt="Trixton" />
+              <span class="pick-six-name">Trixton</span>
+            </div>
+            <div class="pick-six-tile">
+              <img src="friends/Camille Jeff.jpg" alt="Camille Jeff" />
+              <span class="pick-six-name">Camille Jeff</span>
+            </div>
+            <div class="pick-six-tile">
+              <img src="friends/Sunny Rich.jpg" alt="Sunny Rich" />
+              <span class="pick-six-name">Sunny Rich</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Candids Wall -->
+        <div class="sidebar-card glass" style="padding:0; overflow:hidden; background: linear-gradient(135deg, rgba(74,181,170,0.22) 0%, rgba(155,143,212,0.22) 100%);">
+          <div style="padding:1.25rem 1.25rem 0.8rem; display:flex; justify-content:center;">
+            <div class="card-title" style="margin-bottom:0; font-size:1.45rem; font-weight:900; letter-spacing:-0.5px; color:#2d3a4a; text-align:center;">Candids Wall</div>
+          </div>
+          <div class="candids-scroll-wrap">
+            <div class="candids-grid">
+              <div class="candid-tile" onclick="lbOpen('candids/me-.jpg','image','me-.jpg')">
+                <img src="candids/me-.jpg" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_0174.jpeg','image','IMG_0174.jpeg')">
+                <img src="candids/IMG_0174.jpeg" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_0746.JPG','image','IMG_0746.JPG')">
+                <img src="candids/IMG_0746.JPG" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_1739.jpg','image','IMG_1739.jpg')">
+                <img src="candids/IMG_1739.jpg" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_1937.JPG','image','IMG_1937.JPG')">
+                <img src="candids/IMG_1937.JPG" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_1960.jpg','image','IMG_1960.jpg')">
+                <img src="candids/IMG_1960.jpg" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_2076.JPG','image','IMG_2076.JPG')">
+                <img src="candids/IMG_2076.JPG" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_2605.JPG','image','IMG_2605.JPG')">
+                <img src="candids/IMG_2605.JPG" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_4044.JPG','image','IMG_4044.JPG')">
+                <img src="candids/IMG_4044.JPG" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_5883.jpg','image','IMG_5883.jpg')">
+                <img src="candids/IMG_5883.jpg" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_5970.JPG','image','IMG_5970.JPG')">
+                <img src="candids/IMG_5970.JPG" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_6134.JPG','image','IMG_6134.JPG')">
+                <img src="candids/IMG_6134.JPG" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_6289.JPG','image','IMG_6289.JPG')">
+                <img src="candids/IMG_6289.JPG" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_6697 2.JPG','image','IMG_6697 2.JPG')">
+                <img src="candids/IMG_6697 2.JPG" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_6847.jpg','image','IMG_6847.jpg')">
+                <img src="candids/IMG_6847.jpg" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_7073.JPG','image','IMG_7073.JPG')">
+                <img src="candids/IMG_7073.JPG" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_7272.JPG','image','IMG_7272.JPG')">
+                <img src="candids/IMG_7272.JPG" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_7349.JPG','image','IMG_7349.JPG')">
+                <img src="candids/IMG_7349.JPG" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_7350.JPG','image','IMG_7350.JPG')">
+                <img src="candids/IMG_7350.JPG" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/IMG_7529.JPG','image','IMG_7529.JPG')">
+                <img src="candids/IMG_7529.JPG" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/D2FFD1AA-AA8C-4FB4-82E5-4B410A74EEC8.jpg','image','D2FFD1AA-AA8C-4FB4-82E5-4B410A74EEC8.jpg')">
+                <img src="candids/D2FFD1AA-AA8C-4FB4-82E5-4B410A74EEC8.jpg" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/ld-export-fae74027-10242025.jpg','image','ld-export-fae74027-10242025.jpg')">
+                <img src="candids/ld-export-fae74027-10242025.jpg" alt="candid" loading="lazy" />
+                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/80f860e90da84dd8abea3b310afce689.mov','video','80f860e90da84dd8abea3b310afce689.mov')">
+                <video src="candids/80f860e90da84dd8abea3b310afce689.mov" muted preload="metadata"></video>
+                <div class="video-pill">Video</div>
+                <div class="tile-hover"><div class="tile-hover-icon">▶</div></div>
+              </div>
+              <div class="candid-tile" onclick="lbOpen('candids/87a12adb05a648069bc8156492047af4.mov','video','87a12adb05a648069bc8156492047af4.mov')">
+                <video src="candids/87a12adb05a648069bc8156492047af4.mov" muted preload="metadata"></video>
+                <div class="video-pill">Video</div>
+                <div class="tile-hover"><div class="tile-hover-icon">▶</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- The Marquee -->
+        <div class="sidebar-card glass" id="theMarquee" style="background: linear-gradient(135deg, rgba(74,181,170,0.22) 0%, rgba(155,143,212,0.22) 100%);">
+          <div style="display:flex; justify-content:center; margin-bottom:0.75rem;">
+            <div class="card-title" style="margin-bottom:0; font-size:1.45rem; font-weight:900; letter-spacing:-0.5px; color:#2d3a4a; text-align:center;">The Marquee</div>
+          </div>
+          <div class="feed-tabs" style="margin-bottom:0.75rem;">
+            <button class="feed-tab active" onclick="switchMqTab('seen')">Recently Watched</button>
+            <button class="feed-tab"        onclick="switchMqTab('want')">Watchlist</button>
+            <button class="feed-tab"        onclick="switchMqTab('must')">Must Watch</button>
+          </div>
+          <div class="mq-panel active" id="mq-seen">
+            <div class="mq-carousel-wrap">
+              <button class="mq-arrow mq-prev" onclick="mqScroll('stageSeen',-1)">&#8249;</button>
+              <div class="mq-stage" id="stageSeen"></div>
+              <button class="mq-arrow mq-next" onclick="mqScroll('stageSeen', 1)">&#8250;</button>
+            </div>
+          </div>
+          <div class="mq-panel" id="mq-want">
+            <div class="mq-carousel-wrap">
+              <button class="mq-arrow mq-prev" onclick="mqScroll('stageWant',-1)">&#8249;</button>
+              <div class="mq-stage" id="stageWant"></div>
+              <button class="mq-arrow mq-next" onclick="mqScroll('stageWant', 1)">&#8250;</button>
+            </div>
+          </div>
+          <div class="mq-panel" id="mq-must">
+            <div class="mq-carousel-wrap">
+              <button class="mq-arrow mq-prev" onclick="mqScroll('stageMust',-1)">&#8249;</button>
+              <div class="mq-stage" id="stageMust"></div>
+              <button class="mq-arrow mq-next" onclick="mqScroll('stageMust', 1)">&#8250;</button>
+            </div>
+          </div>
+          <div class="marquee-spotlight" id="marqueeSpotlight">
+            <div class="spotlight-poster" id="spotlightPoster">
+              <img id="spotlightImg" alt="" />
+              <div class="spotlight-grad" id="spotlightGrad"></div>
+            </div>
+            <div class="spotlight-info">
+              <div class="spotlight-status" id="spotlightStatus"></div>
+              <div class="spotlight-title-lg" id="spotlightTitle"></div>
+              <div class="spotlight-year-lg"  id="spotlightYear"></div>
+              <div class="spotlight-rating"   id="spotlightRating"></div>
+              <div class="spotlight-seen"     id="spotlightSeen"></div>
+              <div class="spotlight-thoughts" id="spotlightThoughts"></div>
+              <button class="spotlight-close" onclick="closeSpotlight()">✕ close</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /right-col -->
     </div><!-- /main-grid -->
 
     <footer class="page-footer">
@@ -2845,7 +3088,84 @@
     });
 
     myqRender();
+
+    // ─── Albums ──────────────────────────────────────
+    const ALBUMS = {
+      'payson-jun15': {
+        title: 'Summer Camping & Fishing in Payson',
+        meta: 'June 15, 2026 · 6 photos',
+        photos: [
+          'candids/IMG_7797.jpg',
+          'candids/IMG_7802.JPG',
+          'candids/IMG_7812.JPG',
+          'candids/IMG_7845.jpg',
+          'candids/IMG_7848.JPG',
+          'candids/IMG_2847.jpeg',
+        ]
+      }
+    };
+
+    function albumOpen(id) {
+      const album = ALBUMS[id];
+      if (!album) return;
+      document.getElementById('albumModalTitle').textContent = album.title;
+      document.getElementById('albumModalMeta').textContent = album.meta;
+      const grid = document.getElementById('albumModalGrid');
+      grid.innerHTML = album.photos.map(src =>
+        `<div class="album-photo" onclick="lbOpen('${src}','image')">
+          <img src="${src}" loading="lazy" />
+        </div>`
+      ).join('');
+      document.getElementById('albumOverlay').classList.add('open');
+    }
+
+    function albumClose() {
+      document.getElementById('albumOverlay').classList.remove('open');
+    }
+
+    document.getElementById('albumOverlay').addEventListener('click', function(e) {
+      if (e.target === this) albumClose();
+    });
+
+    // ─── Lounge ──────────────────────────────────────
+    function loungeOpen(e) {
+      e.preventDefault();
+      document.getElementById('loungeOverlay').classList.add('open');
+    }
+    function loungeClose() {
+      document.getElementById('loungeOverlay').classList.remove('open');
+    }
+    document.getElementById('loungeOverlay').addEventListener('click', function(e) {
+      if (e.target === this) loungeClose();
+    });
   </script>
+
+  <!-- Album Modal -->
+  <div class="album-overlay" id="albumOverlay">
+    <div class="album-modal">
+      <div class="album-modal-header">
+        <div>
+          <div class="album-modal-title" id="albumModalTitle"></div>
+          <div class="album-modal-meta" id="albumModalMeta"></div>
+        </div>
+        <button class="album-modal-close" onclick="albumClose()">✕</button>
+      </div>
+      <div class="album-modal-grid" id="albumModalGrid"></div>
+    </div>
+  </div>
+
+  <!-- Lounge Modal -->
+  <div class="lounge-overlay" id="loungeOverlay">
+    <div class="lounge-modal">
+      <div class="lounge-header">
+        <div class="lounge-title"><i class="ti ti-messages"></i> Lounge</div>
+        <button class="lounge-close" onclick="loungeClose()">✕</button>
+      </div>
+      <div class="lounge-body">
+        Coming soon — IM &amp; community chat will live here.
+      </div>
+    </div>
+  </div>
 
 </body>
 </html>
