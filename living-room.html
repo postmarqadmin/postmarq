@@ -582,7 +582,7 @@
       case 'friendfeed': return `<div id="ff-${id}"></div>`;
       case 'im': return `
         <div id="im-${id}"></div>
-        <a class="im-open-link" href="#" onclick="return false;">Open Den (Messages) ↗</a>`;
+        <a class="im-open-link" href="#" onclick="openLounge();return false;">Open Lounge ↗</a>`;
       case 'quicknotes': return `<textarea class="notes-textarea" id="notes-${id}" placeholder="Jot something down…" oninput="saveNote('${id}')"></textarea>`;
       case 'newsfeed': return `<div class="news-loading" id="nl-${id}"><i class="ti ti-loader" style="animation:spin 1s linear infinite;display:inline-block;"></i> Loading headlines…</div><div id="nlist-${id}"></div>`;
       case 'snake': return `
@@ -830,15 +830,23 @@
 
   // ── IM ─────────────────────────────────────
   const IM_SEED = [
-    {av:'MK',name:'Maya Kim',   preview:'Hey! Did you see the event tonight?', time:'now',  unread:2},
-    {av:'JT',name:'Jordan T.',  preview:'The edit looks amazing btw 🔥',        time:'5m',   unread:0},
-    {av:'SS',name:'Sam Silva',  preview:'Let me know when you\'re free to link',time:'1h',   unread:1},
+    {id:'dm-mia',    av:'MK', name:'Maya Kim',   preview:'Hey! Did you see the event tonight?', time:'now', unread:2},
+    {id:'dm-jordan', av:'JT', name:'Jordan T.',  preview:'The edit looks amazing btw 🔥',        time:'5m',  unread:0},
+    {id:'q-phx',     av:'🌵', name:'PHX Crew',   preview:'Anyone down for Taco Tuesday?',        time:'1h',  unread:1},
   ];
+
+  function openLounge() {
+    window.open('lounge.html', 'postmarq-lounge', 'width=780,height=620,resizable=yes');
+  }
+  function openLoungeConvo(convoId) {
+    const win = window.open('lounge.html#' + convoId, 'postmarq-lounge', 'width=780,height=620,resizable=yes');
+    if (win) win.focus();
+  }
   function initIM(id) {
     const el = document.getElementById('im-'+id);
     if(!el) return;
     el.innerHTML = IM_SEED.map(t=>`
-      <div class="im-thread">
+      <div class="im-thread" onclick="openLoungeConvo('${t.id}')">
         <div class="im-avatar">${t.av}${t.unread?`<div class="im-unread-dot">${t.unread}</div>`:''}</div>
         <div class="im-body">
           <div class="im-name">${t.name}</div>

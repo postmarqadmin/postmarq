@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lounge — davemichael.postmarq</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0f0f14;
+      --bg2:       #1a1a22;
+      --panel:     #16161f;
+      --panel2:    #1e1e2a;
+      --border:    rgba(255,255,255,0.07);
+      --border2:   rgba(255,255,255,0.12);
+      --accent:    #9b8fd4;
+      --teal:      #4ab5aa;
+      --amber:     #e8992a;
+      --rust:      #c85c3a;
+      --ink:       #e8e0f0;
+      --ink-2:     rgba(232,224,240,0.6);
+      --ink-3:     rgba(232,224,240,0.35);
+      --ink-4:     rgba(232,224,240,0.18);
+      --font:      'Nunito', system-ui, sans-serif;
+
+      /* Per-user personality — Dave's defaults */
+      --bubble-me:      #6b4fbb;
+      --bubble-me-text: #fff;
+      --bubble-them:    #252530;
+      --bubble-them-text: var(--ink);
+      --chat-font:      'Nunito';
+      --status-color:   #4ade80;
+    }
+
+    html, body { height: 100%; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--ink);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Address Bar ── */
+    .address-bar {
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0.55rem 1rem;
+      background: rgba(15,15,20,0.92);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+    }
+    .address-inner {
+      display: flex; align-items: center; gap: 0.55rem;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 999px; padding: 0.28rem 1rem 0.28rem 0.7rem;
+    }
+    .address-dot { width: 7px; height: 7px; border-radius: 50%; background: linear-gradient(135deg,#f5c462,#e8992a); }
+    .address-text { font-size: 0.75rem; font-weight: 500; color: var(--ink-2); letter-spacing:.02em; }
+    .address-text strong { color: var(--ink); font-weight: 700; }
+
+    /* ── Room Nav ── */
+    .room-nav-bar {
+      flex-shrink: 0;
+      display: flex; justify-content: center;
+      padding: 0.5rem 1rem;
+      background: rgba(15,15,20,0.85);
+      border-bottom: 1px solid var(--border);
+      gap: 0.25rem;
+    }
+    .room-tab {
+      display: flex; flex-direction: column; align-items: center; gap: 0.18rem;
+      padding: 0.4rem 0.9rem;
+      border-radius: 10px;
+      color: var(--ink-3);
+      text-decoration: none;
+      font-size: 0.62rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      transition: background 0.15s, color 0.15s;
+    }
+    .room-tab i { font-size: 1.2rem; }
+    .room-tab:hover { background: rgba(255,255,255,0.06); color: var(--ink-2); }
+    .room-tab.active { background: rgba(155,143,212,0.15); color: var(--accent); }
+
+    /* ── Main Layout ── */
+    .lounge-layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 240px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .sidebar-me {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .avatar {
+      position: relative;
+      flex-shrink: 0;
+    }
+    .avatar img, .avatar-placeholder {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .avatar-placeholder {
+      background: linear-gradient(135deg, var(--accent), var(--teal));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 800; color: #fff;
+    }
+    .status-dot {
+      position: absolute;
+      bottom: 1px; right: 1px;
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      background: var(--status-color);
+      border: 2px solid var(--panel);
+    }
+    .me-info { flex: 1; min-width: 0; }
+    .me-name { font-size: 0.82rem; font-weight: 800; color: var(--ink); }
+    .me-away {
+      font-size: 0.68rem; color: var(--ink-3);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      cursor: pointer;
+    }
+    .me-away:hover { color: var(--ink-2); }
+    .btn-icon {
+      background: none; border: none; cursor: pointer;
+      color: var(--ink-3); font-size: 1rem;
+      padding: 0.3rem; border-radius: 6px;
+      transition: color 0.15s, background 0.15s;
+    }
+    .btn-icon:hover { color: var(--ink); background: rgba(255,255,255,0.07); }
+
+    .sidebar-search {
+      padding: 0.6rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .search-input {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      padding: 0.42rem 0.7rem;
+      color: var(--ink);
+      font-family: var(--font);
+      font-size: 0.75rem;
+      outline: none;
+    }
+    .search-input::placeholder { color: var(--ink-4); }
+    .search-input:focus { border-color: rgba(155,143,212,0.4); }
+
+    .sidebar-scroll { flex: 1; overflow-y: auto; padding-bottom: 0.5rem; }
+    .sidebar-scroll::-webkit-scrollbar { width: 3px; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+    .sidebar-section { padding: 0.6rem 0.75rem 0.2rem; }
+    .section-label {
+      font-size: 0.6rem; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--ink-4);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .section-label .btn-add {
+      background: none; border: none; cursor: pointer;
+      color: var(--ink-4); font-size: 0.9rem;
+      padding: 0; line-height: 1;
+      transition: color 0.15s;
+    }
+    .section-label .btn-add:hover { color: var(--accent); }
+
+    .conv-list { list-style: none; margin-top: 0.3rem; }
+    .conv-item {
+      display: flex; align-items: center; gap: 0.55rem;
+      padding: 0.45rem 0.6rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.12s;
+      position: relative;
+    }
+    .conv-item:hover { background: rgba(255,255,255,0.05); }
+    .conv-item.active { background: rgba(155,143,212,0.15); }
+    .conv-avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4e3aa0, #326e8e);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.72rem; font-weight: 800; color: #fff;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .conv-avatar.group {
+      border-radius: 10px;
+      background: linear-gradient(135deg, #2a2a3a, #3a2a4a);
+      font-size: 1rem;
+    }
+    .conv-status {
+      position: absolute; bottom: 0; right: 0;
+      width: 8px; height: 8px; border-radius: 50%;
+      border: 2px solid var(--panel);
+    }
+    .conv-status.online { background: #4ade80; }
+    .conv-status.away   { background: #facc15; }
+    .conv-status.busy   { background: #f87171; }
+    .conv-status.offline { background: var(--ink-4); }
+    .conv-info { flex: 1; min-width: 0; }
+    .conv-name { font-size: 0.78rem; font-weight: 700; color: var(--ink); }
+    .conv-preview { font-size: 0.67rem; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .conv-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 0.15rem; flex-shrink: 0; }
+    .conv-time { font-size: 0.6rem; color: var(--ink-4); }
+    .conv-badge {
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.58rem; font-weight: 800;
+      border-radius: 999px;
+      padding: 0.08rem 0.4rem;
+      min-width: 1rem; text-align: center;
+    }
+
+    /* ── Chat Panel ── */
+    .chat-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--bg2);
+    }
+
+    .chat-header {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.75rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(15,15,20,0.6);
+      flex-shrink: 0;
+    }
+    .chat-header-avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4e3aa0, #326e8e);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 800; color: #fff;
+      flex-shrink: 0;
+    }
+    .chat-header-avatar.group { border-radius: 11px; background: linear-gradient(135deg, #2a2a3a, #3a2a4a); font-size: 1.1rem; }
+    .chat-header-info { flex: 1; min-width: 0; }
+    .chat-header-name { font-size: 0.95rem; font-weight: 800; color: var(--ink); }
+    .chat-header-sub { font-size: 0.68rem; color: var(--ink-3); }
+    .chat-header-actions { display: flex; gap: 0.3rem; }
+
+    .messages-wrap {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+    .messages-wrap::-webkit-scrollbar { width: 4px; }
+    .messages-wrap::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+
+    .msg-day-divider {
+      display: flex; align-items: center; gap: 0.75rem;
+      margin: 0.75rem 0;
+      color: var(--ink-4); font-size: 0.65rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.07em;
+    }
+    .msg-day-divider::before, .msg-day-divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    .msg-group {
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-end;
+      margin-top: 0.5rem;
+    }
+    .msg-group.me { flex-direction: row-reverse; }
+    .msg-group-avatar {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.62rem; font-weight: 800; color: #fff;
+      margin-bottom: 2px;
+    }
+    .msg-group.me .msg-group-avatar { display: none; }
+    .msg-bubbles { display: flex; flex-direction: column; gap: 0.25rem; max-width: 68%; }
+    .msg-group.me .msg-bubbles { align-items: flex-end; }
+    .msg-sender-name {
+      font-size: 0.65rem; font-weight: 700;
+      color: var(--ink-3);
+      padding: 0 0.6rem;
+      margin-bottom: 0.15rem;
+    }
+    .msg-group.me .msg-sender-name { display: none; }
+
+    .bubble {
+      padding: 0.5rem 0.8rem;
+      border-radius: 16px;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      word-break: break-word;
+      position: relative;
+      max-width: 100%;
+    }
+    .bubble.them {
+      background: var(--bubble-them);
+      color: var(--bubble-them-text);
+      border-bottom-left-radius: 4px;
+    }
+    .bubble.me {
+      background: var(--bubble-me);
+      color: var(--bubble-me-text);
+      border-bottom-right-radius: 4px;
+    }
+    .bubble.first-them { border-top-left-radius: 16px; }
+    .bubble.first-me   { border-top-right-radius: 16px; }
+
+    .bubble-time {
+      font-size: 0.58rem;
+      color: var(--ink-4);
+      margin-top: 0.15rem;
+      padding: 0 0.2rem;
+    }
+    .msg-group.me .bubble-time { text-align: right; }
+
+    .bubble img.gif-preview {
+      max-width: 240px;
+      max-height: 180px;
+      border-radius: 10px;
+      display: block;
+    }
+    .link-preview {
+      margin-top: 0.4rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border2);
+      border-left: 3px solid var(--accent);
+      border-radius: 8px;
+      padding: 0.5rem 0.65rem;
+      font-size: 0.72rem;
+    }
+    .link-preview-title { font-weight: 700; color: var(--ink); }
+    .link-preview-url { color: var(--ink-3); margin-top: 0.1rem; font-size: 0.65rem; }
+
+    /* ── Composer ── */
+    .composer {
+      flex-shrink: 0;
+      padding: 0.75rem 1.25rem 1rem;
+      border-top: 1px solid var(--border);
+      background: rgba(15,15,20,0.5);
+    }
+    .composer-inner {
+      display: flex; align-items: flex-end; gap: 0.5rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border2);
+      border-radius: 14px;
+      padding: 0.5rem 0.6rem 0.5rem 0.75rem;
+      transition: border-color 0.15s;
+    }
+    .composer-inner:focus-within { border-color: rgba(155,143,212,0.45); }
+    .composer-toolbar { display: flex; gap: 0.15rem; flex-shrink: 0; }
+    .composer-input {
+      flex: 1;
+      background: none; border: none; outline: none;
+      color: var(--ink);
+      font-family: var(--font);
+      font-size: 0.84rem;
+      resize: none;
+      line-height: 1.45;
+      max-height: 120px;
+      min-height: 24px;
+      align-self: center;
+    }
+    .composer-input::placeholder { color: var(--ink-4); }
+    .btn-send {
+      flex-shrink: 0;
+      background: var(--accent);
+      border: none; cursor: pointer;
+      color: #fff;
+      width: 32px; height: 32px;
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .btn-send:hover { background: #7d6fc2; }
+    .btn-send:active { transform: scale(0.93); }
+
+    /* ── GIF Picker ── */
+    .gif-picker {
+      position: absolute;
+      bottom: calc(100% + 0.5rem);
+      left: 0;
+      width: 320px;
+      background: var(--panel2);
+      border: 1px solid var(--border2);
+      border-radius: 14px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 200;
+    }
+    .gif-picker.open { display: flex; }
+    .gif-search-wrap { padding: 0.65rem; border-bottom: 1px solid var(--border); }
+    .gif-search {
+      width: 100%; background: rgba(255,255,255,0.07);
+      border: 1px solid var(--border2); border-radius: 8px;
+      padding: 0.42rem 0.7rem; color: var(--ink);
+      font-family: var(--font); font-size: 0.78rem; outline: none;
+    }
+    .gif-search::placeholder { color: var(--ink-4); }
+    .gif-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px;
+      padding: 0.5rem; max-height: 260px; overflow-y: auto;
+    }
+    .gif-grid::-webkit-scrollbar { width: 3px; }
+    .gif-grid::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+    .gif-thumb {
+      border-radius: 7px; overflow: hidden; cursor: pointer;
+      aspect-ratio: 4/3; background: rgba(255,255,255,0.04);
+      transition: opacity 0.12s;
+    }
+    .gif-thumb:hover { opacity: 0.8; }
+    .gif-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .gif-powered { padding: 0.35rem 0.65rem; font-size: 0.6rem; color: var(--ink-4); text-align: right; border-top: 1px solid var(--border); }
+
+    /* ── Personality Panel ── */
+    .personality-drawer {
+      width: 240px;
+      flex-shrink: 0;
+      border-left: 1px solid var(--border);
+      background: var(--panel);
+      display: none;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    .personality-drawer.open { display: flex; }
+    .personality-drawer::-webkit-scrollbar { width: 3px; }
+    .personality-drawer::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+    .drawer-header {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .drawer-title { font-size: 0.78rem; font-weight: 800; color: var(--ink); }
+    .drawer-section { padding: 0.85rem 1rem; border-bottom: 1px solid var(--border); }
+    .drawer-section-label { font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-4); margin-bottom: 0.6rem; }
+    .color-row { display: flex; gap: 0.45rem; flex-wrap: wrap; }
+    .color-swatch {
+      width: 26px; height: 26px; border-radius: 50%;
+      cursor: pointer; border: 2px solid transparent;
+      transition: border-color 0.12s, transform 0.12s;
+    }
+    .color-swatch:hover, .color-swatch.active { border-color: #fff; transform: scale(1.15); }
+    .font-options { display: flex; flex-direction: column; gap: 0.35rem; }
+    .font-option {
+      padding: 0.4rem 0.6rem; border-radius: 7px;
+      cursor: pointer; font-size: 0.78rem; color: var(--ink-2);
+      border: 1px solid transparent;
+      transition: background 0.12s, border-color 0.12s;
+    }
+    .font-option:hover { background: rgba(255,255,255,0.05); }
+    .font-option.active { border-color: var(--accent); color: var(--ink); background: rgba(155,143,212,0.1); }
+    .away-msg-input {
+      width: 100%; background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border2); border-radius: 8px;
+      padding: 0.45rem 0.6rem; color: var(--ink);
+      font-family: var(--font); font-size: 0.75rem;
+      outline: none; resize: none; min-height: 56px;
+    }
+    .away-msg-input:focus { border-color: rgba(155,143,212,0.4); }
+    .status-options { display: flex; flex-direction: column; gap: 0.3rem; }
+    .status-option {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.38rem 0.6rem; border-radius: 7px;
+      cursor: pointer; font-size: 0.78rem; color: var(--ink-2);
+      transition: background 0.12s;
+    }
+    .status-option:hover { background: rgba(255,255,255,0.05); }
+    .status-option.active { background: rgba(255,255,255,0.07); color: var(--ink); }
+    .status-pip { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── Empty state ── */
+    .chat-empty {
+      flex: 1;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      color: var(--ink-4); gap: 0.75rem;
+    }
+    .chat-empty i { font-size: 2.5rem; }
+    .chat-empty p { font-size: 0.82rem; }
+
+    /* ── New Lounge Modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 400;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--panel2);
+      border: 1px solid var(--border2);
+      border-radius: 18px;
+      width: 360px;
+      padding: 1.5rem;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+    }
+    .modal-title { font-size: 1rem; font-weight: 800; margin-bottom: 1rem; }
+    .modal label { display: block; font-size: 0.7rem; font-weight: 700; color: var(--ink-3); margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.06em; }
+    .modal input, .modal textarea {
+      width: 100%; background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border2); border-radius: 8px;
+      padding: 0.5rem 0.75rem; color: var(--ink);
+      font-family: var(--font); font-size: 0.82rem;
+      outline: none; margin-bottom: 0.9rem;
+    }
+    .modal input:focus, .modal textarea:focus { border-color: rgba(155,143,212,0.45); }
+    .modal textarea { resize: none; min-height: 64px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.25rem; }
+    .btn-cancel {
+      background: rgba(255,255,255,0.07); border: none; cursor: pointer;
+      color: var(--ink-2); font-family: var(--font); font-size: 0.8rem; font-weight: 700;
+      padding: 0.48rem 1rem; border-radius: 8px;
+      transition: background 0.15s;
+    }
+    .btn-cancel:hover { background: rgba(255,255,255,0.12); }
+    .btn-primary {
+      background: var(--accent); border: none; cursor: pointer;
+      color: #fff; font-family: var(--font); font-size: 0.8rem; font-weight: 800;
+      padding: 0.48rem 1.25rem; border-radius: 8px;
+      transition: background 0.15s;
+    }
+    .btn-primary:hover { background: #7d6fc2; }
+
+    /* ── Typing indicator ── */
+    .typing-indicator {
+      display: flex; align-items: center; gap: 0.35rem;
+      padding: 0.3rem 0.5rem;
+      font-size: 0.68rem; color: var(--ink-3);
+      min-height: 1.5rem;
+    }
+    .typing-dots { display: flex; gap: 3px; }
+    .typing-dots span {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--ink-3);
+      animation: blink 1.2s infinite;
+    }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes blink {
+      0%, 60%, 100% { opacity: 0.2; }
+      30% { opacity: 1; }
+    }
+
+    .composer-area { position: relative; }
+  </style>
+</head>
+<body>
+
+  <!-- Address Bar -->
+  <div class="address-bar">
+    <div class="address-inner">
+      <div class="address-dot"></div>
+      <div class="address-text">davemichael.postmarq / <strong>lounge</strong></div>
+    </div>
+  </div>
+
+  <!-- Room Nav -->
+  <nav class="room-nav-bar">
+    <a class="room-tab" href="index.html" title="Home">
+      <i class="ti ti-home-2"></i><span>Home</span>
+    </a>
+    <a class="room-tab" href="living-room.html" title="Living Room">
+      <i class="ti ti-sofa"></i><span>Living Room</span>
+    </a>
+    <a class="room-tab" href="office.html" title="Office">
+      <i class="ti ti-briefcase"></i><span>Office</span>
+    </a>
+    <a class="room-tab" href="playground.html" title="Playground">
+      <i class="ti ti-assembly"></i><span>Playground</span>
+    </a>
+    <a class="room-tab active" href="lounge.html" title="Lounge">
+      <i class="ti ti-messages"></i><span>Lounge</span>
+    </a>
+  </nav>
+
+  <!-- Main Layout -->
+  <div class="lounge-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <!-- Me -->
+      <div class="sidebar-me">
+        <div class="avatar">
+          <img src="Profile Pic_01x.JPG" alt="Dave Michael" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="avatar-placeholder" style="display:none">DM</div>
+          <div class="status-dot" id="myStatusDot"></div>
+        </div>
+        <div class="me-info">
+          <div class="me-name">Dave Michael</div>
+          <div class="me-away" id="myAwayMsg" onclick="openPersonality()">Here to make real connections ✌️</div>
+        </div>
+        <button class="btn-icon" title="Personality" onclick="togglePersonality()">
+          <i class="ti ti-palette"></i>
+        </button>
+      </div>
+
+      <!-- Search -->
+      <div class="sidebar-search">
+        <input type="text" class="search-input" placeholder="Search conversations..." oninput="filterConvs(this.value)" />
+      </div>
+
+      <!-- Scroll area -->
+      <div class="sidebar-scroll">
+
+        <!-- Quorums (Groups) -->
+        <div class="sidebar-section">
+          <div class="section-label">
+            Quorums
+            <button class="btn-add" title="New Quorum" onclick="openNewLounge()"><i class="ti ti-plus"></i></button>
+          </div>
+        </div>
+        <ul class="conv-list" id="quorumList"></ul>
+
+        <!-- DMs -->
+        <div class="sidebar-section">
+          <div class="section-label">
+            Direct Messages
+            <button class="btn-add" title="New DM"><i class="ti ti-plus"></i></button>
+          </div>
+        </div>
+        <ul class="conv-list" id="dmList"></ul>
+
+      </div>
+    </aside>
+
+    <!-- Chat Panel -->
+    <div class="chat-panel" id="chatPanel">
+      <div class="chat-empty" id="chatEmpty">
+        <i class="ti ti-messages-off"></i>
+        <p>Select a conversation to start chatting</p>
+      </div>
+
+      <!-- Chat header (hidden until convo selected) -->
+      <div class="chat-header" id="chatHeader" style="display:none">
+        <div class="chat-header-avatar" id="chatHeaderAvatar">?</div>
+        <div class="chat-header-info">
+          <div class="chat-header-name" id="chatHeaderName">—</div>
+          <div class="chat-header-sub" id="chatHeaderSub">—</div>
+        </div>
+        <div class="chat-header-actions">
+          <button class="btn-icon" title="Members / Info"><i class="ti ti-info-circle"></i></button>
+          <button class="btn-icon" title="Personality" onclick="togglePersonality()"><i class="ti ti-palette"></i></button>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div class="messages-wrap" id="messagesWrap" style="display:none"></div>
+
+      <!-- Typing -->
+      <div class="typing-indicator" id="typingIndicator" style="display:none">
+        <div class="typing-dots"><span></span><span></span><span></span></div>
+        <span id="typingText"></span>
+      </div>
+
+      <!-- Composer -->
+      <div class="composer" id="composer" style="display:none">
+        <div class="composer-area">
+          <!-- GIF Picker -->
+          <div class="gif-picker" id="gifPicker">
+            <div class="gif-search-wrap">
+              <input type="text" class="gif-search" placeholder="Search GIFs…" id="gifSearch" oninput="searchGifs(this.value)" />
+            </div>
+            <div class="gif-grid" id="gifGrid"></div>
+            <div class="gif-powered">Powered by GIPHY</div>
+          </div>
+        </div>
+        <div class="composer-inner">
+          <div class="composer-toolbar">
+            <button class="btn-icon" title="GIF" onclick="toggleGifPicker(event)">
+              <i class="ti ti-brand-tenor"></i>
+            </button>
+            <button class="btn-icon" title="Link"><i class="ti ti-link"></i></button>
+          </div>
+          <textarea
+            class="composer-input"
+            id="composerInput"
+            placeholder="Say something…"
+            rows="1"
+            onkeydown="handleComposerKey(event)"
+            oninput="autoResize(this)"
+          ></textarea>
+          <button class="btn-send" onclick="sendMessage()" title="Send">
+            <i class="ti ti-send"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Personality Drawer -->
+    <aside class="personality-drawer" id="personalityDrawer">
+      <div class="drawer-header">
+        <div class="drawer-title">Your Personality</div>
+        <button class="btn-icon" onclick="togglePersonality()"><i class="ti ti-x"></i></button>
+      </div>
+
+      <div class="drawer-section">
+        <div class="drawer-section-label">Status</div>
+        <div class="status-options">
+          <div class="status-option active" onclick="setStatus('online', this)">
+            <div class="status-pip" style="background:#4ade80"></div> Online
+          </div>
+          <div class="status-option" onclick="setStatus('away', this)">
+            <div class="status-pip" style="background:#facc15"></div> Away
+          </div>
+          <div class="status-option" onclick="setStatus('busy', this)">
+            <div class="status-pip" style="background:#f87171"></div> Do Not Disturb
+          </div>
+          <div class="status-option" onclick="setStatus('offline', this)">
+            <div class="status-pip" style="background:rgba(232,224,240,0.18)"></div> Appear Offline
+          </div>
+        </div>
+      </div>
+
+      <div class="drawer-section">
+        <div class="drawer-section-label">Away Message</div>
+        <textarea class="away-msg-input" id="awayMsgInput" placeholder="What's on your mind?" oninput="updateAwayMsg(this.value)">Here to make real connections ✌️</textarea>
+      </div>
+
+      <div class="drawer-section">
+        <div class="drawer-section-label">My Bubble Color</div>
+        <div class="color-row" id="bubbleColors"></div>
+      </div>
+
+      <div class="drawer-section">
+        <div class="drawer-section-label">Chat Font</div>
+        <div class="font-options" id="fontOptions"></div>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- New Lounge/Quorum Modal -->
+  <div class="modal-overlay" id="newLoungeModal">
+    <div class="modal">
+      <div class="modal-title">Create a Lounge</div>
+      <label>Name</label>
+      <input type="text" id="newLoungeName" placeholder="e.g. PHX Crew, Taco Tuesday…" />
+      <label>Vibe (optional)</label>
+      <textarea id="newLoungeDesc" placeholder="What's this lounge about?"></textarea>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeNewLounge()">Cancel</button>
+        <button class="btn-primary" onclick="createLounge()">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  /* ═══════════════════════════════════════════
+     DATA LAYER
+     — Replace with real API/WebSocket calls when backend is ready.
+     — Each convo has: id, type ('dm'|'group'), name, avatar (emoji or initials),
+       color, status, members, messages[], unread
+  ═══════════════════════════════════════════ */
+
+  const ME = {
+    id: 'dave',
+    name: 'Dave Michael',
+    initials: 'DM',
+    status: 'online',
+    awayMsg: 'Here to make real connections ✌️',
+    bubbleColor: '#6b4fbb',
+    font: 'Nunito',
+  };
+
+  let convos = [
+    {
+      id: 'q-phx',
+      type: 'group',
+      name: 'PHX Crew',
+      avatar: '🌵',
+      color: '#4e3aa0',
+      members: ['Jordan','Mia','Carlos','Dave'],
+      unread: 3,
+      messages: [
+        { id:1, from:'Jordan', fromId:'jordan', text:'Anyone down for Taco Tuesday?', ts:'Yesterday 6:48 PM' },
+        { id:2, from:'Mia',    fromId:'mia',    text:'Always 🌮', ts:'Yesterday 6:49 PM' },
+        { id:3, from:'Carlos', fromId:'carlos', text:'Can we do Los Olivos?', ts:'Yesterday 6:52 PM' },
+        { id:4, from:'Jordan', fromId:'jordan', gif: 'https://media.giphy.com/media/l0HlNQ03J5JxX6lva/giphy.gif', ts:'Yesterday 6:53 PM' },
+        { id:5, from:'Dave',   fromId:'dave',   text:'YES. 7pm?', ts:'Yesterday 7:01 PM' },
+        { id:6, from:'Mia',    fromId:'mia',    text:'Perfect 🙌', ts:'Yesterday 7:02 PM' },
+      ]
+    },
+    {
+      id: 'q-music',
+      type: 'group',
+      name: 'Playlist Lords',
+      avatar: '🎵',
+      color: '#326e8e',
+      members: ['Dave','Sasha','Renee'],
+      unread: 0,
+      messages: [
+        { id:1, from:'Sasha', fromId:'sasha', text:'New ODESZA track dropped 🔥', ts:'Mon 2:14 PM' },
+        { id:2, from:'Dave',  fromId:'dave',  text:'Already on repeat', ts:'Mon 2:20 PM' },
+        { id:3, from:'Renee', fromId:'renee', text:'Adding to the collab playlist now', ts:'Mon 2:21 PM',
+          link: { title: 'Spotify Collab: Late Night Drives', url: 'spotify.com/playlist/collab' } },
+      ]
+    },
+    {
+      id: 'dm-mia',
+      type: 'dm',
+      name: 'Mia Torres',
+      initials: 'MT',
+      color: '#c85c3a',
+      status: 'online',
+      unread: 1,
+      messages: [
+        { id:1, from:'Mia',  fromId:'mia',  text:'Hey! Did you see the game last night?', ts:'Today 10:32 AM' },
+        { id:2, from:'Dave', fromId:'dave', text:'I missed it — Dbacks win?', ts:'Today 10:45 AM' },
+        { id:3, from:'Mia',  fromId:'mia',  text:'Walk-off. It was INSANE', ts:'Today 10:46 AM' },
+      ]
+    },
+    {
+      id: 'dm-jordan',
+      type: 'dm',
+      name: 'Jordan Lee',
+      initials: 'JL',
+      color: '#4ab5aa',
+      status: 'away',
+      unread: 0,
+      messages: [
+        { id:1, from:'Jordan', fromId:'jordan', text:'Yo you ever gonna finish that side project? 😂', ts:'Sun 4:10 PM' },
+        { id:2, from:'Dave',   fromId:'dave',   text:'I\'m literally building it right now lol', ts:'Sun 4:22 PM' },
+        { id:3, from:'Jordan', fromId:'jordan', text:'Based', ts:'Sun 4:23 PM' },
+      ]
+    },
+  ];
+
+  let activeConvoId = null;
+  let pendingGif = null;
+
+  /* ═══════════════════════════════════════════
+     RENDER
+  ═══════════════════════════════════════════ */
+
+  function renderSidebar() {
+    const query = document.querySelector('.search-input')?.value.toLowerCase() || '';
+    const quorums = convos.filter(c => c.type === 'group' && c.name.toLowerCase().includes(query));
+    const dms     = convos.filter(c => c.type === 'dm'    && c.name.toLowerCase().includes(query));
+
+    document.getElementById('quorumList').innerHTML = quorums.map(convItem).join('');
+    document.getElementById('dmList').innerHTML     = dms.map(convItem).join('');
+  }
+
+  function convItem(c) {
+    const lastMsg = c.messages[c.messages.length - 1];
+    const preview = lastMsg
+      ? (lastMsg.gif ? '🖼 GIF' : lastMsg.link ? '🔗 Link' : lastMsg.text || '')
+      : '';
+    const isGroup = c.type === 'group';
+    const statusClass = isGroup ? '' : (c.status || 'offline');
+    const avatarHtml = isGroup
+      ? `<div class="conv-avatar group" style="background:${c.color}20">${c.avatar}</div>`
+      : `<div class="conv-avatar" style="background:${c.color}">
+           ${c.initials || c.name.split(' ').map(w=>w[0]).join('').slice(0,2)}
+           ${statusClass ? `<div class="conv-status ${statusClass}"></div>` : ''}
+         </div>`;
+
+    return `<li class="conv-item${activeConvoId === c.id ? ' active' : ''}" onclick="openConvo('${c.id}')">
+      ${avatarHtml}
+      <div class="conv-info">
+        <div class="conv-name">${c.name}</div>
+        <div class="conv-preview">${escHtml(preview)}</div>
+      </div>
+      <div class="conv-meta">
+        <div class="conv-time">${lastMsg ? lastMsg.ts.split(' ').slice(-2).join(' ') : ''}</div>
+        ${c.unread ? `<div class="conv-badge">${c.unread}</div>` : ''}
+      </div>
+    </li>`;
+  }
+
+  function openConvo(id) {
+    activeConvoId = id;
+    const c = convos.find(x => x.id === id);
+    if (!c) return;
+    c.unread = 0;
+
+    // Header
+    const isGroup = c.type === 'group';
+    const hdrAvatar = document.getElementById('chatHeaderAvatar');
+    hdrAvatar.textContent = isGroup ? c.avatar : (c.initials || c.name.split(' ').map(w=>w[0]).join('').slice(0,2));
+    hdrAvatar.className = 'chat-header-avatar' + (isGroup ? ' group' : '');
+    if (!isGroup) hdrAvatar.style.background = c.color;
+    document.getElementById('chatHeaderName').textContent = c.name;
+    document.getElementById('chatHeaderSub').textContent = isGroup
+      ? `${c.members.length} members`
+      : (c.status === 'online' ? 'Active now' : c.status === 'away' ? 'Away' : 'Offline');
+
+    // Show panels
+    document.getElementById('chatEmpty').style.display = 'none';
+    document.getElementById('chatHeader').style.display = 'flex';
+    document.getElementById('messagesWrap').style.display = 'flex';
+    document.getElementById('typingIndicator').style.display = 'flex';
+    document.getElementById('composer').style.display = 'block';
+
+    renderMessages(c);
+    renderSidebar();
+
+    // Simulate typing after a bit in active convo
+    clearTimeout(window._typingTimer);
+    const typingEl = document.getElementById('typingIndicator');
+    const typingText = document.getElementById('typingText');
+    typingEl.style.opacity = '0';
+
+    if (c.messages.length > 0) {
+      window._typingTimer = setTimeout(() => {
+        const typer = c.type === 'group'
+          ? c.members.filter(m => m !== 'Dave')[Math.floor(Math.random() * (c.members.length - 1))]
+          : c.name.split(' ')[0];
+        typingText.textContent = `${typer} is typing…`;
+        typingEl.style.opacity = '1';
+        setTimeout(() => { typingEl.style.opacity = '0'; }, 3000);
+      }, 2500);
+    }
+  }
+
+  function renderMessages(c) {
+    const wrap = document.getElementById('messagesWrap');
+    let html = '';
+    let prevFrom = null;
+    let prevDate = null;
+
+    c.messages.forEach((msg, i) => {
+      const isMe = msg.fromId === 'dave';
+      const dateStr = msg.ts.split(' ').slice(0, -2).join(' ') || msg.ts.split(' ')[0];
+
+      if (dateStr !== prevDate) {
+        html += `<div class="msg-day-divider">${dateStr || 'Today'}</div>`;
+        prevDate = dateStr;
+        prevFrom = null;
+      }
+
+      const newSender = msg.fromId !== prevFrom;
+      if (newSender) {
+        if (prevFrom !== null) html += '</div>'; // close prev group
+        const avatarColor = isMe ? ME.bubbleColor : getColor(msg.fromId);
+        const initials = msg.from.split(' ').map(w=>w[0]).join('').slice(0,2);
+        html += `<div class="msg-group${isMe ? ' me' : ''}">
+          <div class="msg-group-avatar" style="background:${avatarColor}">${initials}</div>
+          <div class="msg-bubbles">
+            ${!isMe && newSender ? `<div class="msg-sender-name">${msg.from}</div>` : ''}`;
+      }
+
+      if (msg.gif) {
+        html += `<div class="bubble ${isMe ? 'me' : 'them'}"><img class="gif-preview" src="${msg.gif}" alt="GIF" loading="lazy" /></div>`;
+      } else if (msg.link) {
+        html += `<div class="bubble ${isMe ? 'me' : 'them'}">${escHtml(msg.text || '')}
+          <div class="link-preview">
+            <div class="link-preview-title">${escHtml(msg.link.title)}</div>
+            <div class="link-preview-url">${escHtml(msg.link.url)}</div>
+          </div>
+        </div>`;
+      } else {
+        html += `<div class="bubble ${isMe ? 'me' : 'them'}">${escHtml(msg.text)}</div>`;
+      }
+
+      prevFrom = msg.fromId;
+
+      if (i === c.messages.length - 1) {
+        html += `<div class="bubble-time">${msg.ts.split(' ').slice(-2).join(' ')}</div>`;
+        html += '</div></div>';
+      }
+    });
+
+    if (c.messages.length === 0) {
+      html = `<div class="chat-empty"><i class="ti ti-message-plus"></i><p>No messages yet — say hi!</p></div>`;
+    }
+
+    wrap.innerHTML = html;
+    wrap.scrollTop = wrap.scrollHeight;
+  }
+
+  /* ═══════════════════════════════════════════
+     SEND MESSAGE
+  ═══════════════════════════════════════════ */
+
+  function sendMessage() {
+    const input = document.getElementById('composerInput');
+    const text = input.value.trim();
+    if (!text && !pendingGif) return;
+    const c = convos.find(x => x.id === activeConvoId);
+    if (!c) return;
+
+    const now = new Date();
+    const timeStr = `Today ${now.getHours() % 12 || 12}:${String(now.getMinutes()).padStart(2,'0')} ${now.getHours() >= 12 ? 'PM' : 'AM'}`;
+
+    const msg = {
+      id: Date.now(),
+      from: 'Dave Michael',
+      fromId: 'dave',
+      ts: timeStr,
+    };
+    if (pendingGif) {
+      msg.gif = pendingGif;
+      pendingGif = null;
+    } else {
+      msg.text = text;
+    }
+
+    c.messages.push(msg);
+    input.value = '';
+    input.style.height = '';
+    renderMessages(c);
+    renderSidebar();
+    closeGifPicker();
+  }
+
+  function handleComposerKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  }
+
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  }
+
+  /* ═══════════════════════════════════════════
+     GIF PICKER
+  ═══════════════════════════════════════════ */
+
+  // Trending GIFs — static set for prototype.
+  // When backend is live, call Giphy API with user's key.
+  const TRENDING_GIFS = [
+    { url: 'https://media.giphy.com/media/l0HlNQ03J5JxX6lva/giphy.gif', title: 'celebration' },
+    { url: 'https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif', title: 'nod' },
+    { url: 'https://media.giphy.com/media/xT9IgG50Lg7russbDa/giphy.gif', title: 'wave' },
+    { url: 'https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif', title: 'fire' },
+    { url: 'https://media.giphy.com/media/l0MYGb1LuZ3n7dRnO/giphy.gif', title: 'thumbs up' },
+    { url: 'https://media.giphy.com/media/3oz8xIsloV7zOmt81G/giphy.gif', title: 'laugh' },
+    { url: 'https://media.giphy.com/media/du3J3cXyzhj75IOgvA/giphy.gif', title: 'cool' },
+    { url: 'https://media.giphy.com/media/l0HlvtIPzPdt2usKs/giphy.gif', title: 'wow' },
+  ];
+
+  let gifResults = [...TRENDING_GIFS];
+
+  function renderGifs(list) {
+    document.getElementById('gifGrid').innerHTML = list.map(g =>
+      `<div class="gif-thumb" onclick="selectGif('${g.url}')">
+        <img src="${g.url}" alt="${g.title}" loading="lazy" />
+      </div>`
+    ).join('');
+  }
+
+  function toggleGifPicker(e) {
+    e.stopPropagation();
+    const picker = document.getElementById('gifPicker');
+    const isOpen = picker.classList.contains('open');
+    picker.classList.toggle('open', !isOpen);
+    if (!isOpen) renderGifs(gifResults);
+  }
+
+  function closeGifPicker() {
+    document.getElementById('gifPicker').classList.remove('open');
+  }
+
+  function searchGifs(query) {
+    // Prototype: filter static set. Wire to Giphy /search when live.
+    const q = query.toLowerCase();
+    gifResults = q ? TRENDING_GIFS.filter(g => g.title.includes(q)) : TRENDING_GIFS;
+    renderGifs(gifResults);
+  }
+
+  function selectGif(url) {
+    pendingGif = url;
+    sendMessage();
+  }
+
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.composer-area') && !e.target.closest('.gif-picker')) {
+      closeGifPicker();
+    }
+  });
+
+  /* ═══════════════════════════════════════════
+     PERSONALITY
+  ═══════════════════════════════════════════ */
+
+  const BUBBLE_COLORS = [
+    { hex: '#6b4fbb', name: 'Lavender' },
+    { hex: '#c85c3a', name: 'Rust' },
+    { hex: '#4ab5aa', name: 'Teal' },
+    { hex: '#e8992a', name: 'Amber' },
+    { hex: '#2563eb', name: 'Blue' },
+    { hex: '#16a34a', name: 'Green' },
+    { hex: '#9333ea', name: 'Purple' },
+    { hex: '#e11d48', name: 'Rose' },
+  ];
+
+  const FONTS = [
+    { name: 'Nunito', label: 'Nunito (default)' },
+    { name: 'Georgia', label: 'Georgia (classic)' },
+    { name: 'Courier New', label: 'Courier (retro)' },
+    { name: 'Comic Sans MS', label: 'Comic Sans (legend)' },
+  ];
+
+  function renderPersonality() {
+    document.getElementById('bubbleColors').innerHTML = BUBBLE_COLORS.map(c =>
+      `<div class="color-swatch${ME.bubbleColor === c.hex ? ' active' : ''}"
+            style="background:${c.hex}"
+            title="${c.name}"
+            onclick="setBubbleColor('${c.hex}', this)"></div>`
+    ).join('');
+
+    document.getElementById('fontOptions').innerHTML = FONTS.map(f =>
+      `<div class="font-option${ME.font === f.name ? ' active' : ''}"
+            style="font-family:'${f.name}'"
+            onclick="setChatFont('${f.name}', this)">${f.label}</div>`
+    ).join('');
+  }
+
+  function togglePersonality() {
+    const drawer = document.getElementById('personalityDrawer');
+    drawer.classList.toggle('open');
+    renderPersonality();
+  }
+
+  function setBubbleColor(hex, el) {
+    ME.bubbleColor = hex;
+    document.documentElement.style.setProperty('--bubble-me', hex);
+    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+    el.classList.add('active');
+    if (activeConvoId) {
+      const c = convos.find(x => x.id === activeConvoId);
+      if (c) renderMessages(c);
+    }
+    localStorage.setItem('pm_bubble', hex);
+  }
+
+  function setChatFont(name, el) {
+    ME.font = name;
+    document.documentElement.style.setProperty('--chat-font', name);
+    document.querySelector('.messages-wrap').style.fontFamily = name;
+    document.querySelectorAll('.font-option').forEach(o => o.classList.remove('active'));
+    el.classList.add('active');
+    localStorage.setItem('pm_font', name);
+  }
+
+  function setStatus(status, el) {
+    ME.status = status;
+    const colors = { online: '#4ade80', away: '#facc15', busy: '#f87171', offline: 'rgba(232,224,240,0.18)' };
+    document.documentElement.style.setProperty('--status-color', colors[status]);
+    document.getElementById('myStatusDot').style.background = colors[status];
+    document.querySelectorAll('.status-option').forEach(o => o.classList.remove('active'));
+    el.classList.add('active');
+    localStorage.setItem('pm_status', status);
+  }
+
+  function updateAwayMsg(val) {
+    ME.awayMsg = val;
+    document.getElementById('myAwayMsg').textContent = val || 'Set an away message…';
+    localStorage.setItem('pm_away', val);
+  }
+
+  /* ═══════════════════════════════════════════
+     NEW LOUNGE MODAL
+  ═══════════════════════════════════════════ */
+
+  function openNewLounge() {
+    document.getElementById('newLoungeModal').classList.add('open');
+    document.getElementById('newLoungeName').focus();
+  }
+  function closeNewLounge() {
+    document.getElementById('newLoungeModal').classList.remove('open');
+  }
+  function createLounge() {
+    const name = document.getElementById('newLoungeName').value.trim();
+    if (!name) return;
+    const id = 'q-' + Date.now();
+    convos.unshift({
+      id, type: 'group', name,
+      avatar: '💬', color: '#4e3aa0',
+      members: ['Dave'], unread: 0, messages: [],
+    });
+    closeNewLounge();
+    document.getElementById('newLoungeName').value = '';
+    document.getElementById('newLoungeDesc').value = '';
+    renderSidebar();
+    openConvo(id);
+  }
+  document.getElementById('newLoungeModal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeNewLounge();
+  });
+
+  /* ═══════════════════════════════════════════
+     FILTER
+  ═══════════════════════════════════════════ */
+
+  function filterConvs(q) { renderSidebar(); }
+
+  /* ═══════════════════════════════════════════
+     UTILS
+  ═══════════════════════════════════════════ */
+
+  const COLORS = ['#4e3aa0','#326e8e','#c85c3a','#4ab5aa','#9333ea'];
+  function getColor(id) {
+    let h = 0; for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
+    return COLORS[Math.abs(h) % COLORS.length];
+  }
+
+  function escHtml(str) {
+    return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  /* ═══════════════════════════════════════════
+     INIT
+  ═══════════════════════════════════════════ */
+
+  (function init() {
+    // Restore saved personality
+    const savedBubble = localStorage.getItem('pm_bubble');
+    if (savedBubble) { ME.bubbleColor = savedBubble; document.documentElement.style.setProperty('--bubble-me', savedBubble); }
+    const savedFont = localStorage.getItem('pm_font');
+    if (savedFont) { ME.font = savedFont; }
+    const savedAway = localStorage.getItem('pm_away');
+    if (savedAway) { ME.awayMsg = savedAway; document.getElementById('awayMsgInput').value = savedAway; document.getElementById('myAwayMsg').textContent = savedAway; }
+    const savedStatus = localStorage.getItem('pm_status');
+    if (savedStatus) {
+      const colors = { online: '#4ade80', away: '#facc15', busy: '#f87171', offline: 'rgba(232,224,240,0.18)' };
+      document.documentElement.style.setProperty('--status-color', colors[savedStatus] || colors.online);
+      document.getElementById('myStatusDot').style.background = colors[savedStatus] || colors.online;
+    }
+    renderSidebar();
+
+    // Auto-open convo if launched with a hash (e.g. from Living Room widget)
+    const hash = location.hash.slice(1);
+    if (hash && convos.find(c => c.id === hash)) openConvo(hash);
+  })();
+  </script>
+
+</body>
+</html>
