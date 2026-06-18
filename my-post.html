@@ -29,7 +29,7 @@
       min-height: 100vh;
       background: linear-gradient(135deg, #f5d5a0 0%, #e8aa60 40%, #c87840 100%);
       background-attachment: fixed;
-      padding: 2rem 1rem;
+      padding: 2rem 1rem 4rem;
       color: var(--ink);
     }
 
@@ -41,19 +41,8 @@
       align-items: center;
       justify-content: space-between;
     }
-
-    .nav-logo {
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: var(--ink);
-    }
-
-    .nav-actions {
-      display: flex;
-      gap: 0.75rem;
-      align-items: center;
-    }
-
+    .nav-logo { font-size: 1.2rem; font-weight: 800; color: var(--ink); }
+    .nav-actions { display: flex; gap: 0.75rem; align-items: center; }
     .btn-ghost {
       background: rgba(255,255,255,0.45);
       border: 1px solid var(--glass-border);
@@ -66,18 +55,18 @@
       cursor: pointer;
       text-decoration: none;
     }
-
     .btn-amber {
       background: linear-gradient(135deg, var(--amber-light), var(--amber));
       border: none;
       border-radius: 8px;
       padding: 0.4rem 0.9rem;
       font-family: var(--font);
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       font-weight: 700;
       color: white;
       cursor: pointer;
     }
+    .btn-amber:hover { opacity: 0.9; }
 
     /* Card */
     .card {
@@ -87,19 +76,36 @@
       border: 1px solid var(--glass-border);
       box-shadow: var(--glass-shadow);
       border-radius: 20px;
-      padding: 2rem;
+      padding: 1.75rem;
       max-width: 700px;
       margin: 0 auto 1.25rem;
+    }
+
+    /* Section title */
+    .section-title {
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-2);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.5);
     }
 
     /* Profile header */
     .profile-header {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 1.25rem;
-      margin-bottom: 1.5rem;
     }
-
     .avatar {
       width: 72px;
       height: 72px;
@@ -113,114 +119,177 @@
       color: white;
       flex-shrink: 0;
     }
+    .profile-info { flex: 1; }
+    .profile-name { font-size: 1.4rem; font-weight: 800; color: var(--ink); }
+    .profile-address { font-size: 0.8rem; color: var(--ink-2); margin-top: 0.2rem; }
+    .profile-bio { font-size: 0.88rem; color: var(--ink-2); margin-top: 0.5rem; line-height: 1.5; }
 
-    .profile-name {
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: var(--ink);
-    }
-
-    .profile-address {
-      font-size: 0.8rem;
+    /* Edit profile */
+    .edit-profile-btn {
+      display: none;
+      margin-top: 0.85rem;
+      background: rgba(255,255,255,0.55);
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      padding: 0.35rem 0.8rem;
+      font-family: var(--font);
+      font-size: 0.78rem;
+      font-weight: 700;
       color: var(--ink-2);
-      margin-top: 0.2rem;
+      cursor: pointer;
     }
+    .owner-only { display: none; }
 
-    .profile-bio {
+    /* Edit profile modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(38, 24, 14, 0.45);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #fef3d8;
+      border-radius: 20px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 20px 60px rgba(38,24,14,0.25);
+    }
+    .modal h3 { font-size: 1rem; font-weight: 800; color: var(--ink); margin-bottom: 1.25rem; }
+    .modal label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--ink-2);
+      margin-bottom: 0.3rem;
+      margin-top: 0.9rem;
+    }
+    .modal input, .modal textarea {
+      width: 100%;
+      padding: 0.65rem 0.9rem;
+      border-radius: 10px;
+      border: 1px solid rgba(232,153,42,0.35);
+      background: rgba(255,255,255,0.75);
+      font-family: var(--font);
       font-size: 0.88rem;
-      color: var(--ink-2);
-      margin-top: 0.5rem;
-      line-height: 1.5;
+      color: var(--ink);
+      outline: none;
     }
+    .modal textarea { resize: vertical; min-height: 80px; }
+    .modal input:focus, .modal textarea:focus { border-color: var(--amber); }
+    .modal-actions { display: flex; gap: 0.75rem; margin-top: 1.25rem; }
+    .modal-actions button { flex: 1; padding: 0.7rem; border-radius: 10px; font-family: var(--font); font-size: 0.88rem; font-weight: 700; cursor: pointer; border: none; }
+    .btn-save { background: linear-gradient(135deg, var(--amber-light), var(--amber)); color: white; }
+    .btn-cancel { background: rgba(0,0,0,0.08); color: var(--ink-2); }
 
-    /* Section */
-    .section-title {
-      font-size: 0.72rem;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--ink-2);
-      margin-bottom: 1rem;
+    /* Composer */
+    .composer {
+      display: flex;
+      gap: 0.9rem;
+      align-items: flex-start;
+    }
+    .composer-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--amber-light), var(--amber));
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      justify-content: center;
+      font-size: 1rem;
+      font-weight: 800;
+      color: white;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .composer-body { flex: 1; }
+    .composer-input {
+      width: 100%;
+      border: none;
+      background: transparent;
+      font-family: var(--font);
+      font-size: 0.92rem;
+      color: var(--ink);
+      resize: none;
+      outline: none;
+      min-height: 48px;
+      line-height: 1.55;
+    }
+    .composer-input::placeholder { color: rgba(90,62,40,0.45); }
+    .composer-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(255,255,255,0.5);
+    }
+    .char-count { font-size: 0.75rem; color: rgba(90,62,40,0.45); margin-right: auto; }
+    .char-count.warn { color: #c87840; }
+
+    /* Post feed */
+    .post-item {
+      padding: 1.1rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.45);
+    }
+    .post-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .post-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.5rem;
+    }
+    .post-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--amber-light), var(--amber));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: white;
+      flex-shrink: 0;
+    }
+    .post-author { font-size: 0.82rem; font-weight: 800; color: var(--ink); }
+    .post-time { font-size: 0.75rem; color: rgba(90,62,40,0.5); margin-left: auto; }
+    .post-delete {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 0.75rem;
+      color: rgba(90,62,40,0.4);
+      cursor: pointer;
+      padding: 0 0.25rem;
+    }
+    .post-delete:hover { color: #c87840; }
+    .post-body { font-size: 0.9rem; color: var(--ink); line-height: 1.6; }
+
+    .empty-feed {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: rgba(90,62,40,0.45);
+      font-size: 0.85rem;
     }
 
-    .section-title::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: rgba(255,255,255,0.5);
-    }
-
-    /* Beta welcome */
-    .welcome-banner {
+    /* Beta banner */
+    .beta-banner {
       background: rgba(232,153,42,0.12);
       border: 1px solid rgba(232,153,42,0.3);
       border-radius: 12px;
-      padding: 1rem 1.25rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .welcome-banner h3 {
-      font-size: 0.9rem;
-      font-weight: 800;
-      color: var(--ink);
-      margin-bottom: 0.3rem;
-    }
-
-    .welcome-banner p {
+      padding: 0.85rem 1.1rem;
+      margin-bottom: 1.25rem;
       font-size: 0.82rem;
       color: var(--ink-2);
       line-height: 1.5;
     }
-
-    /* Placeholder widgets */
-    .widget-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-    }
-
-    .widget {
-      background: rgba(255,255,255,0.45);
-      border: 1px solid var(--glass-border);
-      border-radius: 14px;
-      padding: 1.25rem;
-      min-height: 100px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      gap: 0.5rem;
-      color: var(--ink-2);
-      font-size: 0.82rem;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .widget:hover {
-      background: rgba(255,255,255,0.65);
-    }
-
-    .widget-icon {
-      font-size: 1.5rem;
-    }
-
-    .widget-label {
-      font-weight: 700;
-      font-size: 0.78rem;
-      color: var(--ink-2);
-    }
-
-    .widget-sub {
-      font-size: 0.72rem;
-      color: rgba(90,62,40,0.6);
-    }
-
-    /* Logout */
-    #logoutBtn { cursor: pointer; }
+    .beta-banner strong { color: var(--ink); }
   </style>
 </head>
 <body>
@@ -233,44 +302,62 @@
     </div>
   </nav>
 
+  <!-- Profile card -->
   <div class="card">
-    <div class="welcome-banner">
-      <h3>Welcome to your Post — beta access</h3>
-      <p>You're one of the first people here. Your Post is your space. More customization is coming — for now, this is home base.</p>
+    <div class="beta-banner owner-only">
+      <strong>Welcome to your Post — beta access.</strong> You're one of the first people here. Edit your profile below, then start posting.
     </div>
-
     <div class="profile-header">
       <div class="avatar" id="avatarInitial">?</div>
-      <div>
+      <div class="profile-info">
         <div class="profile-name" id="profileName">Your Name</div>
         <div class="profile-address" id="profileAddress">—.postmarq</div>
-        <div class="profile-bio">Tell people a little about yourself. (Coming soon: edit your bio)</div>
+        <div class="profile-bio" id="profileBio">Tell people a little about yourself.</div>
+        <button class="edit-profile-btn owner-only" onclick="openEditModal()">Edit Profile</button>
       </div>
     </div>
   </div>
 
+  <!-- Composer (owner only) -->
+  <div class="card owner-only" id="composerCard">
+    <div class="composer">
+      <div class="composer-avatar" id="composerAvatar">?</div>
+      <div class="composer-body">
+        <textarea
+          class="composer-input"
+          id="composerInput"
+          placeholder="What's on your mind?"
+          rows="2"
+          maxlength="500"
+          oninput="onComposerInput()"
+        ></textarea>
+        <div class="composer-footer">
+          <span class="char-count" id="charCount">0 / 500</span>
+          <button class="btn-amber" onclick="publishPost()">Post</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feed -->
   <div class="card">
-    <div class="section-title">Your Widgets</div>
-    <div class="widget-grid">
-      <div class="widget">
-        <div class="widget-icon">📍</div>
-        <div class="widget-label">Where I Am</div>
-        <div class="widget-sub">Coming soon</div>
-      </div>
-      <div class="widget">
-        <div class="widget-icon">🎵</div>
-        <div class="widget-label">Now Playing</div>
-        <div class="widget-sub">Coming soon</div>
-      </div>
-      <div class="widget">
-        <div class="widget-icon">📝</div>
-        <div class="widget-label">My Feed</div>
-        <div class="widget-sub">Coming soon</div>
-      </div>
-      <div class="widget">
-        <div class="widget-icon">🔗</div>
-        <div class="widget-label">My Links</div>
-        <div class="widget-sub">Coming soon</div>
+    <div class="section-title">Posts</div>
+    <div id="feedContainer">
+      <div class="empty-feed" id="emptyFeed">No posts yet. Say something.</div>
+    </div>
+  </div>
+
+  <!-- Edit profile modal -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal">
+      <h3>Edit your profile</h3>
+      <label for="editName">Display name</label>
+      <input type="text" id="editName" placeholder="Your name" maxlength="40" />
+      <label for="editBio">Bio</label>
+      <textarea id="editBio" placeholder="Tell people about yourself..." maxlength="200"></textarea>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+        <button class="btn-save" onclick="saveProfile()">Save</button>
       </div>
     </div>
   </div>
@@ -283,6 +370,10 @@
       'sb_publishable_JFEpFZi63RZja2WorNkBdQ_L3E4mZ6q'
     );
 
+    let currentUser = null;
+    let profileKey = null;
+    let postsKey = null;
+
     async function init() {
       const { data: { session } } = await client.auth.getSession();
 
@@ -291,21 +382,140 @@
         return;
       }
 
-      const user = session.user;
-      const name = user.user_metadata?.full_name || user.email.split('@')[0];
-      const initial = name.charAt(0).toUpperCase();
-      const handle = name.toLowerCase().replace(/\s+/g, '') + '.postmarq';
+      currentUser = session.user;
+      profileKey = `pm_profile_${currentUser.id}`;
+      postsKey   = `pm_posts_${currentUser.id}`;
 
-      document.getElementById('avatarInitial').textContent = initial;
-      document.getElementById('profileName').textContent = name;
+      // Show owner-only elements
+      document.querySelectorAll('.owner-only').forEach(el => el.style.display = 'block');
+      document.querySelectorAll('.edit-profile-btn').forEach(el => el.style.display = 'inline-block');
+
+      document.getElementById('userEmail').textContent = currentUser.email;
+
+      loadProfile();
+      loadFeed();
+    }
+
+    function loadProfile() {
+      const saved = JSON.parse(localStorage.getItem(profileKey) || '{}');
+      const fallbackName = currentUser.user_metadata?.full_name || currentUser.email.split('@')[0];
+      const name    = saved.name || fallbackName;
+      const bio     = saved.bio  || 'Tell people a little about yourself.';
+      const initial = name.charAt(0).toUpperCase();
+      const handle  = name.toLowerCase().replace(/\s+/g, '') + '.postmarq';
+
+      document.getElementById('avatarInitial').textContent  = initial;
+      document.getElementById('composerAvatar').textContent = initial;
+      document.getElementById('profileName').textContent    = name;
       document.getElementById('profileAddress').textContent = handle;
-      document.getElementById('userEmail').textContent = user.email;
+      document.getElementById('profileBio').textContent     = bio;
+    }
+
+    function openEditModal() {
+      const saved = JSON.parse(localStorage.getItem(profileKey) || '{}');
+      const fallbackName = currentUser.user_metadata?.full_name || currentUser.email.split('@')[0];
+      document.getElementById('editName').value = saved.name || fallbackName;
+      document.getElementById('editBio').value  = saved.bio  || '';
+      document.getElementById('editModal').classList.add('open');
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.remove('open');
+    }
+
+    function saveProfile() {
+      const name = document.getElementById('editName').value.trim();
+      const bio  = document.getElementById('editBio').value.trim();
+      if (!name) return;
+      localStorage.setItem(profileKey, JSON.stringify({ name, bio }));
+      closeEditModal();
+      loadProfile();
+    }
+
+    // Close modal on overlay click
+    document.getElementById('editModal').addEventListener('click', function(e) {
+      if (e.target === this) closeEditModal();
+    });
+
+    function onComposerInput() {
+      const val = document.getElementById('composerInput').value;
+      const el  = document.getElementById('charCount');
+      el.textContent = `${val.length} / 500`;
+      el.className   = 'char-count' + (val.length > 450 ? ' warn' : '');
+    }
+
+    function publishPost() {
+      const text = document.getElementById('composerInput').value.trim();
+      if (!text) return;
+
+      const saved = JSON.parse(localStorage.getItem(profileKey) || '{}');
+      const fallbackName = currentUser.user_metadata?.full_name || currentUser.email.split('@')[0];
+      const name = saved.name || fallbackName;
+
+      const posts = JSON.parse(localStorage.getItem(postsKey) || '[]');
+      posts.unshift({ id: Date.now(), text, name, ts: Date.now() });
+      localStorage.setItem(postsKey, JSON.stringify(posts));
+
+      document.getElementById('composerInput').value = '';
+      document.getElementById('charCount').textContent = '0 / 500';
+      loadFeed();
+    }
+
+    function deletePost(id) {
+      const posts = JSON.parse(localStorage.getItem(postsKey) || '[]').filter(p => p.id !== id);
+      localStorage.setItem(postsKey, JSON.stringify(posts));
+      loadFeed();
+    }
+
+    function loadFeed() {
+      const posts     = JSON.parse(localStorage.getItem(postsKey) || '[]');
+      const container = document.getElementById('feedContainer');
+      const saved     = JSON.parse(localStorage.getItem(profileKey) || '{}');
+      const fallbackName = currentUser?.user_metadata?.full_name || currentUser?.email?.split('@')[0] || '?';
+      const name      = saved.name || fallbackName;
+      const initial   = name.charAt(0).toUpperCase();
+
+      if (!posts.length) {
+        container.innerHTML = '<div class="empty-feed" id="emptyFeed">No posts yet. Say something.</div>';
+        return;
+      }
+
+      container.innerHTML = posts.map(p => `
+        <div class="post-item">
+          <div class="post-meta">
+            <div class="post-avatar">${initial}</div>
+            <span class="post-author">${p.name || name}</span>
+            <span class="post-time">${timeAgo(p.ts)}</span>
+            <button class="post-delete owner-only" style="display:inline;" onclick="deletePost(${p.id})">✕</button>
+          </div>
+          <div class="post-body">${escapeHtml(p.text)}</div>
+        </div>
+      `).join('');
+    }
+
+    function timeAgo(ts) {
+      const diff = Date.now() - ts;
+      const m = Math.floor(diff / 60000);
+      if (m < 1)  return 'just now';
+      if (m < 60) return `${m}m ago`;
+      const h = Math.floor(m / 60);
+      if (h < 24) return `${h}h ago`;
+      return `${Math.floor(h / 24)}d ago`;
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
     }
 
     async function logOut() {
       await client.auth.signOut();
       window.location.href = '/login.html';
     }
+
+    // Submit on Cmd/Ctrl + Enter
+    document.addEventListener('keydown', e => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') publishPost();
+    });
 
     init();
   </script>
