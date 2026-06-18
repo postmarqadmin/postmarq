@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Post — Postmarq</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --glass-white:  rgba(255, 255, 255, 0.52);
+      --glass-border: rgba(255, 255, 255, 0.75);
+      --glass-shadow: 0 8px 32px rgba(120, 80, 40, 0.10), 0 2px 8px rgba(120,80,40,0.07);
+      --amber:        #e8992a;
+      --amber-light:  #f5c462;
+      --amber-pale:   #fef3d8;
+      --teal:         #4ab5aa;
+      --lavender:     #9b8fd4;
+      --ink:          #26180e;
+      --ink-2:        #5a3e28;
+      --font:         'Nunito', sans-serif;
+    }
+
+    body {
+      font-family: var(--font);
+      min-height: 100vh;
+      background: linear-gradient(135deg, #f5d5a0 0%, #e8aa60 40%, #c87840 100%);
+      background-attachment: fixed;
+      padding: 2rem 1rem;
+      color: var(--ink);
+    }
+
+    /* Nav */
+    .nav {
+      max-width: 700px;
+      margin: 0 auto 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .btn-ghost {
+      background: rgba(255,255,255,0.45);
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      padding: 0.4rem 0.9rem;
+      font-family: var(--font);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--ink-2);
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .btn-amber {
+      background: linear-gradient(135deg, var(--amber-light), var(--amber));
+      border: none;
+      border-radius: 8px;
+      padding: 0.4rem 0.9rem;
+      font-family: var(--font);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+    }
+
+    /* Card */
+    .card {
+      background: var(--glass-white);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      border-radius: 20px;
+      padding: 2rem;
+      max-width: 700px;
+      margin: 0 auto 1.25rem;
+    }
+
+    /* Profile header */
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--amber-light), var(--amber));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .profile-name {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .profile-address {
+      font-size: 0.8rem;
+      color: var(--ink-2);
+      margin-top: 0.2rem;
+    }
+
+    .profile-bio {
+      font-size: 0.88rem;
+      color: var(--ink-2);
+      margin-top: 0.5rem;
+      line-height: 1.5;
+    }
+
+    /* Section */
+    .section-title {
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-2);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.5);
+    }
+
+    /* Beta welcome */
+    .welcome-banner {
+      background: rgba(232,153,42,0.12);
+      border: 1px solid rgba(232,153,42,0.3);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .welcome-banner h3 {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: var(--ink);
+      margin-bottom: 0.3rem;
+    }
+
+    .welcome-banner p {
+      font-size: 0.82rem;
+      color: var(--ink-2);
+      line-height: 1.5;
+    }
+
+    /* Placeholder widgets */
+    .widget-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .widget {
+      background: rgba(255,255,255,0.45);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      padding: 1.25rem;
+      min-height: 100px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      gap: 0.5rem;
+      color: var(--ink-2);
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .widget:hover {
+      background: rgba(255,255,255,0.65);
+    }
+
+    .widget-icon {
+      font-size: 1.5rem;
+    }
+
+    .widget-label {
+      font-weight: 700;
+      font-size: 0.78rem;
+      color: var(--ink-2);
+    }
+
+    .widget-sub {
+      font-size: 0.72rem;
+      color: rgba(90,62,40,0.6);
+    }
+
+    /* Logout */
+    #logoutBtn { cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-logo">Postmarq</div>
+    <div class="nav-actions">
+      <span id="userEmail" style="font-size:0.78rem; color:var(--ink-2); font-weight:600;"></span>
+      <button class="btn-ghost" id="logoutBtn" onclick="logOut()">Log out</button>
+    </div>
+  </nav>
+
+  <div class="card">
+    <div class="welcome-banner">
+      <h3>Welcome to your Post — beta access</h3>
+      <p>You're one of the first people here. Your Post is your space. More customization is coming — for now, this is home base.</p>
+    </div>
+
+    <div class="profile-header">
+      <div class="avatar" id="avatarInitial">?</div>
+      <div>
+        <div class="profile-name" id="profileName">Your Name</div>
+        <div class="profile-address" id="profileAddress">—.postmarq</div>
+        <div class="profile-bio">Tell people a little about yourself. (Coming soon: edit your bio)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Your Widgets</div>
+    <div class="widget-grid">
+      <div class="widget">
+        <div class="widget-icon">📍</div>
+        <div class="widget-label">Where I Am</div>
+        <div class="widget-sub">Coming soon</div>
+      </div>
+      <div class="widget">
+        <div class="widget-icon">🎵</div>
+        <div class="widget-label">Now Playing</div>
+        <div class="widget-sub">Coming soon</div>
+      </div>
+      <div class="widget">
+        <div class="widget-icon">📝</div>
+        <div class="widget-label">My Feed</div>
+        <div class="widget-sub">Coming soon</div>
+      </div>
+      <div class="widget">
+        <div class="widget-icon">🔗</div>
+        <div class="widget-label">My Links</div>
+        <div class="widget-sub">Coming soon</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const { createClient } = supabase;
+    const client = createClient(
+      'https://vzvgqkxhhjubylojhohn.supabase.co',
+      'sb_publishable_JFEpFZi63RZja2WorNkBdQ_L3E4mZ6q'
+    );
+
+    async function init() {
+      const { data: { session } } = await client.auth.getSession();
+
+      if (!session) {
+        window.location.href = '/login.html';
+        return;
+      }
+
+      const user = session.user;
+      const name = user.user_metadata?.full_name || user.email.split('@')[0];
+      const initial = name.charAt(0).toUpperCase();
+      const handle = name.toLowerCase().replace(/\s+/g, '') + '.postmarq';
+
+      document.getElementById('avatarInitial').textContent = initial;
+      document.getElementById('profileName').textContent = name;
+      document.getElementById('profileAddress').textContent = handle;
+      document.getElementById('userEmail').textContent = user.email;
+    }
+
+    async function logOut() {
+      await client.auth.signOut();
+      window.location.href = '/login.html';
+    }
+
+    init();
+  </script>
+</body>
+</html>

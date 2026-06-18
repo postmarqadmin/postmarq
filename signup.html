@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Join Postmarq — Beta</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --glass-white:  rgba(255, 255, 255, 0.52);
+      --glass-border: rgba(255, 255, 255, 0.75);
+      --glass-shadow: 0 8px 32px rgba(120, 80, 40, 0.10), 0 2px 8px rgba(120,80,40,0.07);
+      --amber:        #e8992a;
+      --amber-light:  #f5c462;
+      --amber-pale:   #fef3d8;
+      --ink:          #26180e;
+      --ink-2:        #5a3e28;
+      --font:         'Nunito', sans-serif;
+    }
+
+    body {
+      font-family: var(--font);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #f5d5a0 0%, #e8aa60 40%, #c87840 100%);
+      background-attachment: fixed;
+      padding: 2rem;
+    }
+
+    .card {
+      background: var(--glass-white);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      border-radius: 20px;
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--ink);
+      margin-bottom: 0.25rem;
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      color: var(--ink-2);
+      margin-bottom: 2rem;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(232,153,42,0.2);
+      color: #a06010;
+      border: 1px solid rgba(232,153,42,0.4);
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      margin-bottom: 1rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--ink-2);
+      margin-bottom: 0.4rem;
+      margin-top: 1rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.75);
+      background: rgba(255,255,255,0.6);
+      font-family: var(--font);
+      font-size: 0.9rem;
+      color: var(--ink);
+      outline: none;
+      transition: border 0.2s;
+    }
+
+    input:focus {
+      border-color: var(--amber);
+    }
+
+    button {
+      width: 100%;
+      margin-top: 1.5rem;
+      padding: 0.85rem;
+      background: linear-gradient(135deg, var(--amber-light), var(--amber));
+      border: none;
+      border-radius: 10px;
+      font-family: var(--font);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    button:hover { opacity: 0.9; }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .message {
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: none;
+    }
+
+    .message.success {
+      background: rgba(74,181,170,0.15);
+      color: #2e8a82;
+      border: 1px solid rgba(74,181,170,0.35);
+      display: block;
+    }
+
+    .message.error {
+      background: rgba(200,92,58,0.12);
+      color: #a03820;
+      border: 1px solid rgba(200,92,58,0.30);
+      display: block;
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.82rem;
+      color: var(--ink-2);
+    }
+
+    .login-link a {
+      color: var(--amber);
+      font-weight: 700;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="badge">Beta Access</div>
+    <div class="logo">Postmarq</div>
+    <div class="subtitle">You've been invited. Create your Post.</div>
+
+    <label for="name">Your Name</label>
+    <input type="text" id="name" placeholder="Dave Michael" />
+
+    <label for="email">Email</label>
+    <input type="email" id="email" placeholder="you@example.com" />
+
+    <label for="password">Password</label>
+    <input type="password" id="password" placeholder="At least 8 characters" />
+
+    <button id="signupBtn" onclick="signUp()">Create My Post</button>
+
+    <div class="message" id="message"></div>
+
+    <div class="login-link">
+      Already have an account? <a href="/login.html">Log in</a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const { createClient } = supabase;
+    const client = createClient(
+      'https://vzvgqkxhhjubylojhohn.supabase.co',
+      'sb_publishable_JFEpFZi63RZja2WorNkBdQ_L3E4mZ6q'
+    );
+
+    async function signUp() {
+      const name     = document.getElementById('name').value.trim();
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const btn      = document.getElementById('signupBtn');
+      const msg      = document.getElementById('message');
+
+      msg.className = 'message';
+      msg.textContent = '';
+
+      if (!name || !email || !password) {
+        msg.className = 'message error';
+        msg.textContent = 'Please fill in all fields.';
+        return;
+      }
+
+      if (password.length < 8) {
+        msg.className = 'message error';
+        msg.textContent = 'Password must be at least 8 characters.';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Creating your Post...';
+
+      const { error } = await client.auth.signUp({
+        email,
+        password,
+        options: { data: { full_name: name } }
+      });
+
+      if (error) {
+        msg.className = 'message error';
+        msg.textContent = error.message;
+        btn.disabled = false;
+        btn.textContent = 'Create My Post';
+      } else {
+        msg.className = 'message success';
+        msg.textContent = 'Check your email to confirm your account, then log in.';
+        btn.textContent = 'Done!';
+      }
+    }
+  </script>
+</body>
+</html>
