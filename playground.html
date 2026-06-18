@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Your Post — Postmarq</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', system-ui, sans-serif;
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at 80% 10%, rgba(195,160,255,0.30) 0%, transparent 52%),
+        radial-gradient(ellipse at 10% 90%, rgba(255,180,90,0.38) 0%, transparent 52%),
+        linear-gradient(158deg, #ede5f8 0%, #f8ead8 38%, #fdf4e8 62%, #f3e2cc 100%);
+      background-attachment: fixed;
+      color: #26180e;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    /* ── Progress bar ── */
+    .progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #9b8fd4, #e8a87c);
+      transition: width 0.4s ease;
+      z-index: 100;
+    }
+
+    /* ── Back link ── */
+    .back-link {
+      position: fixed;
+      top: 1.2rem; left: 1.4rem;
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      font-size: 0.78rem; font-weight: 700; color: #7a5c3e;
+      text-decoration: none; opacity: 0.7;
+      transition: opacity 0.15s;
+    }
+    .back-link:hover { opacity: 1; }
+
+    /* ── Step wrapper ── */
+    .step {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      max-width: 640px;
+      width: 100%;
+      animation: fadeUp 0.35s ease both;
+    }
+    .step.active { display: flex; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Typography ── */
+    .eyebrow {
+      font-size: 0.7rem; font-weight: 800; letter-spacing: 0.12em;
+      text-transform: uppercase; color: #9b8fd4; margin-bottom: 0.6rem;
+    }
+    h1 {
+      font-size: 2rem; font-weight: 900; line-height: 1.2;
+      margin-bottom: 0.6rem; color: #26180e;
+    }
+    .subtitle {
+      font-size: 0.95rem; color: #7a5c3e; margin-bottom: 2rem; line-height: 1.5;
+    }
+
+    /* ── Path cards ── */
+    .path-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 580px) {
+      .path-grid { grid-template-columns: 1fr; }
+      h1 { font-size: 1.6rem; }
+    }
+
+    .path-card {
+      background: rgba(255,255,255,0.55);
+      border: 2px solid rgba(255,255,255,0.8);
+      border-radius: 18px;
+      padding: 1.6rem 1.2rem;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+    }
+    .path-card:hover {
+      background: rgba(255,255,255,0.8);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(90,60,30,0.12);
+    }
+    .path-card.selected {
+      border-color: #9b8fd4;
+      background: rgba(255,255,255,0.85);
+      box-shadow: 0 0 0 3px rgba(155,143,212,0.25);
+    }
+    .path-card .badge {
+      display: inline-block;
+      font-size: 0.62rem; font-weight: 800; letter-spacing: 0.1em;
+      text-transform: uppercase; padding: 0.2rem 0.55rem;
+      border-radius: 999px; margin-bottom: 0.9rem;
+    }
+    .badge-free  { background: rgba(155,143,212,0.15); color: #7a6bbf; }
+    .badge-paid  { background: rgba(232,168,124,0.25); color: #b06830; }
+    .badge-power { background: rgba(90,190,140,0.2);   color: #2d7a58; }
+
+    .path-card .icon {
+      font-size: 1.8rem; color: #9b8fd4;
+      display: block; margin-bottom: 0.75rem;
+    }
+    .path-card h3 { font-size: 1rem; font-weight: 800; margin-bottom: 0.3rem; }
+    .path-card p  { font-size: 0.78rem; color: #7a5c3e; line-height: 1.5; }
+
+    /* ── Choice cards (guided vs diy) ── */
+    .choice-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 480px) { .choice-grid { grid-template-columns: 1fr; } }
+
+    .choice-card {
+      background: rgba(255,255,255,0.55);
+      border: 2px solid rgba(255,255,255,0.8);
+      border-radius: 18px;
+      padding: 1.8rem 1.4rem;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      text-align: left;
+    }
+    .choice-card:hover {
+      background: rgba(255,255,255,0.8);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(90,60,30,0.12);
+    }
+    .choice-card i { font-size: 2rem; color: #9b8fd4; display: block; margin-bottom: 0.75rem; }
+    .choice-card h3 { font-size: 1rem; font-weight: 800; margin-bottom: 0.4rem; }
+    .choice-card p  { font-size: 0.8rem; color: #7a5c3e; line-height: 1.5; }
+
+    /* ── Form fields ── */
+    .form-group {
+      width: 100%;
+      text-align: left;
+      margin-bottom: 1rem;
+    }
+    .form-group label {
+      display: block; font-size: 0.75rem; font-weight: 800;
+      color: #7a5c3e; margin-bottom: 0.4rem; letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      border: 1.5px solid rgba(155,143,212,0.3);
+      background: rgba(255,255,255,0.65);
+      font-family: inherit; font-size: 0.9rem; color: #26180e;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      border-color: #9b8fd4;
+      box-shadow: 0 0 0 3px rgba(155,143,212,0.2);
+    }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+
+    .address-row {
+      display: flex; align-items: center; gap: 0;
+      background: rgba(255,255,255,0.65);
+      border: 1.5px solid rgba(155,143,212,0.3);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .address-row:focus-within {
+      border-color: #9b8fd4;
+      box-shadow: 0 0 0 3px rgba(155,143,212,0.2);
+    }
+    .address-row input {
+      border: none; background: transparent;
+      border-radius: 0; box-shadow: none;
+      flex: 1; padding: 0.75rem 0.75rem 0.75rem 1rem;
+    }
+    .address-row input:focus { box-shadow: none; border: none; }
+    .address-suffix {
+      padding: 0.75rem 1rem 0.75rem 0;
+      font-size: 0.82rem; font-weight: 700; color: #9b8fd4;
+      white-space: nowrap;
+    }
+
+    /* ── Vibe picker ── */
+    .vibe-grid {
+      display: flex; gap: 0.6rem; flex-wrap: wrap;
+    }
+    .vibe-btn {
+      padding: 0.45rem 1rem;
+      border-radius: 999px;
+      border: 1.5px solid rgba(155,143,212,0.3);
+      background: rgba(255,255,255,0.5);
+      font-family: inherit; font-size: 0.8rem; font-weight: 700;
+      color: #5a3e28; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .vibe-btn:hover { background: rgba(255,255,255,0.8); }
+    .vibe-btn.active {
+      background: #9b8fd4; color: #fff;
+      border-color: #9b8fd4;
+    }
+
+    /* ── Pricing card ── */
+    .pricing-card {
+      width: 100%;
+      background: rgba(255,255,255,0.6);
+      border: 2px solid rgba(232,168,124,0.4);
+      border-radius: 18px;
+      padding: 1.6rem;
+      text-align: left;
+      margin-bottom: 1.2rem;
+    }
+    .pricing-card .price {
+      font-size: 2rem; font-weight: 900; color: #26180e;
+      margin-bottom: 0.2rem;
+    }
+    .pricing-card .price span { font-size: 0.9rem; font-weight: 600; color: #7a5c3e; }
+    .pricing-card .tagline { font-size: 0.82rem; color: #7a5c3e; margin-bottom: 1.2rem; }
+    .pricing-card ul { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+    .pricing-card ul li {
+      font-size: 0.82rem; color: #5a3e28;
+      display: flex; align-items: flex-start; gap: 0.5rem;
+    }
+    .pricing-card ul li i { color: #9b8fd4; font-size: 0.9rem; margin-top: 1px; flex-shrink: 0; }
+
+    /* ── Builder terminal hint ── */
+    .terminal-hint {
+      width: 100%;
+      background: rgba(38,24,14,0.06);
+      border: 1.5px solid rgba(38,24,14,0.1);
+      border-radius: 12px;
+      padding: 1rem 1.2rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.78rem;
+      color: #5a3e28;
+      text-align: left;
+      margin-bottom: 1.2rem;
+      line-height: 1.7;
+    }
+    .terminal-hint .prompt { color: #9b8fd4; font-weight: 700; }
+
+    /* ── Buttons ── */
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.75rem 2rem;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #9b8fd4, #b06830);
+      border: none; color: #fff;
+      font-family: inherit; font-size: 0.9rem; font-weight: 800;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.15s;
+      text-decoration: none;
+    }
+    .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.6rem 1.4rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.5);
+      border: 1.5px solid rgba(255,255,255,0.8);
+      font-family: inherit; font-size: 0.82rem; font-weight: 700;
+      color: #5a3e28; cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.8); }
+
+    .btn-row {
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.75rem; flex-wrap: wrap; margin-top: 0.5rem;
+    }
+
+    /* ── Confirmation screen ── */
+    .confirm-icon {
+      width: 72px; height: 72px;
+      background: linear-gradient(135deg, rgba(155,143,212,0.2), rgba(232,168,124,0.2));
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; color: #9b8fd4;
+      margin-bottom: 1.2rem;
+    }
+    .confirm-summary {
+      width: 100%;
+      background: rgba(255,255,255,0.55);
+      border: 1.5px solid rgba(255,255,255,0.8);
+      border-radius: 14px;
+      padding: 1.2rem 1.4rem;
+      text-align: left;
+      margin-bottom: 1.5rem;
+    }
+    .confirm-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(155,143,212,0.12);
+      font-size: 0.82rem;
+    }
+    .confirm-row:last-child { border-bottom: none; }
+    .confirm-row .label { color: #9b8fd4; font-weight: 800; text-transform: uppercase; font-size: 0.68rem; letter-spacing: 0.08em; }
+    .confirm-row .value { font-weight: 700; color: #26180e; }
+  </style>
+</head>
+<body>
+
+  <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+
+  <a href="index.html" class="back-link">
+    <i class="ti ti-arrow-left"></i> Back to Home
+  </a>
+
+  <!-- ─────────────────────────────────────────
+       STEP 1 — Choose your path
+  ───────────────────────────────────────── -->
+  <div class="step active" id="step-1">
+    <div class="eyebrow">Welcome to Postmarq</div>
+    <h1>Make it yours.</h1>
+    <p class="subtitle">Your Post is a space you build, decorate, and share on your own terms. No templates telling you who to be. No feed deciding what matters.</p>
+
+    <div class="path-grid">
+      <div class="path-card" onclick="selectPath('personal')">
+        <span class="badge badge-free">Free</span>
+        <i class="ti ti-home-heart icon"></i>
+        <h3>Personal</h3>
+        <p>Your own corner of the internet. Fill it, decorate it, make it feel like you.</p>
+      </div>
+      <div class="path-card" onclick="selectPath('builder')">
+        <span class="badge badge-power">Power User</span>
+        <i class="ti ti-terminal-2 icon"></i>
+        <h3>Builder</h3>
+        <p>Full access. Rewire anything, build from scratch, make it something entirely your own.</p>
+      </div>
+      <div class="path-card" onclick="selectPath('business')">
+        <span class="badge badge-paid">Paid</span>
+        <i class="ti ti-building-store icon"></i>
+        <h3>Business</h3>
+        <p>A local shop, studio, or org that belongs in the neighborhood — not a banner ad.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────
+       STEP 2A — Personal: guided vs diy
+  ───────────────────────────────────────── -->
+  <div class="step" id="step-2-personal">
+    <div class="eyebrow">Personal Post</div>
+    <h1>How do you want to set it up?</h1>
+    <p class="subtitle">Either way, you end up with something that's yours. Pick what feels right.</p>
+
+    <div class="choice-grid">
+      <div class="choice-card" onclick="goTo('step-3-guided')">
+        <i class="ti ti-wand"></i>
+        <h3>Walk me through it</h3>
+        <p>Answer a few simple questions. We'll handle the rest and you can tweak from there.</p>
+      </div>
+      <div class="choice-card" onclick="goTo('step-3-diy')">
+        <i class="ti ti-tools"></i>
+        <h3>I'll do it myself</h3>
+        <p>Just give me the keys. I know what I want and I'd rather figure it out as I go.</p>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="goTo('step-1')"><i class="ti ti-arrow-left"></i> Back</button>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────
+       STEP 2B — Business
+  ───────────────────────────────────────── -->
+  <div class="step" id="step-2-business">
+    <div class="eyebrow">Business Post</div>
+    <h1>Be a neighbor, not a billboard.</h1>
+    <p class="subtitle">Your Post is a place people actually want to visit — not a page they scroll past. You grow here the same way anyone does: by being worth knowing.</p>
+
+    <div class="pricing-card">
+      <div class="price">$12 <span>/ month</span></div>
+      <div class="tagline">Everything you need. Nothing you don't.</div>
+      <ul>
+        <li><i class="ti ti-check"></i> Verified business badge on your Post</li>
+        <li><i class="ti ti-check"></i> Neighborhood Pulse presence — show up where locals actually look</li>
+        <li><i class="ti ti-check"></i> Quorum connections — real regulars, not a follower count</li>
+        <li><i class="ti ti-check"></i> Loop announcements — events, specials, updates (only to people who want them)</li>
+        <li><i class="ti ti-check"></i> See who's looping you in and what's resonating</li>
+      </ul>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="goTo('step-1')"><i class="ti ti-arrow-left"></i> Back</button>
+      <button class="btn-primary" onclick="goTo('step-3-business')">Continue <i class="ti ti-arrow-right"></i></button>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────
+       STEP 2C — Builder
+  ───────────────────────────────────────── -->
+  <div class="step" id="step-2-builder">
+    <div class="eyebrow">Builder</div>
+    <h1>Start from zero. End up with something real.</h1>
+    <p class="subtitle">Full access to every piece. Rearrange it, rewrite it, make it something nobody else has. Your Post is a blank canvas — and you hold the brush.</p>
+
+    <div class="terminal-hint">
+      <span class="prompt">→</span> postmarq init my-post<br>
+      <span class="prompt">→</span> postmarq add widget clock weather<br>
+      <span class="prompt">→</span> postmarq loop @davemichael<br>
+      <span class="prompt">→</span> postmarq deploy
+    </div>
+
+    <div class="choice-grid">
+      <div class="choice-card" onclick="goTo('step-3-builder-ai')">
+        <i class="ti ti-sparkles"></i>
+        <h3>Describe it, we'll build it</h3>
+        <p>Tell us what you're imagining in plain words. We'll set it up and you take it from there.</p>
+      </div>
+      <div class="choice-card" onclick="goTo('step-3-builder-code')">
+        <i class="ti ti-code"></i>
+        <h3>Build it by hand</h3>
+        <p>Raw access. Component library, config files, no guardrails. Make it exactly what you want.</p>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="goTo('step-1')"><i class="ti ti-arrow-left"></i> Back</button>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────
+       STEP 3A — Guided personal setup
+  ───────────────────────────────────────── -->
+  <div class="step" id="step-3-guided">
+    <div class="eyebrow">Step 3 of 4</div>
+    <h1>Let's get your Post ready.</h1>
+    <p class="subtitle">A few basics and you're in. You can change every bit of this once you're home.</p>
+
+    <div class="form-group">
+      <label>Your name</label>
+      <input type="text" id="guided-name" placeholder="Dave Michael" />
+    </div>
+
+    <div class="form-group">
+      <label>Claim your address</label>
+      <div class="address-row">
+        <input type="text" id="guided-address" placeholder="davemichael" />
+        <span class="address-suffix">.postmarq</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>One line about you</label>
+      <input type="text" id="guided-bio" placeholder="Designer. Phoenix. Coffee first." />
+    </div>
+
+    <div class="form-group">
+      <label>Pick a vibe</label>
+      <div class="vibe-grid">
+        <button class="vibe-btn" onclick="pickVibe(this)">Warm</button>
+        <button class="vibe-btn" onclick="pickVibe(this)">Minimal</button>
+        <button class="vibe-btn" onclick="pickVibe(this)">Bold</button>
+        <button class="vibe-btn" onclick="pickVibe(this)">Retro</button>
+        <button class="vibe-btn" onclick="pickVibe(this)">Cozy</button>
+      </div>
+    </div>
+
+    <div class="btn-row" style="margin-top:1.2rem">
+      <button class="btn-ghost" onclick="goTo('step-2-personal')"><i class="ti ti-arrow-left"></i> Back</button>
+      <button class="btn-primary" onclick="goToConfirm('guided')">Next <i class="ti ti-arrow-right"></i></button>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────
+       STEP 3B — DIY personal setup
+  ───────────────────────────────────────── -->
+  <div class="step" id="step-3-diy">
+    <div class="eyebrow">Step 3 of 4</div>
+    <h1>Claim your address. The rest is up to you.</h1>
+    <p class="subtitle">Once you're in, every widget, layout, and detail is yours to arrange however you want.</p>
+
+    <div class="form-group">
+      <label>Your name</label>
+      <input type="text" id="diy-name" placeholder="Dave Michael" />
+    </div>
+
+    <div class="form-group">
+      <label>Claim your address</label>
+      <div class="address-row">
+        <input type="text" id="diy-address" placeholder="davemichael" />
+        <span class="address-suffix">.postmarq</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="diy-email" placeholder="you@example.com" />
+    </div>
+
+    <div class="btn-row" style="margin-top:1.2rem">
+      <button class="btn-ghost" onclick="goTo('step-2-personal')"><i class="ti ti-arrow-left"></i> Back</button>
+      <button class="btn-primary" onclick="goToConfirm('diy')">Create my Postmarq <i class="ti ti-arrow-right"></i></button>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────
+       STEP 3C — Business setup
+  ───────────────────────────────────────── -->
+  <div class="step" id="step-3-business">
+    <div class="eyebrow">Step 3 of 4</div>
+    <h1>Tell us about your place.</h1>
+    <p class="subtitle">Your Post should feel like walking through your door — not clicking an ad. Let's set the right tone from the start.</p>
+
+    <div class="form-group">
+      <label>Business name</label>
+      <input type="text" id="biz-name" placeholder="Copper Cup Coffee" />
+    </div>
+
+    <div class="form-group">
+      <label>Claim your address</label>
+      <div class="address-row">
+        <input type="text" id="biz-address" placeholder="coppercup" />
+        <span class="address-suffix">.postmarq</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>What do you do?</label>
+      <input type="text" id="biz-tagline" placeholder="Specialty coffee in downtown Phoenix." />
+    </div>
+
+    <div class="form-group">
+      <label>Neighborhood</label>
+      <input type="text" id="biz-neighborhood" placeholder="Roosevelt Row, Phoenix AZ" />
+    </div>
+
+    <div class="form-group">
+      <label>Contact email</label>
+      <input type="email" id="biz-email" placeholder="hello@coppercup.com" />
+    </div>
+
+    <div class="btn-row" style="margin-top:1.2rem">
+      <button class="btn-ghost" onclick="goTo('step-2-business')"><i class="ti ti-arrow-left"></i> Back</button>
+      <button class="btn-primary" onclick="goToConfirm('business')">Continue to payment <i class="ti ti-arrow-right"></i></button>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────
+       STEP 3D — Builder AI
+  ───────────────────────────────────────── -->
+  <div class="step" id="step-3-builder-ai">
+    <div class="eyebrow">Builder — Describe it</div>
+    <h1>What are you imagining?</h1>
+    <p class="subtitle">Write it out like you're explaining it to a friend. We'll turn it into a real starting point — then it's yours to shape.</p>
+
+    <div class="form-group">
+      <label>Your name</label>
+      <input type="text" id="ai-name" placeholder="Dave Michael" />
+    </div>
+
+    <div class="form-group">
+      <label>Claim your address</label>
+      <div class="address-row">
+        <input type="text" id="ai-address" placeholder="davemichael" />
+        <span class="address-suffix">.postmarq</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Describe your Post in plain English</label>
+      <textarea id="ai-prompt" placeholder="I want a simple, warm homepage that shows my photography, a few links, and a space for people I actually know to check in with me. Minimal. Clean. No clutter."></textarea>
+    </div>
+
+    <div class="btn-row" style="margin-top:1.2rem">
+      <button class="btn-ghost" onclick="goTo('step-2-builder')"><i class="ti ti-arrow-left"></i> Back</button>
+      <button class="btn-primary" onclick="goToConfirm('builder-ai')">Build it <i class="ti ti-sparkles"></i></button>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────
+       STEP 3E — Builder code
+  ───────────────────────────────────────── -->
+  <div class="step" id="step-3-builder-code">
+    <div class="eyebrow">Builder — Code mode</div>
+    <h1>Here's the foundation. Do what you want with it.</h1>
+    <p class="subtitle">A bare Post, every component available, and nothing locked down. If you can imagine it, you can build it here.</p>
+
+    <div class="form-group">
+      <label>Your name</label>
+      <input type="text" id="code-name" placeholder="Dave Michael" />
+    </div>
+
+    <div class="form-group">
+      <label>Claim your address</label>
+      <div class="address-row">
+        <input type="text" id="code-address" placeholder="davemichael" />
+        <span class="address-suffix">.postmarq</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="code-email" placeholder="you@example.com" />
+    </div>
+
+    <div class="btn-row" style="margin-top:1.2rem">
+      <button class="btn-ghost" onclick="goTo('step-2-builder')"><i class="ti ti-arrow-left"></i> Back</button>
+      <button class="btn-primary" onclick="goToConfirm('builder-code')">Initialize my Post <i class="ti ti-terminal-2"></i></button>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────
+       STEP 4 — Confirmation
+  ───────────────────────────────────────── -->
+  <div class="step" id="step-confirm">
+    <div class="confirm-icon"><i class="ti ti-mailbox"></i></div>
+    <div class="eyebrow">You're almost home</div>
+    <h1>Looking good. One last check.</h1>
+    <p class="subtitle">Here's what you've got so far. Nothing is set in stone — change anything you want once you're inside.</p>
+
+    <div class="confirm-summary" id="confirmSummary">
+      <!-- filled by JS -->
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-ghost" id="confirmBack" onclick="goBack()"><i class="ti ti-arrow-left"></i> Edit</button>
+      <button class="btn-primary" onclick="goTo('step-loop')">Loop someone in <i class="ti ti-users"></i></button>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────
+       STEP 5 — Loop someone in
+  ───────────────────────────────────────── -->
+  <div class="step" id="step-loop">
+    <div class="eyebrow">Final step</div>
+    <h1>Who gets the first loop?</h1>
+    <p class="subtitle">Your Quorum is the handful of people who actually matter to you — not a following, not a list. Invite one to get started, or skip it and do it from your Post.</p>
+
+    <div class="form-group">
+      <label>Their email or Postmarq address</label>
+      <input type="text" id="loop-person" placeholder="friend@example.com or davemichael.postmarq" />
+    </div>
+
+    <div class="form-group">
+      <label>A note (optional)</label>
+      <textarea id="loop-note" placeholder="Hey, I set up my Post on Postmarq. Come check it out — no ads, no algorithm, just us." style="min-height:64px"></textarea>
+    </div>
+
+    <div class="btn-row" style="margin-top:0.5rem">
+      <button class="btn-ghost" onclick="goTo('step-confirm')">Skip for now</button>
+      <button class="btn-primary" onclick="goTo('step-done')">Send the loop <i class="ti ti-send"></i></button>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────
+       STEP 6 — Done
+  ───────────────────────────────────────── -->
+  <div class="step" id="step-done">
+    <div class="confirm-icon" style="background: linear-gradient(135deg, rgba(90,190,140,0.2), rgba(155,143,212,0.2)); color: #2d7a58;">
+      <i class="ti ti-circle-check"></i>
+    </div>
+    <div class="eyebrow">You're in</div>
+    <h1>Welcome home.</h1>
+    <p class="subtitle">Your Post is live. Decorate it, rearrange it, make it weird — it's yours. The only people who see it are the ones you let in.</p>
+
+    <div class="btn-row" style="margin-top:0.5rem">
+      <a href="index.html" class="btn-primary">Go to my Post <i class="ti ti-arrow-right"></i></a>
+    </div>
+  </div>
+
+  <script>
+    let currentPath = '';
+    let lastStep3 = '';
+
+    const PROGRESS = {
+      'step-1': 8,
+      'step-2-personal': 25, 'step-2-business': 25, 'step-2-builder': 25,
+      'step-3-guided': 55, 'step-3-diy': 55, 'step-3-business': 55,
+      'step-3-builder-ai': 55, 'step-3-builder-code': 55,
+      'step-confirm': 78,
+      'step-loop': 92,
+      'step-done': 100,
+    };
+
+    function goTo(id) {
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      const next = document.getElementById(id);
+      if (next) {
+        next.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        const pct = PROGRESS[id] ?? 50;
+        document.getElementById('progressBar').style.width = pct + '%';
+      }
+    }
+
+    function selectPath(path) {
+      currentPath = path;
+      if (path === 'personal') goTo('step-2-personal');
+      if (path === 'business') goTo('step-2-business');
+      if (path === 'builder')  goTo('step-2-builder');
+    }
+
+    function pickVibe(btn) {
+      document.querySelectorAll('.vibe-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function goToConfirm(mode) {
+      lastStep3 = 'step-3-' + (mode === 'guided' ? 'guided' : mode === 'diy' ? 'diy' : mode === 'business' ? 'business' : mode === 'builder-ai' ? 'builder-ai' : 'builder-code');
+
+      const rows = buildSummaryRows(mode);
+      const summary = document.getElementById('confirmSummary');
+      summary.innerHTML = rows.map(r => `
+        <div class="confirm-row">
+          <span class="label">${r.label}</span>
+          <span class="value">${r.value || '—'}</span>
+        </div>`).join('');
+
+      goTo('step-confirm');
+    }
+
+    function buildSummaryRows(mode) {
+      if (mode === 'guided') return [
+        { label: 'Path',    value: 'Personal — Guided' },
+        { label: 'Name',    value: val('guided-name') },
+        { label: 'Address', value: (val('guided-address') || 'yourname') + '.postmarq' },
+        { label: 'Bio',     value: val('guided-bio') },
+        { label: 'Vibe',    value: document.querySelector('.vibe-btn.active')?.textContent || '—' },
+      ];
+      if (mode === 'diy') return [
+        { label: 'Path',    value: 'Personal — DIY' },
+        { label: 'Name',    value: val('diy-name') },
+        { label: 'Address', value: (val('diy-address') || 'yourname') + '.postmarq' },
+        { label: 'Email',   value: val('diy-email') },
+      ];
+      if (mode === 'business') return [
+        { label: 'Path',         value: 'Business (paid)' },
+        { label: 'Business',     value: val('biz-name') },
+        { label: 'Address',      value: (val('biz-address') || 'yourname') + '.postmarq' },
+        { label: 'Tagline',      value: val('biz-tagline') },
+        { label: 'Neighborhood', value: val('biz-neighborhood') },
+        { label: 'Email',        value: val('biz-email') },
+      ];
+      if (mode === 'builder-ai') return [
+        { label: 'Path',    value: 'Builder — AI Mode' },
+        { label: 'Name',    value: val('ai-name') },
+        { label: 'Address', value: (val('ai-address') || 'yourname') + '.postmarq' },
+        { label: 'Prompt',  value: truncate(val('ai-prompt'), 60) },
+      ];
+      if (mode === 'builder-code') return [
+        { label: 'Path',    value: 'Builder — Code Mode' },
+        { label: 'Name',    value: val('code-name') },
+        { label: 'Address', value: (val('code-address') || 'yourname') + '.postmarq' },
+        { label: 'Email',   value: val('code-email') },
+      ];
+      return [];
+    }
+
+    function val(id) {
+      return (document.getElementById(id)?.value || '').trim();
+    }
+
+    function truncate(str, n) {
+      return str.length > n ? str.slice(0, n) + '…' : str;
+    }
+
+    function goBack() {
+      goTo(lastStep3);
+    }
+  </script>
+</body>
+</html>
