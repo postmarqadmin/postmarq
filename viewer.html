@@ -23,6 +23,23 @@
 
     #post-root { min-height: 100vh; }
 
+    /* ── Always-visible logout pill ── */
+    #logout-pill {
+      display: none;
+      position: fixed; bottom: 12px; right: 12px; z-index: 99999;
+      background: #ECE9D8; border: 2px solid;
+      border-color: #fff #808080 #808080 #fff;
+      padding: 4px 10px; font-family: Tahoma, Arial, sans-serif;
+      font-size: 11px; color: #333; gap: 8px; align-items: center;
+      box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    #logout-pill.visible { display: flex; }
+    #logout-pill button {
+      background: none; border: none; color: #316AC5;
+      text-decoration: underline; cursor: pointer;
+      font-size: 11px; font-family: Tahoma, Arial, sans-serif; padding: 0;
+    }
+
     /* ── Edit toolbar ── */
     #edit-toolbar {
       display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
@@ -107,6 +124,11 @@
   </style>
 </head>
 <body>
+
+<div id="logout-pill">
+  <span id="pill-username"></span>
+  <button onclick="signOut()">Sign out</button>
+</div>
 
 <div id="visitor-bar">
   <span>You're signed in as <strong id="visitorUsername"></strong></span>
@@ -234,6 +256,10 @@
     // Check ownership
     const { data: { session } } = await sb.auth.getSession();
     if (session) {
+      // Always show logout pill
+      const pill = document.getElementById('logout-pill');
+      pill.classList.add('visible');
+      document.getElementById('pill-username').textContent = session.user.email;
       if (session.user.id === post.user_id) {
         isOwner = true;
         showEditUI();
