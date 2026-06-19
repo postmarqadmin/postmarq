@@ -922,10 +922,16 @@
 
     // 3. Go to done screen then redirect
     goTo('step-done');
-    document.getElementById('post-link').href =
-      window.location.hostname === 'localhost'
-        ? '/viewer.html'
-        : 'https://' + username + '.postmarq.org';
+    const isLocal = window.location.hostname === 'localhost';
+    let postUrl = '/viewer.html';
+    if (!isLocal) {
+      const { data: { session: newSession } } = await sb.auth.getSession();
+      const hash = newSession
+        ? '#access_token=' + newSession.access_token + '&refresh_token=' + newSession.refresh_token + '&type=magiclink'
+        : '';
+      postUrl = 'https://' + username + '.postmarq.org' + hash;
+    }
+    document.getElementById('post-link').href = postUrl;
     document.getElementById('post-link').textContent = username + '.postmarq.org →';
   }
 

@@ -209,11 +209,20 @@
 </div>`;
 
   let username = '';
-  let currentRoom = null; // null = main post
+  let currentRoom = null;
   let postData = null;
   let roomsData = [];
   let isOwner = false;
   let currentContent = { html: '', css: '', js: '' };
+  let authChecked = false;
+
+  // Listen for session from URL hash tokens (cross-subdomain handoff)
+  sb.auth.onAuthStateChange((event, session) => {
+    if (!authChecked && session) {
+      authChecked = true;
+      checkOwnership(session);
+    }
+  });
 
   async function init() {
     const host = window.location.hostname;
@@ -253,30 +262,35 @@
     }
     renderContent(currentContent, post.display_name || username);
 
-    // Check ownership
+    // Check ownership via getSession (fallback if onAuthStateChange already fired)
     const { data: { session } } = await sb.auth.getSession();
-    if (session) {
-      // Always show logout pill
-      const pill = document.getElementById('logout-pill');
-      pill.classList.add('visible');
-      document.getElementById('pill-username').textContent = session.user.email;
-      if (session.user.id === post.user_id) {
-        isOwner = true;
-        showEditUI();
+    if (session && !authChecked) {
+      authChecked = true;
+      checkOwnership(session);
+    }
+  }
+
+  async function checkOwnership(session) {
+    // Always show logout pill
+    document.getElementById('logout-pill').classList.add('visible');
+    document.getElementById('pill-username').textContent = session.user.email;
+
+    if (postData && session.user.id === postData.user_id) {
+      isOwner = true;
+      showEditUI();
+    } else {
+      // Visiting someone else's Post
+      const { data: myPost } = await sb.from('posts').select('username').eq('user_id', session.user.id).single();
+      const visitorBar = document.getElementById('visitor-bar');
+      visitorBar.classList.add('visible');
+      document.getElementById('visitorUsername').textContent = myPost?.username || session.user.email;
+      const myPostLink = document.getElementById('myPostLink');
+      if (myPost?.username) {
+        myPostLink.onclick = () => window.location.href = 'https://' + myPost.username + '.postmarq.org';
       } else {
-        // Logged in but visiting someone else's Post — show visitor bar
-        const { data: myPost } = await sb.from('posts').select('username').eq('user_id', session.user.id).single();
-        const visitorBar = document.getElementById('visitor-bar');
-        visitorBar.classList.add('visible');
-        document.getElementById('visitorUsername').textContent = myPost?.username || session.user.email;
-        const myPostLink = document.getElementById('myPostLink');
-        if (myPost?.username) {
-          myPostLink.onclick = () => window.location.href = 'https://' + myPost.username + '.postmarq.org';
-        } else {
-          myPostLink.style.display = 'none';
-        }
-        document.body.style.paddingTop = '28px';
+        myPostLink.style.display = 'none';
       }
+      document.body.style.paddingTop = '28px';
     }
   }
 

@@ -502,7 +502,11 @@
       var isLocal = host === 'localhost' || host.endsWith('vercel.app');
       var { data } = await sb.from('posts').select('username').eq('user_id', userId).single();
       if (data && data.username && !isLocal) {
-        window.location.replace('https://' + data.username + '.postmarq.org');
+        var { data: { session } } = await sb.auth.getSession();
+        var hash = session
+          ? '#access_token=' + session.access_token + '&refresh_token=' + session.refresh_token + '&type=magiclink'
+          : '';
+        window.location.replace('https://' + data.username + '.postmarq.org' + hash);
       } else {
         window.location.replace('/viewer.html');
       }
