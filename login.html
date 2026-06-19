@@ -4,14 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sign in — Postmarq</title>
-  <script>
-    (function() {
-      var h = window.location.hostname;
-      if (h !== 'postmarq.org' && h !== 'www.postmarq.org' && h !== 'localhost' && !h.endsWith('vercel.app')) {
-        window.location.replace('/viewer.html' + window.location.hash);
-      }
-    })();
-  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -508,17 +500,11 @@
     );
 
     async function redirectToPost(userId) {
-      var host = window.location.hostname;
-      var isLocal = host === 'localhost' || host.endsWith('vercel.app');
       var { data } = await sb.from('posts').select('username').eq('user_id', userId).single();
-      if (data && data.username && !isLocal) {
-        var { data: { session } } = await sb.auth.getSession();
-        var hash = session
-          ? '#access_token=' + session.access_token + '&refresh_token=' + session.refresh_token + '&type=magiclink'
-          : '';
-        window.location.replace('https://' + data.username + '.postmarq.org' + hash);
+      if (data && data.username) {
+        window.location.replace('/' + data.username);
       } else {
-        window.location.replace('/viewer.html' + window.location.hash);
+        window.location.replace('/');
       }
     }
 

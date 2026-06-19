@@ -227,18 +227,15 @@
   });
 
   async function init() {
-    const host = window.location.hostname;
+    // Read username and room from path: /davemichael or /davemichael/living-room
+    const segments = window.location.pathname.replace(/^\//, '').split('/');
+    username = segments[0];
+    currentRoom = segments[1] || null;
 
-    if (host === 'postmarq.org' || host === 'www.postmarq.org') {
+    if (!username || username === 'viewer.html' || username === 'index.html') {
       window.location.replace('/'); return;
     }
 
-    const parts = host.split('.');
-    if (parts.length < 3) { showError('No Post found.'); return; }
-    username = parts[0];
-
-    const path = window.location.pathname.replace(/^\//, '').replace(/\/$/, '');
-    currentRoom = (path === '' || path === 'viewer.html' || path === 'index.html') ? null : path;
     document.title = username + (currentRoom ? '/' + currentRoom : '') + ' — Postmarq';
 
     // 1. Fetch post data first
@@ -283,7 +280,7 @@
       document.getElementById('visitorUsername').textContent = myPost?.username || session.user.email;
       const myPostLink = document.getElementById('myPostLink');
       if (myPost?.username) {
-        myPostLink.onclick = () => window.location.href = 'https://' + myPost.username + '.postmarq.org';
+        myPostLink.onclick = () => window.location.href = '/' + myPost.username;
       } else {
         myPostLink.style.display = 'none';
       }
@@ -326,7 +323,7 @@
 
   function buildRoomNav() {
     const nav = document.getElementById('room-nav');
-    const base = 'https://' + username + '.postmarq.org';
+    const base = '';
     let html = `<a class="room-tab ${!currentRoom ? 'active' : ''}" href="${base}">Home</a>`;
     roomsData.forEach(r => {
       html += `<a class="room-tab ${currentRoom === r.room_name ? 'active' : ''}" href="${base}/${r.room_name}">${r.room_name}</a>`;
@@ -395,15 +392,15 @@
       user_id: session.user.id, username, room_name: slug, html: '', css: '', js: ''
     });
     if (error) { alert('Could not create room: ' + error.message); return; }
-    window.location.href = 'https://' + username + '.postmarq.org/' + slug;
+    window.location.href = '/' + username + '/' + slug;
   }
 
   function showNotFound() {
     document.getElementById('post-root').innerHTML = `
       <div class="state">
         <div class="state-title">This Post doesn't exist yet.</div>
-        <p><strong>${username}.postmarq.org</strong> hasn't been claimed.</p>
-        <a href="https://postmarq.org"><button class="xp-btn">Claim it →</button></a>
+        <p><strong>postmarq.org/${username}</strong> hasn't been claimed.</p>
+        <a href="/"><button class="xp-btn">Claim it →</button></a>
       </div>`;
   }
 
@@ -411,8 +408,8 @@
     document.getElementById('post-root').innerHTML = `
       <div class="state">
         <div class="state-title">Room not found.</div>
-        <p><strong>${username}.postmarq.org/${currentRoom}</strong> doesn't exist yet.</p>
-        <a href="https://${username}.postmarq.org"><button class="xp-btn">← Back to Post</button></a>
+        <p><strong>postmarq.org/${username}/${currentRoom}</strong> doesn't exist yet.</p>
+        <a href="/${username}"><button class="xp-btn">← Back to Post</button></a>
       </div>`;
   }
 

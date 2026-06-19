@@ -185,7 +185,7 @@
       setTimeout(async function() {
         var { data: post } = await sb.from('posts').select('username').eq('user_id', data.user.id).single();
         if (post && post.username) {
-          window.location.replace('https://' + post.username + '.postmarq.org');
+          window.location.replace('/' + post.username);
         } else {
           window.location.replace('/');
         }
