@@ -3,795 +3,852 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Create Your Post — Postmarq</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <title>Claim Your Post — Postmarq</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      font-family: 'Nunito', system-ui, sans-serif;
-      min-height: 100vh;
-      background:
-        radial-gradient(ellipse at 80% 10%, rgba(195,160,255,0.30) 0%, transparent 52%),
-        radial-gradient(ellipse at 10% 90%, rgba(255,180,90,0.38) 0%, transparent 52%),
-        linear-gradient(158deg, #ede5f8 0%, #f8ead8 38%, #fdf4e8 62%, #f3e2cc 100%);
-      background-attachment: fixed;
-      color: #26180e;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem 1rem;
+    :root {
+      --xp-gray:      #ECE9D8;
+      --xp-gray-dk:   #D4D0C8;
+      --xp-blue-deep: #0A246A;
+      --xp-blue-mid:  #2268D0;
+      --xp-border-lt: #FFFFFF;
+      --xp-border-dk: #808080;
+      --xp-border-dkk:#404040;
+      --font: 'Tahoma', 'Arial', sans-serif;
     }
 
-    /* ── Progress bar ── */
-    .progress-bar {
-      position: fixed;
-      top: 0; left: 0;
-      height: 3px;
-      background: linear-gradient(90deg, #9b8fd4, #e8a87c);
+    html, body {
+      height: 100%; width: 100%;
+      font-family: var(--font);
+      font-size: 11px;
+      overflow: hidden;
+      background: url('Login screen.jpg') center center / cover no-repeat;
+    }
+
+    /* ── Desktop ── */
+    .desktop {
+      width: 100%; height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ── XP Wizard Window ── */
+    .xp-window {
+      width: 600px;
+      max-height: 92vh;
+      display: flex; flex-direction: column;
+      border-radius: 8px 8px 4px 4px;
+      box-shadow: 4px 4px 20px rgba(0,0,0,0.55);
+      border: 1px solid #244797;
+      overflow: hidden;
+    }
+
+    /* ── Title Bar ── */
+    .xp-titlebar {
+      display: flex; align-items: center; gap: 5px;
+      padding: 4px 6px 5px; height: 30px;
+      flex-shrink: 0; user-select: none;
+      background: linear-gradient(180deg,
+        #5896E8 0%, #3A74D8 4%, #1F5FBE 8%,
+        #1A54B2 30%, #1F5FBE 55%, #2870D0 75%,
+        #5A96E8 90%, #C8DCFA 100%
+      );
+      border-bottom: 1px solid #1040A0;
+    }
+    .xp-titlebar-icon { font-size: 14px; flex-shrink: 0; }
+    .xp-titlebar-text {
+      flex: 1; font-size: 12px; font-weight: bold; color: white;
+      text-shadow: 1px 1px 2px rgba(0,0,40,0.7);
+    }
+    .xp-titlebar-btns { display: flex; gap: 2px; }
+    .xp-tb-btn {
+      width: 21px; height: 21px; font-size: 10px; font-weight: bold;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; border-radius: 3px;
+      border: 1px solid rgba(255,255,255,0.5);
+      background: linear-gradient(180deg, #6AAAF8 0%, #4A8AE8 30%, #3A78D8 50%, #4A8AE8 100%);
+      color: white; text-shadow: 0 1px 1px rgba(0,0,60,0.5);
+    }
+    .xp-tb-btn.close {
+      background: linear-gradient(180deg, #F87070 0%, #D84040 30%, #C83030 50%, #D84040 100%);
+    }
+
+    /* ── Wizard Body ── */
+    .xp-wizard-body {
+      display: flex; flex: 1; overflow: hidden;
+    }
+
+    /* ── Left Sidebar ── */
+    .xp-sidebar {
+      width: 160px; flex-shrink: 0;
+      background: linear-gradient(180deg, #2060C8 0%, #1848A8 40%, #1040A0 100%);
+      border-right: 2px solid #1040A0;
+      display: flex; flex-direction: column;
+      padding: 1.5rem 1rem 1rem;
+      gap: 0.75rem;
+    }
+    .xp-sidebar-logo {
+      font-size: 20px; font-weight: bold; color: white;
+      text-shadow: 0 1px 4px rgba(0,0,60,0.5);
+    }
+    .xp-sidebar-step {
+      font-size: 10px; color: rgba(180,210,255,0.8); font-style: italic;
+      line-height: 1.5;
+    }
+    .xp-sidebar-divider { height: 1px; background: rgba(255,255,255,0.2); margin: 0.4rem 0; }
+    .xp-sidebar-hint {
+      font-size: 9px; color: rgba(160,200,255,0.65);
+      line-height: 1.6;
+    }
+
+    /* ── Content Pane ── */
+    .xp-content {
+      flex: 1; background: var(--xp-gray);
+      overflow-y: auto;
+      display: flex; flex-direction: column;
+    }
+
+    /* ── Progress Bar (XP style) ── */
+    .xp-progress-wrap {
+      height: 14px; margin: 0.75rem 1rem 0;
+      border: 2px solid;
+      border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk);
+      background: white; flex-shrink: 0;
+    }
+    .xp-progress-fill {
+      height: 100%;
+      background: repeating-linear-gradient(
+        90deg,
+        #316AC5 0px, #316AC5 10px,
+        #4A8AE8 10px, #4A8AE8 12px
+      );
       transition: width 0.4s ease;
-      z-index: 100;
+      width: 0%;
     }
 
-    /* ── Back link ── */
-    .back-link {
-      position: fixed;
-      top: 1.2rem; left: 1.4rem;
-      display: inline-flex; align-items: center; gap: 0.35rem;
-      font-size: 0.78rem; font-weight: 700; color: #7a5c3e;
-      text-decoration: none; opacity: 0.7;
-      transition: opacity 0.15s;
-    }
-    .back-link:hover { opacity: 1; }
-
-    /* ── Step wrapper ── */
-    .step {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      max-width: 640px;
-      width: 100%;
-      animation: fadeUp 0.35s ease both;
-    }
+    /* ── Step ── */
+    .step { display: none; flex-direction: column; padding: 0.9rem 1rem 0; flex: 1; }
     .step.active { display: flex; }
 
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(18px); }
-      to   { opacity: 1; transform: translateY(0); }
+    .xp-step-title {
+      font-size: 13px; font-weight: bold; color: var(--xp-blue-deep);
+      border-bottom: 1px solid var(--xp-border-dk);
+      padding-bottom: 0.4rem; margin-bottom: 0.75rem;
+    }
+    .xp-step-sub {
+      font-size: 11px; color: #333; line-height: 1.5; margin-bottom: 0.9rem;
     }
 
-    /* ── Typography ── */
-    .eyebrow {
-      font-size: 0.7rem; font-weight: 800; letter-spacing: 0.12em;
-      text-transform: uppercase; color: #9b8fd4; margin-bottom: 0.6rem;
-    }
-    h1 {
-      font-size: 2rem; font-weight: 900; line-height: 1.2;
-      margin-bottom: 0.6rem; color: #26180e;
-    }
-    .subtitle {
-      font-size: 0.95rem; color: #7a5c3e; margin-bottom: 2rem; line-height: 1.5;
-    }
-
-    /* ── Path cards ── */
+    /* ── Path Cards (XP raised panels) ── */
     .path-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
-      width: 100%;
-      margin-bottom: 1.5rem;
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem; margin-bottom: 0.75rem;
     }
-    @media (max-width: 580px) {
-      .path-grid { grid-template-columns: 1fr; }
-      h1 { font-size: 1.6rem; }
-    }
-
     .path-card {
-      background: rgba(255,255,255,0.55);
-      border: 2px solid rgba(255,255,255,0.8);
-      border-radius: 18px;
-      padding: 1.6rem 1.2rem;
-      cursor: pointer;
-      transition: all 0.18s ease;
-      text-align: left;
-      position: relative;
-      overflow: hidden;
+      background: var(--xp-gray);
+      border: 2px solid;
+      border-color: var(--xp-border-lt) var(--xp-border-dk) var(--xp-border-dk) var(--xp-border-lt);
+      padding: 0.75rem 0.6rem;
+      cursor: pointer; text-align: left;
     }
-    .path-card:hover {
-      background: rgba(255,255,255,0.8);
-      transform: translateY(-3px);
-      box-shadow: 0 8px 24px rgba(90,60,30,0.12);
-    }
+    .path-card:hover { background: white; }
     .path-card.selected {
-      border-color: #9b8fd4;
-      background: rgba(255,255,255,0.85);
-      box-shadow: 0 0 0 3px rgba(155,143,212,0.25);
+      border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk);
+      background: #DDD9C8;
+      outline: 1px dotted #316AC5;
+      outline-offset: -3px;
     }
     .path-card .badge {
-      display: inline-block;
-      font-size: 0.62rem; font-weight: 800; letter-spacing: 0.1em;
-      text-transform: uppercase; padding: 0.2rem 0.55rem;
-      border-radius: 999px; margin-bottom: 0.9rem;
+      display: inline-block; font-size: 9px; font-weight: bold;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      padding: 1px 5px; margin-bottom: 0.4rem;
+      border: 1px solid; color: #444;
+      border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk);
+      background: var(--xp-gray-dk);
     }
-    .badge-free  { background: rgba(155,143,212,0.15); color: #7a6bbf; }
-    .badge-paid  { background: rgba(232,168,124,0.25); color: #b06830; }
-    .badge-power { background: rgba(90,190,140,0.2);   color: #2d7a58; }
+    .path-card .card-icon { font-size: 20px; display: block; margin-bottom: 0.4rem; }
+    .path-card h3 { font-size: 11px; font-weight: bold; margin-bottom: 0.25rem; color: #000; }
+    .path-card p  { font-size: 10px; color: #444; line-height: 1.4; }
 
-    .path-card .icon {
-      font-size: 1.8rem; color: #9b8fd4;
-      display: block; margin-bottom: 0.75rem;
-    }
-    .path-card h3 { font-size: 1rem; font-weight: 800; margin-bottom: 0.3rem; }
-    .path-card p  { font-size: 0.78rem; color: #7a5c3e; line-height: 1.5; }
-
-    /* ── Choice cards (guided vs diy) ── */
+    /* ── Choice Cards ── */
     .choice-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      width: 100%;
-      margin-bottom: 1.5rem;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0.5rem; margin-bottom: 0.75rem;
     }
-    @media (max-width: 480px) { .choice-grid { grid-template-columns: 1fr; } }
-
     .choice-card {
-      background: rgba(255,255,255,0.55);
-      border: 2px solid rgba(255,255,255,0.8);
-      border-radius: 18px;
-      padding: 1.8rem 1.4rem;
-      cursor: pointer;
-      transition: all 0.18s ease;
-      text-align: left;
+      background: var(--xp-gray);
+      border: 2px solid;
+      border-color: var(--xp-border-lt) var(--xp-border-dk) var(--xp-border-dk) var(--xp-border-lt);
+      padding: 0.9rem 0.75rem;
+      cursor: pointer; text-align: left;
     }
-    .choice-card:hover {
-      background: rgba(255,255,255,0.8);
-      transform: translateY(-3px);
-      box-shadow: 0 8px 24px rgba(90,60,30,0.12);
-    }
-    .choice-card i { font-size: 2rem; color: #9b8fd4; display: block; margin-bottom: 0.75rem; }
-    .choice-card h3 { font-size: 1rem; font-weight: 800; margin-bottom: 0.4rem; }
-    .choice-card p  { font-size: 0.8rem; color: #7a5c3e; line-height: 1.5; }
+    .choice-card:hover { background: white; }
+    .choice-card .card-icon { font-size: 20px; display: block; margin-bottom: 0.4rem; }
+    .choice-card h3 { font-size: 11px; font-weight: bold; margin-bottom: 0.3rem; }
+    .choice-card p  { font-size: 10px; color: #444; line-height: 1.4; }
 
-    /* ── Form fields ── */
-    .form-group {
-      width: 100%;
-      text-align: left;
-      margin-bottom: 1rem;
+    /* ── Form Fields ── */
+    .xp-field { margin-bottom: 0.65rem; }
+    .xp-label {
+      display: block; font-size: 11px; font-weight: bold;
+      color: #1a1a1a; margin-bottom: 3px;
     }
-    .form-group label {
-      display: block; font-size: 0.75rem; font-weight: 800;
-      color: #7a5c3e; margin-bottom: 0.4rem; letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-    .form-group input,
-    .form-group textarea,
-    .form-group select {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border-radius: 12px;
-      border: 1.5px solid rgba(155,143,212,0.3);
-      background: rgba(255,255,255,0.65);
-      font-family: inherit; font-size: 0.9rem; color: #26180e;
+    .xp-input {
+      width: 100%; padding: 3px 4px;
+      font-family: var(--font); font-size: 11px; color: #1a1a1a;
+      background: white;
+      border: 2px solid;
+      border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk);
       outline: none;
-      transition: border-color 0.15s, box-shadow 0.15s;
     }
-    .form-group input:focus,
-    .form-group textarea:focus,
-    .form-group select:focus {
-      border-color: #9b8fd4;
-      box-shadow: 0 0 0 3px rgba(155,143,212,0.2);
+    .xp-input:focus {
+      border-color: #316AC5 var(--xp-border-lt) var(--xp-border-lt) #316AC5;
     }
-    .form-group textarea { resize: vertical; min-height: 80px; }
+    textarea.xp-input { resize: vertical; min-height: 60px; }
 
-    .address-row {
-      display: flex; align-items: center; gap: 0;
-      background: rgba(255,255,255,0.65);
-      border: 1.5px solid rgba(155,143,212,0.3);
-      border-radius: 12px;
-      overflow: hidden;
-      transition: border-color 0.15s, box-shadow 0.15s;
+    /* ── Address row ── */
+    .xp-address-row {
+      display: flex; align-items: center;
+      border: 2px solid;
+      border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk);
+      background: white;
     }
-    .address-row:focus-within {
-      border-color: #9b8fd4;
-      box-shadow: 0 0 0 3px rgba(155,143,212,0.2);
+    .xp-address-row input {
+      flex: 1; padding: 3px 4px;
+      font-family: var(--font); font-size: 11px; color: #1a1a1a;
+      border: none; background: transparent; outline: none;
     }
-    .address-row input {
-      border: none; background: transparent;
-      border-radius: 0; box-shadow: none;
-      flex: 1; padding: 0.75rem 0.75rem 0.75rem 1rem;
-    }
-    .address-row input:focus { box-shadow: none; border: none; }
-    .address-suffix {
-      padding: 0.75rem 1rem 0.75rem 0;
-      font-size: 0.82rem; font-weight: 700; color: #9b8fd4;
+    .xp-address-suffix {
+      padding: 3px 6px 3px 0;
+      font-size: 11px; font-weight: bold; color: #316AC5;
       white-space: nowrap;
     }
 
-    /* ── Vibe picker ── */
-    .vibe-grid {
-      display: flex; gap: 0.6rem; flex-wrap: wrap;
-    }
+    /* ── Vibe pills (XP checkboxes look) ── */
+    .vibe-grid { display: flex; gap: 5px; flex-wrap: wrap; }
     .vibe-btn {
-      padding: 0.45rem 1rem;
-      border-radius: 999px;
-      border: 1.5px solid rgba(155,143,212,0.3);
-      background: rgba(255,255,255,0.5);
-      font-family: inherit; font-size: 0.8rem; font-weight: 700;
-      color: #5a3e28; cursor: pointer;
-      transition: all 0.15s;
-    }
-    .vibe-btn:hover { background: rgba(255,255,255,0.8); }
-    .vibe-btn.active {
-      background: #9b8fd4; color: #fff;
-      border-color: #9b8fd4;
-    }
-
-    /* ── Pricing card ── */
-    .pricing-card {
-      width: 100%;
-      background: rgba(255,255,255,0.6);
-      border: 2px solid rgba(232,168,124,0.4);
-      border-radius: 18px;
-      padding: 1.6rem;
-      text-align: left;
-      margin-bottom: 1.2rem;
-    }
-    .pricing-card .price {
-      font-size: 2rem; font-weight: 900; color: #26180e;
-      margin-bottom: 0.2rem;
-    }
-    .pricing-card .price span { font-size: 0.9rem; font-weight: 600; color: #7a5c3e; }
-    .pricing-card .tagline { font-size: 0.82rem; color: #7a5c3e; margin-bottom: 1.2rem; }
-    .pricing-card ul { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
-    .pricing-card ul li {
-      font-size: 0.82rem; color: #5a3e28;
-      display: flex; align-items: flex-start; gap: 0.5rem;
-    }
-    .pricing-card ul li i { color: #9b8fd4; font-size: 0.9rem; margin-top: 1px; flex-shrink: 0; }
-
-    /* ── Builder terminal hint ── */
-    .terminal-hint {
-      width: 100%;
-      background: rgba(38,24,14,0.06);
-      border: 1.5px solid rgba(38,24,14,0.1);
-      border-radius: 12px;
-      padding: 1rem 1.2rem;
-      font-family: 'Courier New', monospace;
-      font-size: 0.78rem;
-      color: #5a3e28;
-      text-align: left;
-      margin-bottom: 1.2rem;
-      line-height: 1.7;
-    }
-    .terminal-hint .prompt { color: #9b8fd4; font-weight: 700; }
-
-    /* ── Buttons ── */
-    .btn-primary {
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      padding: 0.75rem 2rem;
-      border-radius: 999px;
-      background: linear-gradient(135deg, #9b8fd4, #b06830);
-      border: none; color: #fff;
-      font-family: inherit; font-size: 0.9rem; font-weight: 800;
+      padding: 3px 10px;
+      font-family: var(--font); font-size: 11px; color: #1a1a1a;
       cursor: pointer;
-      transition: opacity 0.15s, transform 0.15s;
-      text-decoration: none;
+      background: var(--xp-gray);
+      border: 2px solid;
+      border-color: var(--xp-border-lt) var(--xp-border-dk) var(--xp-border-dk) var(--xp-border-lt);
     }
-    .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
-
-    .btn-ghost {
-      display: inline-flex; align-items: center; gap: 0.4rem;
-      padding: 0.6rem 1.4rem;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.5);
-      border: 1.5px solid rgba(255,255,255,0.8);
-      font-family: inherit; font-size: 0.82rem; font-weight: 700;
-      color: #5a3e28; cursor: pointer;
-      transition: background 0.15s;
-    }
-    .btn-ghost:hover { background: rgba(255,255,255,0.8); }
-
-    .btn-row {
-      display: flex; align-items: center; justify-content: center;
-      gap: 0.75rem; flex-wrap: wrap; margin-top: 0.5rem;
+    .vibe-btn:hover { background: white; }
+    .vibe-btn.active {
+      border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk);
+      background: #DDD9C8;
+      outline: 1px dotted #316AC5;
+      outline-offset: -3px;
     }
 
-    /* ── Confirmation screen ── */
-    .confirm-icon {
-      width: 72px; height: 72px;
-      background: linear-gradient(135deg, rgba(155,143,212,0.2), rgba(232,168,124,0.2));
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 2rem; color: #9b8fd4;
-      margin-bottom: 1.2rem;
+    /* ── Pricing box ── */
+    .xp-pricing {
+      border: 2px solid;
+      border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk);
+      background: white; padding: 0.75rem; margin-bottom: 0.75rem;
     }
-    .confirm-summary {
-      width: 100%;
-      background: rgba(255,255,255,0.55);
-      border: 1.5px solid rgba(255,255,255,0.8);
-      border-radius: 14px;
-      padding: 1.2rem 1.4rem;
-      text-align: left;
-      margin-bottom: 1.5rem;
+    .xp-price { font-size: 18px; font-weight: bold; color: #000; margin-bottom: 3px; }
+    .xp-price span { font-size: 11px; font-weight: normal; color: #555; }
+    .xp-price-tag { font-size: 10px; color: #555; margin-bottom: 0.6rem; }
+    .xp-pricing ul { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+    .xp-pricing ul li { font-size: 11px; color: #333; display: flex; gap: 6px; align-items: flex-start; }
+    .xp-pricing ul li::before { content: '✓'; color: #316AC5; font-weight: bold; flex-shrink: 0; }
+
+    /* ── Terminal hint ── */
+    .xp-terminal {
+      border: 2px solid;
+      border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk);
+      background: #000; padding: 0.75rem;
+      font-family: 'Courier New', monospace; font-size: 11px;
+      color: #C0C0C0; line-height: 1.7;
+      margin-bottom: 0.75rem;
+    }
+    .xp-terminal .prompt { color: #00C000; }
+
+    /* ── Confirm summary ── */
+    .xp-confirm {
+      border: 2px solid;
+      border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk);
+      background: white; margin-bottom: 0.75rem; overflow: hidden;
     }
     .confirm-row {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 0.5rem 0;
-      border-bottom: 1px solid rgba(155,143,212,0.12);
-      font-size: 0.82rem;
+      padding: 4px 8px;
+      border-bottom: 1px solid var(--xp-gray-dk);
+      font-size: 11px;
     }
     .confirm-row:last-child { border-bottom: none; }
-    .confirm-row .label { color: #9b8fd4; font-weight: 800; text-transform: uppercase; font-size: 0.68rem; letter-spacing: 0.08em; }
-    .confirm-row .value { font-weight: 700; color: #26180e; }
+    .confirm-row .label { color: #316AC5; font-weight: bold; text-transform: uppercase; font-size: 9px; letter-spacing: 0.06em; }
+    .confirm-row .value { font-weight: bold; color: #000; }
+
+    /* ── Done icon ── */
+    .xp-done-icon {
+      font-size: 32px; text-align: center;
+      margin: 0.5rem 0 0.75rem;
+    }
+
+    /* ── Buttons ── */
+    .xp-btn-row {
+      display: flex; gap: 6px; justify-content: flex-end;
+      margin-top: auto;
+      padding: 0.6rem 1rem;
+      border-top: 1px solid var(--xp-border-dk);
+      background: var(--xp-gray);
+      flex-shrink: 0;
+    }
+    .xp-btn {
+      min-width: 75px; padding: 4px 10px;
+      font-family: var(--font); font-size: 11px; color: #1a1a1a;
+      cursor: pointer; text-align: center;
+      background: linear-gradient(180deg, #F8F6F2 0%, #ECE9D8 50%, #DDD9C8 100%);
+      border: 2px solid;
+      border-color: var(--xp-border-lt) var(--xp-border-dk) var(--xp-border-dk) var(--xp-border-lt);
+      box-shadow: 1px 1px 0 var(--xp-border-dkk);
+    }
+    .xp-btn:hover { background: linear-gradient(180deg, #FFFFF8 0%, #F4F2E8 50%, #EAE8D8 100%); }
+    .xp-btn:active {
+      border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk);
+      padding: 5px 9px 3px 11px;
+    }
+    .xp-btn-primary {
+      min-width: 75px; padding: 4px 10px;
+      font-family: var(--font); font-size: 11px; color: white; font-weight: bold;
+      cursor: pointer; text-align: center;
+      background: linear-gradient(180deg, #6AAAF8 0%, #4A88E8 25%, #2A68D0 50%, #3A78DC 75%, #6AAAF8 100%);
+      border: 2px solid;
+      border-color: #8ABCFA #1040A0 #1040A0 #8ABCFA;
+      box-shadow: 1px 1px 0 #0A2470;
+      text-shadow: 0 1px 1px rgba(0,0,80,0.5);
+    }
+    .xp-btn-primary:hover {
+      background: linear-gradient(180deg, #8ACAFA 0%, #6AAAF0 25%, #4A88E8 50%, #5A98F0 75%, #8ACAFA 100%);
+    }
+    .xp-btn-primary:active {
+      border-color: #1040A0 #8ABCFA #8ABCFA #1040A0;
+      padding: 5px 9px 3px 11px;
+    }
+    .xp-link-btn {
+      background: none; border: none; font-family: var(--font); font-size: 11px;
+      color: #316AC5; text-decoration: underline; cursor: pointer; padding: 4px 6px;
+    }
+
+    /* ── Status Bar ── */
+    .xp-statusbar {
+      background: var(--xp-gray); border-top: 1px solid var(--xp-border-dk);
+      padding: 2px 6px; flex-shrink: 0;
+    }
+    .xp-status-panel {
+      font-size: 10px; color: #444;
+      border: 1px solid;
+      border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk);
+      padding: 1px 6px; display: inline-block;
+    }
+
+    /* ── Taskbar ── */
+    .xp-taskbar {
+      position: fixed; bottom: 0; left: 0; right: 0; height: 34px;
+      display: flex; align-items: center; z-index: 100;
+      background: linear-gradient(180deg,
+        #2E6FBE 0%, #2060B0 4%, #1A54A8 8%, #1850A4 30%,
+        #1A54A8 55%, #2060B4 75%, #2E6FBE 90%, #5898D8 100%
+      );
+      border-top: 1px solid #5898E8; padding: 0 4px; gap: 6px;
+    }
+    .xp-start-btn {
+      height: 28px; padding: 0 12px 0 8px;
+      display: flex; align-items: center; gap: 5px;
+      border-radius: 0 14px 14px 0;
+      border: 1px solid #1A6A18; border-left: none;
+      background: linear-gradient(180deg, #60C840 0%, #40A820 30%, #30980E 50%, #40A820 70%, #60C840 100%);
+      color: white; font-family: var(--font); font-size: 13px;
+      font-weight: bold; font-style: italic; cursor: pointer;
+      box-shadow: 2px 0 8px rgba(0,120,0,0.4);
+      text-shadow: 0 1px 2px rgba(0,60,0,0.6);
+    }
+    .xp-taskbar-item {
+      height: 24px; min-width: 140px; padding: 0 8px;
+      display: flex; align-items: center; gap: 5px;
+      font-size: 11px; font-weight: bold; color: white;
+      background: linear-gradient(180deg, #1A50A0 0%, #2468C0 50%, #1A50A0 100%);
+      border: 1px solid; border-color: #1848A0 #3878D0 #3878D0 #1848A0;
+      border-radius: 2px; cursor: default;
+      overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      text-shadow: 0 1px 1px rgba(0,0,60,0.5);
+    }
+    .xp-tray {
+      margin-left: auto; display: flex; align-items: center;
+      height: 26px; padding: 0 8px;
+      background: rgba(0,30,100,0.3);
+      border: 1px solid rgba(255,255,255,0.15); border-radius: 2px;
+    }
+    .xp-clock { font-size: 11px; color: white; font-family: var(--font); }
   </style>
 </head>
 <body>
 
-  <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+<div class="desktop">
+  <div class="xp-window">
 
-  <a href="index.html" class="back-link">
-    <i class="ti ti-arrow-left"></i> Back to Home
-  </a>
-
-  <!-- ─────────────────────────────────────────
-       STEP 1 — Choose your path
-  ───────────────────────────────────────── -->
-  <div class="step active" id="step-1">
-    <div class="eyebrow">Welcome to Postmarq</div>
-    <h1>Make it yours.</h1>
-    <p class="subtitle">Your Post is a space you build, decorate, and share on your own terms. No templates telling you who to be. No feed deciding what matters.</p>
-
-    <div class="path-grid">
-      <div class="path-card" onclick="selectPath('personal')">
-        <span class="badge badge-free">Free</span>
-        <i class="ti ti-home-heart icon"></i>
-        <h3>Personal</h3>
-        <p>Your own corner of the internet. Fill it, decorate it, make it feel like you.</p>
-      </div>
-      <div class="path-card" onclick="selectPath('builder')">
-        <span class="badge badge-power">Power User</span>
-        <i class="ti ti-terminal-2 icon"></i>
-        <h3>Builder</h3>
-        <p>Full access. Rewire anything, build from scratch, make it something entirely your own.</p>
-      </div>
-      <div class="path-card" onclick="selectPath('business')">
-        <span class="badge badge-paid">Paid</span>
-        <i class="ti ti-building-store icon"></i>
-        <h3>Business</h3>
-        <p>A local shop, studio, or org that belongs in the neighborhood — not a banner ad.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ─────────────────────────────────────────
-       STEP 2A — Personal: guided vs diy
-  ───────────────────────────────────────── -->
-  <div class="step" id="step-2-personal">
-    <div class="eyebrow">Personal Post</div>
-    <h1>How do you want to set it up?</h1>
-    <p class="subtitle">Either way, you end up with something that's yours. Pick what feels right.</p>
-
-    <div class="choice-grid">
-      <div class="choice-card" onclick="goTo('step-3-guided')">
-        <i class="ti ti-wand"></i>
-        <h3>Walk me through it</h3>
-        <p>Answer a few simple questions. We'll handle the rest and you can tweak from there.</p>
-      </div>
-      <div class="choice-card" onclick="goTo('step-3-diy')">
-        <i class="ti ti-tools"></i>
-        <h3>I'll do it myself</h3>
-        <p>Just give me the keys. I know what I want and I'd rather figure it out as I go.</p>
+    <div class="xp-titlebar">
+      <div class="xp-titlebar-icon">🌐</div>
+      <span class="xp-titlebar-text">Postmarq — Claim Your Post</span>
+      <div class="xp-titlebar-btns">
+        <button class="xp-tb-btn">&#8722;</button>
+        <button class="xp-tb-btn">&#9633;</button>
+        <button class="xp-tb-btn close" onclick="window.location.href='index.html'">&#10005;</button>
       </div>
     </div>
 
-    <div class="btn-row">
-      <button class="btn-ghost" onclick="goTo('step-1')"><i class="ti ti-arrow-left"></i> Back</button>
-    </div>
-  </div>
+    <div class="xp-wizard-body">
 
-  <!-- ─────────────────────────────────────────
-       STEP 2B — Business
-  ───────────────────────────────────────── -->
-  <div class="step" id="step-2-business">
-    <div class="eyebrow">Business Post</div>
-    <h1>Be a neighbor, not a billboard.</h1>
-    <p class="subtitle">Your Post is a place people actually want to visit — not a page they scroll past. You grow here the same way anyone does: by being worth knowing.</p>
-
-    <div class="pricing-card">
-      <div class="price">$12 <span>/ month</span></div>
-      <div class="tagline">Everything you need. Nothing you don't.</div>
-      <ul>
-        <li><i class="ti ti-check"></i> Verified business badge on your Post</li>
-        <li><i class="ti ti-check"></i> Neighborhood Pulse presence — show up where locals actually look</li>
-        <li><i class="ti ti-check"></i> Quorum connections — real regulars, not a follower count</li>
-        <li><i class="ti ti-check"></i> Loop announcements — events, specials, updates (only to people who want them)</li>
-        <li><i class="ti ti-check"></i> See who's looping you in and what's resonating</li>
-      </ul>
-    </div>
-
-    <div class="btn-row">
-      <button class="btn-ghost" onclick="goTo('step-1')"><i class="ti ti-arrow-left"></i> Back</button>
-      <button class="btn-primary" onclick="goTo('step-3-business')">Continue <i class="ti ti-arrow-right"></i></button>
-    </div>
-  </div>
-
-  <!-- ─────────────────────────────────────────
-       STEP 2C — Builder
-  ───────────────────────────────────────── -->
-  <div class="step" id="step-2-builder">
-    <div class="eyebrow">Builder</div>
-    <h1>Start from zero. End up with something real.</h1>
-    <p class="subtitle">Full access to every piece. Rearrange it, rewrite it, make it something nobody else has. Your Post is a blank canvas — and you hold the brush.</p>
-
-    <div class="terminal-hint">
-      <span class="prompt">→</span> postmarq init my-post<br>
-      <span class="prompt">→</span> postmarq add widget clock weather<br>
-      <span class="prompt">→</span> postmarq loop @davemichael<br>
-      <span class="prompt">→</span> postmarq deploy
-    </div>
-
-    <div class="choice-grid">
-      <div class="choice-card" onclick="goTo('step-3-builder-ai')">
-        <i class="ti ti-sparkles"></i>
-        <h3>Describe it, we'll build it</h3>
-        <p>Tell us what you're imagining in plain words. We'll set it up and you take it from there.</p>
+      <!-- Sidebar -->
+      <div class="xp-sidebar">
+        <div class="xp-sidebar-logo">postmarq</div>
+        <div class="xp-sidebar-divider"></div>
+        <div class="xp-sidebar-step" id="sidebarStep">Choose your path</div>
+        <div class="xp-sidebar-divider"></div>
+        <div class="xp-sidebar-hint" id="sidebarHint">Your Post is a place on the internet that's entirely yours — no ads, no algorithm.</div>
       </div>
-      <div class="choice-card" onclick="goTo('step-3-builder-code')">
-        <i class="ti ti-code"></i>
-        <h3>Build it by hand</h3>
-        <p>Raw access. Component library, config files, no guardrails. Make it exactly what you want.</p>
-      </div>
-    </div>
 
-    <div class="btn-row">
-      <button class="btn-ghost" onclick="goTo('step-1')"><i class="ti ti-arrow-left"></i> Back</button>
-    </div>
-  </div>
+      <!-- Content -->
+      <div class="xp-content">
 
-  <!-- ─────────────────────────────────────────
-       STEP 3A — Guided personal setup
-  ───────────────────────────────────────── -->
-  <div class="step" id="step-3-guided">
-    <div class="eyebrow">Step 3 of 4</div>
-    <h1>Let's get your Post ready.</h1>
-    <p class="subtitle">A few basics and you're in. You can change every bit of this once you're home.</p>
+        <!-- Progress bar -->
+        <div class="xp-progress-wrap">
+          <div class="xp-progress-fill" id="progressBar"></div>
+        </div>
 
-    <div class="form-group">
-      <label>Your name</label>
-      <input type="text" id="guided-name" placeholder="Dave Michael" />
-    </div>
+        <!-- STEP 1 — Choose path -->
+        <div class="step active" id="step-1" style="padding-top:0.75rem;">
+          <div style="padding: 0 1rem;">
+            <div class="xp-step-title">Welcome to Postmarq — Make it yours.</div>
+            <div class="xp-step-sub">Your Post is a space you build, decorate, and share on your own terms. No templates telling you who to be. No feed deciding what matters.</div>
 
-    <div class="form-group">
-      <label>Claim your address</label>
-      <div class="address-row">
-        <input type="text" id="guided-address" placeholder="davemichael" />
-        <span class="address-suffix">.postmarq</span>
-      </div>
-    </div>
+            <div class="path-grid">
+              <div class="path-card" onclick="selectPath('personal')">
+                <span class="badge">Free</span>
+                <span class="card-icon">🏠</span>
+                <h3>Personal</h3>
+                <p>Your own place on the internet. Fill it, decorate it, make it feel like you.</p>
+              </div>
+              <div class="path-card" onclick="selectPath('builder')">
+                <span class="badge">Power User</span>
+                <span class="card-icon">⚙️</span>
+                <h3>Builder</h3>
+                <p>Full access. Rewire anything, build from scratch, make it entirely your own.</p>
+              </div>
+              <div class="path-card" onclick="selectPath('business')">
+                <span class="badge">Paid</span>
+                <span class="card-icon">🏪</span>
+                <h3>Business</h3>
+                <p>A local shop, studio, or org that belongs in the neighborhood — not a banner ad.</p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-    <div class="form-group">
-      <label>One line about you</label>
-      <input type="text" id="guided-bio" placeholder="Designer. Phoenix. Coffee first." />
-    </div>
+        <!-- STEP 2A — Personal: guided vs diy -->
+        <div class="step" id="step-2-personal" style="padding-top:0.75rem;">
+          <div style="padding: 0 1rem; flex:1;">
+            <div class="xp-step-title">Personal Post — How do you want to set it up?</div>
+            <div class="xp-step-sub">Either way, you end up with something that's yours. Pick what feels right.</div>
+            <div class="choice-grid">
+              <div class="choice-card" onclick="goTo('step-3-guided')">
+                <span class="card-icon">🪄</span>
+                <h3>Walk me through it</h3>
+                <p>Answer a few simple questions. We'll handle the rest and you can tweak from there.</p>
+              </div>
+              <div class="choice-card" onclick="goTo('step-3-diy')">
+                <span class="card-icon">🔧</span>
+                <h3>I'll do it myself</h3>
+                <p>Just give me the keys. I know what I want and I'd rather figure it out as I go.</p>
+              </div>
+            </div>
+          </div>
+          <div class="xp-btn-row">
+            <button class="xp-btn" onclick="goTo('step-1')">&#8592; Back</button>
+          </div>
+        </div>
 
-    <div class="form-group">
-      <label>Pick a vibe</label>
-      <div class="vibe-grid">
-        <button class="vibe-btn" onclick="pickVibe(this)">Warm</button>
-        <button class="vibe-btn" onclick="pickVibe(this)">Minimal</button>
-        <button class="vibe-btn" onclick="pickVibe(this)">Bold</button>
-        <button class="vibe-btn" onclick="pickVibe(this)">Retro</button>
-        <button class="vibe-btn" onclick="pickVibe(this)">Cozy</button>
-      </div>
-    </div>
+        <!-- STEP 2B — Business -->
+        <div class="step" id="step-2-business" style="padding-top:0.75rem;">
+          <div style="padding: 0 1rem; flex:1;">
+            <div class="xp-step-title">Business Post — Be a neighbor, not a billboard.</div>
+            <div class="xp-step-sub">Your Post is a place people actually want to visit. You grow here the same way anyone does: by being worth knowing.</div>
+            <div class="xp-pricing">
+              <div class="xp-price">$12 <span>/ month</span></div>
+              <div class="xp-price-tag">Everything you need. Nothing you don't.</div>
+              <ul>
+                <li>Verified business badge on your Post</li>
+                <li>Neighborhood Pulse presence — show up where locals actually look</li>
+                <li>Quorum connections — real regulars, not a follower count</li>
+                <li>Loop announcements — events, specials, updates (only to people who want them)</li>
+                <li>See who's looping you in and what's resonating</li>
+              </ul>
+            </div>
+          </div>
+          <div class="xp-btn-row">
+            <button class="xp-btn" onclick="goTo('step-1')">&#8592; Back</button>
+            <button class="xp-btn-primary" onclick="goTo('step-3-business')">Continue &#8594;</button>
+          </div>
+        </div>
 
-    <div class="btn-row" style="margin-top:1.2rem">
-      <button class="btn-ghost" onclick="goTo('step-2-personal')"><i class="ti ti-arrow-left"></i> Back</button>
-      <button class="btn-primary" onclick="goToConfirm('guided')">Next <i class="ti ti-arrow-right"></i></button>
-    </div>
-  </div>
+        <!-- STEP 2C — Builder -->
+        <div class="step" id="step-2-builder" style="padding-top:0.75rem;">
+          <div style="padding: 0 1rem; flex:1;">
+            <div class="xp-step-title">Builder — Start from zero. End up with something real.</div>
+            <div class="xp-step-sub">Full access to every piece. Rearrange it, rewrite it, make it something nobody else has.</div>
+            <div class="xp-terminal">
+              <span class="prompt">C:\Postmarq&gt;</span> postmarq init my-post<br>
+              <span class="prompt">C:\Postmarq&gt;</span> postmarq add widget clock weather<br>
+              <span class="prompt">C:\Postmarq&gt;</span> postmarq loop @davemichael<br>
+              <span class="prompt">C:\Postmarq&gt;</span> postmarq deploy
+            </div>
+            <div class="choice-grid">
+              <div class="choice-card" onclick="goTo('step-3-builder-ai')">
+                <span class="card-icon">✨</span>
+                <h3>Describe it, we'll build it</h3>
+                <p>Tell us what you're imagining in plain words. We'll set it up and you take it from there.</p>
+              </div>
+              <div class="choice-card" onclick="goTo('step-3-builder-code')">
+                <span class="card-icon">💻</span>
+                <h3>Build it by hand</h3>
+                <p>Raw access. Component library, config files, no guardrails. Make it exactly what you want.</p>
+              </div>
+            </div>
+          </div>
+          <div class="xp-btn-row">
+            <button class="xp-btn" onclick="goTo('step-1')">&#8592; Back</button>
+          </div>
+        </div>
 
-  <!-- ─────────────────────────────────────────
-       STEP 3B — DIY personal setup
-  ───────────────────────────────────────── -->
-  <div class="step" id="step-3-diy">
-    <div class="eyebrow">Step 3 of 4</div>
-    <h1>Claim your address. The rest is up to you.</h1>
-    <p class="subtitle">Once you're in, every widget, layout, and detail is yours to arrange however you want.</p>
+        <!-- STEP 3A — Guided personal setup -->
+        <div class="step" id="step-3-guided" style="padding-top:0.75rem;">
+          <div style="padding: 0 1rem; flex:1;">
+            <div class="xp-step-title">Step 3 of 4 — Let's get your Post ready.</div>
+            <div class="xp-step-sub">A few basics and you're in. You can change every bit of this once you're home.</div>
+            <div class="xp-field">
+              <label class="xp-label">Your name:</label>
+              <input class="xp-input" type="text" id="guided-name" placeholder="Dave Michael" />
+            </div>
+            <div class="xp-field">
+              <label class="xp-label">Claim your address:</label>
+              <div class="xp-address-row">
+                <input type="text" id="guided-address" placeholder="davemichael" />
+                <span class="xp-address-suffix">.postmarq</span>
+              </div>
+            </div>
+            <div class="xp-field">
+              <label class="xp-label">One line about you:</label>
+              <input class="xp-input" type="text" id="guided-bio" placeholder="Designer. Phoenix. Coffee first." />
+            </div>
+            <div class="xp-field">
+              <label class="xp-label">Pick a vibe:</label>
+              <div class="vibe-grid">
+                <button class="vibe-btn" onclick="pickVibe(this)">Warm</button>
+                <button class="vibe-btn" onclick="pickVibe(this)">Minimal</button>
+                <button class="vibe-btn" onclick="pickVibe(this)">Bold</button>
+                <button class="vibe-btn" onclick="pickVibe(this)">Retro</button>
+                <button class="vibe-btn" onclick="pickVibe(this)">Cozy</button>
+              </div>
+            </div>
+          </div>
+          <div class="xp-btn-row">
+            <button class="xp-btn" onclick="goTo('step-2-personal')">&#8592; Back</button>
+            <button class="xp-btn-primary" onclick="goToConfirm('guided')">Next &#8594;</button>
+          </div>
+        </div>
 
-    <div class="form-group">
-      <label>Your name</label>
-      <input type="text" id="diy-name" placeholder="Dave Michael" />
-    </div>
+        <!-- STEP 3B — DIY personal setup -->
+        <div class="step" id="step-3-diy" style="padding-top:0.75rem;">
+          <div style="padding: 0 1rem; flex:1;">
+            <div class="xp-step-title">Step 3 of 4 — Claim your address. The rest is up to you.</div>
+            <div class="xp-step-sub">Once you're in, every widget, layout, and detail is yours to arrange however you want.</div>
+            <div class="xp-field">
+              <label class="xp-label">Your name:</label>
+              <input class="xp-input" type="text" id="diy-name" placeholder="Dave Michael" />
+            </div>
+            <div class="xp-field">
+              <label class="xp-label">Claim your address:</label>
+              <div class="xp-address-row">
+                <input type="text" id="diy-address" placeholder="davemichael" />
+                <span class="xp-address-suffix">.postmarq</span>
+              </div>
+            </div>
+            <div class="xp-field">
+              <label class="xp-label">Email:</label>
+              <input class="xp-input" type="email" id="diy-email" placeholder="you@example.com" />
+            </div>
+          </div>
+          <div class="xp-btn-row">
+            <button class="xp-btn" onclick="goTo('step-2-personal')">&#8592; Back</button>
+            <button class="xp-btn-primary" onclick="goToConfirm('diy')">Create my Post &#8594;</button>
+          </div>
+        </div>
 
-    <div class="form-group">
-      <label>Claim your address</label>
-      <div class="address-row">
-        <input type="text" id="diy-address" placeholder="davemichael" />
-        <span class="address-suffix">.postmarq</span>
-      </div>
-    </div>
+        <!-- STEP 3C — Business setup -->
+        <div class="step" id="step-3-business" style="padding-top:0.75rem;">
+          <div style="padding: 0 1rem; flex:1;">
+            <div class="xp-step-title">Step 3 of 4 — Tell us about your place.</div>
+            <div class="xp-step-sub">Your Post should feel like walking through your door — not clicking an ad.</div>
+            <div class="xp-field">
+              <label class="xp-label">Business name:</label>
+              <input class="xp-input" type="text" id="biz-name" placeholder="Copper Cup Coffee" />
+            </div>
+            <div class="xp-field">
+              <label class="xp-label">Claim your address:</label>
+              <div class="xp-address-row">
+                <input type="text" id="biz-address" placeholder="coppercup" />
+                <span class="xp-address-suffix">.postmarq</span>
+              </div>
+            </div>
+            <div class="xp-field">
+              <label class="xp-label">What do you do?</label>
+              <input class="xp-input" type="text" id="biz-tagline" placeholder="Specialty coffee in downtown Phoenix." />
+            </div>
+            <div class="xp-field">
+              <label class="xp-label">Neighborhood:</label>
+              <input class="xp-input" type="text" id="biz-neighborhood" placeholder="Roosevelt Row, Phoenix AZ" />
+            </div>
+            <div class="xp-field">
+              <label class="xp-label">Contact email:</label>
+              <input class="xp-input" type="email" id="biz-email" placeholder="hello@coppercup.com" />
+            </div>
+          </div>
+          <div class="xp-btn-row">
+            <button class="xp-btn" onclick="goTo('step-2-business')">&#8592; Back</button>
+            <button class="xp-btn-primary" onclick="goToConfirm('business')">Continue to payment &#8594;</button>
+          </div>
+        </div>
 
-    <div class="form-group">
-      <label>Email</label>
-      <input type="email" id="diy-email" placeholder="you@example.com" />
-    </div>
+        <!-- STEP 3D — Builder AI -->
+        <div class="step" id="step-3-builder-ai" style="padding-top:0.75rem;">
+          <div style="padding: 0 1rem; flex:1;">
+            <div class="xp-step-title">Builder — Describe it, we'll build it.</div>
+            <div class="xp-step-sub">Write it out like you're explaining it to a friend. We'll turn it into a real starting point.</div>
+            <div class="xp-field">
+              <label class="xp-label">Your name:</label>
+              <input class="xp-input" type="text" id="ai-name" placeholder="Dave Michael" />
+            </div>
+            <div class="xp-field">
+              <label class="xp-label">Claim your address:</label>
+              <div class="xp-address-row">
+                <input type="text" id="ai-address" placeholder="davemichael" />
+                <span class="xp-address-suffix">.postmarq</span>
+              </div>
+            </div>
+            <div class="xp-field">
+              <label class="xp-label">Describe your Post in plain English:</label>
+              <textarea class="xp-input" id="ai-prompt" placeholder="I want a simple, warm homepage that shows my photography, a few links, and a space for people I actually know to check in with me. Minimal. Clean. No clutter."></textarea>
+            </div>
+          </div>
+          <div class="xp-btn-row">
+            <button class="xp-btn" onclick="goTo('step-2-builder')">&#8592; Back</button>
+            <button class="xp-btn-primary" onclick="goToConfirm('builder-ai')">Build it &#8594;</button>
+          </div>
+        </div>
 
-    <div class="btn-row" style="margin-top:1.2rem">
-      <button class="btn-ghost" onclick="goTo('step-2-personal')"><i class="ti ti-arrow-left"></i> Back</button>
-      <button class="btn-primary" onclick="goToConfirm('diy')">Create my Postmarq <i class="ti ti-arrow-right"></i></button>
-    </div>
-  </div>
+        <!-- STEP 3E — Builder code -->
+        <div class="step" id="step-3-builder-code" style="padding-top:0.75rem;">
+          <div style="padding: 0 1rem; flex:1;">
+            <div class="xp-step-title">Builder — Code mode.</div>
+            <div class="xp-step-sub">A bare Post, every component available, and nothing locked down. If you can imagine it, you can build it here.</div>
+            <div class="xp-field">
+              <label class="xp-label">Your name:</label>
+              <input class="xp-input" type="text" id="code-name" placeholder="Dave Michael" />
+            </div>
+            <div class="xp-field">
+              <label class="xp-label">Claim your address:</label>
+              <div class="xp-address-row">
+                <input type="text" id="code-address" placeholder="davemichael" />
+                <span class="xp-address-suffix">.postmarq</span>
+              </div>
+            </div>
+            <div class="xp-field">
+              <label class="xp-label">Email:</label>
+              <input class="xp-input" type="email" id="code-email" placeholder="you@example.com" />
+            </div>
+          </div>
+          <div class="xp-btn-row">
+            <button class="xp-btn" onclick="goTo('step-2-builder')">&#8592; Back</button>
+            <button class="xp-btn-primary" onclick="goToConfirm('builder-code')">Initialize my Post &#8594;</button>
+          </div>
+        </div>
 
-  <!-- ─────────────────────────────────────────
-       STEP 3C — Business setup
-  ───────────────────────────────────────── -->
-  <div class="step" id="step-3-business">
-    <div class="eyebrow">Step 3 of 4</div>
-    <h1>Tell us about your place.</h1>
-    <p class="subtitle">Your Post should feel like walking through your door — not clicking an ad. Let's set the right tone from the start.</p>
+        <!-- STEP 4 — Confirmation -->
+        <div class="step" id="step-confirm" style="padding-top:0.75rem;">
+          <div style="padding: 0 1rem; flex:1;">
+            <div class="xp-step-title">Step 4 of 4 — Looking good. One last check.</div>
+            <div class="xp-step-sub">Here's what you've got so far. Nothing is set in stone — change anything once you're inside.</div>
+            <div class="xp-confirm" id="confirmSummary"></div>
+          </div>
+          <div class="xp-btn-row">
+            <button class="xp-btn" id="confirmBack" onclick="goBack()">&#8592; Edit</button>
+            <button class="xp-btn-primary" onclick="goTo('step-loop')">Loop someone in &#8594;</button>
+          </div>
+        </div>
 
-    <div class="form-group">
-      <label>Business name</label>
-      <input type="text" id="biz-name" placeholder="Copper Cup Coffee" />
-    </div>
+        <!-- STEP 5 — Loop -->
+        <div class="step" id="step-loop" style="padding-top:0.75rem;">
+          <div style="padding: 0 1rem; flex:1;">
+            <div class="xp-step-title">Final Step — Who gets the first loop?</div>
+            <div class="xp-step-sub">Your Quorum is the handful of people who actually matter to you — not a following, not a list. Invite one to get started, or skip it.</div>
+            <div class="xp-field">
+              <label class="xp-label">Their email or Postmarq address:</label>
+              <input class="xp-input" type="text" id="loop-person" placeholder="friend@example.com or davemichael.postmarq" />
+            </div>
+            <div class="xp-field">
+              <label class="xp-label">A note (optional):</label>
+              <textarea class="xp-input" id="loop-note" placeholder="Hey, I set up my Post on Postmarq. Come check it out — no ads, no algorithm, just us." style="min-height:52px"></textarea>
+            </div>
+          </div>
+          <div class="xp-btn-row">
+            <button class="xp-link-btn" onclick="goTo('step-done')">Skip for now</button>
+            <button class="xp-btn-primary" onclick="goTo('step-done')">Send the loop &#8594;</button>
+          </div>
+        </div>
 
-    <div class="form-group">
-      <label>Claim your address</label>
-      <div class="address-row">
-        <input type="text" id="biz-address" placeholder="coppercup" />
-        <span class="address-suffix">.postmarq</span>
-      </div>
-    </div>
+        <!-- STEP 6 — Done -->
+        <div class="step" id="step-done" style="padding-top:0.75rem;">
+          <div style="padding: 0 1rem; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
+            <div class="xp-done-icon">✅</div>
+            <div class="xp-step-title" style="border:none; text-align:center; font-size:15px;">Welcome home.</div>
+            <div class="xp-step-sub" style="max-width:320px;">Your Post is live. Decorate it, rearrange it, make it weird — it's yours. The only people who see it are the ones you let in.</div>
+          </div>
+          <div class="xp-btn-row" style="justify-content:center;">
+            <a href="post.html" class="xp-btn-primary" style="text-decoration:none;">Go to my Post &#8594;</a>
+          </div>
+        </div>
 
-    <div class="form-group">
-      <label>What do you do?</label>
-      <input type="text" id="biz-tagline" placeholder="Specialty coffee in downtown Phoenix." />
-    </div>
+        <div class="xp-statusbar">
+          <span class="xp-status-panel" id="statusText">Ready</span>
+        </div>
 
-    <div class="form-group">
-      <label>Neighborhood</label>
-      <input type="text" id="biz-neighborhood" placeholder="Roosevelt Row, Phoenix AZ" />
-    </div>
+      </div><!-- /xp-content -->
+    </div><!-- /xp-wizard-body -->
 
-    <div class="form-group">
-      <label>Contact email</label>
-      <input type="email" id="biz-email" placeholder="hello@coppercup.com" />
-    </div>
+  </div><!-- /xp-window -->
+</div><!-- /desktop -->
 
-    <div class="btn-row" style="margin-top:1.2rem">
-      <button class="btn-ghost" onclick="goTo('step-2-business')"><i class="ti ti-arrow-left"></i> Back</button>
-      <button class="btn-primary" onclick="goToConfirm('business')">Continue to payment <i class="ti ti-arrow-right"></i></button>
-    </div>
-  </div>
+<!-- Taskbar -->
+<div class="xp-taskbar">
+  <button class="xp-start-btn">🪟 start</button>
+  <div class="xp-taskbar-item">🌐 &nbsp;Postmarq — Claim Your Post</div>
+  <div class="xp-tray"><span class="xp-clock" id="xpClock">12:00 PM</span></div>
+</div>
 
-  <!-- ─────────────────────────────────────────
-       STEP 3D — Builder AI
-  ───────────────────────────────────────── -->
-  <div class="step" id="step-3-builder-ai">
-    <div class="eyebrow">Builder — Describe it</div>
-    <h1>What are you imagining?</h1>
-    <p class="subtitle">Write it out like you're explaining it to a friend. We'll turn it into a real starting point — then it's yours to shape.</p>
+<script>
+  let currentPath = '';
+  let lastStep3 = '';
 
-    <div class="form-group">
-      <label>Your name</label>
-      <input type="text" id="ai-name" placeholder="Dave Michael" />
-    </div>
+  const SIDEBAR = {
+    'step-1':           { step: 'Choose your path',       hint: 'Your Post is a place on the internet that\'s entirely yours — no ads, no algorithm.' },
+    'step-2-personal':  { step: 'Personal Post',          hint: 'Decide how hands-on you want to be when setting up your Post.' },
+    'step-2-business':  { step: 'Business Post',          hint: 'A business Post is a place people actually want to visit.' },
+    'step-2-builder':   { step: 'Builder Post',           hint: 'Full access to every piece. Build something nobody else has.' },
+    'step-3-guided':    { step: 'Setup — Guided',         hint: 'Answer a few basics and we\'ll put your Post together.' },
+    'step-3-diy':       { step: 'Setup — DIY',            hint: 'Claim your address and jump straight in.' },
+    'step-3-business':  { step: 'Setup — Business',       hint: 'Tell us about your place.' },
+    'step-3-builder-ai':{ step: 'Setup — Describe it',    hint: 'Describe your vision and we\'ll build a starting point.' },
+    'step-3-builder-code':{ step: 'Setup — Code mode',   hint: 'Raw access. No guardrails.' },
+    'step-confirm':     { step: 'Step 4 — Review',        hint: 'Check your details before we create your Post.' },
+    'step-loop':        { step: 'Final Step — Loop in',   hint: 'Invite someone to your Quorum to get started.' },
+    'step-done':        { step: 'You\'re in!',            hint: 'Your Post is ready. Go make it yours.' },
+  };
 
-    <div class="form-group">
-      <label>Claim your address</label>
-      <div class="address-row">
-        <input type="text" id="ai-address" placeholder="davemichael" />
-        <span class="address-suffix">.postmarq</span>
-      </div>
-    </div>
+  const PROGRESS = {
+    'step-1': 8,
+    'step-2-personal': 25, 'step-2-business': 25, 'step-2-builder': 25,
+    'step-3-guided': 55, 'step-3-diy': 55, 'step-3-business': 55,
+    'step-3-builder-ai': 55, 'step-3-builder-code': 55,
+    'step-confirm': 78, 'step-loop': 92, 'step-done': 100,
+  };
 
-    <div class="form-group">
-      <label>Describe your Post in plain English</label>
-      <textarea id="ai-prompt" placeholder="I want a simple, warm homepage that shows my photography, a few links, and a space for people I actually know to check in with me. Minimal. Clean. No clutter."></textarea>
-    </div>
-
-    <div class="btn-row" style="margin-top:1.2rem">
-      <button class="btn-ghost" onclick="goTo('step-2-builder')"><i class="ti ti-arrow-left"></i> Back</button>
-      <button class="btn-primary" onclick="goToConfirm('builder-ai')">Build it <i class="ti ti-sparkles"></i></button>
-    </div>
-  </div>
-
-  <!-- ─────────────────────────────────────────
-       STEP 3E — Builder code
-  ───────────────────────────────────────── -->
-  <div class="step" id="step-3-builder-code">
-    <div class="eyebrow">Builder — Code mode</div>
-    <h1>Here's the foundation. Do what you want with it.</h1>
-    <p class="subtitle">A bare Post, every component available, and nothing locked down. If you can imagine it, you can build it here.</p>
-
-    <div class="form-group">
-      <label>Your name</label>
-      <input type="text" id="code-name" placeholder="Dave Michael" />
-    </div>
-
-    <div class="form-group">
-      <label>Claim your address</label>
-      <div class="address-row">
-        <input type="text" id="code-address" placeholder="davemichael" />
-        <span class="address-suffix">.postmarq</span>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label>Email</label>
-      <input type="email" id="code-email" placeholder="you@example.com" />
-    </div>
-
-    <div class="btn-row" style="margin-top:1.2rem">
-      <button class="btn-ghost" onclick="goTo('step-2-builder')"><i class="ti ti-arrow-left"></i> Back</button>
-      <button class="btn-primary" onclick="goToConfirm('builder-code')">Initialize my Post <i class="ti ti-terminal-2"></i></button>
-    </div>
-  </div>
-
-  <!-- ─────────────────────────────────────────
-       STEP 4 — Confirmation
-  ───────────────────────────────────────── -->
-  <div class="step" id="step-confirm">
-    <div class="confirm-icon"><i class="ti ti-mailbox"></i></div>
-    <div class="eyebrow">You're almost home</div>
-    <h1>Looking good. One last check.</h1>
-    <p class="subtitle">Here's what you've got so far. Nothing is set in stone — change anything you want once you're inside.</p>
-
-    <div class="confirm-summary" id="confirmSummary">
-      <!-- filled by JS -->
-    </div>
-
-    <div class="btn-row">
-      <button class="btn-ghost" id="confirmBack" onclick="goBack()"><i class="ti ti-arrow-left"></i> Edit</button>
-      <button class="btn-primary" onclick="goTo('step-loop')">Loop someone in <i class="ti ti-users"></i></button>
-    </div>
-  </div>
-
-  <!-- ─────────────────────────────────────────
-       STEP 5 — Loop someone in
-  ───────────────────────────────────────── -->
-  <div class="step" id="step-loop">
-    <div class="eyebrow">Final step</div>
-    <h1>Who gets the first loop?</h1>
-    <p class="subtitle">Your Quorum is the handful of people who actually matter to you — not a following, not a list. Invite one to get started, or skip it and do it from your Post.</p>
-
-    <div class="form-group">
-      <label>Their email or Postmarq address</label>
-      <input type="text" id="loop-person" placeholder="friend@example.com or davemichael.postmarq" />
-    </div>
-
-    <div class="form-group">
-      <label>A note (optional)</label>
-      <textarea id="loop-note" placeholder="Hey, I set up my Post on Postmarq. Come check it out — no ads, no algorithm, just us." style="min-height:64px"></textarea>
-    </div>
-
-    <div class="btn-row" style="margin-top:0.5rem">
-      <button class="btn-ghost" onclick="goTo('step-confirm')">Skip for now</button>
-      <button class="btn-primary" onclick="goTo('step-done')">Send the loop <i class="ti ti-send"></i></button>
-    </div>
-  </div>
-
-  <!-- ─────────────────────────────────────────
-       STEP 6 — Done
-  ───────────────────────────────────────── -->
-  <div class="step" id="step-done">
-    <div class="confirm-icon" style="background: linear-gradient(135deg, rgba(90,190,140,0.2), rgba(155,143,212,0.2)); color: #2d7a58;">
-      <i class="ti ti-circle-check"></i>
-    </div>
-    <div class="eyebrow">You're in</div>
-    <h1>Welcome home.</h1>
-    <p class="subtitle">Your Post is live. Decorate it, rearrange it, make it weird — it's yours. The only people who see it are the ones you let in.</p>
-
-    <div class="btn-row" style="margin-top:0.5rem">
-      <a href="index.html" class="btn-primary">Go to my Post <i class="ti ti-arrow-right"></i></a>
-    </div>
-  </div>
-
-  <script>
-    let currentPath = '';
-    let lastStep3 = '';
-
-    const PROGRESS = {
-      'step-1': 8,
-      'step-2-personal': 25, 'step-2-business': 25, 'step-2-builder': 25,
-      'step-3-guided': 55, 'step-3-diy': 55, 'step-3-business': 55,
-      'step-3-builder-ai': 55, 'step-3-builder-code': 55,
-      'step-confirm': 78,
-      'step-loop': 92,
-      'step-done': 100,
-    };
-
-    function goTo(id) {
-      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-      const next = document.getElementById(id);
-      if (next) {
-        next.classList.add('active');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        const pct = PROGRESS[id] ?? 50;
-        document.getElementById('progressBar').style.width = pct + '%';
-      }
+  function goTo(id) {
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    const next = document.getElementById(id);
+    if (next) {
+      next.classList.add('active');
+      const pct = PROGRESS[id] ?? 50;
+      document.getElementById('progressBar').style.width = pct + '%';
+      const sb = SIDEBAR[id] || {};
+      document.getElementById('sidebarStep').textContent = sb.step || '';
+      document.getElementById('sidebarHint').textContent = sb.hint || '';
+      document.getElementById('statusText').textContent = sb.step || 'Ready';
     }
+  }
 
-    function selectPath(path) {
-      currentPath = path;
-      if (path === 'personal') goTo('step-2-personal');
-      if (path === 'business') goTo('step-2-business');
-      if (path === 'builder')  goTo('step-2-builder');
-    }
+  function selectPath(path) {
+    currentPath = path;
+    if (path === 'personal') goTo('step-2-personal');
+    if (path === 'business') goTo('step-2-business');
+    if (path === 'builder')  goTo('step-2-builder');
+  }
 
-    function pickVibe(btn) {
-      document.querySelectorAll('.vibe-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-    }
+  function pickVibe(btn) {
+    document.querySelectorAll('.vibe-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
 
-    function goToConfirm(mode) {
-      lastStep3 = 'step-3-' + (mode === 'guided' ? 'guided' : mode === 'diy' ? 'diy' : mode === 'business' ? 'business' : mode === 'builder-ai' ? 'builder-ai' : 'builder-code');
+  function val(id) { return (document.getElementById(id)?.value || '').trim(); }
+  function truncate(s, n) { return s.length > n ? s.slice(0, n) + '…' : s; }
 
-      const rows = buildSummaryRows(mode);
-      const summary = document.getElementById('confirmSummary');
-      summary.innerHTML = rows.map(r => `
-        <div class="confirm-row">
-          <span class="label">${r.label}</span>
-          <span class="value">${r.value || '—'}</span>
-        </div>`).join('');
+  function goToConfirm(mode) {
+    lastStep3 = 'step-3-' + { guided:'guided', diy:'diy', business:'business', 'builder-ai':'builder-ai', 'builder-code':'builder-code' }[mode];
+    const rows = buildSummaryRows(mode);
+    document.getElementById('confirmSummary').innerHTML = rows.map(r =>
+      `<div class="confirm-row"><span class="label">${r.label}</span><span class="value">${r.value || '—'}</span></div>`
+    ).join('');
+    goTo('step-confirm');
+  }
 
-      goTo('step-confirm');
-    }
+  function goBack() { goTo(lastStep3 || 'step-1'); }
 
-    function buildSummaryRows(mode) {
-      if (mode === 'guided') return [
-        { label: 'Path',    value: 'Personal — Guided' },
-        { label: 'Name',    value: val('guided-name') },
-        { label: 'Address', value: (val('guided-address') || 'yourname') + '.postmarq' },
-        { label: 'Bio',     value: val('guided-bio') },
-        { label: 'Vibe',    value: document.querySelector('.vibe-btn.active')?.textContent || '—' },
-      ];
-      if (mode === 'diy') return [
-        { label: 'Path',    value: 'Personal — DIY' },
-        { label: 'Name',    value: val('diy-name') },
-        { label: 'Address', value: (val('diy-address') || 'yourname') + '.postmarq' },
-        { label: 'Email',   value: val('diy-email') },
-      ];
-      if (mode === 'business') return [
-        { label: 'Path',         value: 'Business (paid)' },
-        { label: 'Business',     value: val('biz-name') },
-        { label: 'Address',      value: (val('biz-address') || 'yourname') + '.postmarq' },
-        { label: 'Tagline',      value: val('biz-tagline') },
-        { label: 'Neighborhood', value: val('biz-neighborhood') },
-        { label: 'Email',        value: val('biz-email') },
-      ];
-      if (mode === 'builder-ai') return [
-        { label: 'Path',    value: 'Builder — AI Mode' },
-        { label: 'Name',    value: val('ai-name') },
-        { label: 'Address', value: (val('ai-address') || 'yourname') + '.postmarq' },
-        { label: 'Prompt',  value: truncate(val('ai-prompt'), 60) },
-      ];
-      if (mode === 'builder-code') return [
-        { label: 'Path',    value: 'Builder — Code Mode' },
-        { label: 'Name',    value: val('code-name') },
-        { label: 'Address', value: (val('code-address') || 'yourname') + '.postmarq' },
-        { label: 'Email',   value: val('code-email') },
-      ];
-      return [];
-    }
+  function buildSummaryRows(mode) {
+    if (mode === 'guided') return [
+      { label: 'Path',    value: 'Personal — Guided' },
+      { label: 'Name',    value: val('guided-name') },
+      { label: 'Address', value: (val('guided-address') || 'yourname') + '.postmarq' },
+      { label: 'Bio',     value: val('guided-bio') },
+      { label: 'Vibe',    value: document.querySelector('.vibe-btn.active')?.textContent || '—' },
+    ];
+    if (mode === 'diy') return [
+      { label: 'Path',    value: 'Personal — DIY' },
+      { label: 'Name',    value: val('diy-name') },
+      { label: 'Address', value: (val('diy-address') || 'yourname') + '.postmarq' },
+      { label: 'Email',   value: val('diy-email') },
+    ];
+    if (mode === 'business') return [
+      { label: 'Path',         value: 'Business (paid)' },
+      { label: 'Business',     value: val('biz-name') },
+      { label: 'Address',      value: (val('biz-address') || 'yourname') + '.postmarq' },
+      { label: 'Tagline',      value: val('biz-tagline') },
+      { label: 'Neighborhood', value: val('biz-neighborhood') },
+      { label: 'Email',        value: val('biz-email') },
+    ];
+    if (mode === 'builder-ai') return [
+      { label: 'Path',    value: 'Builder — AI Mode' },
+      { label: 'Name',    value: val('ai-name') },
+      { label: 'Address', value: (val('ai-address') || 'yourname') + '.postmarq' },
+      { label: 'Prompt',  value: truncate(val('ai-prompt'), 60) },
+    ];
+    return [
+      { label: 'Path',    value: 'Builder — Code Mode' },
+      { label: 'Name',    value: val('code-name') },
+      { label: 'Address', value: (val('code-address') || 'yourname') + '.postmarq' },
+      { label: 'Email',   value: val('code-email') },
+    ];
+  }
 
-    function val(id) {
-      return (document.getElementById(id)?.value || '').trim();
-    }
+  function tick() {
+    var now = new Date(), h = now.getHours(), m = now.getMinutes();
+    var ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    document.getElementById('xpClock').textContent = h + ':' + (m < 10 ? '0' : '') + m + ' ' + ampm;
+  }
+  tick(); setInterval(tick, 10000);
+</script>
 
-    function truncate(str, n) {
-      return str.length > n ? str.slice(0, n) + '…' : str;
-    }
-
-    function goBack() {
-      goTo(lastStep3);
-    }
-  </script>
 </body>
 </html>
