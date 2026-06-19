@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reset Password — Postmarq</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --xp-gray: #ECE9D8; --xp-gray-dk: #D4D0C8;
+      --xp-blue-deep: #0A246A; --xp-border-lt: #FFFFFF; --xp-border-dk: #808080;
+      --xp-border-dkk: #404040; --font: 'Tahoma','Arial',sans-serif;
+    }
+    html, body { height: 100%; font-family: var(--font); font-size: 11px; overflow: hidden; }
+    .desktop {
+      width: 100%; height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: url('Login screen.jpg') center center / cover no-repeat;
+    }
+    .xp-window {
+      width: 420px; display: flex; flex-direction: column;
+      border-radius: 8px 8px 4px 4px;
+      box-shadow: 4px 4px 20px rgba(0,0,0,0.55);
+      border: 1px solid #244797; overflow: hidden; position: relative; z-index: 10;
+    }
+    .xp-titlebar {
+      display: flex; align-items: center; gap: 5px;
+      padding: 4px 6px 5px; height: 30px; flex-shrink: 0; user-select: none;
+      background: linear-gradient(180deg, #5896E8 0%, #3A74D8 4%, #1F5FBE 8%, #1A54B2 30%, #1F5FBE 55%, #2870D0 75%, #5A96E8 90%, #C8DCFA 100%);
+      border-bottom: 1px solid #1040A0;
+    }
+    .xp-titlebar-text { flex: 1; font-size: 12px; font-weight: bold; color: white; text-shadow: 1px 1px 2px rgba(0,0,40,0.7); }
+    .xp-tb-btn {
+      width: 21px; height: 21px; font-size: 10px; font-weight: bold;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; border-radius: 3px; border: 1px solid rgba(255,255,255,0.5);
+      background: linear-gradient(180deg, #F87070 0%, #D84040 30%, #C83030 50%, #D84040 100%);
+      color: white;
+    }
+    .xp-body { background: var(--xp-gray); padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; }
+    .xp-form-title {
+      font-size: 13px; font-weight: bold; color: var(--xp-blue-deep);
+      padding-bottom: 0.5rem; border-bottom: 1px solid var(--xp-border-dk);
+    }
+    .xp-field { display: flex; flex-direction: column; gap: 3px; }
+    .xp-label { font-size: 11px; font-weight: bold; color: #1a1a1a; }
+    .xp-input {
+      width: 100%; padding: 3px 4px;
+      font-family: var(--font); font-size: 11px; color: #1a1a1a; background: white;
+      border: 2px solid; border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk); outline: none;
+    }
+    .xp-input:focus { border-color: #316AC5 var(--xp-border-lt) var(--xp-border-lt) #316AC5; }
+    .xp-error { display: none; font-size: 11px; color: #CC0000; background: #FFF0F0; border: 1px solid #CC8888; padding: 3px 6px; }
+    .xp-error.show { display: block; }
+    .xp-success { display: none; font-size: 11px; color: #006600; background: #F0FFF0; border: 1px solid #88CC88; padding: 3px 6px; }
+    .xp-btn-row { display: flex; gap: 6px; justify-content: flex-end; padding-top: 0.6rem; border-top: 1px solid var(--xp-border-dk); }
+    .xp-btn-primary {
+      min-width: 75px; padding: 4px 10px;
+      font-family: var(--font); font-size: 11px; color: white; font-weight: bold; cursor: pointer;
+      background: linear-gradient(180deg, #6AAAF8 0%, #4A88E8 25%, #2A68D0 50%, #3A78DC 75%, #6AAAF8 100%);
+      border: 2px solid; border-color: #8ABCFA #1040A0 #1040A0 #8ABCFA;
+      box-shadow: 1px 1px 0 #0A2470; text-shadow: 0 1px 1px rgba(0,0,80,0.5);
+    }
+    .xp-statusbar {
+      background: var(--xp-gray-dk); border-top: 1px solid var(--xp-border-dk); padding: 2px 6px;
+    }
+    .xp-status-panel {
+      font-size: 10px; color: #444; border: 1px solid;
+      border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk);
+      padding: 1px 6px; display: inline-block;
+    }
+    .xp-taskbar {
+      position: fixed; bottom: 0; left: 0; right: 0; height: 34px;
+      display: flex; align-items: center; z-index: 100; padding: 0 4px; gap: 6px;
+      background: linear-gradient(180deg, #2E6FBE 0%, #1850A4 30%, #1A54A8 55%, #2E6FBE 90%);
+      border-top: 1px solid #5898E8;
+    }
+    .xp-start-btn {
+      height: 28px; padding: 0 12px 0 8px; display: flex; align-items: center; gap: 5px;
+      border-radius: 0 14px 14px 0; border: 1px solid #1A6A18; border-left: none;
+      background: linear-gradient(180deg, #60C840 0%, #30980E 50%, #60C840 100%);
+      color: white; font-family: var(--font); font-size: 13px; font-weight: bold;
+      font-style: italic; cursor: pointer; text-shadow: 0 1px 2px rgba(0,60,0,0.6);
+    }
+    .xp-taskbar-item {
+      height: 24px; min-width: 140px; padding: 0 8px; display: flex; align-items: center; gap: 5px;
+      font-size: 11px; font-weight: bold; color: white;
+      background: linear-gradient(180deg, #1A50A0 0%, #2468C0 50%, #1A50A0 100%);
+      border: 1px solid; border-color: #1848A0 #3878D0 #3878D0 #1848A0; border-radius: 2px;
+      text-shadow: 0 1px 1px rgba(0,0,60,0.5);
+    }
+    .xp-tray { margin-left: auto; padding: 0 8px; }
+    .xp-clock { font-size: 11px; color: white; }
+  </style>
+</head>
+<body>
+<div class="desktop">
+  <div class="xp-window">
+    <div class="xp-titlebar">
+      <span style="font-size:14px">🔑</span>
+      <span class="xp-titlebar-text">Postmarq — Reset Password</span>
+      <button class="xp-tb-btn" onclick="window.location.href='/'">&#10005;</button>
+    </div>
+
+    <div class="xp-body">
+      <div class="xp-form-title">Choose a new password</div>
+
+      <div id="loadingMsg" style="font-size:11px;color:#555;">Verifying your reset link...</div>
+
+      <form id="resetForm" novalidate style="display:none;flex-direction:column;gap:0.65rem;">
+        <div class="xp-field">
+          <label class="xp-label" for="newPass">New password:</label>
+          <input class="xp-input" type="password" id="newPass" autocomplete="new-password" />
+        </div>
+        <div class="xp-field">
+          <label class="xp-label" for="confirmPass">Confirm password:</label>
+          <input class="xp-input" type="password" id="confirmPass" autocomplete="new-password" />
+        </div>
+        <div class="xp-error" id="resetError"></div>
+        <div class="xp-success" id="resetSuccess">Password updated. Signing you in...</div>
+        <div class="xp-btn-row">
+          <button type="submit" class="xp-btn-primary" id="resetBtn">Set Password</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="xp-statusbar">
+      <span class="xp-status-panel" id="statusText">Ready</span>
+    </div>
+  </div>
+</div>
+
+<div class="xp-taskbar">
+  <button class="xp-start-btn">🪟 start</button>
+  <div class="xp-taskbar-item">🔑 &nbsp;Reset Password</div>
+  <div class="xp-tray"><span class="xp-clock" id="xpClock"></span></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const sb = supabase.createClient(
+    'https://vzvgqkxhhjubylojhohn.supabase.co',
+    'sb_publishable_JFEpFZi63RZja2WorNkBdQ_L3E4mZ6q'
+  );
+
+  // Supabase puts the session tokens in the URL hash after redirect
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'PASSWORD_RECOVERY') {
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('resetForm').style.display = 'flex';
+      document.getElementById('statusText').textContent = 'Enter your new password.';
+    }
+  });
+
+  document.getElementById('resetForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    var newPass     = document.getElementById('newPass').value;
+    var confirmPass = document.getElementById('confirmPass').value;
+    var errEl       = document.getElementById('resetError');
+    var okEl        = document.getElementById('resetSuccess');
+    var btn         = document.getElementById('resetBtn');
+    errEl.classList.remove('show');
+
+    if (newPass.length < 6) {
+      errEl.textContent = 'Password must be at least 6 characters.';
+      errEl.classList.add('show'); return;
+    }
+    if (newPass !== confirmPass) {
+      errEl.textContent = 'Passwords do not match.';
+      errEl.classList.add('show'); return;
+    }
+
+    btn.disabled = true; btn.textContent = 'Saving...';
+    document.getElementById('statusText').textContent = 'Updating password...';
+
+    var { data, error } = await sb.auth.updateUser({ password: newPass });
+    if (error) {
+      errEl.textContent = error.message;
+      errEl.classList.add('show');
+      btn.disabled = false; btn.textContent = 'Set Password';
+      document.getElementById('statusText').textContent = 'Error.';
+    } else {
+      okEl.style.display = 'block';
+      document.getElementById('statusText').textContent = 'Password updated!';
+      // Look up username and redirect to their Post
+      setTimeout(async function() {
+        var { data: post } = await sb.from('posts').select('username').eq('user_id', data.user.id).single();
+        if (post && post.username) {
+          window.location.replace('https://' + post.username + '.postmarq.org');
+        } else {
+          window.location.replace('/');
+        }
+      }, 1500);
+    }
+  });
+
+  function tick() {
+    var now = new Date(), h = now.getHours(), m = now.getMinutes();
+    var ampm = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
+    document.getElementById('xpClock').textContent = h + ':' + (m < 10 ? '0' : '') + m + ' ' + ampm;
+  }
+  tick(); setInterval(tick, 10000);
+</script>
+</body>
+</html>
