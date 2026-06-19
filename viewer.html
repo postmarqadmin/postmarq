@@ -8,7 +8,6 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: Tahoma, Arial, sans-serif; background: #ECE9D8; min-height: 100vh; }
 
-    /* ── Loading / error states ── */
     .state {
       display: flex; flex-direction: column; align-items: center;
       justify-content: center; min-height: 100vh; gap: 1rem;
@@ -22,13 +21,11 @@
       border-color: #fff #808080 #808080 #fff;
     }
 
-    /* ── User Post renders here ── */
     #post-root { min-height: 100vh; }
 
-    /* ── Edit mode toolbar ── */
+    /* ── Edit toolbar ── */
     #edit-toolbar {
-      display: none;
-      position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+      display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
       background: linear-gradient(180deg, #5896E8 0%, #1A54B2 50%, #2870D0 100%);
       border-bottom: 2px solid #1040A0;
       padding: 4px 10px; gap: 8px; align-items: center;
@@ -51,18 +48,37 @@
     .tb-spacer { flex: 1; }
     .tb-status { font-size: 10px; opacity: 0.8; font-style: italic; }
 
-    /* ── Code editor panel ── */
+    /* ── Room nav (owner only) ── */
+    #room-nav {
+      display: none; position: fixed; top: 36px; left: 0; right: 0; z-index: 9998;
+      background: #DDD9C8; border-bottom: 1px solid #808080;
+      padding: 3px 10px; gap: 4px; align-items: center; flex-wrap: wrap;
+      font-family: Tahoma, Arial, sans-serif; font-size: 11px;
+    }
+    #room-nav.visible { display: flex; }
+    .room-tab {
+      padding: 2px 10px; cursor: pointer; font-size: 11px;
+      background: #ECE9D8; border: 2px solid;
+      border-color: #fff #808080 #808080 #fff;
+    }
+    .room-tab.active {
+      background: white; border-color: #808080 #fff #fff #808080;
+      font-weight: bold; color: #0A246A;
+    }
+    .room-tab-add {
+      padding: 2px 8px; cursor: pointer; font-size: 11px; color: #316AC5;
+      background: none; border: 1px dashed #808080;
+    }
+
+    /* ── Code editor ── */
     #editor-panel {
-      display: none;
-      position: fixed; bottom: 0; left: 0; right: 0; z-index: 9998;
-      height: 340px; background: #1E1E1E;
-      border-top: 3px solid #1040A0;
+      display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 9997;
+      height: 320px; background: #1E1E1E; border-top: 3px solid #1040A0;
       flex-direction: column;
     }
     #editor-panel.visible { display: flex; }
     .editor-tabs {
-      display: flex; background: #2D2D2D;
-      border-bottom: 1px solid #1040A0;
+      display: flex; background: #2D2D2D; border-bottom: 1px solid #1040A0;
     }
     .editor-tab {
       padding: 5px 16px; font-size: 11px; font-family: Tahoma, Arial, sans-serif;
@@ -70,10 +86,7 @@
     }
     .editor-tab.active { background: #1E1E1E; color: white; border-bottom: 2px solid #4A88E8; }
     .editor-panes { flex: 1; position: relative; }
-    .editor-pane {
-      display: none; width: 100%; height: 100%;
-      position: absolute; top: 0; left: 0;
-    }
+    .editor-pane { display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
     .editor-pane.active { display: block; }
     .editor-pane textarea {
       width: 100%; height: 100%; padding: 10px;
@@ -85,31 +98,29 @@
 </head>
 <body>
 
-<!-- Edit toolbar (owner only) -->
 <div id="edit-toolbar">
   <span>✏️ Edit Mode</span>
   <button class="tb-btn" onclick="toggleEditor()">Code Editor</button>
-  <button class="tb-btn" onclick="savePost()">Save</button>
-  <button class="tb-btn danger" onclick="exitEditMode()">Exit Edit</button>
+  <button class="tb-btn" onclick="saveContent()">Save</button>
+  <button class="tb-btn" onclick="addRoom()">+ New Room</button>
+  <button class="tb-btn danger" onclick="exitEditMode()">Exit</button>
   <div class="tb-spacer"></div>
   <span class="tb-status" id="saveStatus"></span>
-  <span style="opacity:0.7">Viewing as: <strong id="viewingAs"></strong></span>
 </div>
 
-<!-- Post content -->
+<div id="room-nav"></div>
 <div id="post-root"></div>
 
-<!-- Code editor -->
 <div id="editor-panel">
   <div class="editor-tabs">
-    <div class="editor-tab active" onclick="switchTab('html')">HTML</div>
-    <div class="editor-tab" onclick="switchTab('css')">CSS</div>
-    <div class="editor-tab" onclick="switchTab('js')">JS</div>
+    <div class="editor-tab active" onclick="switchTab('html', this)">HTML</div>
+    <div class="editor-tab" onclick="switchTab('css', this)">CSS</div>
+    <div class="editor-tab" onclick="switchTab('js', this)">JS</div>
   </div>
   <div class="editor-panes">
-    <div class="editor-pane active" id="pane-html"><textarea id="code-html" placeholder="<!-- Your HTML here -->"></textarea></div>
-    <div class="editor-pane" id="pane-css"><textarea id="code-css" placeholder="/* Your CSS here */"></textarea></div>
-    <div class="editor-pane" id="pane-js"><textarea id="code-js" placeholder="// Your JS here"></textarea></div>
+    <div class="editor-pane active" id="pane-html"><textarea id="code-html" placeholder="<!-- Paste your HTML here -->"></textarea></div>
+    <div class="editor-pane" id="pane-css"><textarea id="code-css" placeholder="/* CSS here */"></textarea></div>
+    <div class="editor-pane" id="pane-js"><textarea id="code-js" placeholder="// JS here"></textarea></div>
   </div>
 </div>
 
@@ -119,12 +130,11 @@
   const SUPABASE_KEY = 'sb_publishable_JFEpFZi63RZja2WorNkBdQ_L3E4mZ6q';
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  const DEFAULT_HTML = `
+  const DEFAULT_POST_HTML = `
 <style>
   body { font-family: Tahoma, Arial, sans-serif; background: #ECE9D8; margin: 0; padding: 2rem; }
-  .post-header { max-width: 680px; margin: 0 auto 2rem; }
-  .post-name { font-size: 28px; font-weight: bold; color: #0A246A; }
-  .post-bio  { font-size: 13px; color: #555; margin-top: 0.4rem; }
+  .post-name { font-size: 28px; font-weight: bold; color: #0A246A; max-width: 680px; margin: 0 auto 0.4rem; }
+  .post-bio  { font-size: 13px; color: #555; max-width: 680px; margin: 0 auto 2rem; }
   .post-card {
     max-width: 680px; margin: 0 auto; padding: 1.5rem;
     background: white; border: 2px solid;
@@ -133,132 +143,183 @@
   }
   .post-card h2 { font-size: 14px; color: #0A246A; margin-bottom: 0.75rem; }
   .stamp-row { display: flex; gap: 0.5rem; margin-top: 1rem; }
-  .stamp {
-    padding: 4px 12px; font-size: 11px; cursor: pointer;
-    background: #ECE9D8; border: 2px solid;
-    border-color: #fff #808080 #808080 #fff;
-  }
-  .stamp:active { border-color: #808080 #fff #fff #808080; }
+  .stamp { padding: 4px 12px; font-size: 11px; cursor: pointer; background: #ECE9D8; border: 2px solid; border-color: #fff #808080 #808080 #fff; }
 </style>
-<div class="post-header">
-  <div class="post-name" id="post-username">Your Post</div>
-  <div class="post-bio">Welcome to my corner of the internet.</div>
-</div>
+<div class="post-name" id="post-username">Your Post</div>
+<div class="post-bio">Welcome to my place on the internet.</div>
 <div class="post-card">
   <h2>Hello, neighbor.</h2>
-  <p>This is my Post. It's a place I built, decorated, and share on my own terms.
-  Edit this page to make it yours — paste in code from Claude, write it yourself, or remix it any way you like.</p>
+  <p>This is my Post. Edit this page to make it yours — paste in code, write it yourself, or remix it any way you like.</p>
   <div class="stamp-row">
     <button class="stamp">📮 Stamp</button>
     <button class="stamp">🔁 Loop</button>
   </div>
 </div>`;
 
+  const DEFAULT_ROOM_HTML = (roomName) => `
+<style>
+  body { font-family: Tahoma, Arial, sans-serif; background: #ECE9D8; margin: 0; padding: 2rem; }
+  .room-title { font-size: 22px; font-weight: bold; color: #0A246A; max-width: 680px; margin: 0 auto 1.5rem; text-transform: capitalize; }
+  .room-card { max-width: 680px; margin: 0 auto; padding: 1.5rem; background: white; border: 2px solid; border-color: #fff #808080 #808080 #fff; font-size: 13px; color: #333; line-height: 1.6; }
+</style>
+<div class="room-title">${roomName}</div>
+<div class="room-card">
+  <p>This is your ${roomName}. Make it whatever you want — paste in code from Claude, write it yourself, or start fresh.</p>
+</div>`;
+
   let username = '';
+  let currentRoom = null; // null = main post
   let postData = null;
+  let roomsData = [];
   let isOwner = false;
-  let editMode = false;
+  let currentContent = { html: '', css: '', js: '' };
 
   async function init() {
     const host = window.location.hostname;
-    // Extract username from subdomain
+
+    // If root domain, go to login
+    if (host === 'postmarq.org' || host === 'www.postmarq.org') {
+      window.location.replace('/');
+      return;
+    }
+
     const parts = host.split('.');
-    if (parts.length < 3) {
-      showError('No Post found at this address.');
-      return;
-    }
+    if (parts.length < 3) { showError('No Post found.'); return; }
     username = parts[0];
-    document.title = username + '.postmarq.org';
 
-    // Fetch post from Supabase
-    const { data, error } = await sb
-      .from('posts')
-      .select('*')
-      .eq('username', username)
-      .single();
+    // Read room from path: /living-room → "living-room"
+    const path = window.location.pathname.replace(/^\//, '').replace(/\/$/, '');
+    currentRoom = path || null;
 
-    if (error || !data) {
-      showNotFound();
-      return;
+    document.title = username + (currentRoom ? '/' + currentRoom : '') + ' — Postmarq';
+
+    // Fetch main post
+    const { data: post, error } = await sb.from('posts').select('*').eq('username', username).single();
+    if (error || !post) { showNotFound(); return; }
+    postData = post;
+
+    // Fetch all rooms
+    const { data: rooms } = await sb.from('rooms').select('*').eq('username', username);
+    roomsData = rooms || [];
+
+    // Render content
+    if (currentRoom) {
+      const room = roomsData.find(r => r.room_name === currentRoom);
+      if (!room) { showRoomNotFound(); return; }
+      currentContent = { html: room.html || DEFAULT_ROOM_HTML(currentRoom), css: room.css || '', js: room.js || '' };
+    } else {
+      currentContent = { html: post.html || DEFAULT_POST_HTML, css: post.css || '', js: post.js || '' };
     }
+    renderContent(currentContent, post.display_name || username);
 
-    postData = data;
-    renderPost(data);
-
-    // Check if logged-in user owns this Post
+    // Check ownership
     const { data: { session } } = await sb.auth.getSession();
-    if (session && session.user.id === data.user_id) {
+    if (session && session.user.id === post.user_id) {
       isOwner = true;
-      enterEditMode();
+      showEditUI();
     }
   }
 
-  function renderPost(data) {
+  function renderContent(content, displayName) {
     const root = document.getElementById('post-root');
-    const html = data.html || DEFAULT_HTML;
-    const css  = data.css  || '';
-    const js   = data.js   || '';
-
-    let content = '';
-    if (css) content += `<style>${css}</style>`;
-    content += html;
-    if (js)  content += `<script>${js}<\/script>`;
-    root.innerHTML = content;
-
-    // Inject display name if placeholder present
+    let out = '';
+    if (content.css) out += `<style>${content.css}</style>`;
+    out += content.html || '';
+    if (content.js)  out += `<script>${content.js}<\/script>`;
+    root.innerHTML = out;
     const nameEl = document.getElementById('post-username');
-    if (nameEl) nameEl.textContent = data.display_name || username;
+    if (nameEl) nameEl.textContent = displayName;
   }
 
-  function enterEditMode() {
-    editMode = true;
-    document.getElementById('edit-toolbar').classList.add('visible');
-    document.getElementById('viewingAs').textContent = username + '.postmarq.org';
-    document.getElementById('code-html').value = postData.html || DEFAULT_HTML;
-    document.getElementById('code-css').value  = postData.css  || '';
-    document.getElementById('code-js').value   = postData.js   || '';
-    document.body.style.paddingTop = '36px';
+  function showEditUI() {
+    const toolbar = document.getElementById('edit-toolbar');
+    toolbar.classList.add('visible');
+
+    // Build room nav
+    const nav = document.getElementById('room-nav');
+    nav.classList.add('visible');
+    buildRoomNav();
+
+    // Load editor with current content
+    document.getElementById('code-html').value = currentContent.html;
+    document.getElementById('code-css').value  = currentContent.css;
+    document.getElementById('code-js').value   = currentContent.js;
+
+    document.body.style.paddingTop = '60px';
+  }
+
+  function buildRoomNav() {
+    const nav = document.getElementById('room-nav');
+    const base = 'https://' + username + '.postmarq.org';
+    let html = `<a class="room-tab ${!currentRoom ? 'active' : ''}" href="${base}">Home</a>`;
+    roomsData.forEach(r => {
+      html += `<a class="room-tab ${currentRoom === r.room_name ? 'active' : ''}" href="${base}/${r.room_name}">${r.room_name}</a>`;
+    });
+    html += `<button class="room-tab-add" onclick="addRoom()">+ room</button>`;
+    nav.innerHTML = html;
   }
 
   function exitEditMode() {
     document.getElementById('edit-toolbar').classList.remove('visible');
+    document.getElementById('room-nav').classList.remove('visible');
     document.getElementById('editor-panel').classList.remove('visible');
     document.body.style.paddingTop = '';
-    editMode = false;
+    document.body.style.paddingBottom = '';
   }
 
   function toggleEditor() {
-    document.getElementById('editor-panel').classList.toggle('visible');
-    document.body.style.paddingBottom =
-      document.getElementById('editor-panel').classList.contains('visible') ? '340px' : '';
+    const panel = document.getElementById('editor-panel');
+    panel.classList.toggle('visible');
+    document.body.style.paddingBottom = panel.classList.contains('visible') ? '320px' : '';
   }
 
-  function switchTab(lang) {
+  function switchTab(lang, el) {
     document.querySelectorAll('.editor-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.editor-pane').forEach(p => p.classList.remove('active'));
-    event.target.classList.add('active');
+    el.classList.add('active');
     document.getElementById('pane-' + lang).classList.add('active');
   }
 
-  async function savePost() {
+  async function saveContent() {
     const status = document.getElementById('saveStatus');
     status.textContent = 'Saving…';
     const html = document.getElementById('code-html').value;
     const css  = document.getElementById('code-css').value;
     const js   = document.getElementById('code-js').value;
 
-    const { error } = await sb.from('posts').update({
-      html, css, js, updated_at: new Date().toISOString()
-    }).eq('username', username);
+    let error;
+    if (currentRoom) {
+      const res = await sb.from('rooms').update({ html, css, js, updated_at: new Date().toISOString() })
+        .eq('username', username).eq('room_name', currentRoom);
+      error = res.error;
+    } else {
+      const res = await sb.from('posts').update({ html, css, js, updated_at: new Date().toISOString() })
+        .eq('username', username);
+      error = res.error;
+    }
 
     if (error) {
       status.textContent = 'Error saving.';
     } else {
-      postData.html = html; postData.css = css; postData.js = js;
-      renderPost(postData);
+      currentContent = { html, css, js };
+      renderContent(currentContent, postData.display_name || username);
       status.textContent = 'Saved ✓';
       setTimeout(() => status.textContent = '', 3000);
     }
+  }
+
+  async function addRoom() {
+    const name = prompt('Room name (e.g. living-room, office, studio):');
+    if (!name) return;
+    const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    if (!slug) return;
+
+    const { data: { session } } = await sb.auth.getSession();
+    const { error } = await sb.from('rooms').insert({
+      user_id: session.user.id, username, room_name: slug, html: '', css: '', js: ''
+    });
+    if (error) { alert('Could not create room: ' + error.message); return; }
+    window.location.href = 'https://' + username + '.postmarq.org/' + slug;
   }
 
   function showNotFound() {
@@ -270,9 +331,17 @@
       </div>`;
   }
 
-  function showError(msg) {
+  function showRoomNotFound() {
     document.getElementById('post-root').innerHTML = `
-      <div class="state"><div class="state-title">${msg}</div></div>`;
+      <div class="state">
+        <div class="state-title">Room not found.</div>
+        <p><strong>${username}.postmarq.org/${currentRoom}</strong> doesn't exist yet.</p>
+        <a href="https://${username}.postmarq.org"><button class="xp-btn">← Back to Post</button></a>
+      </div>`;
+  }
+
+  function showError(msg) {
+    document.getElementById('post-root').innerHTML = `<div class="state"><div class="state-title">${msg}</div></div>`;
   }
 
   init();
