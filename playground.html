@@ -904,13 +904,19 @@
       return;
     }
 
-    // 2. Insert post row
+    // 2. Sign in immediately to ensure session is active before insert
+    const { error: signInError } = await sb.auth.signInWithPassword({ email, password });
+    if (signInError) {
+      document.getElementById('statusText').textContent = 'Account created — please sign in to finish setup.';
+    }
+
+    // 3. Insert post row (now session is guaranteed active)
     const user_id = authData.user.id;
     const { error: postError } = await sb.from('posts').insert({
       user_id, username, display_name, html: '', css: '', js: ''
     });
     if (postError) {
-      document.getElementById('statusText').textContent = 'Account created but post setup failed.';
+      document.getElementById('statusText').textContent = 'Account created but post setup failed: ' + postError.message;
       console.error(postError);
     }
 

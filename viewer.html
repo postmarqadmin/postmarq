@@ -33,6 +33,16 @@
     }
     #edit-toolbar.visible { display: flex; }
     #edit-toolbar span { font-weight: bold; text-shadow: 0 1px 1px rgba(0,0,60,0.5); }
+
+    /* ── Visitor bar (logged in, not owner) ── */
+    #visitor-bar {
+      display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+      background: #DDD9C8; border-bottom: 2px solid #808080;
+      padding: 3px 10px; gap: 8px; align-items: center;
+      font-family: Tahoma, Arial, sans-serif; font-size: 11px; color: #333;
+    }
+    #visitor-bar.visible { display: flex; }
+    .vb-link { color: #316AC5; text-decoration: underline; cursor: pointer; background: none; border: none; font-size: 11px; font-family: Tahoma, Arial, sans-serif; }
     .tb-btn {
       padding: 3px 10px; font-family: Tahoma, Arial, sans-serif; font-size: 11px;
       font-weight: bold; cursor: pointer;
@@ -98,12 +108,21 @@
 </head>
 <body>
 
+<div id="visitor-bar">
+  <span>You're signed in as <strong id="visitorUsername"></strong></span>
+  <div class="tb-spacer"></div>
+  <button class="vb-link" id="myPostLink">Go to my Post</button>
+  &nbsp;·&nbsp;
+  <button class="vb-link" onclick="signOut()">Sign out</button>
+</div>
+
 <div id="edit-toolbar">
   <span>✏️ Edit Mode</span>
   <button class="tb-btn" onclick="toggleEditor()">Code Editor</button>
   <button class="tb-btn" onclick="saveContent()">Save</button>
   <button class="tb-btn" onclick="addRoom()">+ New Room</button>
-  <button class="tb-btn danger" onclick="exitEditMode()">Exit</button>
+  <button class="tb-btn danger" onclick="exitEditMode()">Exit Edit</button>
+  <button class="tb-btn danger" onclick="signOut()">Sign Out</button>
   <div class="tb-spacer"></div>
   <span class="tb-status" id="saveStatus"></span>
 </div>
@@ -214,10 +233,30 @@
 
     // Check ownership
     const { data: { session } } = await sb.auth.getSession();
-    if (session && session.user.id === post.user_id) {
-      isOwner = true;
-      showEditUI();
+    if (session) {
+      if (session.user.id === post.user_id) {
+        isOwner = true;
+        showEditUI();
+      } else {
+        // Logged in but visiting someone else's Post — show visitor bar
+        const { data: myPost } = await sb.from('posts').select('username').eq('user_id', session.user.id).single();
+        const visitorBar = document.getElementById('visitor-bar');
+        visitorBar.classList.add('visible');
+        document.getElementById('visitorUsername').textContent = myPost?.username || session.user.email;
+        const myPostLink = document.getElementById('myPostLink');
+        if (myPost?.username) {
+          myPostLink.onclick = () => window.location.href = 'https://' + myPost.username + '.postmarq.org';
+        } else {
+          myPostLink.style.display = 'none';
+        }
+        document.body.style.paddingTop = '28px';
+      }
     }
+  }
+
+  async function signOut() {
+    await sb.auth.signOut();
+    window.location.reload();
   }
 
   function renderContent(content, displayName) {
