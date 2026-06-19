@@ -8,7 +8,7 @@
     (function() {
       var h = window.location.hostname;
       if (h !== 'postmarq.org' && h !== 'www.postmarq.org' && h !== 'localhost' && !h.endsWith('vercel.app')) {
-        window.location.replace('/viewer.html');
+        window.location.replace('/viewer.html' + window.location.hash);
       }
     })();
   </script>
@@ -518,7 +518,7 @@
           : '';
         window.location.replace('https://' + data.username + '.postmarq.org' + hash);
       } else {
-        window.location.replace('/viewer.html');
+        window.location.replace('/viewer.html' + window.location.hash);
       }
     }
 
