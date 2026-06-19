@@ -208,7 +208,7 @@
 
     // Read room from path: /living-room → "living-room"
     const path = window.location.pathname.replace(/^\//, '').replace(/\/$/, '');
-    currentRoom = path || null;
+    currentRoom = (path === '' || path === 'viewer.html' || path === 'index.html') ? null : path;
 
     document.title = username + (currentRoom ? '/' + currentRoom : '') + ' — Postmarq';
 
