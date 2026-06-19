@@ -1621,11 +1621,10 @@
     <div class="site-banner-logo">Postmarq</div>
     <nav class="site-banner-nav">
       <a href="#">home</a>
-      <a href="#">search</a>
-      <a href="#">browse</a>
-      <a href="#">invite</a>
+      <a href="#">townsquare</a>
+      <a href="#">neighborhood</a>
       <a href="#">help</a>
-      <a href="#">logout</a>
+      <a href="#" id="logoutBtn">logout</a>
     </nav>
   </div>
 
@@ -3311,6 +3310,26 @@
       </div>
     </div>
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    (function() {
+      var sb = supabase.createClient(
+        'https://vzvgqkxhhjubylojhohn.supabase.co',
+        'sb_publishable_JFEpFZi63RZja2WorNkBdQ_L3E4mZ6q'
+      );
+
+      sb.auth.getSession().then(function(r) {
+        if (!r.data.session) window.location.replace('login.html');
+      });
+
+      document.getElementById('logoutBtn').addEventListener('click', async function(e) {
+        e.preventDefault();
+        await sb.auth.signOut();
+        window.location.href = 'login.html';
+      });
+    })();
+  </script>
 
 </body>
 </html>

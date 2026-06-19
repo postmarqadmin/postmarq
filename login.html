@@ -3,193 +3,523 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Log In — Postmarq</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet" />
+  <title>Sign in — Postmarq</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --glass-white:  rgba(255, 255, 255, 0.52);
-      --glass-border: rgba(255, 255, 255, 0.75);
-      --glass-shadow: 0 8px 32px rgba(120, 80, 40, 0.10), 0 2px 8px rgba(120,80,40,0.07);
-      --amber:        #e8992a;
-      --amber-light:  #f5c462;
-      --ink:          #26180e;
-      --ink-2:        #5a3e28;
-      --font:         'Nunito', sans-serif;
+      --xp-gray:       #ECE9D8;
+      --xp-gray-dark:  #D4D0C8;
+      --xp-blue-deep:  #0A246A;
+      --xp-blue-mid:   #2268D0;
+      --xp-blue-light: #A6CAF0;
+      --xp-border-lt:  #FFFFFF;
+      --xp-border-dk:  #808080;
+      --xp-border-dkk: #404040;
+      --font: 'Tahoma', 'Arial', sans-serif;
     }
 
-    body {
+    html, body {
+      height: 100%; width: 100%;
       font-family: var(--font);
-      min-height: 100vh;
+      font-size: 11px;
+      overflow: hidden;
+    }
+
+    /* ── Desktop ── */
+    .desktop {
+      width: 100%; height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+      background: url('Login screen.jpg') center center / cover no-repeat;
+    }
+
+    /* ── XP Window ── */
+    .xp-window {
+      width: 540px;
+      display: flex; flex-direction: column;
+      border-radius: 8px 8px 4px 4px;
+      box-shadow: 4px 4px 20px rgba(0,0,0,0.55), 1px 1px 0 rgba(255,255,255,0.3) inset;
+      border: 1px solid #244797;
+      overflow: hidden;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* ── Title Bar ── */
+    .xp-titlebar {
       display: flex;
       align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #f5d5a0 0%, #e8aa60 40%, #c87840 100%);
-      background-attachment: fixed;
-      padding: 2rem;
+      gap: 5px;
+      padding: 4px 6px 5px;
+      height: 30px;
+      flex-shrink: 0;
+      user-select: none;
+      background:
+        linear-gradient(180deg,
+          #5896E8 0%, #3A74D8 4%,
+          #1F5FBE 8%, #1A54B2 30%,
+          #1F5FBE 55%, #2870D0 75%,
+          #5A96E8 90%, #C8DCFA 100%
+        );
+      border-bottom: 1px solid #1040A0;
     }
 
-    .card {
-      background: var(--glass-white);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--glass-border);
-      box-shadow: var(--glass-shadow);
-      border-radius: 20px;
-      padding: 2.5rem;
-      width: 100%;
-      max-width: 420px;
+    .xp-titlebar-icon {
+      width: 16px; height: 16px;
+      font-size: 14px; line-height: 1; flex-shrink: 0;
     }
 
-    .logo {
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--ink);
+    .xp-titlebar-text {
+      flex: 1;
+      font-size: 12px; font-weight: bold;
+      color: white;
+      text-shadow: 1px 1px 2px rgba(0,0,40,0.7);
+      letter-spacing: 0.01em;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* ── Title Bar Buttons ── */
+    .xp-titlebar-btns { display: flex; gap: 2px; flex-shrink: 0; }
+
+    .xp-tb-btn {
+      width: 21px; height: 21px;
+      font-size: 10px; font-weight: bold; font-family: 'Marlett', 'Arial', sans-serif;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; border-radius: 3px;
+      border: 1px solid rgba(255,255,255,0.5);
+      background: linear-gradient(180deg, #6AAAF8 0%, #4A8AE8 30%, #3A78D8 50%, #4A8AE8 100%);
+      color: white;
+      text-shadow: 0 1px 1px rgba(0,0,60,0.5);
+    }
+
+    .xp-tb-btn:hover {
+      background: linear-gradient(180deg, #8ABCFA 0%, #6AAAF0 30%, #5A9AE8 50%, #6AAAF0 100%);
+    }
+
+    .xp-tb-btn.close {
+      background: linear-gradient(180deg, #F87070 0%, #D84040 30%, #C83030 50%, #D84040 100%);
+    }
+    .xp-tb-btn.close:hover {
+      background: linear-gradient(180deg, #FA9090 0%, #E85050 30%, #D84040 50%, #E85050 100%);
+    }
+
+    /* ── Window Body ── */
+    .xp-body {
+      display: flex;
+      background: var(--xp-gray);
+      flex: 1;
+    }
+
+    /* ── Left Sidebar ── */
+    .xp-sidebar {
+      width: 160px;
+      flex-shrink: 0;
+      padding: 1.25rem 1rem;
+      display: flex; flex-direction: column; gap: 0.75rem;
+      background: linear-gradient(180deg, #2060C8 0%, #1848A8 40%, #1040A0 100%);
+      border-right: 2px solid #1040A0;
+    }
+
+    .xp-sidebar-logo {
+      font-size: 22px; font-weight: bold;
+      color: white;
+      text-shadow: 0 1px 4px rgba(0,0,60,0.5);
+      letter-spacing: -0.5px;
       margin-bottom: 0.25rem;
     }
 
-    .subtitle {
-      font-size: 0.85rem;
-      color: var(--ink-2);
-      margin-bottom: 2rem;
+    .xp-sidebar-tag {
+      font-size: 10px;
+      color: rgba(200,220,255,0.85);
+      line-height: 1.5;
     }
 
-    label {
-      display: block;
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--ink-2);
-      margin-bottom: 0.4rem;
-      margin-top: 1rem;
+    .xp-sidebar-divider {
+      height: 1px;
+      background: rgba(255,255,255,0.2);
+      margin: 0.5rem 0;
     }
 
-    input {
+    .xp-sidebar-tip {
+      font-size: 9px;
+      color: rgba(180,210,255,0.7);
+      line-height: 1.5;
+      font-style: italic;
+    }
+
+    /* ── Form Area ── */
+    .xp-form-area {
+      flex: 1;
+      padding: 1.1rem 1.25rem;
+      display: flex; flex-direction: column; gap: 0.7rem;
+    }
+
+    .xp-form-title {
+      font-size: 13px; font-weight: bold;
+      color: var(--xp-blue-deep);
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--xp-border-dk);
+      margin-bottom: 0.2rem;
+    }
+
+    .xp-field { display: flex; flex-direction: column; gap: 3px; }
+
+    .xp-label {
+      font-size: 11px; font-weight: bold;
+      color: #1a1a1a;
+    }
+
+    .xp-input {
       width: 100%;
-      padding: 0.75rem 1rem;
-      border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.75);
-      background: rgba(255,255,255,0.6);
-      font-family: var(--font);
-      font-size: 0.9rem;
-      color: var(--ink);
+      padding: 3px 4px;
+      font-family: var(--font); font-size: 11px; color: #1a1a1a;
+      background: white;
+      border: 2px solid;
+      border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk);
       outline: none;
-      transition: border 0.2s;
+    }
+    .xp-input:focus {
+      border-color: #316AC5 var(--xp-border-lt) var(--xp-border-lt) #316AC5;
     }
 
-    input:focus { border-color: var(--amber); }
-
-    button {
-      width: 100%;
-      margin-top: 1.5rem;
-      padding: 0.85rem;
-      background: linear-gradient(135deg, var(--amber-light), var(--amber));
-      border: none;
-      border-radius: 10px;
-      font-family: var(--font);
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: white;
+    .xp-checkbox-row {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .xp-checkbox {
+      width: 13px; height: 13px;
       cursor: pointer;
-      transition: opacity 0.2s;
+      accent-color: #316AC5;
     }
+    .xp-checkbox-label { font-size: 11px; color: #1a1a1a; cursor: pointer; }
 
-    button:hover { opacity: 0.9; }
-    button:disabled { opacity: 0.6; cursor: not-allowed; }
-
-    .message {
-      margin-top: 1rem;
-      padding: 0.75rem 1rem;
-      border-radius: 10px;
-      font-size: 0.85rem;
-      font-weight: 600;
+    .xp-error {
       display: none;
+      font-size: 11px; color: #CC0000;
+      background: #FFF0F0;
+      border: 1px solid #CC8888;
+      padding: 3px 6px;
+    }
+    .xp-error.show { display: block; }
+
+    /* ── XP Buttons ── */
+    .xp-btn-row {
+      display: flex; gap: 6px;
+      justify-content: flex-end;
+      margin-top: 0.3rem;
+      padding-top: 0.6rem;
+      border-top: 1px solid var(--xp-border-dk);
     }
 
-    .message.error {
-      background: rgba(200,92,58,0.12);
-      color: #a03820;
-      border: 1px solid rgba(200,92,58,0.30);
-      display: block;
-    }
-
-    .signup-link {
+    .xp-btn {
+      min-width: 75px;
+      padding: 4px 10px;
+      font-family: var(--font); font-size: 11px; color: #1a1a1a;
+      cursor: pointer;
+      background: linear-gradient(180deg, #F8F6F2 0%, #ECE9D8 50%, #DDD9C8 100%);
+      border: 2px solid;
+      border-color: var(--xp-border-lt) var(--xp-border-dk) var(--xp-border-dk) var(--xp-border-lt);
+      box-shadow: 1px 1px 0 var(--xp-border-dkk);
       text-align: center;
-      margin-top: 1.5rem;
-      font-size: 0.82rem;
-      color: var(--ink-2);
+    }
+    .xp-btn:hover {
+      background: linear-gradient(180deg, #FFFFF8 0%, #F4F2E8 50%, #EAE8D8 100%);
+    }
+    .xp-btn:active {
+      border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk);
+      padding: 5px 9px 3px 11px;
     }
 
-    .signup-link a {
-      color: var(--amber);
-      font-weight: 700;
-      text-decoration: none;
+    .xp-btn-primary {
+      min-width: 75px;
+      padding: 4px 10px;
+      font-family: var(--font); font-size: 11px; color: white;
+      font-weight: bold; cursor: pointer;
+      background: linear-gradient(180deg, #6AAAF8 0%, #4A88E8 25%, #2A68D0 50%, #3A78DC 75%, #6AAAF8 100%);
+      border: 2px solid;
+      border-color: #8ABCFA #1040A0 #1040A0 #8ABCFA;
+      box-shadow: 1px 1px 0 #0A2470;
+      text-align: center;
+      text-shadow: 0 1px 1px rgba(0,0,80,0.5);
+    }
+    .xp-btn-primary:hover {
+      background: linear-gradient(180deg, #8ACAFA 0%, #6AAAF0 25%, #4A88E8 50%, #5A98F0 75%, #8ACAFA 100%);
+    }
+    .xp-btn-primary:active {
+      border-color: #1040A0 #8ABCFA #8ABCFA #1040A0;
+      padding: 5px 9px 3px 11px;
+    }
+    .xp-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* ── Divider link ── */
+    .xp-divider-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 0.4rem 0;
+      border-top: 1px solid var(--xp-border-dk);
+    }
+    .xp-divider-row::after {
+      content: ''; flex: 1; height: 1px; background: var(--xp-gray-dark);
+    }
+
+    .xp-link {
+      font-size: 11px; color: #316AC5; text-decoration: underline; cursor: pointer;
+      background: none; border: none; font-family: var(--font); padding: 0;
+    }
+    .xp-link:hover { color: #D44000; }
+
+    .xp-new-account-row {
+      display: flex; align-items: center; gap: 8px;
+      padding-top: 0.3rem;
+    }
+    .xp-new-account-label { font-size: 11px; color: #1a1a1a; }
+
+    /* ── Status Bar ── */
+    .xp-statusbar {
+      background: var(--xp-gray);
+      border-top: 1px solid var(--xp-border-dk);
+      padding: 2px 6px;
+      display: flex; align-items: center; gap: 1rem;
+      flex-shrink: 0;
+    }
+    .xp-status-panel {
+      font-size: 10px; color: #444;
+      border: 1px solid;
+      border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk);
+      padding: 1px 6px;
+    }
+
+    /* ── Taskbar ── */
+    .xp-taskbar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: 34px;
+      display: flex; align-items: center;
+      z-index: 100;
+      background: linear-gradient(180deg,
+        #2E6FBE 0%, #2060B0 4%,
+        #1A54A8 8%, #1850A4 30%,
+        #1A54A8 55%, #2060B4 75%,
+        #2E6FBE 90%, #5898D8 100%
+      );
+      border-top: 1px solid #5898E8;
+      box-shadow: 0 -1px 0 #0A2470;
+      padding: 0 4px;
+      gap: 6px;
+    }
+
+    /* XP Start Button */
+    .xp-start-btn {
+      height: 28px;
+      padding: 0 12px 0 8px;
+      display: flex; align-items: center; gap: 5px;
+      border-radius: 0 14px 14px 0;
+      border: 1px solid #1A6A18;
+      border-left: none;
+      background: linear-gradient(180deg,
+        #60C840 0%, #40A820 30%,
+        #30980E 50%, #40A820 70%,
+        #60C840 100%
+      );
+      color: white; font-family: var(--font); font-size: 13px;
+      font-weight: bold; font-style: italic;
+      cursor: pointer; flex-shrink: 0;
+      box-shadow: 2px 0 8px rgba(0,120,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+      text-shadow: 0 1px 2px rgba(0,60,0,0.6);
+    }
+    .xp-start-btn:hover {
+      background: linear-gradient(180deg,
+        #78E050 0%, #58C038 30%,
+        #48B028 50%, #58C038 70%,
+        #78E050 100%
+      );
+    }
+    .xp-start-logo {
+      width: 20px; height: 20px; font-size: 18px; line-height: 1;
+    }
+
+    /* Active window in taskbar */
+    .xp-taskbar-item {
+      height: 24px; min-width: 120px; max-width: 180px;
+      display: flex; align-items: center; gap: 5px;
+      padding: 0 8px;
+      font-size: 11px; font-weight: bold; color: white;
+      background: linear-gradient(180deg, #1A50A0 0%, #2468C0 50%, #1A50A0 100%);
+      border: 1px solid;
+      border-color: #1848A0 #3878D0 #3878D0 #1848A0;
+      border-radius: 2px;
+      cursor: default;
+      overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      text-shadow: 0 1px 1px rgba(0,0,60,0.5);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -1px 0 rgba(0,0,0,0.2);
+    }
+
+    /* System tray */
+    .xp-tray {
+      margin-left: auto;
+      display: flex; align-items: center; gap: 8px;
+      height: 26px;
+      padding: 0 8px;
+      background: rgba(0,30,100,0.3);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 2px;
+    }
+    .xp-clock {
+      font-size: 11px; color: white;
+      text-shadow: 0 1px 1px rgba(0,0,60,0.5);
+      font-family: var(--font);
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="logo">Postmarq</div>
-    <div class="subtitle">Welcome back. Your Post is waiting.</div>
 
-    <label for="email">Email</label>
-    <input type="email" id="email" placeholder="you@example.com" />
+  <div class="desktop">
 
-    <label for="password">Password</label>
-    <input type="password" id="password" placeholder="Your password" />
+    <!-- XP Dialog Window -->
+    <div class="xp-window">
 
-    <button id="loginBtn" onclick="logIn()">Log In</button>
+      <div class="xp-titlebar">
+        <div class="xp-titlebar-icon">🌐</div>
+        <span class="xp-titlebar-text">Postmarq — Sign In</span>
+        <div class="xp-titlebar-btns">
+          <button class="xp-tb-btn" title="Minimize">&#8722;</button>
+          <button class="xp-tb-btn" title="Maximize">&#9633;</button>
+          <button class="xp-tb-btn close" title="Close">&#10005;</button>
+        </div>
+      </div>
 
-    <div class="message" id="message"></div>
+      <div class="xp-body">
 
-    <div class="signup-link">
-      New here? <a href="/signup.html">Create your Post</a>
+        <!-- Sidebar -->
+        <div class="xp-sidebar">
+          <div class="xp-sidebar-logo">postmarq</div>
+          <p class="xp-sidebar-tag">Your corner of the internet.</p>
+          <div class="xp-sidebar-divider"></div>
+          <p class="xp-sidebar-tip">Sign in to access your Post, your Quorum, and your Neighborhood.</p>
+        </div>
+
+        <!-- Form -->
+        <div class="xp-form-area">
+          <div class="xp-form-title">Sign in to your Post</div>
+
+          <form id="loginForm" novalidate>
+            <div style="display:flex;flex-direction:column;gap:0.6rem;">
+              <div class="xp-field">
+                <label class="xp-label" for="emailInput">Email address:</label>
+                <input class="xp-input" type="email" id="emailInput" autocomplete="email" />
+              </div>
+
+              <div class="xp-field">
+                <label class="xp-label" for="passInput">Password:</label>
+                <input class="xp-input" type="password" id="passInput" autocomplete="current-password" />
+              </div>
+
+              <div class="xp-checkbox-row">
+                <input class="xp-checkbox" type="checkbox" id="rememberMe" />
+                <label class="xp-checkbox-label" for="rememberMe">Remember me on this computer</label>
+              </div>
+
+              <div class="xp-error" id="errorMsg">The email address or password you entered is incorrect.</div>
+
+              <div class="xp-btn-row">
+                <button type="button" class="xp-btn" onclick="window.location.href='index.html'">Cancel</button>
+                <button type="submit" class="xp-btn-primary" id="signinBtn">Sign In</button>
+              </div>
+            </div>
+          </form>
+
+          <div class="xp-divider-row">
+            <button class="xp-link" type="button">Forgot your password?</button>
+          </div>
+
+          <div class="xp-new-account-row">
+            <span class="xp-new-account-label">Don't have a Post?</span>
+            <button class="xp-btn" style="min-width:unset;padding:3px 10px;" onclick="window.location.href='playground.html'">Claim your Post...</button>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="xp-statusbar">
+        <span class="xp-status-panel" id="statusText">Ready</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- XP Taskbar -->
+  <div class="xp-taskbar">
+    <button class="xp-start-btn">
+      <span class="xp-start-logo">🪟</span>
+      start
+    </button>
+    <div class="xp-taskbar-item">
+      🌐 &nbsp;Postmarq — Sign In
+    </div>
+    <div class="xp-tray">
+      <span class="xp-clock" id="xpClock">12:00 PM</span>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const { createClient } = supabase;
-    const client = createClient(
+    const sb = createClient(
       'https://vzvgqkxhhjubylojhohn.supabase.co',
       'sb_publishable_JFEpFZi63RZja2WorNkBdQ_L3E4mZ6q'
     );
 
-    async function logIn() {
-      const email    = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      const btn      = document.getElementById('loginBtn');
-      const msg      = document.getElementById('message');
+    sb.auth.getSession().then(function(r) {
+      if (r.data.session) window.location.replace('index.html');
+    });
 
-      msg.className = 'message';
-      msg.textContent = '';
+    function tick() {
+      var now = new Date();
+      var h = now.getHours(), m = now.getMinutes();
+      var ampm = h >= 12 ? 'PM' : 'AM';
+      h = h % 12 || 12;
+      document.getElementById('xpClock').textContent =
+        h + ':' + (m < 10 ? '0' : '') + m + ' ' + ampm;
+    }
+    tick();
+    setInterval(tick, 10000);
 
-      if (!email || !password) {
-        msg.className = 'message error';
-        msg.textContent = 'Please enter your email and password.';
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var email   = document.getElementById('emailInput').value.trim();
+      var pass    = document.getElementById('passInput').value;
+      var errEl   = document.getElementById('errorMsg');
+      var btn     = document.getElementById('signinBtn');
+      var status  = document.getElementById('statusText');
+
+      errEl.classList.remove('show');
+
+      if (!email || !pass) {
+        errEl.textContent = 'Please enter your email address and password.';
+        errEl.classList.add('show');
         return;
       }
 
       btn.disabled = true;
-      btn.textContent = 'Logging in...';
+      btn.textContent = 'Signing in...';
+      status.textContent = 'Connecting to Postmarq...';
 
-      const { error } = await client.auth.signInWithPassword({ email, password });
+      var result = await sb.auth.signInWithPassword({ email: email, password: pass });
 
-      if (error) {
-        msg.className = 'message error';
-        msg.textContent = 'Incorrect email or password.';
+      if (result.error) {
+        errEl.textContent = 'The email address or password you entered is incorrect.';
+        errEl.classList.add('show');
         btn.disabled = false;
-        btn.textContent = 'Log In';
+        btn.textContent = 'Sign In';
+        status.textContent = 'Sign in failed.';
       } else {
-        window.location.href = '/my-post.html';
+        status.textContent = 'Success! Loading your Post...';
+        window.location.href = 'index.html';
       }
-    }
+    });
 
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Enter') logIn();
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') document.getElementById('loginForm').requestSubmit();
     });
   </script>
+
 </body>
 </html>
