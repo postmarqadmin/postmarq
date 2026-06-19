@@ -475,8 +475,19 @@
       'sb_publishable_JFEpFZi63RZja2WorNkBdQ_L3E4mZ6q'
     );
 
+    async function redirectToPost(userId) {
+      var host = window.location.hostname;
+      var isLocal = host === 'localhost' || host.endsWith('vercel.app');
+      var { data } = await sb.from('posts').select('username').eq('user_id', userId).single();
+      if (data && data.username && !isLocal) {
+        window.location.replace('https://' + data.username + '.postmarq.org');
+      } else {
+        window.location.replace('/viewer.html');
+      }
+    }
+
     sb.auth.getSession().then(function(r) {
-      if (r.data.session) window.location.replace('post.html');
+      if (r.data.session) redirectToPost(r.data.session.user.id);
     });
 
     function tick() {
@@ -520,7 +531,7 @@
         status.textContent = 'Sign in failed.';
       } else {
         status.textContent = 'Success! Loading your Post...';
-        window.location.href = 'post.html';
+        await redirectToPost(result.data.user.id);
       }
     });
 
