@@ -420,7 +420,7 @@
               <div class="xp-error" id="errorMsg">The email address or password you entered is incorrect.</div>
 
               <div class="xp-btn-row">
-                <button type="button" class="xp-btn" onclick="window.location.href='index.html'">Cancel</button>
+                <button type="button" class="xp-btn" onclick="window.location.href='post.html'">Cancel</button>
                 <button type="submit" class="xp-btn-primary" id="signinBtn">Sign In</button>
               </div>
             </div>
@@ -468,7 +468,7 @@
     );
 
     sb.auth.getSession().then(function(r) {
-      if (r.data.session) window.location.replace('index.html');
+      if (r.data.session) window.location.replace('post.html');
     });
 
     function tick() {
@@ -512,7 +512,7 @@
         status.textContent = 'Sign in failed.';
       } else {
         status.textContent = 'Success! Loading your Post...';
-        window.location.href = 'index.html';
+        window.location.href = 'post.html';
       }
     });
 

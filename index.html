@@ -3,3332 +3,522 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dave Michael — davemichael.postmarq</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
-
+  <title>Sign in — Postmarq</title>
   <style>
-    /* ─── Reset & Base ─── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --glass-white:  rgba(255, 255, 255, 0.52);
-      --glass-border: rgba(255, 255, 255, 0.75);
-      --glass-shadow: 0 8px 32px rgba(120, 80, 40, 0.10), 0 2px 8px rgba(120,80,40,0.07);
-      --glass-inset:  0 1px 0 rgba(255,255,255,0.9) inset;
-
-      --amber:        #e8992a;
-      --amber-light:  #f5c462;
-      --amber-pale:   #fef3d8;
-      --teal:         #4ab5aa;
-      --lavender:     #9b8fd4;
-      --rust:         #c85c3a;
-
-      --ink:   #26180e;
-      --ink-2: #5a3e28;
-      --ink-3: #a07d60;
-      --ink-4: #c9aa90;
-
-      --radius-sm: 10px;
-      --radius-md: 16px;
-      --radius-lg: 22px;
-      --radius-xl: 28px;
-
-      --font: 'Nunito', system-ui, sans-serif;
+      --xp-gray:       #ECE9D8;
+      --xp-gray-dark:  #D4D0C8;
+      --xp-blue-deep:  #0A246A;
+      --xp-blue-mid:   #2268D0;
+      --xp-blue-light: #A6CAF0;
+      --xp-border-lt:  #FFFFFF;
+      --xp-border-dk:  #808080;
+      --xp-border-dkk: #404040;
+      --font: 'Tahoma', 'Arial', sans-serif;
     }
 
-    html { scroll-behavior: smooth; }
-
-    body {
+    html, body {
+      height: 100%; width: 100%;
       font-family: var(--font);
-      color: var(--ink);
-      min-height: 100vh;
-      padding: 0 0 5rem;
-      background:
-        radial-gradient(ellipse at 80% 10%, rgba(195, 160, 255, 0.30) 0%, transparent 52%),
-        radial-gradient(ellipse at 10% 90%, rgba(255, 180, 90,  0.38) 0%, transparent 52%),
-        radial-gradient(ellipse at 55% 55%, rgba(255, 210, 150, 0.18) 0%, transparent 65%),
-        radial-gradient(ellipse at 30% 20%, rgba(160, 210, 255, 0.20) 0%, transparent 45%),
-        linear-gradient(158deg, #ede5f8 0%, #f8ead8 38%, #fdf4e8 62%, #f3e2cc 100%);
-      background-attachment: fixed;
-    }
-
-    .glass {
-      background: var(--glass-white);
-      backdrop-filter: blur(18px) saturate(1.6);
-      -webkit-backdrop-filter: blur(18px) saturate(1.6);
-      border: 1px solid var(--glass-border);
-      box-shadow: var(--glass-shadow), var(--glass-inset);
-    }
-
-    /* ─── Address Bar ─── */
-    .address-bar {
-      position: sticky; top: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: center;
-      padding: 0.65rem 1rem;
-      background: rgba(255,255,255,0.55);
-      backdrop-filter: blur(20px) saturate(1.8);
-      -webkit-backdrop-filter: blur(20px) saturate(1.8);
-      border-bottom: 1px solid rgba(255,255,255,0.6);
-      box-shadow: 0 1px 12px rgba(120,80,40,0.07);
-    }
-    .address-inner {
-      display: flex; align-items: center; gap: 0.55rem;
-      background: rgba(255,255,255,0.6);
-      border: 1px solid rgba(255,255,255,0.8);
-      border-radius: 999px;
-      padding: 0.3rem 1rem 0.3rem 0.75rem;
-      box-shadow: 0 1px 4px rgba(120,80,40,0.06) inset;
-    }
-    .address-dot {
-      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
-      background: linear-gradient(135deg, var(--amber-light), var(--amber));
-    }
-    .address-text {
-      font-size: 0.78rem; font-weight: 500; color: var(--ink-3); letter-spacing: 0.02em;
-    }
-    .address-text strong { color: var(--ink-2); font-weight: 700; }
-
-    /* ─── Page Zones ─── */
-    .zone {
-      width: 100%;
-    }
-    .zone-hero {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 2rem 1.25rem 0;
-    }
-    .zone-feed {
-      max-width: 1400px;
-      margin: 1.25rem auto 0;
-      padding: 0 1.25rem;
-    }
-
-    /* ─── Hero Card ─── */
-    .hero-card { border-radius: var(--radius-xl); overflow: hidden; margin-bottom: 1.25rem; }
-
-    .hero-inner {
-      display: grid;
-      grid-template-columns: 220px 1fr;
-      min-height: 280px;
-    }
-
-    .hero-photo {
-      position: relative; overflow: hidden;
-      background: linear-gradient(165deg, #f5d5a0 0%, #e8aa60 40%, #c87840 100%);
-    }
-    .hero-photo img {
-      width: 100%; height: 100%;
-      object-fit: cover; object-position: center top;
-      display: block;
-    }
-    .hero-photo::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(to right, transparent 60%, rgba(200,180,255,0.12));
-      pointer-events: none;
-    }
-
-    .hero-info {
-      padding: 1.75rem 2rem 1.5rem;
-      display: flex; flex-direction: column; gap: 1rem;
-      background: rgba(255,255,255,0.30);
-    }
-    .hero-top {
-      display: flex; align-items: flex-start;
-      justify-content: space-between; gap: 1rem;
-    }
-    .hero-name {
-      font-size: 2.2rem; font-weight: 800; color: var(--ink);
-      line-height: 1; letter-spacing: -0.02em;
-    }
-    .hero-tagline {
-      font-size: 0.88rem; font-weight: 400; color: var(--ink-2);
-      line-height: 1.5; margin-top: 0.4rem; max-width: 380px;
-    }
-    .location-badge {
-      display: inline-flex; align-items: center; gap: 0.4rem;
-      background: rgba(255,255,255,0.55);
-      border: 1px solid rgba(255,255,255,0.75);
-      border-radius: 999px;
-      padding: 0.35rem 0.85rem;
-      font-size: 0.78rem; font-weight: 600; color: var(--ink-2);
-      white-space: nowrap; flex-shrink: 0;
-    }
-    .location-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); flex-shrink: 0; }
-
-    .tags { display: flex; flex-wrap: wrap; gap: 0.45rem; }
-    .tag {
-      display: inline-flex; align-items: center; gap: 0.3rem;
-      padding: 0.3rem 0.8rem; border-radius: 999px;
-      font-size: 0.78rem; font-weight: 600; letter-spacing: 0.01em;
-      border: 1px solid rgba(255,255,255,0.6); cursor: default;
-      transition: transform 0.15s, box-shadow 0.15s;
-    }
-    .tag:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-    .tag-movies    { background: rgba(155,143,212,0.18); color: #6b5bb8; border-color: rgba(155,143,212,0.35); }
-    .tag-photo     { background: rgba( 74,181,170,0.15); color: #2e8a82; border-color: rgba( 74,181,170,0.35); }
-    .tag-adventure { background: rgba(232,153, 42,0.15); color: #a06010; border-color: rgba(232,153, 42,0.35); }
-    .tag-trixton   { background: rgba(200, 92, 58,0.12); color: #a03820; border-color: rgba(200, 92, 58,0.30); }
-    .tag-phoenix   { background: rgba(255,140, 60,0.14); color: #8a4010; border-color: rgba(255,140, 60,0.32); }
-
-    /* Now Playing */
-    .now-playing {
-      display: flex; align-items: center; gap: 0.75rem;
-      background: rgba(255,255,255,0.45);
-      border: 1px solid rgba(255,255,255,0.7);
-      border-radius: var(--radius-md);
-      padding: 0.65rem 1rem;
-      align-self: flex-start; cursor: default;
-    }
-    .np-art {
-      width: 38px; height: 38px; border-radius: 6px; flex-shrink: 0;
-      background: linear-gradient(135deg, #c8a8e0, #8060c0);
-      display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
-    }
-    .np-text { flex: 1; min-width: 0; }
-    .np-label {
-      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em;
-      text-transform: uppercase; color: var(--ink-4);
-      display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.15rem;
-    }
-    .np-pulse {
-      width: 6px; height: 6px; border-radius: 50%; background: var(--teal);
-      animation: pulse 1.8s ease-in-out infinite;
-    }
-    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
-    .np-song { font-size: 0.82rem; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .np-artist { font-size: 0.72rem; font-weight: 400; color: var(--ink-3); }
-    .np-bars { display: flex; align-items: flex-end; gap: 2px; height: 20px; flex-shrink: 0; }
-    .np-bar { width: 3px; border-radius: 2px; background: var(--lavender); animation: bar-bounce 1.2s ease-in-out infinite; }
-    .np-bar:nth-child(1){height:8px; animation-delay:0s}
-    .np-bar:nth-child(2){height:14px;animation-delay:.15s}
-    .np-bar:nth-child(3){height:10px;animation-delay:.3s}
-    .np-bar:nth-child(4){height:18px;animation-delay:.1s}
-    .np-bar:nth-child(5){height:7px; animation-delay:.25s}
-    @keyframes bar-bounce { 0%,100%{transform:scaleY(.4)} 50%{transform:scaleY(1)} }
-
-    /* ─── Nav Tabs ─── */
-    .nav-tabs {
-      display: flex; border-bottom: 1px solid rgba(255,255,255,0.5);
-      background: rgba(255,255,255,0.20); overflow-x: auto;
-    }
-    .nav-tabs a {
-      padding: 0.75rem 1.3rem;
-      font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em;
-      text-transform: uppercase; text-decoration: none; color: var(--ink-3);
-      white-space: nowrap; border-bottom: 2px solid transparent;
-      transition: color 0.15s, border-color 0.15s;
-    }
-    .nav-tabs a:hover { color: var(--ink); }
-    .nav-tabs a.active { color: var(--ink); border-bottom-color: var(--amber); }
-
-    /* ─── Main Layout ─── */
-    .main-grid {
-      display: grid;
-      grid-template-columns: 280px 1fr 280px;
-      gap: 1.25rem;
-      align-items: start;
-    }
-
-    .left-col  { display: flex; flex-direction: column; gap: 1rem; grid-column: 1; }
-    .feed-col  { display: flex; flex-direction: column; gap: 1rem; grid-column: 2; }
-    .right-col { display: flex; flex-direction: column; gap: 1rem; grid-column: 3; }
-
-    /* 2-col: ≤1299px — right-col wraps under left-col */
-    @media (max-width: 1299px) {
-      .main-grid {
-        grid-template-columns: 280px 1fr;
-        grid-template-rows: auto auto;
-      }
-      .left-col  { grid-column: 1; grid-row: 1; }
-      .feed-col  { grid-column: 2; grid-row: 1 / 3; }
-      .right-col { grid-column: 1; grid-row: 2; }
-    }
-
-    /* 1-col: ≤699px — stacked */
-    @media (max-width: 699px) {
-      .main-grid { grid-template-columns: 1fr; grid-template-rows: unset; }
-      .feed-col  { grid-column: 1; grid-row: unset; order: 1; width: 100%; min-width: 0; }
-      .left-col  { grid-column: 1; grid-row: unset; order: 2; width: 100%; min-width: 0; }
-      .right-col { grid-column: 1; grid-row: unset; order: 3; width: 100%; min-width: 0; }
-      .sidebar-card, .myq-wrap, .myspace-card, .phoenix-card { width: 100%; max-width: 100%; box-sizing: border-box; }
-      .pick-six-grid { padding: 0 0.75rem 1rem; }
-      .candids-scroll-wrap { height: 360px; }
-    }
-
-    /* ─── Posts Column (legacy alias) ─── */
-    .posts-col { display: flex; flex-direction: column; gap: 1rem; }
-
-    .section-header {
-      font-size: 0.68rem; font-weight: 800; letter-spacing: 0.12em;
-      text-transform: uppercase; color: var(--ink-4);
-      display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.15rem;
-    }
-    .section-header::after { content:''; flex:1; height:1px; background:rgba(255,255,255,0.5); }
-
-    /* Composer */
-    .composer { border-radius: var(--radius-lg); padding: 1rem 1.2rem; }
-
-    .composer-header { display: flex; align-items: flex-start; gap: 0.75rem; }
-    .composer-avatar {
-      width: 2.4rem; height: 2.4rem; border-radius: 50%;
-      overflow: hidden; border: 2px solid rgba(255,255,255,0.7); flex-shrink: 0;
-    }
-    .composer-avatar img { width:100%; height:100%; object-fit:cover; object-position:center top; }
-    .composer-right { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.5rem; }
-
-    .composer-textarea {
-      width: 100%;
-      background: rgba(255,255,255,0.45);
-      border: 1.5px solid rgba(255,255,255,0.7);
-      border-radius: var(--radius-sm);
-      padding: 0.55rem 0.9rem;
-      font-family: var(--font); font-size: 0.9rem; font-weight: 500; color: var(--ink);
-      resize: none; min-height: unset; height: auto; overflow: hidden; outline: none;
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-    .composer-textarea:focus {
-      border-color: rgba(155,143,212,0.5);
-      box-shadow: 0 0 0 3px rgba(155,143,212,0.14);
-    }
-    .composer-textarea::placeholder { color: var(--ink-4); font-style: italic; }
-
-    .media-preview-strip { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.6rem; }
-    .media-preview-strip:empty { display: none; }
-    .prev-thumb { position: relative; border-radius: 8px; overflow: hidden; border: 1.5px solid rgba(255,255,255,0.7); }
-    .prev-thumb img, .prev-thumb video { width: 80px; height: 66px; object-fit: cover; display: block; }
-    .prev-remove {
-      position: absolute; top: 3px; right: 3px;
-      width: 18px; height: 18px; border-radius: 50%;
-      background: rgba(0,0,0,0.6); color: white; border: none;
-      font-size: 0.6rem; font-weight: 800; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-    }
-
-    .composer-toolbar {
-      display: flex; align-items: center; gap: 0.5rem;
-      margin-top: 0.56rem; flex-wrap: wrap;
-    }
-    .tool-btn {
-      display: inline-flex; align-items: center; gap: 0.35rem;
-      padding: 0.35rem 0.8rem;
-      background: rgba(255,255,255,0.42);
-      border: 1px solid rgba(255,255,255,0.65);
-      border-radius: 999px;
-      font-family: var(--font); font-size: 0.72rem; font-weight: 700; color: var(--ink-2);
-      cursor: pointer; transition: all 0.14s; white-space: nowrap;
-    }
-    .tool-btn:hover { background: rgba(255,255,255,0.72); transform: translateY(-1px); }
-    .tool-btn:disabled { opacity: 0.38; cursor: not-allowed; transform: none; }
-    .tool-count { font-size: 0.62rem; opacity: 0.65; }
-    .composer-spacer { flex: 1; }
-    .post-btn {
-      background: linear-gradient(135deg, var(--amber-light), var(--amber));
-      color: white; border: none; border-radius: 999px;
-      padding: 0.5rem 1.4rem;
-      font-family: var(--font); font-size: 0.82rem; font-weight: 800; letter-spacing: 0.02em;
-      cursor: pointer;
-      box-shadow: 0 3px 12px rgba(232,153,42,0.32);
-      transition: all 0.18s cubic-bezier(0.34,1.56,0.64,1);
-    }
-    .post-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(232,153,42,0.42); }
-    .post-btn:active { transform: scale(0.97); }
-    .file-input { display: none; }
-
-    /* ── Link Preview Card ── */
-    .link-preview-card {
-      display: flex; gap: 0.7rem; align-items: flex-start;
-      background: rgba(255,255,255,0.5); border: 1.5px solid rgba(255,255,255,0.75);
-      border-radius: var(--radius-sm); overflow: hidden; margin-top: 0.5rem;
-      text-decoration: none; color: inherit;
-      transition: background 0.15s;
-    }
-    .link-preview-card:hover { background: rgba(255,255,255,0.72); }
-    .link-preview-thumb {
-      width: 90px; min-width: 90px; height: 72px;
-      object-fit: cover; display: block;
-    }
-    .link-preview-thumb.yt { width: 112px; min-width: 112px; height: 72px; }
-    .link-preview-info { flex: 1; min-width: 0; padding: 0.5rem 0.6rem 0.5rem 0; display: flex; flex-direction: column; gap: 0.2rem; justify-content: center; }
-    .link-preview-title { font-size: 0.82rem; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .link-preview-desc { font-size: 0.72rem; color: var(--ink-3); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .link-preview-domain { font-size: 0.65rem; font-weight: 700; color: var(--ink-4); text-transform: uppercase; letter-spacing: 0.04em; }
-    .link-preview-remove {
-      align-self: flex-start; margin: 0.35rem 0.5rem 0 0; background: none; border: none;
-      cursor: pointer; font-size: 0.7rem; color: var(--ink-4); opacity: 0.55; padding: 0;
-    }
-    .link-preview-remove:hover { opacity: 1; }
-
-    /* ─── Quorum Post ─── */
-    .post-quorum {
-      border-radius: var(--radius-lg); overflow: hidden; position: relative;
-    }
-    .post-quorum::before {
-      content: ''; position: absolute; inset: 0; border-radius: var(--radius-lg);
-      background: linear-gradient(135deg, rgba(255,210,130,0.25), rgba(232,153,42,0.10));
-      pointer-events: none; z-index: 0;
-    }
-    .post-quorum-inner { position: relative; z-index: 1; padding: 1.5rem 1.75rem; }
-
-    .quorum-badge {
-      display: inline-flex; align-items: center; gap: 0.4rem;
-      background: linear-gradient(135deg, var(--amber-light), var(--amber));
-      color: white; border-radius: 999px;
-      padding: 0.2rem 0.7rem;
-      font-size: 0.62rem; font-weight: 800; letter-spacing: 0.10em; text-transform: uppercase;
-      margin-bottom: 0.9rem;
-      box-shadow: 0 2px 8px rgba(232,153,42,0.35);
-    }
-    .post-body { font-size: 0.95rem; font-weight: 500; line-height: 1.7; color: var(--ink); }
-    .post-body p + p { margin-top: 0.75rem; }
-    .post-quorum .post-body { font-size: 1.05rem; font-weight: 600; }
-
-    /* ─── Regular Post Card ─── */
-    .post-card { border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; }
-
-    .post-footer {
-      display: flex; align-items: center; gap: 1rem; margin-top: 1rem;
-    }
-    .post-date { font-size: 0.72rem; font-weight: 600; color: var(--ink-4); margin-left: auto; }
-
-    .stamp-btn {
-      display: inline-flex; align-items: center; gap: 0.4rem;
-      padding: 0.4rem 0.9rem; border-radius: 999px;
-      border: 1.5px solid rgba(255,255,255,0.7);
-      background: rgba(255,255,255,0.5);
-      font-family: var(--font); font-size: 0.75rem; font-weight: 700; color: var(--ink-2);
-      cursor: pointer; transition: all 0.18s cubic-bezier(0.34,1.56,0.64,1); letter-spacing: 0.02em;
-    }
-    .stamp-btn:hover { background: rgba(255,255,255,0.75); transform: scale(1.04); }
-    .stamp-btn:active { transform: scale(0.96); }
-    .stamp-btn.stamped {
-      background: linear-gradient(135deg, rgba(232,153,42,0.18), rgba(245,196,98,0.22));
-      border-color: rgba(232,153,42,0.5); color: var(--amber);
-    }
-    .stamp-icon { font-size: 0.9rem; transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1); }
-    .stamp-btn:hover .stamp-icon { transform: rotate(-8deg) scale(1.15); }
-    .stamp-btn.stamped .stamp-icon { transform: scale(1.1); }
-    .stamp-count { font-size: 0.72rem; font-weight: 600; color: var(--ink-4); }
-
-    /* ─── Post media grid ─── */
-    .post-media-grid { display: grid; gap: 3px; margin-top: 0.85rem; border-radius: var(--radius-md); overflow: hidden; }
-    .post-media-grid.count-1 { grid-template-columns: 1fr; }
-    .post-media-grid.count-2 { grid-template-columns: 1fr 1fr; }
-    .post-media-grid.count-3 { grid-template-columns: 1fr 1fr; }
-
-    .post-media-grid.count-1 .media-item img  { width:100%; height:auto; max-height:none; object-fit:unset; }
-    .post-media-grid.count-1 .media-item video { width:100%; max-height:none; height:auto; }
-    .post-media-grid.count-2 .media-item { aspect-ratio: 4/3; }
-    .post-media-grid.count-2 .media-item img { width:100%; height:100%; object-fit:contain; background:rgba(0,0,0,0.04); }
-    .post-media-grid.count-3 .media-item:nth-child(1) { grid-row: span 2; aspect-ratio: 4/5; }
-    .post-media-grid.count-3 .media-item:nth-child(2),
-    .post-media-grid.count-3 .media-item:nth-child(3) { aspect-ratio: 4/3; }
-    .post-media-grid.count-3 .media-item img { width:100%; height:100%; object-fit:contain; background:rgba(0,0,0,0.04); }
-    .post-media-grid.count-6 { grid-template-columns: repeat(3, 1fr); }
-    .post-media-grid.count-6 .media-item { aspect-ratio: 4/5; }
-    .post-media-grid.count-6 .media-item img { width:100%; height:100%; object-fit:cover; }
-
-    .media-item { position: relative; overflow: hidden; background: rgba(0,0,0,0.03); }
-    .media-item img { display:block; cursor:zoom-in; transition:transform 0.2s; }
-    .media-item img:hover { transform: scale(1.015); }
-    .media-item video { width:100%; display:block; max-height:400px; object-fit:contain; background:#000; }
-
-    /* Permanent post images */
-    .post-img-wrap { margin-top: 0.85rem; border-radius: var(--radius-md); overflow: hidden; cursor: zoom-in; }
-    .post-img-wrap img { width:100%; height:auto; display:block; transition: transform 0.2s; }
-    .post-img-wrap:hover img { transform: scale(1.01); }
-
-    /* ─── Guestbook ─── */
-    .guestbook-card { border-radius: var(--radius-lg); padding: 1.5rem 1.75rem; }
-
-    .gb-entries { display: flex; flex-direction: column; gap: 0.9rem; margin-bottom: 1.5rem; }
-    .gb-entry {
-      background: rgba(255,255,255,0.35); border: 1px solid rgba(255,255,255,0.6);
-      border-radius: var(--radius-md); padding: 0.9rem 1.1rem;
-      border-left: 3px solid var(--amber-light);
-    }
-    .gb-header { display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.35rem; }
-    .gb-author { font-size: 0.85rem; font-weight: 700; color: var(--ink); }
-    .gb-when   { font-size: 0.65rem; font-weight: 600; color: var(--ink-4); }
-    .gb-msg    { font-size: 0.83rem; font-weight: 400; line-height: 1.6; color: var(--ink-2); font-style: italic; }
-
-    .gb-form-label {
-      font-size: 0.68rem; font-weight: 800; letter-spacing: 0.10em;
-      text-transform: uppercase; color: var(--ink-4); margin-bottom: 0.65rem; display: block;
-    }
-    .gb-form textarea, .gb-form input {
-      width: 100%;
-      background: rgba(255,255,255,0.5); border: 1.5px solid rgba(255,255,255,0.7);
-      border-radius: var(--radius-sm); padding: 0.65rem 0.85rem;
-      font-family: var(--font); font-size: 0.85rem; font-weight: 500; color: var(--ink);
-      outline: none; transition: border-color 0.15s, box-shadow 0.15s;
-    }
-    .gb-form textarea { resize: vertical; min-height: 76px; margin-bottom: 0.6rem; }
-    .gb-form textarea:focus, .gb-form input:focus {
-      border-color: var(--amber-light); box-shadow: 0 0 0 3px rgba(245,196,98,0.18);
-    }
-    .gb-form textarea::placeholder, .gb-form input::placeholder { color: var(--ink-4); }
-    .gb-form-row { display: flex; gap: 0.65rem; }
-    .gb-form input { flex: 1; }
-    .btn-send {
-      background: linear-gradient(135deg, var(--amber-light), var(--amber));
-      color: white; border: none; border-radius: var(--radius-sm);
-      padding: 0.6rem 1.2rem;
-      font-family: var(--font); font-size: 0.8rem; font-weight: 800; letter-spacing: 0.03em;
-      cursor: pointer; white-space: nowrap;
-      box-shadow: 0 3px 12px rgba(232,153,42,0.35);
-      transition: all 0.18s cubic-bezier(0.34,1.56,0.64,1);
-    }
-    .btn-send:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(232,153,42,0.45); }
-    .btn-send:active { transform: scale(0.97); }
-
-    /* ─── Sidebar ─── */
-    .sidebar, .feed-col { display: flex; flex-direction: column; gap: 1rem; }
-    .sidebar-card { border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; }
-
-    .card-title {
-      font-size: 0.68rem; font-weight: 800; letter-spacing: 0.12em;
-      text-transform: uppercase; color: var(--ink-4);
-      margin-bottom: 1rem;
-      display: flex; align-items: center; gap: 0.5rem;
-    }
-    .card-title::after { content:''; flex:1; height:1px; background:rgba(255,255,255,0.55); }
-
-    .about-text { font-size: 0.85rem; line-height: 1.7; color: var(--ink-2); font-weight: 400; }
-    .about-text strong { font-weight: 700; color: var(--ink); }
-
-    .stamps-received { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.85rem; }
-    .stamps-number { font-size: 2rem; font-weight: 800; color: var(--amber); line-height: 1; }
-    .stamps-label { font-size: 0.72rem; font-weight: 600; color: var(--ink-3); line-height: 1.3; }
-
-    .stamp-avatars { display: flex; flex-wrap: wrap; gap: 0.35rem; }
-    .stamp-avatar {
-      width: 34px; height: 34px; border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.8);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.8rem; font-weight: 700; color: white; cursor: default;
-      transition: transform 0.15s; box-shadow: 0 2px 8px rgba(0,0,0,0.10);
-      position: relative;
-    }
-    .stamp-avatar:hover { transform: scale(1.12) translateY(-2px); z-index: 2; }
-    .stamp-avatar[title]:hover::after {
-      content: attr(title); position: absolute; bottom: calc(100% + 6px); left: 50%;
-      transform: translateX(-50%); background: var(--ink); color: rgba(255,255,255,0.9);
-      font-size: 0.65rem; font-weight: 600; padding: 0.2rem 0.5rem;
-      border-radius: 6px; white-space: nowrap; pointer-events: none; font-family: var(--font);
-    }
-    .av-1{background:linear-gradient(135deg,#9b8fd4,#6b5ab8)}
-    .av-2{background:linear-gradient(135deg,#4ab5aa,#2e8080)}
-    .av-3{background:linear-gradient(135deg,#e8a840,#c07820)}
-    .av-4{background:linear-gradient(135deg,#e08080,#b84040)}
-    .av-5{background:linear-gradient(135deg,#80b870,#488040)}
-    .av-6{background:linear-gradient(135deg,#80a8e8,#4070c0)}
-
-    .quorum-list { display: flex; flex-direction: column; gap: 0.75rem; }
-    .quorum-item { display: flex; align-items: center; gap: 0.65rem; }
-    .quorum-av {
-      width: 32px; height: 32px; border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.8);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.75rem; font-weight: 700; color: white; flex-shrink: 0;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
-    }
-    .quorum-meta { flex: 1; min-width: 0; }
-    .quorum-name { font-size: 0.82rem; font-weight: 700; color: var(--ink); }
-    .quorum-handle { font-size: 0.68rem; font-weight: 500; color: var(--ink-4); }
-    .q-status { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-    .status-on  { background: var(--teal); box-shadow: 0 0 0 2px rgba(74,181,170,0.25); }
-    .status-off { background: var(--ink-4); }
-    .quorum-cap-bar {
-      margin-top: 0.85rem; background: rgba(255,255,255,0.35);
-      border-radius: 999px; height: 5px; overflow: hidden;
-    }
-    .quorum-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,var(--amber-light),var(--amber)); width:30%; }
-    .quorum-cap-label { font-size: 0.65rem; font-weight: 600; color: var(--ink-4); margin-top: 0.35rem; text-align: right; }
-
-    .phoenix-card { border-radius: var(--radius-lg); overflow: hidden; position: relative; }
-    .phoenix-bg { position:absolute; inset:0; background:linear-gradient(158deg,rgba(255,160,60,0.22),rgba(200,80,40,0.15)); pointer-events:none; }
-    .phoenix-inner { position:relative; padding:1.25rem 1.5rem; }
-    .phoenix-emoji { font-size:1.75rem; display:block; margin-bottom:0.4rem; }
-    .phoenix-city  { font-size:1.05rem; font-weight:800; color:var(--ink); }
-    .phoenix-state { font-size:0.78rem; font-weight:500; color:var(--ink-3); margin-bottom:0.6rem; }
-    .phoenix-desc  { font-size:0.78rem; font-weight:500; color:var(--ink-2); line-height:1.55; }
-    .square-link {
-      display:inline-flex; align-items:center; gap:0.3rem; margin-top:0.75rem;
-      font-size:0.72rem; font-weight:700; color:var(--teal); text-decoration:none; letter-spacing:0.02em;
-    }
-    .square-link:hover { text-decoration:underline; }
-
-    .interests-wrap { display:flex; flex-wrap:wrap; gap:0.4rem; }
-    .int-tag {
-      font-size:0.72rem; font-weight:600; padding:0.28rem 0.7rem;
-      border:1px solid rgba(255,255,255,0.6); border-radius:999px;
-      color:var(--ink-2); background:rgba(255,255,255,0.38);
-    }
-
-    /* ─── The Marquee ─── */
-    .marquee-section-label {
-      font-size: 0.6rem; font-weight: 900;
-      letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--ink-4); margin-bottom: 0.5rem;
-    }
-    /* ── Marquee tab panels ── */
-    .mq-panel { display: none; flex-direction: column; gap: 0.75rem; }
-    .mq-panel.active { display: flex; }
-
-    /* ── Carousel ── */
-    .mq-carousel-wrap { position: relative; }
-    .mq-stage {
-      display: flex;
-      overflow-x: scroll;
-      scroll-snap-type: x mandatory;
-      scroll-behavior: smooth;
-      gap: 14px;
-      padding: 10px 46px 10px;
-      scrollbar-width: none;
-      background: linear-gradient(180deg, rgba(180,160,120,0.14) 0%, rgba(140,110,70,0.18) 100%);
-      border-bottom: 5px solid rgba(160,130,80,0.35);
-      border-radius: 8px;
-    }
-    .mq-stage::-webkit-scrollbar { display: none; }
-
-    .mq-arrow {
-      position: absolute; top: 40%; transform: translateY(-50%);
-      z-index: 10;
-      width: 30px; height: 30px; border-radius: 50%;
-      background: rgba(255,255,255,0.78);
-      border: 1px solid rgba(255,255,255,0.9);
-      backdrop-filter: blur(6px);
-      font-size: 1.1rem; font-weight: 700; color: var(--ink-2);
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; transition: background 0.14s, transform 0.14s;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.14);
-    }
-    .mq-arrow:hover { background: rgba(255,255,255,0.98); transform: translateY(-50%) scale(1.08); }
-    .mq-prev { left: 7px; }
-    .mq-next { right: 7px; }
-
-    /* Wrapper: poster + label stacked */
-    .tile-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      flex-shrink: 0;
-      gap: 8px;
-      width: 140px;
-      scroll-snap-align: center;
-    }
-
-    .marquee-tile {
-      position: relative;
-      width: 140px;
-      height: 210px;
-      border-radius: 6px;
+      font-size: 11px;
       overflow: hidden;
-      cursor: pointer;
-      transition: transform 0.18s ease, box-shadow 0.18s ease;
-      box-shadow: -4px 5px 16px rgba(0,0,0,0.4), inset -2px 0 5px rgba(0,0,0,0.28);
-    }
-    .marquee-tile > *:not(.poster-reflection) { border-radius: 6px; }
-    .marquee-tile:hover {
-      transform: translateY(-5px) scale(1.02);
-      box-shadow: -4px 12px 28px rgba(0,0,0,0.45), inset -2px 0 5px rgba(0,0,0,0.28);
-      z-index: 2;
-    }
-    .marquee-tile.active-tile {
-      outline: 2px solid var(--amber);
-      outline-offset: 3px;
     }
 
-    /* Spine shadow */
-    .marquee-tile::before {
-      content: '';
-      position: absolute; top: 0; left: 0;
-      width: 14px; height: 100%;
-      background: linear-gradient(to right, rgba(0,0,0,0.55), transparent);
-      z-index: 3; border-radius: 6px 0 0 6px; pointer-events: none;
-    }
-    /* Gloss highlight */
-    .marquee-tile::after {
-      content: '';
-      position: absolute; top: 0; left: 0;
-      width: 100%; height: 55%;
-      background: linear-gradient(to bottom, rgba(255,255,255,0.22), transparent);
-      z-index: 4; border-radius: 6px 6px 0 0; pointer-events: none;
+    /* ── Desktop ── */
+    .desktop {
+      width: 100%; height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+      background: url('Login screen.jpg') center center / cover no-repeat;
     }
 
-    /* Reflection — hidden at carousel scale */
-    .poster-reflection { display: none; }
-
-    /* Label below poster */
-    .tile-label { width: 140px; text-align: center; }
-    .tile-label-title {
-      font-size: 0.78rem; font-weight: 700; color: var(--ink-2);
-      line-height: 1.3; overflow: hidden;
-      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-    }
-    .tile-label-rating {
-      font-size: 0.68rem; color: var(--amber);
-      margin-top: 3px; letter-spacing: 0.04em;
-    }
-
-    /* Must Watch featured highlight */
-    .mq-featured .marquee-tile {
-      box-shadow: 0 0 0 2.5px var(--amber), -4px 5px 16px rgba(232,153,42,0.35), inset -2px 0 5px rgba(0,0,0,0.28);
-    }
-    .mq-featured .marquee-tile:hover {
-      box-shadow: 0 0 0 2.5px var(--amber), -4px 14px 30px rgba(232,153,42,0.45), inset -2px 0 5px rgba(0,0,0,0.28);
-    }
-    .mq-featured .tile-label-title { color: var(--amber); font-weight: 800; }
-    .spotlight-status.must { color: var(--amber); }
-
-    /* Real poster — hidden until TMDB loads */
-    .marquee-tile .real-poster {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%;
-      object-fit: cover; display: none;
-    }
-    .marquee-tile.has-poster .real-poster  { display: block; }
-    .marquee-tile.has-poster .poster-grad  { display: none; }
-
-    /* Gradient placeholder */
-    .poster-grad {
-      position: absolute; inset: 0;
+    /* ── XP Window ── */
+    .xp-window {
+      width: 540px;
       display: flex; flex-direction: column;
-      justify-content: flex-end; padding: 0.45rem;
-    }
-    .poster-title {
-      font-size: 0.6rem; font-weight: 800;
-      color: rgba(255,255,255,0.95);
-      line-height: 1.2;
-      text-shadow: 0 1px 4px rgba(0,0,0,0.6);
-    }
-    .poster-year {
-      font-size: 0.52rem; font-weight: 600;
-      color: rgba(255,255,255,0.6);
-      margin-top: 0.08rem;
-    }
-    .marquee-tile .poster-hover {
-      position: absolute; inset: 0;
-      background: rgba(0,0,0,0.4);
-      display: flex; align-items: center; justify-content: center;
-      opacity: 0; transition: opacity 0.16s;
-    }
-    .marquee-tile:hover .poster-hover { opacity: 1; }
-    .poster-hover-icon { font-size: 1.2rem; }
-
-    /* Spotlight panel */
-    .marquee-spotlight {
-      display: none;
-      margin-top: 1rem;
-      background: rgba(255,255,255,0.28);
-      border: 1px solid rgba(255,255,255,0.6);
-      border-radius: 10px;
+      border-radius: 8px 8px 4px 4px;
+      box-shadow: 4px 4px 20px rgba(0,0,0,0.55), 1px 1px 0 rgba(255,255,255,0.3) inset;
+      border: 1px solid #244797;
       overflow: hidden;
-    }
-    .marquee-spotlight.open { display: grid; grid-template-columns: 1fr 2fr; }
-    .spotlight-poster {
       position: relative;
-      aspect-ratio: 2/3;
-      overflow: hidden;
-    }
-    .spotlight-poster img  { width:100%; height:100%; object-fit:cover; display:none; }
-    .spotlight-poster.has-poster img { display:block; }
-    .spotlight-poster.has-poster .spotlight-grad { display:none; }
-    .spotlight-grad {
-      position:absolute; inset:0;
-      display:flex; flex-direction:column; justify-content:flex-end; padding:0.5rem;
-    }
-    .spotlight-info {
-      padding: 0.75rem 0.85rem;
-      display: flex; flex-direction: column; gap: 0.3rem;
-      justify-content: center;
-    }
-    .spotlight-status {
-      font-size: 0.55rem; font-weight: 900;
-      letter-spacing: 0.12em; text-transform: uppercase;
-    }
-    .spotlight-status.seen     { color: var(--teal); }
-    .spotlight-status.want     { color: var(--lavender); }
-    .spotlight-title-lg {
-      font-size: 0.82rem; font-weight: 800;
-      color: var(--ink); line-height: 1.2;
-    }
-    .spotlight-year-lg {
-      font-size: 0.68rem; font-weight: 600;
-      color: var(--ink-3);
-    }
-    .spotlight-rating {
-      font-size: 0.72rem; letter-spacing: 0.05em;
-      color: var(--amber); margin-top: 0.1rem;
-    }
-    .spotlight-seen {
-      font-size: 0.6rem; font-weight: 600;
-      color: var(--ink-4); letter-spacing: 0.04em;
-    }
-    .spotlight-thoughts {
-      font-size: 0.68rem; font-weight: 500;
-      color: var(--ink-2); line-height: 1.5;
-      font-style: italic; margin-top: 0.3rem;
-      border-left: 2px solid var(--amber-light);
-      padding-left: 0.5rem;
-    }
-    .spotlight-close {
-      margin-top: 0.5rem; padding: 0;
-      background: none; border: none;
-      font-family: var(--font); font-size: 0.62rem;
-      font-weight: 700; color: var(--ink-4);
-      cursor: pointer; text-align: left;
-      letter-spacing: 0.04em;
-    }
-    .spotlight-close:hover { color: var(--ink-2); }
-
-    /* ─── Candids Module ─── */
-    .candids-scroll-wrap {
-      height: 430px;
-      overflow-y: scroll;
-      overflow-x: hidden;
-      /* thin scrollbar */
-      scrollbar-width: thin;
-      scrollbar-color: rgba(180,140,100,0.35) transparent;
-    }
-    .candids-scroll-wrap::-webkit-scrollbar { width: 4px; }
-    .candids-scroll-wrap::-webkit-scrollbar-track { background: transparent; }
-    .candids-scroll-wrap::-webkit-scrollbar-thumb { background: rgba(180,140,100,0.35); border-radius: 2px; }
-
-    .candids-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 3px;
-    }
-    .candid-tile {
-      position: relative;
-      aspect-ratio: 4 / 5;
-      overflow: hidden;
-      cursor: pointer;
-      background: rgba(0,0,0,0.08);
-    }
-    .candid-tile img,
-    .candid-tile video {
-      width: 100%; height: 100%;
-      object-fit: cover; display: block;
-      transition: transform 0.28s ease;
-    }
-    .candid-tile:hover img,
-    .candid-tile:hover video { transform: scale(1.05); }
-    .candid-tile .tile-hover {
-      position: absolute; inset: 0;
-      background: rgba(15,8,2,0.28);
-      opacity: 0; transition: opacity 0.2s;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .candid-tile:hover .tile-hover { opacity: 1; }
-    .tile-hover-icon { font-size: 1.6rem; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4)); }
-    .video-pill {
-      position: absolute; top: 8px; left: 8px;
-      background: rgba(0,0,0,0.58); backdrop-filter: blur(4px);
-      border-radius: 6px; padding: 0.18rem 0.5rem;
-      font-size: 0.6rem; font-weight: 800; letter-spacing: 0.07em;
-      color: white; text-transform: uppercase;
+      z-index: 10;
     }
 
-    /* ─── My Q ─── */
-    .myq-wrap {
-      border-radius: 14px;
-      overflow: hidden;
-      background: rgba(26,26,31,0.90);
-      border: 0.5px solid rgba(255,255,255,0.08);
-      box-shadow: 0 4px 24px rgba(0,0,0,0.28);
-      font-family: 'Nunito', sans-serif;
-    }
-    .myq-header {
+    /* ── Title Bar ── */
+    .xp-titlebar {
       display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      padding: 1.1rem 1.2rem 0.85rem;
-      border-bottom: 0.5px solid rgba(255,255,255,0.07);
-    }
-    .myq-date-block { display: flex; flex-direction: column; line-height: 1; gap: 2px; }
-    .myq-day-num {
-      font-size: 42px; font-weight: 900; color: #fff; line-height: 1;
-    }
-    .myq-day-name {
-      font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
-      background: linear-gradient(90deg, #7F77DD, #5aafc2);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .myq-month {
-      font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.35); margin-top: 2px;
-    }
-    .myq-title-block { text-align: right; }
-    .myq-title {
-      font-size: 36px; font-weight: 900; line-height: 1;
-      background: linear-gradient(90deg, #7F77DD, #EF9F27);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .myq-subtitle {
-      font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
-      color: rgba(255,255,255,0.3); margin-top: 3px;
-    }
-    .myq-list { display: flex; flex-direction: column; padding: 0.5rem 0; }
-    .myq-item {
-      display: flex; align-items: flex-start; gap: 0;
-      padding: 0.55rem 1.2rem;
-      transition: background 0.15s;
-    }
-    .myq-item:hover { background: rgba(255,255,255,0.03); }
-    .myq-accent {
-      width: 3px; border-radius: 999px; flex-shrink: 0;
-      align-self: stretch; margin-right: 10px; min-height: 28px;
-    }
-    .myq-accent.loop   { background: #7F77DD; }
-    .myq-accent.invite { background: #EF9F27; }
-    .myq-body { flex: 1; min-width: 0; }
-    .myq-item-top { display: flex; align-items: center; gap: 5px; }
-    .myq-item-title {
-      font-size: 0.82rem; font-weight: 700; color: rgba(255,255,255,0.88);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .myq-private-dot {
-      width: 16px; height: 16px; border-radius: 50%;
-      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 8px; font-weight: 800; color: rgba(255,255,255,0.5);
-      flex-shrink: 0;
-    }
-    .myq-item-when {
-      font-size: 0.7rem; font-weight: 500; color: rgba(255,255,255,0.38); margin-top: 1px;
-    }
-    .myq-item-remove {
-      background: none; border: none; cursor: pointer;
-      color: rgba(255,255,255,0.2); font-size: 13px; padding: 0 0 0 6px;
-      flex-shrink: 0; line-height: 1; transition: color 0.15s; align-self: center;
-    }
-    .myq-item-remove:hover { color: rgba(255,80,80,0.7); }
-    .myq-body { cursor: pointer; }
-    /* My Q detail/edit modal */
-    .myq-detail-modal {
-      background: #1e1e26; border: 0.5px solid rgba(255,255,255,0.1);
-      border-radius: 16px; padding: 1.5rem; width: 300px;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
-    }
-    .myq-detail-type-pill {
-      display: inline-block; font-size: 0.68rem; font-weight: 800;
-      letter-spacing: 0.08em; text-transform: uppercase;
-      border-radius: 999px; padding: 2px 10px; margin-bottom: 0.75rem;
-    }
-    .myq-detail-type-pill.loop   { background: rgba(127,119,221,0.2); color: #a09af0; border: 1px solid rgba(127,119,221,0.4); }
-    .myq-detail-type-pill.invite { background: rgba(239,159,39,0.15); color: #f0b84a; border: 1px solid rgba(239,159,39,0.4); }
-    .myq-detail-title {
-      font-size: 1.1rem; font-weight: 900; color: #fff; margin-bottom: 0.35rem; line-height: 1.25;
-    }
-    .myq-detail-when {
-      font-size: 0.8rem; font-weight: 500; color: rgba(255,255,255,0.45); margin-bottom: 0.9rem;
-    }
-    .myq-detail-details {
-      font-size: 0.78rem; color: rgba(255,255,255,0.55); line-height: 1.5;
-      margin-bottom: 1rem; white-space: pre-wrap;
-    }
-    .myq-detail-divider {
-      border: none; border-top: 0.5px solid rgba(255,255,255,0.08); margin: 0.85rem 0;
-    }
-    .myq-detail-edit-row { margin-bottom: 0.7rem; }
-    .myq-detail-actions { display: flex; gap: 8px; justify-content: space-between; margin-top: 0.5rem; }
-    .myq-delete-btn {
-      background: none; border: 1px solid rgba(255,60,60,0.25); color: rgba(255,80,80,0.55);
-      border-radius: 8px; padding: 0.4rem 0.8rem;
-      font-family: 'Nunito', sans-serif; font-size: 0.78rem; font-weight: 700; cursor: pointer;
-      transition: all 0.15s;
-    }
-    .myq-delete-btn:hover { border-color: rgba(255,60,60,0.6); color: rgba(255,80,80,0.9); }
-    .myq-more-btn {
-      background: none; border: none; cursor: pointer;
-      font-size: 0.73rem; font-weight: 700; color: rgba(127,119,221,0.75);
-      padding: 0.3rem 1.2rem 0.6rem; text-align: left;
-      transition: color 0.15s;
-    }
-    .myq-more-btn:hover { color: #7F77DD; }
-    .myq-footer {
-      padding: 0.6rem 1.2rem 0.9rem;
-      border-top: 0.5px solid rgba(255,255,255,0.07);
-      display: flex; justify-content: flex-end;
-    }
-    .myq-add-btn {
-      background: rgba(127,119,221,0.15); border: 1px solid rgba(127,119,221,0.35);
-      color: rgba(127,119,221,0.9); border-radius: 8px;
-      font-size: 0.75rem; font-weight: 700; padding: 0.35rem 0.85rem;
-      cursor: pointer; font-family: 'Nunito', sans-serif;
-      transition: background 0.15s, color 0.15s;
-    }
-    .myq-add-btn:hover { background: rgba(127,119,221,0.28); color: #fff; }
-
-    /* My Q Modal */
-    .myq-modal-overlay {
-      position: fixed; inset: 0; z-index: 2000;
-      background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
-      display: none; align-items: center; justify-content: center;
-    }
-    .myq-modal-overlay.open { display: flex; }
-    .myq-modal {
-      background: #1e1e26; border: 0.5px solid rgba(255,255,255,0.1);
-      border-radius: 16px; padding: 1.5rem; width: 300px;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
-    }
-    .myq-modal h3 {
-      font-size: 1rem; font-weight: 800; color: #fff; margin: 0 0 1rem;
-    }
-    .myq-type-toggle {
-      display: flex; gap: 8px; margin-bottom: 1rem;
-    }
-    .myq-type-btn {
-      flex: 1; padding: 0.4rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5);
-      font-family: 'Nunito', sans-serif; font-size: 0.8rem; font-weight: 700; cursor: pointer;
-      transition: all 0.15s;
-    }
-    .myq-type-btn.sel-loop   { background: rgba(127,119,221,0.25); border-color: #7F77DD; color: #a09af0; }
-    .myq-type-btn.sel-invite { background: rgba(239,159,39,0.2);   border-color: #EF9F27; color: #f0b84a; }
-    .myq-field-label {
-      font-size: 0.7rem; font-weight: 700; color: rgba(255,255,255,0.4);
-      text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px;
-    }
-    .myq-field-wrap { margin-bottom: 0.75rem; }
-    .myq-input, .myq-textarea {
-      width: 100%; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
-      background: rgba(255,255,255,0.05); color: #fff; padding: 0.45rem 0.6rem;
-      font-family: 'Nunito', sans-serif; font-size: 0.8rem; box-sizing: border-box;
-      outline: none; transition: border-color 0.15s;
-    }
-    .myq-input:focus, .myq-textarea:focus { border-color: rgba(127,119,221,0.55); }
-    .myq-textarea { resize: vertical; min-height: 60px; }
-    .myq-vis-toggle {
-      display: flex; gap: 8px; margin-bottom: 1rem;
-    }
-    .myq-vis-btn {
-      flex: 1; padding: 0.35rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
-      background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.4);
-      font-family: 'Nunito', sans-serif; font-size: 0.75rem; font-weight: 700; cursor: pointer;
-      transition: all 0.15s;
-    }
-    .myq-vis-btn.active { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.3); color: #fff; }
-    .myq-modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 0.25rem; }
-    .myq-cancel-btn {
-      background: none; border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.4);
-      border-radius: 8px; padding: 0.4rem 0.9rem;
-      font-family: 'Nunito', sans-serif; font-size: 0.8rem; font-weight: 700; cursor: pointer;
-    }
-    .myq-save-btn {
-      background: linear-gradient(90deg, #7F77DD, #EF9F27); border: none;
-      color: #fff; border-radius: 8px; padding: 0.4rem 1rem;
-      font-family: 'Nunito', sans-serif; font-size: 0.8rem; font-weight: 800; cursor: pointer;
-    }
-
-    /* ─── Pick Six ─── */
-    .pick-six-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      padding: 0 1rem 1.1rem;
-    }
-    .pick-six-tile {
-      display: flex;
-      flex-direction: column;
       align-items: center;
       gap: 5px;
-    }
-    .pick-six-tile img {
-      width: 100%;
-      aspect-ratio: 3 / 4;
-      object-fit: cover;
-      border-radius: 10px;
-      border: 2.5px solid rgba(232,153,42,0.55);
-      box-shadow: 0 2px 10px rgba(232,153,42,0.22), 0 1px 4px rgba(0,0,0,0.13);
-      transition: transform 0.18s, box-shadow 0.18s;
-    }
-    .pick-six-tile img:hover {
-      transform: scale(1.05);
-      box-shadow: 0 4px 18px rgba(232,153,42,0.45), 0 2px 6px rgba(0,0,0,0.18);
-    }
-    .pick-six-name {
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: #3d2a0a;
-      text-align: center;
-      line-height: 1.2;
-      text-shadow: 0 1px 2px rgba(255,255,255,0.6);
-    }
-
-    /* ─── Lightbox ─── */
-    .lightbox {
-      position:fixed; inset:0; z-index:1000;
-      display:flex; align-items:center; justify-content:center;
-      opacity:0; pointer-events:none; transition:opacity 0.22s ease;
-    }
-    .lightbox.open { opacity:1; pointer-events:all; }
-    .lb-backdrop {
-      position:absolute; inset:0;
-      background:rgba(20,12,5,0.92);
-      backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); cursor:zoom-out;
-    }
-    .lb-wrap {
-      position:relative; z-index:1; max-width:92vw; max-height:88vh;
-      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.75rem;
-      transform:scale(0.94); transition:transform 0.22s cubic-bezier(0.34,1.3,0.64,1);
-    }
-    .lightbox.open .lb-wrap { transform:scale(1); }
-    .lb-wrap img  {
-      max-width:92vw; max-height:82vh; width:auto; height:auto;
-      border-radius:var(--radius-lg); box-shadow:0 24px 80px rgba(0,0,0,0.55); display:block;
-    }
-    .lb-wrap video {
-      max-width:92vw; max-height:82vh;
-      border-radius:var(--radius-lg); box-shadow:0 24px 80px rgba(0,0,0,0.55);
-      background:#000; display:block;
-    }
-    .lb-caption {
-      font-size:0.75rem; font-weight:600; color:rgba(255,255,255,0.5);
-      letter-spacing:0.04em; text-align:center;
-    }
-    .lb-close {
-      position:absolute; top:-14px; right:-14px;
-      width:34px; height:34px; border-radius:50%;
-      background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3);
-      color:white; font-size:0.85rem; font-weight:800; cursor:pointer;
-      display:flex; align-items:center; justify-content:center;
-      backdrop-filter:blur(6px); transition:background 0.15s;
-    }
-    .lb-close:hover { background:rgba(255,255,255,0.28); }
-
-    /* ─── Footer ─── */
-    .page-footer {
-      max-width:980px; margin:2rem auto 0; padding:0 1.25rem;
-      display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.75rem;
-    }
-    .footer-left  { font-size:0.78rem; font-weight:500; color:var(--ink-4); font-style:italic; }
-    .footer-right { font-size:0.7rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-4); }
-    .footer-right span { color:var(--amber); }
-
-    /* ─── Responsive ─── */
-    /* ─── Feed Tabs ─── */
-    .feed-tabs {
-      display: flex; gap: 0;
-      background: linear-gradient(90deg, rgba(78,58,160,0.88) 0%, rgba(50,150,142,0.88) 100%);
-      border-radius: 12px;
-      padding: 5px;
-      margin-bottom: 1rem;
-      box-shadow: 0 2px 10px rgba(60,40,120,0.18);
-    }
-    .feed-tab {
-      flex: 1; padding: 0.52rem 0.6rem;
-      font-family: inherit; font-size: 0.72rem; font-weight: 700;
-      letter-spacing: 0.03em; border: none; cursor: pointer;
-      border-radius: 8px; background: transparent;
-      color: rgba(255,255,255,0.65); transition: all 0.16s ease;
-    }
-    .feed-tab:hover { color: rgba(255,255,255,0.9); background: rgba(255,255,255,0.12); }
-    .feed-tab.active {
-      background: linear-gradient(135deg, var(--amber-light), var(--amber));
-      color: #fff;
-      box-shadow: 0 2px 8px rgba(232,153,42,0.45);
-      font-weight: 800;
-    }
-    .tab-panel { display: none; flex-direction: column; gap: 1rem; }
-    .tab-panel.active { display: flex; }
-
-    /* type tag pill */
-    .type-tag {
-      display: inline-flex; align-items: center; gap: 0.25rem;
-      font-size: 0.58rem; font-weight: 800; letter-spacing: 0.08em;
-      text-transform: uppercase; padding: 0.18rem 0.5rem;
-      border-radius: 999px; border: 1px solid transparent;
-    }
-    .type-tag.photo    { background: rgba(232,153,42,0.15); color: #a06010; border-color: rgba(232,153,42,0.3); }
-    .type-tag.video    { background: rgba(200,80,50,0.12);  color: #943020; border-color: rgba(200,80,50,0.28); }
-    .type-tag.quorum   { background: rgba(155,143,212,0.18); color: #6b5bb8; border-color: rgba(155,143,212,0.35); }
-    .type-tag.note     { background: rgba(140,130,120,0.14); color: #6a6055; border-color: rgba(140,130,120,0.28); }
-    .type-tag.marquee   { background: rgba(74,181,170,0.15); color: #2e8a82; border-color: rgba(74,181,170,0.3); }
-    .type-tag.pq-update { background: rgba(107,138,173,0.14); color: #4a6882; border-color: rgba(107,138,173,0.3); }
-
-    /* ── Post card color variants ── */
-    .post-card--photo { background: rgba(232,153,42,0.07) !important; }
-    .post-card--video { background: rgba(200,80,50,0.07)  !important; }
-    .post-card--text  { background: rgba(155,143,212,0.07) !important; }
-
-    /* ── Weekly row color variants ── */
-    .weekly-row--photo    { background: rgba(232,153,42,0.08); }
-    .weekly-row--photo:hover { background: rgba(232,153,42,0.14); }
-    .weekly-row--video    { background: rgba(200,80,50,0.07); }
-    .weekly-row--video:hover { background: rgba(200,80,50,0.13); }
-    .weekly-row--pq-update { background: rgba(107,138,173,0.09); border-left: 2px solid #6b8aad; }
-    .weekly-row--pq-update:hover { background: rgba(107,138,173,0.15); }
-    .weekly-row--text     { background: rgba(155,143,212,0.07); }
-    .weekly-row--text:hover { background: rgba(155,143,212,0.13); }
-
-    /* ── PQ Update Post Card ── */
-    .post-pq-update {
-      border-radius: var(--radius-lg); padding: 1.1rem 1.5rem;
-      border-left: 3px solid #6b8aad;
-      background: rgba(107,138,173,0.07) !important;
-    }
-    .pq-update-label {
-      font-size: 0.6rem; font-weight: 800; letter-spacing: 0.1em;
-      text-transform: uppercase; font-family: 'Courier New', monospace;
-      color: #6b8aad; margin-bottom: 0.2rem;
-    }
-    .pq-update-time {
-      font-size: 0.65rem; font-weight: 600; color: var(--ink-4); margin-bottom: 0.65rem;
-    }
-    .pq-update-summary {
-      font-size: 0.88rem; font-weight: 400; line-height: 1.65; color: var(--ink-2);
-    }
-
-    /* ── Album Thumb ── */
-    .album-thumb-wrap {
-      position: relative; border-radius: var(--radius-md); overflow: hidden;
-      cursor: pointer; margin-top: 0.85rem;
-      aspect-ratio: 4/3; background: rgba(0,0,0,0.07);
-    }
-    .album-thumb-wrap img {
-      width: 100%; height: 100%; object-fit: cover; display: block;
-      transition: transform 0.25s ease;
-    }
-    .album-thumb-wrap:hover img { transform: scale(1.04); }
-    .album-count-badge {
-      position: absolute; bottom: 0.6rem; right: 0.65rem;
-      background: rgba(20,15,8,0.72); backdrop-filter: blur(6px);
-      border: 1px solid rgba(255,255,255,0.25);
-      border-radius: 999px; padding: 0.25rem 0.65rem;
-      font-size: 0.72rem; font-weight: 700; color: #fff;
-      display: flex; align-items: center; gap: 0.35rem;
-      pointer-events: none;
-    }
-    /* in weekly-row context, thumb is smaller */
-    .weekly-row .album-thumb-wrap {
-      width: 62px; height: 78px; aspect-ratio: unset; margin-top: 0; flex-shrink: 0;
-      border: 1px solid rgba(255,255,255,0.6);
-    }
-    .weekly-row .album-count-badge {
-      font-size: 0.58rem; padding: 0.15rem 0.45rem; bottom: 0.3rem; right: 0.3rem;
-    }
-
-    /* ── Album Modal ── */
-    .album-overlay {
-      display: none; position: fixed; inset: 0; z-index: 400;
-      background: rgba(40,30,20,0.55); backdrop-filter: blur(8px);
-      align-items: center; justify-content: center;
-      padding: 1.5rem;
-    }
-    .album-overlay.open { display: flex; }
-    .album-modal {
-      width: min(780px, 96vw); max-height: 90vh;
-      border-radius: var(--radius-xl);
-      background: linear-gradient(135deg, rgba(155,143,212,0.28) 0%, rgba(74,181,170,0.16) 100%);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border: 1px solid rgba(255,255,255,0.55);
-      box-shadow: 0 4px 24px rgba(80,60,140,0.10);
-      display: flex; flex-direction: column; overflow: hidden;
-    }
-    .album-modal-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 1rem 1.25rem 0.75rem;
-      background: linear-gradient(90deg, rgba(78,58,160,0.97), rgba(50,150,142,0.97));
+      padding: 4px 6px 5px;
+      height: 30px;
       flex-shrink: 0;
-    }
-    .album-modal-title {
-      font-size: 0.95rem; font-weight: 800; color: #fff;
-      letter-spacing: 0.01em;
-    }
-    .album-modal-meta {
-      font-size: 0.72rem; font-weight: 500; color: rgba(255,255,255,0.7); margin-top: 0.1rem;
-    }
-    .album-modal-close {
-      background: none; border: none; cursor: pointer;
-      color: rgba(255,255,255,0.75); font-size: 1.1rem; line-height: 1; flex-shrink: 0;
-    }
-    .album-modal-close:hover { color: #fff; }
-    .album-modal-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
-      overflow-y: auto; padding: 4px;
-    }
-    .album-modal-grid .album-photo {
-      aspect-ratio: 4/5; overflow: hidden; cursor: pointer; border-radius: 6px;
-      background: rgba(0,0,0,0.07);
-    }
-    .album-modal-grid .album-photo img {
-      width: 100%; height: 100%; object-fit: cover; display: block;
-      transition: transform 0.22s ease;
-    }
-    .album-modal-grid .album-photo:hover img { transform: scale(1.05); }
-
-    /* ── Weekly view ── */
-    .weekly-day-group { display: flex; flex-direction: column; gap: 0.65rem; }
-    .weekly-day-label {
-      display: flex; align-items: center; gap: 0.65rem;
-      font-size: 0.62rem; font-weight: 900; letter-spacing: 0.1em;
-      text-transform: uppercase; color: var(--ink-3);
-    }
-    .weekly-day-label::after { content:''; flex:1; height:1px; background:rgba(255,255,255,0.5); }
-    .weekly-row {
-      display: flex; align-items: center; gap: 0.85rem;
-      padding: 0.75rem 1rem;
-      background: rgba(255,255,255,0.52);
-      border: 1px solid rgba(255,255,255,0.7);
-      border-radius: 14px;
-      cursor: default;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-      transition: background 0.14s, box-shadow 0.14s;
-    }
-    .weekly-row:hover { background: rgba(255,255,255,0.72); box-shadow: 0 4px 16px rgba(0,0,0,0.10); }
-    .weekly-thumb {
-      width: 62px; height: 78px; border-radius: 10px;
-      object-fit: cover; flex-shrink: 0;
-      background: rgba(0,0,0,0.07);
-      border: 1px solid rgba(255,255,255,0.6);
-    }
-    .weekly-thumb-wrap {
-      position: relative; width: 62px; height: 78px;
-      border-radius: 10px; overflow: hidden; flex-shrink: 0;
-      background: rgba(0,0,0,0.08);
-      border: 1px solid rgba(255,255,255,0.6);
-    }
-    .weekly-thumb-wrap video,
-    .weekly-thumb-wrap img {
-      width: 100%; height: 100%; object-fit: cover; display: block;
-    }
-    .weekly-thumb-wrap .video-pill {
-      top: 5px; left: 5px; font-size: 0.52rem; padding: 0.12rem 0.38rem;
-    }
-    .weekly-thumb-wrap .thumb-play {
-      position: absolute; inset: 0;
-      display: flex; align-items: center; justify-content: center;
-      background: rgba(0,0,0,0.22);
-      font-size: 1.2rem;
-      pointer-events: none;
-    }
-    .weekly-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.25rem; }
-    .weekly-excerpt {
-      font-size: 0.82rem; font-weight: 600; color: var(--ink);
-      overflow: hidden; display: -webkit-box;
-      -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-      line-height: 1.4;
-    }
-    .weekly-meta {
-      display: flex; align-items: center; gap: 0.5rem;
-    }
-    .weekly-time { font-size: 0.62rem; font-weight: 600; color: var(--ink-4); }
-    .weekly-stamps { font-size: 0.62rem; font-weight: 600; color: var(--ink-4); }
-
-    /* ── Yearbook view ── */
-    .yb-stats {
-      display: grid; grid-template-columns: repeat(4,1fr); gap: 0.5rem;
-      margin-bottom: 0.5rem;
-    }
-    .yb-stat {
-      background: rgba(255,255,255,0.45);
-      border: 1px solid rgba(255,255,255,0.6);
-      border-radius: 10px; padding: 0.7rem 0.5rem;
-      text-align: center;
-    }
-    .yb-stat-num { font-size: 1.4rem; font-weight: 900; color: var(--amber); line-height: 1; }
-    .yb-stat-lbl { font-size: 0.55rem; font-weight: 700; color: var(--ink-3); margin-top: 0.2rem; line-height: 1.3; text-transform: uppercase; letter-spacing: 0.06em; }
-    .yb-month-label {
-      display: flex; align-items: center; gap: 0.65rem;
-      font-size: 0.62rem; font-weight: 900; letter-spacing: 0.1em;
-      text-transform: uppercase; color: var(--ink-3); margin-top: 0.5rem;
-    }
-    .yb-month-label::after { content:''; flex:1; height:1px; background:rgba(255,255,255,0.5); }
-    .yb-tile-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 4px; }
-    .yb-tile {
-      aspect-ratio: 4/5; border-radius: 10px;
-      border: 1px solid transparent;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.5rem; cursor: default; position: relative;
-      overflow: hidden;
-      transition: transform 0.15s, box-shadow 0.15s;
-    }
-    .yb-tile:hover { transform: scale(1.04) translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.14); z-index: 2; }
-    .yb-tile video,
-    .yb-tile img {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%; object-fit: cover;
-    }
-    .yb-tile .video-pill { top: 6px; left: 6px; }
-    .yb-tile .thumb-play {
-      position: absolute; inset: 0;
-      display: flex; align-items: center; justify-content: center;
-      background: rgba(0,0,0,0.22); font-size: 1.4rem; pointer-events: none;
-    }
-    .yb-tile-emoji {
-      position: relative; z-index: 1;
-    }
-    .yb-tile.photo   { background: rgba(232,153,42,0.22); border-color: rgba(232,153,42,0.4); }
-    .yb-tile.video   { background: rgba(200,80,50,0.18);  border-color: rgba(200,80,50,0.35); }
-    .yb-tile.quorum  { background: rgba(155,143,212,0.22); border-color: rgba(155,143,212,0.4); }
-    .yb-tile.note    { background: rgba(140,130,120,0.16); border-color: rgba(140,130,120,0.3); }
-    .yb-tile-tip {
-      display: none; position: absolute; bottom: calc(100% + 6px); left: 50%;
-      transform: translateX(-50%);
-      background: rgba(30,20,10,0.88); color: #fff;
-      font-size: 0.6rem; font-weight: 600; line-height: 1.35;
-      padding: 0.35rem 0.6rem; border-radius: 6px;
-      white-space: nowrap; max-width: 160px;
-      white-space: normal; text-align: center; width: max-content;
-      pointer-events: none; z-index: 10;
-    }
-    .yb-tile:hover .yb-tile-tip { display: block; }
-
-    /* ─── Site Banner ─── */
-    .site-banner {
-      position: sticky; top: 0; z-index: 200;
-      background: linear-gradient(90deg, rgba(78,58,160,0.97) 0%, rgba(50,150,142,0.97) 100%);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 1.5rem;
-      height: 44px;
-      box-shadow: 0 2px 12px rgba(60,40,120,0.25);
-    }
-    .site-banner-logo {
-      font-size: 1.25rem; font-weight: 900;
-      color: rgba(255,255,255,0.97);
-      letter-spacing: -0.5px;
-    }
-    .site-banner-nav {
-      display: flex; align-items: center; gap: 1.5rem;
-    }
-    .site-banner-nav a {
-      font-size: 0.72rem; font-weight: 700;
-      color: rgba(255,255,255,0.82);
-      text-decoration: none; letter-spacing: 0.04em;
-      text-transform: lowercase;
-      transition: color 0.14s;
-    }
-    .site-banner-nav a:hover { color: rgba(255,255,255,1); }
-
-    @media (max-width:699px) {
-      .hero-inner  { grid-template-columns:1fr; }
-      .hero-photo  { height:200px; }
-      .hero-name   { font-size:1.8rem; }
+      user-select: none;
+      background:
+        linear-gradient(180deg,
+          #5896E8 0%, #3A74D8 4%,
+          #1F5FBE 8%, #1A54B2 30%,
+          #1F5FBE 55%, #2870D0 75%,
+          #5A96E8 90%, #C8DCFA 100%
+        );
+      border-bottom: 1px solid #1040A0;
     }
 
-    /* ─── Room Nav Tabs ─── */
-    .room-nav {
-      display: flex;
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      background: var(--glass-white);
-      backdrop-filter: blur(18px) saturate(1.6);
-      -webkit-backdrop-filter: blur(18px) saturate(1.6);
-      border: 1px solid var(--glass-border);
-      box-shadow: var(--glass-shadow), var(--glass-inset);
+    .xp-titlebar-icon {
+      width: 16px; height: 16px;
+      font-size: 14px; line-height: 1; flex-shrink: 0;
     }
-    .room-tab {
+
+    .xp-titlebar-text {
       flex: 1;
+      font-size: 12px; font-weight: bold;
+      color: white;
+      text-shadow: 1px 1px 2px rgba(0,0,40,0.7);
+      letter-spacing: 0.01em;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* ── Title Bar Buttons ── */
+    .xp-titlebar-btns { display: flex; gap: 2px; flex-shrink: 0; }
+
+    .xp-tb-btn {
+      width: 21px; height: 21px;
+      font-size: 10px; font-weight: bold; font-family: 'Marlett', 'Arial', sans-serif;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; border-radius: 3px;
+      border: 1px solid rgba(255,255,255,0.5);
+      background: linear-gradient(180deg, #6AAAF8 0%, #4A8AE8 30%, #3A78D8 50%, #4A8AE8 100%);
+      color: white;
+      text-shadow: 0 1px 1px rgba(0,0,60,0.5);
+    }
+
+    .xp-tb-btn:hover {
+      background: linear-gradient(180deg, #8ABCFA 0%, #6AAAF0 30%, #5A9AE8 50%, #6AAAF0 100%);
+    }
+
+    .xp-tb-btn.close {
+      background: linear-gradient(180deg, #F87070 0%, #D84040 30%, #C83030 50%, #D84040 100%);
+    }
+    .xp-tb-btn.close:hover {
+      background: linear-gradient(180deg, #FA9090 0%, #E85050 30%, #D84040 50%, #E85050 100%);
+    }
+
+    /* ── Window Body ── */
+    .xp-body {
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-      padding: 0.65rem 0.25rem 0.55rem;
-      text-decoration: none;
-      color: var(--ink-3);
-      font-size: 0.6rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      border-right: 1px solid rgba(255,255,255,0.5);
-      transition: background 0.15s, color 0.15s;
-      cursor: pointer;
-    }
-    .room-tab:last-child { border-right: none; }
-    .room-tab i { font-size: 1.2rem; }
-    .room-tab:hover { background: rgba(255,255,255,0.45); color: var(--ink); }
-    .room-tab.active {
-      background: linear-gradient(160deg, rgba(155,143,212,0.25), rgba(74,181,170,0.18));
-      color: var(--ink);
-    }
-    .room-tab.active i { color: var(--lavender); }
-
-    /* ─── Lounge Modal ─── */
-    .lounge-overlay {
-      display: none;
-      position: fixed; inset: 0; z-index: 300;
-      background: rgba(30,20,10,0.45);
-      backdrop-filter: blur(6px);
-      align-items: center; justify-content: center;
-    }
-    .lounge-overlay.open { display: flex; }
-    .lounge-modal {
-      width: min(480px, 92vw);
-      min-height: 320px;
-      border-radius: var(--radius-xl);
-      background: var(--glass-white);
-      backdrop-filter: blur(24px) saturate(1.8);
-      -webkit-backdrop-filter: blur(24px) saturate(1.8);
-      border: 1px solid var(--glass-border);
-      box-shadow: 0 24px 64px rgba(80,40,10,0.18);
-      display: flex; flex-direction: column;
-      overflow: hidden;
-    }
-    .lounge-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 1rem 1.25rem 0.75rem;
-      border-bottom: 1px solid rgba(255,255,255,0.5);
-    }
-    .lounge-title {
-      font-size: 1rem; font-weight: 800; color: var(--ink);
-      display: flex; align-items: center; gap: 0.5rem;
-    }
-    .lounge-title i { color: var(--lavender); font-size: 1.1rem; }
-    .lounge-close {
-      background: none; border: none; cursor: pointer;
-      color: var(--ink-3); font-size: 1rem; line-height: 1;
-    }
-    .lounge-close:hover { color: var(--ink); }
-    .lounge-body {
-      flex: 1; display: flex; align-items: center; justify-content: center;
-      padding: 2rem;
-      color: var(--ink-4); font-size: 0.85rem; font-weight: 500; text-align: center;
-      line-height: 1.6;
+      background: var(--xp-gray);
+      flex: 1;
     }
 
-    /* ─── MySpace Profile Header ─── */
-    .myspace-card {
-      border-radius: 14px;
-      overflow: hidden;
-      background: linear-gradient(135deg, rgba(155,143,212,0.28) 0%, rgba(74,181,170,0.16) 100%);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border: 1px solid rgba(255,255,255,0.55);
-      box-shadow: 0 4px 24px rgba(80,60,140,0.10);
-      margin-bottom: 1rem;
+    /* ── Left Sidebar ── */
+    .xp-sidebar {
+      width: 160px;
+      flex-shrink: 0;
+      padding: 1.25rem 1rem;
+      display: flex; flex-direction: column; gap: 0.75rem;
+      background: linear-gradient(180deg, #2060C8 0%, #1848A8 40%, #1040A0 100%);
+      border-right: 2px solid #1040A0;
     }
 
-    /* — Profile section — */
-    .ms-profile {
-      display: grid;
-      grid-template-columns: 120px 1fr;
-      gap: 0;
+    .xp-sidebar-logo {
+      font-size: 22px; font-weight: bold;
+      color: white;
+      text-shadow: 0 1px 4px rgba(0,0,60,0.5);
+      letter-spacing: -0.5px;
+      margin-bottom: 0.25rem;
     }
-    .ms-photo {
-      width: 120px; height: 120px;
-      object-fit: cover;
-      display: block;
-      border-radius: 0;
+
+    .xp-sidebar-tag {
+      font-size: 10px;
+      color: rgba(200,220,255,0.85);
+      line-height: 1.5;
     }
-    .ms-info {
-      padding: 0.85rem 1rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 0.18rem;
-    }
-    .ms-name {
-      font-size: 1.15rem;
-      font-weight: 900;
-      color: var(--ink);
-      letter-spacing: -0.3px;
-      line-height: 1.1;
-    }
-    .ms-meta {
-      font-size: 0.68rem;
-      font-weight: 600;
-      color: var(--ink-3);
-      line-height: 1.6;
-    }
-    .ms-meta span {
-      color: var(--ink-2);
-      font-weight: 700;
-    }
-    .ms-divider {
+
+    .xp-sidebar-divider {
       height: 1px;
-      background: rgba(255,255,255,0.45);
-      margin: 0 0.85rem;
-    }
-    .ms-stamp-row {
-      padding: 0.55rem 1rem 0.65rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.68rem;
-      font-weight: 700;
-      color: var(--ink-3);
-    }
-    .ms-stamp-img {
-      height: 28px;
-      width: auto;
-      display: block;
+      background: rgba(255,255,255,0.2);
+      margin: 0.5rem 0;
     }
 
-    /* — Contact box — */
-    .ms-contact-header {
-      background: linear-gradient(90deg, rgba(100,80,180,0.82) 0%, rgba(74,181,170,0.72) 100%);
-      padding: 0.4rem 0.9rem;
-      font-size: 0.68rem;
-      font-weight: 900;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.96);
+    .xp-sidebar-tip {
+      font-size: 9px;
+      color: rgba(180,210,255,0.7);
+      line-height: 1.5;
+      font-style: italic;
     }
-    .ms-contact-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+
+    /* ── Form Area ── */
+    .xp-form-area {
+      flex: 1;
+      padding: 1.1rem 1.25rem;
+      display: flex; flex-direction: column; gap: 0.7rem;
     }
-    .ms-contact-item {
-      display: flex;
-      align-items: center;
-      gap: 0.45rem;
-      padding: 0.48rem 0.9rem;
-      font-size: 0.68rem;
-      font-weight: 700;
-      color: var(--ink-2);
+
+    .xp-form-title {
+      font-size: 13px; font-weight: bold;
+      color: var(--xp-blue-deep);
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--xp-border-dk);
+      margin-bottom: 0.2rem;
+    }
+
+    .xp-field { display: flex; flex-direction: column; gap: 3px; }
+
+    .xp-label {
+      font-size: 11px; font-weight: bold;
+      color: #1a1a1a;
+    }
+
+    .xp-input {
+      width: 100%;
+      padding: 3px 4px;
+      font-family: var(--font); font-size: 11px; color: #1a1a1a;
+      background: white;
+      border: 2px solid;
+      border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk);
+      outline: none;
+    }
+    .xp-input:focus {
+      border-color: #316AC5 var(--xp-border-lt) var(--xp-border-lt) #316AC5;
+    }
+
+    .xp-checkbox-row {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .xp-checkbox {
+      width: 13px; height: 13px;
       cursor: pointer;
-      transition: background 0.14s;
-      border-bottom: 1px solid rgba(155,143,212,0.18);
-      text-decoration: none;
+      accent-color: #316AC5;
     }
-    .ms-contact-item:nth-child(odd)  { background: rgba(155,143,212,0.08); }
-    .ms-contact-item:nth-child(even) { background: rgba(74,181,170,0.07); }
-    .ms-contact-item:hover           { background: rgba(155,143,212,0.22); color: var(--ink); }
-    .ms-contact-item i {
-      font-size: 0.95rem;
-      color: var(--lavender);
+    .xp-checkbox-label { font-size: 11px; color: #1a1a1a; cursor: pointer; }
+
+    .xp-error {
+      display: none;
+      font-size: 11px; color: #CC0000;
+      background: #FFF0F0;
+      border: 1px solid #CC8888;
+      padding: 3px 6px;
+    }
+    .xp-error.show { display: block; }
+
+    /* ── XP Buttons ── */
+    .xp-btn-row {
+      display: flex; gap: 6px;
+      justify-content: flex-end;
+      margin-top: 0.3rem;
+      padding-top: 0.6rem;
+      border-top: 1px solid var(--xp-border-dk);
+    }
+
+    .xp-btn {
+      min-width: 75px;
+      padding: 4px 10px;
+      font-family: var(--font); font-size: 11px; color: #1a1a1a;
+      cursor: pointer;
+      background: linear-gradient(180deg, #F8F6F2 0%, #ECE9D8 50%, #DDD9C8 100%);
+      border: 2px solid;
+      border-color: var(--xp-border-lt) var(--xp-border-dk) var(--xp-border-dk) var(--xp-border-lt);
+      box-shadow: 1px 1px 0 var(--xp-border-dkk);
+      text-align: center;
+    }
+    .xp-btn:hover {
+      background: linear-gradient(180deg, #FFFFF8 0%, #F4F2E8 50%, #EAE8D8 100%);
+    }
+    .xp-btn:active {
+      border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk);
+      padding: 5px 9px 3px 11px;
+    }
+
+    .xp-btn-primary {
+      min-width: 75px;
+      padding: 4px 10px;
+      font-family: var(--font); font-size: 11px; color: white;
+      font-weight: bold; cursor: pointer;
+      background: linear-gradient(180deg, #6AAAF8 0%, #4A88E8 25%, #2A68D0 50%, #3A78DC 75%, #6AAAF8 100%);
+      border: 2px solid;
+      border-color: #8ABCFA #1040A0 #1040A0 #8ABCFA;
+      box-shadow: 1px 1px 0 #0A2470;
+      text-align: center;
+      text-shadow: 0 1px 1px rgba(0,0,80,0.5);
+    }
+    .xp-btn-primary:hover {
+      background: linear-gradient(180deg, #8ACAFA 0%, #6AAAF0 25%, #4A88E8 50%, #5A98F0 75%, #8ACAFA 100%);
+    }
+    .xp-btn-primary:active {
+      border-color: #1040A0 #8ABCFA #8ABCFA #1040A0;
+      padding: 5px 9px 3px 11px;
+    }
+    .xp-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* ── Divider link ── */
+    .xp-divider-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 0.4rem 0;
+      border-top: 1px solid var(--xp-border-dk);
+    }
+    .xp-divider-row::after {
+      content: ''; flex: 1; height: 1px; background: var(--xp-gray-dark);
+    }
+
+    .xp-link {
+      font-size: 11px; color: #316AC5; text-decoration: underline; cursor: pointer;
+      background: none; border: none; font-family: var(--font); padding: 0;
+    }
+    .xp-link:hover { color: #D44000; }
+
+    .xp-new-account-row {
+      display: flex; align-items: center; gap: 8px;
+      padding-top: 0.3rem;
+    }
+    .xp-new-account-label { font-size: 11px; color: #1a1a1a; }
+
+    /* ── Status Bar ── */
+    .xp-statusbar {
+      background: var(--xp-gray);
+      border-top: 1px solid var(--xp-border-dk);
+      padding: 2px 6px;
+      display: flex; align-items: center; gap: 1rem;
       flex-shrink: 0;
     }
-    /* remove bottom border from last two items */
-    .ms-contact-item:nth-last-child(-n+2) { border-bottom: none; }
+    .xp-status-panel {
+      font-size: 10px; color: #444;
+      border: 1px solid;
+      border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk);
+      padding: 1px 6px;
+    }
+
+    /* ── Taskbar ── */
+    .xp-taskbar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: 34px;
+      display: flex; align-items: center;
+      z-index: 100;
+      background: linear-gradient(180deg,
+        #2E6FBE 0%, #2060B0 4%,
+        #1A54A8 8%, #1850A4 30%,
+        #1A54A8 55%, #2060B4 75%,
+        #2E6FBE 90%, #5898D8 100%
+      );
+      border-top: 1px solid #5898E8;
+      box-shadow: 0 -1px 0 #0A2470;
+      padding: 0 4px;
+      gap: 6px;
+    }
+
+    /* XP Start Button */
+    .xp-start-btn {
+      height: 28px;
+      padding: 0 12px 0 8px;
+      display: flex; align-items: center; gap: 5px;
+      border-radius: 0 14px 14px 0;
+      border: 1px solid #1A6A18;
+      border-left: none;
+      background: linear-gradient(180deg,
+        #60C840 0%, #40A820 30%,
+        #30980E 50%, #40A820 70%,
+        #60C840 100%
+      );
+      color: white; font-family: var(--font); font-size: 13px;
+      font-weight: bold; font-style: italic;
+      cursor: pointer; flex-shrink: 0;
+      box-shadow: 2px 0 8px rgba(0,120,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+      text-shadow: 0 1px 2px rgba(0,60,0,0.6);
+    }
+    .xp-start-btn:hover {
+      background: linear-gradient(180deg,
+        #78E050 0%, #58C038 30%,
+        #48B028 50%, #58C038 70%,
+        #78E050 100%
+      );
+    }
+    .xp-start-logo {
+      width: 20px; height: 20px; font-size: 18px; line-height: 1;
+    }
+
+    /* Active window in taskbar */
+    .xp-taskbar-item {
+      height: 24px; min-width: 120px; max-width: 180px;
+      display: flex; align-items: center; gap: 5px;
+      padding: 0 8px;
+      font-size: 11px; font-weight: bold; color: white;
+      background: linear-gradient(180deg, #1A50A0 0%, #2468C0 50%, #1A50A0 100%);
+      border: 1px solid;
+      border-color: #1848A0 #3878D0 #3878D0 #1848A0;
+      border-radius: 2px;
+      cursor: default;
+      overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      text-shadow: 0 1px 1px rgba(0,0,60,0.5);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -1px 0 rgba(0,0,0,0.2);
+    }
+
+    /* System tray */
+    .xp-tray {
+      margin-left: auto;
+      display: flex; align-items: center; gap: 8px;
+      height: 26px;
+      padding: 0 8px;
+      background: rgba(0,30,100,0.3);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 2px;
+    }
+    .xp-clock {
+      font-size: 11px; color: white;
+      text-shadow: 0 1px 1px rgba(0,0,60,0.5);
+      font-family: var(--font);
+    }
   </style>
 </head>
 <body>
 
-  <!-- Lightbox -->
-  <div class="lightbox" id="lightbox">
-    <div class="lb-backdrop" onclick="lbClose(event)"></div>
-    <div class="lb-wrap">
-      <img    id="lbImg" src="" alt="" style="display:none" />
-      <video  id="lbVid" src=""  controls style="display:none"></video>
-      <div class="lb-caption" id="lbCaption"></div>
-      <button class="lb-close" onclick="lbClose()">✕</button>
+  <div class="desktop">
+
+    <!-- XP Dialog Window -->
+    <div class="xp-window">
+
+      <div class="xp-titlebar">
+        <div class="xp-titlebar-icon">🌐</div>
+        <span class="xp-titlebar-text">Postmarq — Sign In</span>
+        <div class="xp-titlebar-btns">
+          <button class="xp-tb-btn" title="Minimize">&#8722;</button>
+          <button class="xp-tb-btn" title="Maximize">&#9633;</button>
+          <button class="xp-tb-btn close" title="Close">&#10005;</button>
+        </div>
+      </div>
+
+      <div class="xp-body">
+
+        <!-- Sidebar -->
+        <div class="xp-sidebar">
+          <div class="xp-sidebar-logo">postmarq</div>
+          <p class="xp-sidebar-tag">Your corner of the internet.</p>
+          <div class="xp-sidebar-divider"></div>
+          <p class="xp-sidebar-tip">Sign in to access your Post, your Quorum, and your Neighborhood.</p>
+        </div>
+
+        <!-- Form -->
+        <div class="xp-form-area">
+          <div class="xp-form-title">Sign in to your Post</div>
+
+          <form id="loginForm" novalidate>
+            <div style="display:flex;flex-direction:column;gap:0.6rem;">
+              <div class="xp-field">
+                <label class="xp-label" for="emailInput">Email address:</label>
+                <input class="xp-input" type="email" id="emailInput" autocomplete="email" />
+              </div>
+
+              <div class="xp-field">
+                <label class="xp-label" for="passInput">Password:</label>
+                <input class="xp-input" type="password" id="passInput" autocomplete="current-password" />
+              </div>
+
+              <div class="xp-checkbox-row">
+                <input class="xp-checkbox" type="checkbox" id="rememberMe" />
+                <label class="xp-checkbox-label" for="rememberMe">Remember me on this computer</label>
+              </div>
+
+              <div class="xp-error" id="errorMsg">The email address or password you entered is incorrect.</div>
+
+              <div class="xp-btn-row">
+                <button type="button" class="xp-btn" onclick="window.location.href='post.html'">Cancel</button>
+                <button type="submit" class="xp-btn-primary" id="signinBtn">Sign In</button>
+              </div>
+            </div>
+          </form>
+
+          <div class="xp-divider-row">
+            <button class="xp-link" type="button">Forgot your password?</button>
+          </div>
+
+          <div class="xp-new-account-row">
+            <span class="xp-new-account-label">Don't have a Post?</span>
+            <button class="xp-btn" style="min-width:unset;padding:3px 10px;" onclick="window.location.href='playground.html'">Claim your Post...</button>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="xp-statusbar">
+        <span class="xp-status-panel" id="statusText">Ready</span>
+      </div>
+
     </div>
   </div>
 
-  <!-- Address Bar -->
-  <!-- Site Banner -->
-  <div class="site-banner">
-    <div class="site-banner-logo">Postmarq</div>
-    <nav class="site-banner-nav">
-      <a href="#">home</a>
-      <a href="#">townsquare</a>
-      <a href="#">neighborhood</a>
-      <a href="#">help</a>
-      <a href="#" id="logoutBtn">logout</a>
-    </nav>
-  </div>
-
-  <!-- ═══ ZONE: POST FEED ═══ -->
-  <div class="zone zone-feed">
-    <div class="main-grid">
-
-      <!-- Left Column: Profile + My Q + Neighborhood -->
-      <div class="left-col">
-
-        <!-- Room Nav Tabs -->
-        <div class="room-nav">
-          <a class="room-tab active" href="index.html" title="Home">
-            <i class="ti ti-home-2"></i>
-            <span>Home</span>
-          </a>
-          <a class="room-tab" href="living-room.html" title="Living Room">
-            <i class="ti ti-sofa"></i>
-            <span>Living Room</span>
-          </a>
-          <a class="room-tab" href="office.html" title="Office">
-            <i class="ti ti-briefcase"></i>
-            <span>Office</span>
-          </a>
-          <a class="room-tab" href="playground.html" title="Playground">
-            <i class="ti ti-assembly"></i>
-            <span>Playground</span>
-          </a>
-          <a class="room-tab" href="lounge.html" title="Lounge" onclick="event.preventDefault();window.open('lounge.html','postmarq-lounge','width=780,height=620,resizable=yes')">
-            <i class="ti ti-messages"></i>
-            <span>Lounge</span>
-          </a>
-        </div>
-
-        <!-- My Post Card -->
-        <div class="myspace-card">
-
-          <!-- Profile section -->
-          <div class="ms-profile">
-            <img class="ms-photo" src="Profile Pic_01x.JPG" alt="Dave Michael" />
-            <div class="ms-info">
-              <div class="ms-name">Dave Michael</div>
-              <div class="ms-meta">
-                My Townsquare: <span>Phoenix, AZ</span><br>
-                My Hood: <span>Uptown PHX</span><br>
-                In a Relationship: <span>1 Year</span><br>
-                Last Update: <span>June 11, 2026</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="ms-divider"></div>
-
-          <!-- My Marq row -->
-          <div class="ms-stamp-row" style="flex-direction:column; align-items:flex-start; gap:0.15rem; padding-bottom:0.5rem;">
-            <span style="font-size:0.6rem; font-weight:900; letter-spacing:0.08em; text-transform:uppercase; color:var(--lavender);">My Marq</span>
-            <span style="font-size:0.72rem; font-weight:500; color:var(--ink-2); line-height:1.45;">Here to make real connections while learning how to code. Welcome to Postmarq.</span>
-          </div>
-
-          <div class="ms-divider"></div>
-
-          <!-- Current Stamp row -->
-          <div class="ms-stamp-row">
-            Current Stamp:
-            <img class="ms-stamp-img" src="Stamp_odesza.png" alt="Current Stamp" />
-          </div>
-
-          <div class="ms-divider"></div>
-
-          <!-- Contacting Dave box -->
-          <div class="ms-contact-header">Contacting Dave</div>
-          <div class="ms-contact-grid">
-            <a class="ms-contact-item" href="#"><i class="ti ti-mail"></i> Send Message</a>
-            <a class="ms-contact-item" href="#"><i class="ti ti-share"></i> Forward to Friend</a>
-            <a class="ms-contact-item" href="#"><i class="ti ti-user-plus"></i> Add to Friends</a>
-            <a class="ms-contact-item" href="#"><i class="ti ti-heart"></i> Add to Favorites</a>
-            <a class="ms-contact-item" href="#"><i class="ti ti-message-circle"></i> IM / Call</a>
-            <a class="ms-contact-item" href="#"><i class="ti ti-ban"></i> Block User</a>
-          </div>
-
-        </div>
-
-        <!-- My Q -->
-        <div class="myq-wrap" id="myQWrap">
-          <div class="myq-header">
-            <div class="myq-date-block">
-              <div class="myq-day-num" id="myqDayNum"></div>
-              <div class="myq-day-name" id="myqDayName"></div>
-              <div class="myq-month" id="myqMonth"></div>
-            </div>
-            <div class="myq-title-block">
-              <div class="myq-title" id="myqModuleTitle">My Q</div>
-              <div class="myq-subtitle">loop schedule</div>
-            </div>
-          </div>
-          <div class="myq-list" id="myqList"></div>
-          <button class="myq-more-btn" id="myqMoreBtn" style="display:none;"></button>
-          <div class="myq-footer">
-            <button class="myq-add-btn" onclick="myqOpenModal()">+ Add</button>
-          </div>
-        </div>
-
-        <!-- My Q Modal -->
-        <div class="myq-modal-overlay" id="myqOverlay">
-          <div class="myq-modal">
-            <h3>New item</h3>
-            <div class="myq-type-toggle">
-              <button class="myq-type-btn sel-loop" id="myqTypeLoop" onclick="myqSetType('loop')">Loop</button>
-              <button class="myq-type-btn" id="myqTypeInvite" onclick="myqSetType('invite')">Invite</button>
-            </div>
-            <div class="myq-field-wrap">
-              <div class="myq-field-label">Title</div>
-              <input class="myq-input" id="myqInputTitle" type="text" placeholder="e.g. Canal walk with Trixton" />
-            </div>
-            <div class="myq-field-wrap">
-              <div class="myq-field-label" id="myqWhenLabel">Cadence</div>
-              <input class="myq-input" id="myqInputWhen" type="text" placeholder="e.g. Tues & Thurs 5:30pm" />
-            </div>
-            <div class="myq-field-wrap">
-              <div class="myq-field-label">Details (optional)</div>
-              <textarea class="myq-textarea" id="myqInputDetails" placeholder="Anything else..."></textarea>
-            </div>
-            <div class="myq-field-wrap">
-              <div class="myq-field-label">Visibility</div>
-              <div class="myq-vis-toggle">
-                <button class="myq-vis-btn active" id="myqVisPublic" onclick="myqSetVis('public')">Public</button>
-                <button class="myq-vis-btn" id="myqVisPrivate" onclick="myqSetVis('private')">Private</button>
-              </div>
-            </div>
-            <div class="myq-modal-actions">
-              <button class="myq-cancel-btn" onclick="myqCloseModal()">Cancel</button>
-              <button class="myq-save-btn" onclick="myqSave()">Save</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- My Q Detail/Edit Modal -->
-        <div class="myq-modal-overlay" id="myqDetailOverlay">
-          <div class="myq-detail-modal">
-            <div id="myqdTypePill" class="myq-detail-type-pill"></div>
-            <div id="myqdViewMode">
-              <div class="myq-detail-title" id="myqdTitle"></div>
-              <div class="myq-detail-when" id="myqdWhen"></div>
-              <div class="myq-detail-details" id="myqdDetails" style="display:none;"></div>
-              <hr class="myq-detail-divider">
-              <div style="display:flex; gap:8px; justify-content:flex-end;">
-                <button class="myq-cancel-btn" onclick="myqDetailClose()">Close</button>
-                <button class="myq-add-btn" onclick="myqDetailSwitchEdit()">Edit</button>
-              </div>
-            </div>
-            <div id="myqdEditMode" style="display:none;">
-              <div class="myq-detail-edit-row">
-                <div class="myq-field-label">Title</div>
-                <input class="myq-input" id="myqdEditTitle" type="text" />
-              </div>
-              <div class="myq-detail-edit-row">
-                <div class="myq-field-label" id="myqdEditWhenLabel">Cadence</div>
-                <input class="myq-input" id="myqdEditWhen" type="text" />
-              </div>
-              <div class="myq-detail-edit-row">
-                <div class="myq-field-label">Details (optional)</div>
-                <textarea class="myq-textarea" id="myqdEditDetails"></textarea>
-              </div>
-              <div class="myq-detail-edit-row">
-                <div class="myq-field-label">Visibility</div>
-                <div class="myq-vis-toggle">
-                  <button class="myq-vis-btn" id="myqdEditVisPublic"  onclick="myqDetailSetVis('public')">Public</button>
-                  <button class="myq-vis-btn" id="myqdEditVisPrivate" onclick="myqDetailSetVis('private')">Private</button>
-                </div>
-              </div>
-              <div class="myq-detail-actions">
-                <button class="myq-delete-btn" onclick="myqDetailDelete()">Delete</button>
-                <div style="display:flex; gap:8px;">
-                  <button class="myq-cancel-btn" onclick="myqDetailSwitchView()">Cancel</button>
-                  <button class="myq-save-btn" onclick="myqDetailSave()">Save</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Neighborhood -->
-        <div class="phoenix-card glass">
-          <div class="phoenix-bg"></div>
-          <div class="phoenix-inner">
-            <div class="card-title">Neighborhood</div>
-            <span class="phoenix-emoji">☀️</span>
-            <div class="phoenix-city">Phoenix</div>
-            <div class="phoenix-state">Arizona · The Valley</div>
-            <div class="phoenix-desc">Paying attention to what's happening here. Looking to be part of something good locally.</div>
-            <a href="#" class="square-link">→ The Square · Phoenix</a>
-          </div>
-        </div>
-
-      </div><!-- /left-col -->
-
-      <!-- Center Column: Tabbed Feed -->
-      <div class="feed-col">
-
-        <!-- Composer -->
-        <div class="composer glass" id="composer">
-          <div class="composer-header">
-            <div class="composer-avatar"><img src="Profile Pic_01x.JPG" alt="Dave" /></div>
-            <div class="composer-right">
-              <textarea class="composer-textarea" id="composerText" placeholder="What's on your mind?" rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
-              <div class="media-preview-strip" id="mediaPreviews"></div>
-              <div id="linkPreviewBox"></div>
-              <div class="composer-toolbar">
-                <button class="tool-btn" id="photoBtn" onclick="document.getElementById('photoInput').click()">
-                  📷 Photo <span class="tool-count" id="photoCount"></span>
-                </button>
-                <button class="tool-btn" id="videoBtn" onclick="document.getElementById('videoInput').click()">
-                  🎬 Video <span class="tool-count" id="videoCount"></span>
-                </button>
-                <button class="tool-btn" id="linkBtn" onclick="toggleLinkInput()">🔗 Link</button>
-                <div class="composer-spacer"></div>
-                <button class="post-btn" onclick="submitPost()">Post</button>
-              </div>
-              <div id="linkInputRow" style="display:none; margin-top:0.4rem;">
-                <input id="linkInput" type="url" placeholder="Paste a URL…" style="width:100%; padding:0.45rem 0.75rem; border-radius:var(--radius-sm); border:1.5px solid rgba(255,255,255,0.7); background:rgba(255,255,255,0.45); font-family:var(--font); font-size:0.85rem; color:var(--ink); outline:none;" oninput="debounceLinkPreview(this.value)" />
-              </div>
-            </div>
-          </div>
-          <input type="file" id="photoInput" class="file-input" accept="image/*" multiple onchange="addMedia(this,'image')" />
-          <input type="file" id="videoInput" class="file-input" accept="video/*" onchange="addMedia(this,'video')" />
-        </div>
-
-        <!-- ── Tab Bar ── -->
-        <div class="feed-tabs">
-          <button class="feed-tab"        onclick="switchTab('daily')">Daily</button>
-          <button class="feed-tab active" onclick="switchTab('weekly')">Weekly</button>
-          <button class="feed-tab"        onclick="switchTab('yearbook')">My Yearbook</button>
-        </div>
-
-        <!-- ══ PANEL: DAILY ══ -->
-        <div class="tab-panel" id="panel-daily">
-
-        <!-- Dynamic feed renders here -->
-        <div id="dynamicFeed"></div>
-
-        <!-- ── Permanent Post: Payson Camping Jun 15 ── -->
-        <div class="post-card post-card--photo glass">
-          <div class="post-body"><p>Summer Camping and Fishing in Payson! It's nice getting off the grid once in a while.</p></div>
-          <div class="post-media-grid count-6">
-            <div class="media-item"><img src="candids/IMG_7797.jpg" alt="Payson camping" onclick="lbOpen('candids/IMG_7797.jpg','image')" /></div>
-            <div class="media-item"><img src="candids/IMG_7802.JPG" alt="Payson camping" onclick="lbOpen('candids/IMG_7802.JPG','image')" /></div>
-            <div class="media-item"><img src="candids/IMG_7812.JPG" alt="Payson fishing" onclick="lbOpen('candids/IMG_7812.JPG','image')" /></div>
-            <div class="media-item"><img src="candids/IMG_7845.jpg" alt="Payson overlook" onclick="lbOpen('candids/IMG_7845.jpg','image')" /></div>
-            <div class="media-item"><img src="candids/IMG_7848.JPG" alt="Payson fishing catch" onclick="lbOpen('candids/IMG_7848.JPG','image')" /></div>
-            <div class="media-item"><img src="candids/IMG_2847.jpeg" alt="Trixton at summit" onclick="lbOpen('candids/IMG_2847.jpeg','image')" /></div>
-          </div>
-          <div class="post-footer">
-            <button class="stamp-btn" onclick="toggleStamp(this,0)">
-              <span class="stamp-icon">⬡</span> Stamp
-            </button>
-            <span class="stamp-count">0 stamps</span>
-            <span class="post-date">June 15, 2026</span>
-          </div>
-        </div>
-
-        <!-- ── PQ Update: PQ Updates feature — Jun 15, 2026 ── -->
-        <div class="post-pq-update glass">
-          <div class="pq-update-label">PQ Update</div>
-          <div class="pq-update-time">June 15, 2026</div>
-          <div class="pq-update-summary">PQ Updates introduced as a new post type. These are development log entries generated by Claude Code that appear in Daily and Weekly feeds alongside regular posts, sorted by timestamp. Each card uses a slate blue left accent bar, a monospace PQ Update label, a timestamp, and plain prose describing what changed. PQ Updates are excluded from the Yearbook view. No Stamp interaction for now.</div>
-        </div>
-
-
-        <!-- ── PQ Update: Feed colors, Weekly cleanup, Yearbook stats — Jun 15, 2026 ── -->
-        <div class="post-pq-update glass">
-          <div class="pq-update-label">PQ Update</div>
-          <div class="pq-update-time">June 15, 2026</div>
-          <div class="pq-update-summary">Removed the June 12 Postmarq Updates post from Daily, Weekly, and Yearbook views. Post cards in Daily and Weekly feeds now carry subtle background color tints by type — amber for photo posts, rust for video, blue-grey for PQ Updates. Type-tag pills removed from Weekly post meta rows; relative timestamps replaced with calendar dates. Yearbook stats overhauled: Films Seen removed; new stats added for Captures (10), Posts Created (5), PQ Updates (1), Connected Loops (3), and Stamps Sent (0).</div>
-        </div>
-
-        <!-- ── Permanent Post: Introducing My Q ── -->
-        <div class="post-card post-card--photo glass">
-          <div class="post-body"><p>Introducing My Q</p><p>My Q is a new module on your Postmarq profile that lets people know what you're up to — and signals you're open to company.</p><p>It runs on two simple ideas:</p><p><strong>Loops</strong> are things you do regularly and wouldn't mind doing with others. Walking the canal at 5:30pm. Browsing records on Saturday. Morning coffee at your usual spot. No RSVP, no commitment — just visibility into your rhythm.</p><p><strong>Invites</strong> are specific. A movie opening night. A game at Chase Field. A dinner you're organizing. Time, place, and a seat at the table if you want it.</p><p>Both live on your profile. Your neighborhood can see what you're up to. A Stamp says I'm interested. A message says I'm in.</p><p>No algorithm. No follower count. Just people whose lives happen to overlap with yours.</p></div>
-          <div class="post-img-wrap" onclick="lbOpen('MyQ.png','image')">
-            <img src="MyQ.png" alt="My Q module" />
-          </div>
-          <div class="post-footer">
-            <button class="stamp-btn" onclick="toggleStamp(this,0)">
-              <span class="stamp-icon">⬡</span> Stamp
-            </button>
-            <span class="stamp-count">0 stamps</span>
-            <span class="post-date">June 11, 2026</span>
-          </div>
-        </div>
-
-        <!-- ── Permanent Post: New stamp ── -->
-        <div class="post-card post-card--photo glass">
-          <div class="post-body"><p>My new stamp. What it does... IDK. Need ideas!</p></div>
-          <div class="post-media-grid count-1">
-            <div class="media-item">
-              <img src="Stamp_odesza.png" alt="Stamp" onclick="lbOpen('Stamp_odesza.png','image')" />
-            </div>
-          </div>
-          <div class="post-footer">
-            <button class="stamp-btn" onclick="toggleStamp(this,0)">
-              <span class="stamp-icon">⬡</span> Stamp
-            </button>
-            <span class="stamp-count">0 stamps</span>
-            <span class="post-date">June 10, 2026</span>
-          </div>
-        </div>
-
-        <!-- ── Permanent Post: D-backs walk-off ── -->
-        <div class="post-card post-card--video glass">
-          <div class="post-body"><p>D-backs win with a walk-off homerun against the Dodgers! [3-2].</p></div>
-          <div class="post-media-grid count-1">
-            <div class="media-item">
-              <video src="dbacks.MOV" controls playsinline preload="metadata" style="width:100%; height:auto; display:block; background:#000;"></video>
-            </div>
-          </div>
-          <div class="post-footer">
-            <button class="stamp-btn" onclick="toggleStamp(this,0)">
-              <span class="stamp-icon">⬡</span> Stamp
-            </button>
-            <span class="stamp-count">0 stamps</span>
-            <span class="post-date">June 10, 2026</span>
-          </div>
-        </div>
-
-        <!-- ── Permanent Post: First Post ── -->
-        <div class="post-card post-card--photo glass">
-          <div class="post-body"><p>My first post on Postmarq!</p></div>
-          <div class="post-img-wrap" onclick="lbOpen('post_01x.JPG','image')">
-            <img src="post_01x.JPG" alt="Dave Michael" />
-          </div>
-          <div class="post-footer">
-            <button class="stamp-btn" onclick="toggleStamp(this,0)">
-              <span class="stamp-icon">⬡</span> Stamp
-            </button>
-            <span class="stamp-count">0 stamps</span>
-            <span class="post-date">June 8, 2026</span>
-          </div>
-        </div>
-
-
-        </div><!-- /panel-daily -->
-
-        <!-- ══ PANEL: WEEKLY ══ -->
-        <div class="tab-panel active" id="panel-weekly">
-
-          <!-- Dynamic weekly rows render here -->
-          <div id="dynamicWeekly"></div>
-
-          <!-- Sunday Jun 15 -->
-          <div class="weekly-day-group">
-            <div class="weekly-day-label">Sunday — Jun 15</div>
-            <div class="weekly-row weekly-row--photo" onclick="albumOpen('payson-jun15')" style="cursor:pointer;">
-              <div class="album-thumb-wrap">
-                <img src="candids/IMG_7802.JPG" alt="Payson camping" />
-                <div class="album-count-badge"><i class="ti ti-camera"></i> 6</div>
-              </div>
-              <div class="weekly-body">
-                <div class="weekly-excerpt">Summer Camping and Fishing in Payson! It's nice getting off the grid once in a while.</div>
-                <div class="weekly-meta"><span class="weekly-time">June 15, 2026</span></div>
-              </div>
-            </div>
-            <div class="weekly-row weekly-row--pq-update">
-              <div class="weekly-body">
-                <div class="weekly-excerpt">PQ Updates introduced — development log entries from Claude Code, visible in Daily and Weekly feeds, excluded from Yearbook. Slate blue accent bar distinguishes them from user posts.</div>
-                <div class="weekly-meta"><span class="weekly-time">June 15, 2026</span></div>
-              </div>
-            </div>
-            <div class="weekly-row weekly-row--pq-update">
-              <div class="weekly-body">
-                <div class="weekly-excerpt">Removed June 12 post. Feed posts now carry subtle color tints by type. Weekly type-tag pills removed; dates updated. Yearbook stats overhauled with Captures, Posts Created, PQ Updates, Connected Loops, and Stamps Sent.</div>
-                <div class="weekly-meta"><span class="weekly-time">June 15, 2026</span></div>
-              </div>
-            </div>
-          </div>
-
-
-          <!-- Wednesday Jun 11 -->
-          <div class="weekly-day-group">
-            <div class="weekly-day-label">Wednesday — Jun 11</div>
-
-            <div class="weekly-row weekly-row--photo">
-              <div class="weekly-thumb-wrap"><img src="MyQ.png" alt="My Q" /></div>
-              <div class="weekly-body">
-                <div class="weekly-excerpt">Introducing My Q — a new module on your profile that lets people know what you're up to.</div>
-                <div class="weekly-meta">
-                  <span class="weekly-time">June 11, 2026</span>
-                  <span class="weekly-stamps">⬡ 0</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Tuesday Jun 10 -->
-          <div class="weekly-day-group">
-            <div class="weekly-day-label">Tuesday — Jun 10</div>
-
-            <div class="weekly-row weekly-row--photo">
-              <div class="weekly-thumb-wrap"><img src="Stamp_odesza.png" alt="Stamp" /></div>
-              <div class="weekly-body">
-                <div class="weekly-excerpt">My new stamp. What it does... IDK. Need ideas!</div>
-                <div class="weekly-meta">
-                  <span class="weekly-time">June 10, 2026</span>
-                  <span class="weekly-stamps">⬡ 0</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="weekly-row weekly-row--video">
-              <div class="weekly-thumb-wrap">
-                <video src="dbacks.MOV" muted preload="metadata" playsinline></video>
-                <div class="video-pill">Video</div>
-                <div class="thumb-play">▶</div>
-              </div>
-              <div class="weekly-body">
-                <div class="weekly-excerpt">D-backs win with a walk-off homerun against the Dodgers! [3-2].</div>
-                <div class="weekly-meta">
-                  <span class="weekly-time">June 10, 2026</span>
-                  <span class="weekly-stamps">⬡ 0</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Sunday Jun 8 -->
-          <div class="weekly-day-group">
-            <div class="weekly-day-label">Sunday — Jun 8</div>
-
-            <div class="weekly-row weekly-row--photo">
-              <div class="weekly-thumb-wrap"><img src="post_01x.JPG" alt="First post" /></div>
-              <div class="weekly-body">
-                <div class="weekly-excerpt">My first post on Postmarq!</div>
-                <div class="weekly-meta">
-                  <span class="weekly-time">June 8, 2026</span>
-                  <span class="weekly-stamps">⬡ 0</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div><!-- /panel-weekly -->
-
-        <!-- ══ PANEL: YEARBOOK ══ -->
-        <div class="tab-panel" id="panel-yearbook">
-
-          <!-- Stats -->
-          <div class="yb-stats" style="grid-template-columns: repeat(5,1fr);">
-            <div class="yb-stat">
-              <div class="yb-stat-num">10</div>
-              <div class="yb-stat-lbl">Captures</div>
-            </div>
-            <div class="yb-stat">
-              <div class="yb-stat-num">5</div>
-              <div class="yb-stat-lbl">Posts<br>Created</div>
-            </div>
-            <div class="yb-stat">
-              <div class="yb-stat-num">2</div>
-              <div class="yb-stat-lbl">PQ<br>Updates</div>
-            </div>
-            <div class="yb-stat">
-              <div class="yb-stat-num">3</div>
-              <div class="yb-stat-lbl">Connected<br>Loops</div>
-            </div>
-            <div class="yb-stat">
-              <div class="yb-stat-num">0</div>
-              <div class="yb-stat-lbl">Stamps<br>Sent</div>
-            </div>
-          </div>
-
-          <!-- Dynamic yearbook tiles render here -->
-          <div id="dynamicYearbook"></div>
-
-          <!-- June 2026 -->
-          <div class="yb-month-label">June 2026</div>
-          <div class="yb-tile-grid">
-            <div class="yb-tile photo" onclick="albumOpen('payson-jun15')" style="cursor:pointer; position:relative;">
-              <img src="candids/IMG_7802.JPG" alt="Payson trip" />
-              <div class="album-count-badge" style="position:absolute;bottom:0.4rem;right:0.4rem;font-size:0.62rem;padding:0.15rem 0.45rem;"><i class="ti ti-camera"></i> 6</div>
-              <div class="yb-tile-tip">Camping in Payson<br>Jun 15</div>
-            </div>
-
-
-            <div class="yb-tile photo">
-              <img src="MyQ.png" alt="My Q" />
-              <div class="yb-tile-tip">Introducing My Q<br>Jun 11</div>
-            </div>
-            <div class="yb-tile photo">
-              <img src="Stamp_odesza.png" alt="Stamp" />
-              <div class="yb-tile-tip">My new stamp<br>Jun 10</div>
-            </div>
-            <div class="yb-tile video">
-              <video src="dbacks.MOV" muted preload="metadata" playsinline></video>
-              <div class="video-pill">Video</div>
-              <div class="thumb-play">▶</div>
-              <div class="yb-tile-tip">D-backs walk-off<br>Jun 10</div>
-            </div>
-            <div class="yb-tile photo">
-              <img src="post_01x.JPG" alt="First post" />
-              <div class="yb-tile-tip">My first post on Postmarq!<br>Jun 8</div>
-            </div>
-          </div>
-
-        </div><!-- /panel-yearbook -->
-
-      </div><!-- /feed-col -->
-
-      <!-- Right Column: Pick Six + Candids + Marquee -->
-      <div class="right-col">
-
-        <!-- Pick Six -->
-        <div class="sidebar-card glass" style="padding:0; overflow:hidden; background: linear-gradient(135deg, rgba(155,143,212,0.28) 0%, rgba(74,181,170,0.16) 100%); border: 1px solid rgba(255,255,255,0.55); box-shadow: 0 4px 24px rgba(80,60,140,0.10);">
-          <div style="padding:1.1rem 1.25rem 0.75rem; display:flex; justify-content:center;">
-            <div class="card-title" style="margin-bottom:0; font-size:1.2rem; font-weight:900; letter-spacing:-0.4px; color:#3d2a0a;">My Pick Six</div>
-          </div>
-          <div class="pick-six-grid">
-            <div class="pick-six-tile">
-              <img src="friends/Charlie.JPG" alt="Charlie" />
-              <span class="pick-six-name">Charlie</span>
-            </div>
-            <div class="pick-six-tile">
-              <img src="friends/Keller.jpg" alt="Keller" />
-              <span class="pick-six-name">Keller</span>
-            </div>
-            <div class="pick-six-tile">
-              <img src="friends/Tom.jpg" alt="Tom" />
-              <span class="pick-six-name">Tom</span>
-            </div>
-            <div class="pick-six-tile">
-              <img src="friends/Trixton.JPG" alt="Trixton" />
-              <span class="pick-six-name">Trixton</span>
-            </div>
-            <div class="pick-six-tile">
-              <img src="friends/Camille Jeff.jpg" alt="Camille Jeff" />
-              <span class="pick-six-name">Camille Jeff</span>
-            </div>
-            <div class="pick-six-tile">
-              <img src="friends/Sunny Rich.jpg" alt="Sunny Rich" />
-              <span class="pick-six-name">Sunny Rich</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Candids Wall -->
-        <div class="sidebar-card glass" style="padding:0; overflow:hidden; background: linear-gradient(135deg, rgba(74,181,170,0.22) 0%, rgba(155,143,212,0.22) 100%);">
-          <div style="padding:1.25rem 1.25rem 0.8rem; display:flex; justify-content:center;">
-            <div class="card-title" style="margin-bottom:0; font-size:1.45rem; font-weight:900; letter-spacing:-0.5px; color:#2d3a4a; text-align:center;">Candids Wall</div>
-          </div>
-          <div class="candids-scroll-wrap">
-            <div class="candids-grid">
-              <div class="candid-tile" onclick="lbOpen('candids/me-.jpg','image','me-.jpg')">
-                <img src="candids/me-.jpg" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_0174.jpeg','image','IMG_0174.jpeg')">
-                <img src="candids/IMG_0174.jpeg" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_0746.JPG','image','IMG_0746.JPG')">
-                <img src="candids/IMG_0746.JPG" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_1739.jpg','image','IMG_1739.jpg')">
-                <img src="candids/IMG_1739.jpg" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_1937.JPG','image','IMG_1937.JPG')">
-                <img src="candids/IMG_1937.JPG" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_1960.jpg','image','IMG_1960.jpg')">
-                <img src="candids/IMG_1960.jpg" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_2076.JPG','image','IMG_2076.JPG')">
-                <img src="candids/IMG_2076.JPG" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_2605.JPG','image','IMG_2605.JPG')">
-                <img src="candids/IMG_2605.JPG" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_4044.JPG','image','IMG_4044.JPG')">
-                <img src="candids/IMG_4044.JPG" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_5883.jpg','image','IMG_5883.jpg')">
-                <img src="candids/IMG_5883.jpg" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_5970.JPG','image','IMG_5970.JPG')">
-                <img src="candids/IMG_5970.JPG" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_6134.JPG','image','IMG_6134.JPG')">
-                <img src="candids/IMG_6134.JPG" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_6289.JPG','image','IMG_6289.JPG')">
-                <img src="candids/IMG_6289.JPG" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_6697 2.JPG','image','IMG_6697 2.JPG')">
-                <img src="candids/IMG_6697 2.JPG" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_6847.jpg','image','IMG_6847.jpg')">
-                <img src="candids/IMG_6847.jpg" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_7073.JPG','image','IMG_7073.JPG')">
-                <img src="candids/IMG_7073.JPG" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_7272.JPG','image','IMG_7272.JPG')">
-                <img src="candids/IMG_7272.JPG" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_7349.JPG','image','IMG_7349.JPG')">
-                <img src="candids/IMG_7349.JPG" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_7350.JPG','image','IMG_7350.JPG')">
-                <img src="candids/IMG_7350.JPG" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/IMG_7529.JPG','image','IMG_7529.JPG')">
-                <img src="candids/IMG_7529.JPG" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/D2FFD1AA-AA8C-4FB4-82E5-4B410A74EEC8.jpg','image','D2FFD1AA-AA8C-4FB4-82E5-4B410A74EEC8.jpg')">
-                <img src="candids/D2FFD1AA-AA8C-4FB4-82E5-4B410A74EEC8.jpg" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/ld-export-fae74027-10242025.jpg','image','ld-export-fae74027-10242025.jpg')">
-                <img src="candids/ld-export-fae74027-10242025.jpg" alt="candid" loading="lazy" />
-                <div class="tile-hover"><div class="tile-hover-icon">🔍</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/80f860e90da84dd8abea3b310afce689.mov','video','80f860e90da84dd8abea3b310afce689.mov')">
-                <video src="candids/80f860e90da84dd8abea3b310afce689.mov" muted preload="metadata"></video>
-                <div class="video-pill">Video</div>
-                <div class="tile-hover"><div class="tile-hover-icon">▶</div></div>
-              </div>
-              <div class="candid-tile" onclick="lbOpen('candids/87a12adb05a648069bc8156492047af4.mov','video','87a12adb05a648069bc8156492047af4.mov')">
-                <video src="candids/87a12adb05a648069bc8156492047af4.mov" muted preload="metadata"></video>
-                <div class="video-pill">Video</div>
-                <div class="tile-hover"><div class="tile-hover-icon">▶</div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- The Marquee -->
-        <div class="sidebar-card glass" id="theMarquee" style="background: linear-gradient(135deg, rgba(74,181,170,0.22) 0%, rgba(155,143,212,0.22) 100%);">
-          <div style="display:flex; justify-content:center; margin-bottom:0.75rem;">
-            <div class="card-title" style="margin-bottom:0; font-size:1.45rem; font-weight:900; letter-spacing:-0.5px; color:#2d3a4a; text-align:center;">The Marquee</div>
-          </div>
-          <div class="feed-tabs" style="margin-bottom:0.75rem;">
-            <button class="feed-tab active" onclick="switchMqTab('seen')">Recently Watched</button>
-            <button class="feed-tab"        onclick="switchMqTab('want')">Watchlist</button>
-            <button class="feed-tab"        onclick="switchMqTab('must')">Must Watch</button>
-          </div>
-          <div class="mq-panel active" id="mq-seen">
-            <div class="mq-carousel-wrap">
-              <button class="mq-arrow mq-prev" onclick="mqScroll('stageSeen',-1)">&#8249;</button>
-              <div class="mq-stage" id="stageSeen"></div>
-              <button class="mq-arrow mq-next" onclick="mqScroll('stageSeen', 1)">&#8250;</button>
-            </div>
-          </div>
-          <div class="mq-panel" id="mq-want">
-            <div class="mq-carousel-wrap">
-              <button class="mq-arrow mq-prev" onclick="mqScroll('stageWant',-1)">&#8249;</button>
-              <div class="mq-stage" id="stageWant"></div>
-              <button class="mq-arrow mq-next" onclick="mqScroll('stageWant', 1)">&#8250;</button>
-            </div>
-          </div>
-          <div class="mq-panel" id="mq-must">
-            <div class="mq-carousel-wrap">
-              <button class="mq-arrow mq-prev" onclick="mqScroll('stageMust',-1)">&#8249;</button>
-              <div class="mq-stage" id="stageMust"></div>
-              <button class="mq-arrow mq-next" onclick="mqScroll('stageMust', 1)">&#8250;</button>
-            </div>
-          </div>
-          <div class="marquee-spotlight" id="marqueeSpotlight">
-            <div class="spotlight-poster" id="spotlightPoster">
-              <img id="spotlightImg" alt="" />
-              <div class="spotlight-grad" id="spotlightGrad"></div>
-            </div>
-            <div class="spotlight-info">
-              <div class="spotlight-status" id="spotlightStatus"></div>
-              <div class="spotlight-title-lg" id="spotlightTitle"></div>
-              <div class="spotlight-year-lg"  id="spotlightYear"></div>
-              <div class="spotlight-rating"   id="spotlightRating"></div>
-              <div class="spotlight-seen"     id="spotlightSeen"></div>
-              <div class="spotlight-thoughts" id="spotlightThoughts"></div>
-              <button class="spotlight-close" onclick="closeSpotlight()">✕ close</button>
-            </div>
-          </div>
-        </div>
-
-      </div><!-- /right-col -->
-    </div><!-- /main-grid -->
-
-    <footer class="page-footer">
-      <div class="footer-left">Your mark. Your address. Yours.</div>
-      <div class="footer-right">on <span>Postmarq</span> · davemichael.postmarq</div>
-    </footer>
-
-  </div><!-- /zone-feed -->
-
-  <script>
-    /* ══════════════════════════════════════════
-       THE MARQUEE — Film Data & Poster Renderer
-       ══════════════════════════════════════════
-       TO USE REAL POSTERS:
-       1. Get a free key at https://www.themoviedb.org/settings/api
-       2. Paste it into TMDB_API_KEY below
-       3. Uncomment loadTMDBPosters() at the bottom
-       ══════════════════════════════════════════ */
-
-    // ─── SEEN ───────────────────────────────────
-    const FILMS_SEEN = [
-      {
-        title:  "Backrooms",
-        year:   2023,
-        rating: 4,
-        seen:   "June 6, 2026",
-        thoughts: "It's not a movie you can watch face value. You have to do some existential thinking to understand the deeper meanings of the plot."
-      },
-      {
-        title:  "Masters of the Universe",
-        year:   2025,
-        rating: 4,
-        seen:   "June 7, 2026",
-        thoughts: "A very fun movie to watch and was surprised how much I enjoyed it — mainly for the comedic relief. The movie knew what it was."
-      },
-      {
-        title:  "Obsession",
-        year:   2024,
-        rating: 4,
-        seen:   "June 1, 2026",
-        thoughts: "Suspenseful, eerie, and intriguing. It had psychological elements of addiction, obsessive thinking, and co-dependency. This movie is not for everyone."
-      },
-      {
-        title:  "Send Help",
-        year:   2025,
-        rating: 3,
-        seen:   "June 8, 2026",
-        thoughts: "Entertaining, interesting and intricate filming elements. Not a perfect movie — a lot of plot holes."
-      },
-      {
-        title:  "The Cider House Rules",
-        year:   1999,
-        rating: 4,
-        seen:   "May 24, 2026",
-        thoughts: "Slow paced, but in the end it had a beautiful story."
-      },
-      {
-        title:  "Driving Miss Daisy",
-        year:   1989,
-        rating: 3,
-        seen:   "June 1, 2026",
-        thoughts: "Good movie. How they presented the timeline as they were aging was a little skewed. You see a subtle change of their age and looks, but sometimes hard to know what point in time you are in their lives."
-      },
-    ];
-
-    // ─── WANT TO SEE ────────────────────────────
-    const FILMS_WANT = [
-      { title: "Disclosure Day"                               },
-      { title: "The Odyssey",                  year: 2025    },
-      { title: "Supergirl: Woman of Tomorrow", year: 2026    },
-      { title: "Spider-Man: Brand New Day"                   },
-    ];
-
-    // ─── MUST WATCH ─────────────────────────────
-    const FILMS_MUST = [
-      {
-        title:    "Obsession",
-        year:     2024,
-        rating:   4,
-        thoughts: "Suspenseful, eerie, and intriguing. It had psychological elements of addiction, obsessive thinking, and co-dependency. This movie is not for everyone.",
-        featured: true
-      },
-    ];
-
-    // ─── Gradient palette ───────────────────────
-    const POSTER_GRADIENTS = [
-      "linear-gradient(160deg,#c87840,#2a1808)",
-      "linear-gradient(160deg,#3a6080,#0a1820)",
-      "linear-gradient(160deg,#805080,#180828)",
-      "linear-gradient(160deg,#208060,#041810)",
-      "linear-gradient(160deg,#c04030,#200808)",
-      "linear-gradient(160deg,#806020,#180e04)",
-      "linear-gradient(160deg,#204880,#060c18)",
-      "linear-gradient(160deg,#a06040,#200c04)",
-      "linear-gradient(160deg,#386858,#081410)",
-      "linear-gradient(160deg,#604888,#100818)",
-    ];
-
-    let gradIdx = 0;
-    function nextGrad() { return POSTER_GRADIENTS[gradIdx++ % POSTER_GRADIENTS.length]; }
-
-    function makeTile(film, status) {
-      const grad = nextGrad();
-      const wrap = document.createElement('div');
-      wrap.className = 'tile-wrap';
-
-      const tile = document.createElement('div');
-      tile.className = 'marquee-tile';
-      tile.dataset.title  = film.title;
-      tile.dataset.status = status;
-      tile.dataset.grad   = grad;
-      tile.innerHTML = `
-        <img class="real-poster" alt="${film.title}" />
-        <div class="poster-grad" style="background:${grad};">
-          <div class="poster-title">${film.title}</div>
-        </div>
-        <div class="poster-hover"><div class="poster-hover-icon">🎬</div></div>
-        <div class="poster-reflection"><img alt="" /></div>
-      `;
-      tile.addEventListener('click', () => openSpotlight(tile, film, status, grad));
-
-      // rating only shown on Must Watch tiles
-      const showRating = status === 'must' && film.rating;
-      const label = document.createElement('div');
-      label.className = 'tile-label';
-      label.innerHTML = `
-        <div class="tile-label-title">${film.title}</div>
-        ${showRating ? `<div class="tile-label-rating">${'★'.repeat(film.rating)}</div>` : ''}
-      `;
-
-      if (status === 'must' && film.featured) wrap.classList.add('mq-featured');
-
-      wrap.appendChild(tile);
-      wrap.appendChild(label);
-      return wrap;
-    }
-
-    function buildMarquee() {
-      FILMS_SEEN.forEach(f => document.getElementById('stageSeen').appendChild(makeTile(f, 'seen')));
-      FILMS_WANT.forEach(f => document.getElementById('stageWant').appendChild(makeTile(f, 'want')));
-      FILMS_MUST.forEach(f => document.getElementById('stageMust').appendChild(makeTile(f, 'must')));
-    }
-    buildMarquee();
-
-    // ─── Marquee tab + carousel ──────────────────
-    function switchMqTab(name) {
-      document.querySelectorAll('#theMarquee .feed-tab').forEach((btn, i) => {
-        btn.classList.toggle('active', ['seen','want','must'][i] === name);
-      });
-      document.querySelectorAll('.mq-panel').forEach(p => {
-        p.classList.toggle('active', p.id === 'mq-' + name);
-      });
-      closeSpotlight();
-    }
-
-    function mqScroll(stageId, dir) {
-      const stage = document.getElementById(stageId);
-      const tile  = stage.querySelector('.tile-wrap');
-      if (!tile) return;
-      stage.scrollBy({ left: dir * (tile.getBoundingClientRect().width + 14), behavior: 'smooth' });
-    }
-
-    // ─── Spotlight ──────────────────────────────
-    function openSpotlight(tile, film, status, grad) {
-      // clear active
-      document.querySelectorAll('.marquee-tile').forEach(t => t.classList.remove('active-tile'));
-      tile.classList.add('active-tile');
-
-      const panel   = document.getElementById('marqueeSpotlight');
-      const mqPanel = tile.closest('.mq-panel');
-      mqPanel.appendChild(panel);
-      const poster  = document.getElementById('spotlightPoster');
-      const sGrad   = document.getElementById('spotlightGrad');
-      const sImg    = document.getElementById('spotlightImg');
-      const sStatus = document.getElementById('spotlightStatus');
-      const sTitle  = document.getElementById('spotlightTitle');
-      const sYear   = document.getElementById('spotlightYear');
-
-      // poster side
-      sGrad.style.background = grad;
-      sGrad.innerHTML = `<div class="poster-title" style="font-size:0.7rem;">${film.title}</div>`;
-      if (tile.classList.contains('has-poster')) {
-        sImg.src = tile.querySelector('.real-poster').src;
-        sImg.style.display = 'block';
-        poster.classList.add('has-poster');
-      } else {
-        sImg.style.display = 'none';
-        poster.classList.remove('has-poster');
-      }
-
-      // info side
-      const statusMap = { seen: ['✓ Seen','seen'], want: ['◎ Watchlist','want'], must: ['♦ Must Watch','must'] };
-      const [statusText, statusCls] = statusMap[status] || ['',''];
-      sStatus.textContent = statusText;
-      sStatus.className   = 'spotlight-status ' + statusCls;
-      sTitle.textContent  = film.title;
-      sYear.textContent   = film.year || '';
-
-      const sRating   = document.getElementById('spotlightRating');
-      const sSeen     = document.getElementById('spotlightSeen');
-      const sThoughts = document.getElementById('spotlightThoughts');
-
-      sRating.textContent   = film.rating ? '★'.repeat(film.rating) + '☆'.repeat(5 - film.rating) + `  ${film.rating}/5` : '';
-      sSeen.textContent     = film.seen   ? `Seen ${film.seen}` : '';
-      sThoughts.textContent = film.thoughts || '';
-      sThoughts.style.display = film.thoughts ? 'block' : 'none';
-
-      panel.classList.add('open');
-      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-
-    function closeSpotlight() {
-      document.getElementById('marqueeSpotlight').classList.remove('open');
-      document.querySelectorAll('.marquee-tile').forEach(t => t.classList.remove('active-tile'));
-    }
-
-    // ══════════════════════════════════════════
-    // TMDB API INTEGRATION — drop your key in
-    // ══════════════════════════════════════════
-    //
-    const TMDB_API_KEY = '8aa40129d309ada1f40a0145f66c1068';
-    const TMDB_SEARCH  = 'https://api.themoviedb.org/3/search/movie';
-    const TMDB_IMG     = 'https://image.tmdb.org/t/p/w342';
-
-    async function fetchPoster(title) {
-      try {
-        const url  = `${TMDB_SEARCH}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(title)}&include_adult=false`;
-        const data = await (await fetch(url)).json();
-        const hit  = data.results?.find(r => r.poster_path);
-        return hit ? TMDB_IMG + hit.poster_path : null;
-      } catch { return null; }
-    }
-
-    async function loadTMDBPosters() {
-      for (const tile of document.querySelectorAll('.mq-stage .marquee-tile')) {
-        const src = await fetchPoster(tile.dataset.title);
-        if (src) {
-          const img = tile.querySelector('.real-poster');
-          img.src = src;
-          img.onload = () => {
-            tile.classList.add('has-poster');
-            const ref = tile.querySelector('.poster-reflection img');
-            if (ref) ref.src = src;
-          };
-        }
-      }
-    }
-
-    loadTMDBPosters();
-    // ══════════════════════════════════════════
-
-    /* ── Lightbox ── */
-    function lbOpen(src, type, caption) {
-      const lb  = document.getElementById('lightbox');
-      const img = document.getElementById('lbImg');
-      const vid = document.getElementById('lbVid');
-      const cap = document.getElementById('lbCaption');
-
-      if (type === 'video') {
-        vid.src = src; vid.style.display = 'block';
-        img.style.display = 'none'; img.src = '';
-      } else {
-        img.src = src; img.style.display = 'block';
-        vid.style.display = 'none'; vid.pause && vid.pause(); vid.src = '';
-      }
-      cap.textContent = caption || '';
-      lb.classList.add('open');
-      document.body.style.overflow = 'hidden';
-    }
-    function lbClose(e) {
-      if (e && e.target.closest('.lb-wrap') && !e.target.closest('.lb-close')) return;
-      const vid = document.getElementById('lbVid');
-      vid.pause && vid.pause(); vid.src = '';
-      document.getElementById('lightbox').classList.remove('open');
-      document.body.style.overflow = '';
-    }
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') lbClose();
-      // P — focus composer (only when not already typing in a field)
-      if (e.key === 'p' && document.activeElement.tagName !== 'TEXTAREA' && document.activeElement.tagName !== 'INPUT') {
-        e.preventDefault();
-        const ta = document.getElementById('composerText');
-        ta.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        ta.focus();
-      }
-    });
-
-    /* ── Stamp toggle ── */
-    function toggleStamp(btn, base) {
-      const stamped = btn.classList.toggle('stamped');
-      const countEl = btn.nextElementSibling;
-      const current = base !== undefined ? base : parseInt(countEl.textContent);
-      const n = current + (stamped ? 1 : -1);
-      countEl.textContent = n + (n === 1 ? ' stamp' : ' stamps');
-      btn.querySelector('.stamp-icon').style.transform = stamped ? 'scale(1.1)' : '';
-    }
-
-    /* ── Guestbook ── */
-    function gbSubmit(btn) {
-      const form = btn.closest('.gb-form');
-      const ta   = form.querySelector('textarea');
-      const inp  = form.querySelector('input');
-      if (!ta.value.trim()) { ta.focus(); return; }
-      const entry = document.createElement('div');
-      entry.className = 'gb-entry';
-      entry.style.opacity = '0'; entry.style.transform = 'translateY(8px)';
-      entry.style.transition = 'all 0.3s ease';
-      entry.innerHTML = `
-        <div class="gb-header">
-          <span class="gb-author">${esc(inp.value.trim() || 'anonymous')}</span>
-          <span class="gb-when">just now</span>
-        </div>
-        <div class="gb-msg">"${esc(ta.value.trim())}"</div>
-      `;
-      document.getElementById('gbEntries').appendChild(entry);
-      requestAnimationFrame(() => { entry.style.opacity = '1'; entry.style.transform = 'translateY(0)'; });
-      ta.value = ''; inp.value = '';
-    }
-
-    /* ── Composer ── */
-    let mediaFiles = [];
-    let postType   = 'post';
-
-    function setType(btn) {
-      document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      postType = btn.dataset.type;
-      document.getElementById('composerText').placeholder =
-        postType === 'quorum'
-          ? 'Make a Quorum post — invite people to connect around something specific.'
-          : "What's on your mind?";
-    }
-
-    function addMedia(input, type) {
-      const files = Array.from(input.files);
-      if (type === 'video') {
-        if (mediaFiles.filter(f => f.kind === 'video').length > 0) return;
-        mediaFiles.push({ file: files[0], kind: 'video' });
-      } else {
-        const imgCount = mediaFiles.filter(f => f.kind === 'image').length;
-        files.slice(0, 3 - imgCount).forEach(f => mediaFiles.push({ file: f, kind: 'image' }));
-      }
-      renderPreviews();
-      input.value = '';
-    }
-
-    function renderPreviews() {
-      const strip    = document.getElementById('mediaPreviews');
-      const imgCount = mediaFiles.filter(f => f.kind === 'image').length;
-      const vidCount = mediaFiles.filter(f => f.kind === 'video').length;
-      document.getElementById('photoBtn').disabled = imgCount >= 3;
-      document.getElementById('videoBtn').disabled = vidCount >= 1;
-      document.getElementById('photoCount').textContent = imgCount > 0 ? imgCount + '/3' : '';
-      document.getElementById('videoCount').textContent = vidCount > 0 ? '1/1' : '';
-      strip.innerHTML = '';
-      mediaFiles.forEach((item, i) => {
-        const wrap = document.createElement('div');
-        wrap.className = 'prev-thumb';
-        const url = URL.createObjectURL(item.file);
-        const el  = document.createElement(item.kind === 'video' ? 'video' : 'img');
-        el.src = url; if (item.kind === 'video') el.muted = true;
-        wrap.appendChild(el);
-        const rm = document.createElement('button');
-        rm.className = 'prev-remove'; rm.textContent = '✕';
-        rm.onclick = () => { mediaFiles.splice(i, 1); renderPreviews(); };
-        wrap.appendChild(rm);
-        strip.appendChild(wrap);
-      });
-    }
-
-    // ─── localStorage persistence ───────────────
-    const STORAGE_KEY = 'postmarq_posts_v1';
-
-    function getSavedPosts() {
-      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
-      catch { return []; }
-    }
-
-    function savePosts(posts) {
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(posts)); }
-      catch(e) { console.warn('localStorage full — media too large?', e); }
-    }
-
-    function deletePost(id) {
-      const posts = getSavedPosts().filter(p => p.id !== id);
-      savePosts(posts);
-      const el = document.getElementById('post-' + id);
-      if (el) { el.style.opacity = '0'; el.style.transform = 'translateY(-8px)'; setTimeout(() => el.remove(), 280); }
-    }
-
-    function buildPostCard(post, animate) {
-      const card = document.createElement('div');
-      card.className = 'post-card glass';
-      card.id = 'post-' + post.id;
-      card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-      if (animate) { card.style.opacity = '0'; card.style.transform = 'translateY(10px)'; }
-
-      // quorum badge
-      if (post.type === 'quorum') {
-        const badge = document.createElement('div');
-        badge.className = 'quorum-badge'; badge.style.marginBottom = '0.8rem';
-        badge.textContent = '⬡ Quorum'; card.appendChild(badge);
-      }
-
-      // text
-      if (post.text) {
-        const p = document.createElement('div');
-        p.className = 'post-body';
-        p.innerHTML = '<p>' + post.text.replace(/\n/g, '<br>') + '</p>';
-        card.appendChild(p);
-      }
-
-      // media
-      if (post.media && post.media.length > 0) {
-        const imgs = post.media.filter(m => m.kind === 'image');
-        const vids = post.media.filter(m => m.kind === 'video');
-        const total = imgs.length + (vids.length > 0 ? 1 : 0);
-        const grid = document.createElement('div');
-        grid.className = 'post-media-grid count-' + Math.min(total, 3);
-        imgs.forEach(m => {
-          const wrap = document.createElement('div'); wrap.className = 'media-item';
-          const img  = document.createElement('img'); img.src = m.data;
-          img.onclick = () => lbOpen(m.data);
-          wrap.appendChild(img); grid.appendChild(wrap);
-        });
-        vids.forEach(m => {
-          const wrap = document.createElement('div'); wrap.className = 'media-item';
-          const vid  = document.createElement('video'); vid.src = m.data; vid.controls = true; vid.playsInline = true; vid.preload = 'metadata';
-          wrap.appendChild(vid); grid.appendChild(wrap);
-        });
-        card.appendChild(grid);
-      }
-
-      // link preview
-      if (post.link) {
-        const a = document.createElement('a');
-        a.className = 'link-preview-card';
-        a.href = post.link.url; a.target = '_blank'; a.rel = 'noopener';
-        a.style.marginBottom = '0.4rem';
-        if (post.link.image) {
-          const img = document.createElement('img');
-          img.className = 'link-preview-thumb' + (post.link.ytId ? ' yt' : '');
-          img.src = post.link.image; img.alt = '';
-          a.appendChild(img);
-        }
-        const info = document.createElement('div'); info.className = 'link-preview-info';
-        if (post.link.domain) { const d = document.createElement('div'); d.className = 'link-preview-domain'; d.textContent = post.link.domain; info.appendChild(d); }
-        if (post.link.title)  { const t = document.createElement('div'); t.className = 'link-preview-title';  t.textContent = post.link.title;  info.appendChild(t); }
-        if (post.link.description) { const ds = document.createElement('div'); ds.className = 'link-preview-desc'; ds.textContent = post.link.description; info.appendChild(ds); }
-        a.appendChild(info);
-        card.appendChild(a);
-      }
-
-      // footer
-      const footer = document.createElement('div');
-      footer.className = 'post-footer';
-      const stampBtn = document.createElement('button');
-      stampBtn.className = 'stamp-btn';
-      stampBtn.innerHTML = '<span class="stamp-icon">⬡</span> Stamp';
-      stampBtn.onclick = function() { toggleStamp(this, 0); };
-      const count = document.createElement('span');
-      count.className = 'stamp-count'; count.textContent = '0 stamps';
-      const date = document.createElement('span');
-      date.className = 'post-date'; date.textContent = post.date;
-      const del = document.createElement('button');
-      del.textContent = '✕';
-      del.title = 'Delete post';
-      del.style.cssText = 'margin-left:auto; background:none; border:none; cursor:pointer; font-size:0.7rem; color:var(--ink-4); opacity:0.5; padding:0 0.25rem;';
-      del.onmouseenter = () => del.style.opacity = '1';
-      del.onmouseleave = () => del.style.opacity = '0.5';
-      del.onclick = () => { if (confirm('Delete this post?')) deletePost(post.id); };
-      footer.appendChild(stampBtn); footer.appendChild(count); footer.appendChild(date); footer.appendChild(del);
-      card.appendChild(footer);
-
-      return card;
-    }
-
-    function loadSavedPosts() {
-      const feed  = document.getElementById('dynamicFeed');
-      const posts = getSavedPosts();
-      posts.forEach(post => {
-        feed.appendChild(buildPostCard(post, false));
-        insertWeeklyRow(post, false);
-        insertYearbookTile(post, false);
-      });
-    }
-
-    /* ── Weekly row builder ── */
-    function insertWeeklyRow(post, prepend) {
-      const container = document.getElementById('dynamicWeekly');
-      if (!container) return;
-
-      const d = new Date(post.date);
-      const dayLabel = d.toLocaleDateString('en-US', { weekday:'long', month:'short', day:'numeric' });
-      const groupId  = 'dyn-wk-' + post.date.replace(/\s/g,'-');
-
-      let group = document.getElementById(groupId);
-      if (!group) {
-        group = document.createElement('div');
-        group.className = 'weekly-day-group';
-        group.id = groupId;
-        group.innerHTML = `<div class="weekly-day-label">${dayLabel}</div>`;
-        if (prepend) container.insertBefore(group, container.firstChild);
-        else container.appendChild(group);
-      }
-
-      const typeClass = post.media && post.media.length > 0
-        ? (post.media[0].kind === 'video' ? 'weekly-row--video' : 'weekly-row--photo')
-        : '';
-      const thumbHtml = (post.media && post.media.length > 0)
-        ? `<div class="weekly-thumb-wrap">
-             ${post.media[0].kind === 'video'
-               ? `<video src="${post.media[0].data}" muted preload="metadata" playsinline></video><div class="video-pill">Video</div><div class="thumb-play">▶</div>`
-               : `<img src="${post.media[0].data}" alt="" />`}
-           </div>`
-        : '';
-      const excerpt = (post.text || '').replace(/<[^>]+>/g,'').slice(0, 120);
-
-      const row = document.createElement('div');
-      row.className = `weekly-row ${typeClass}`;
-      row.innerHTML = `${thumbHtml}
-        <div class="weekly-body">
-          <div class="weekly-excerpt">${excerpt || '(no text)'}</div>
-          <div class="weekly-meta">
-            <span class="weekly-time">${post.date}</span>
-            <span class="weekly-stamps">⬡ 0</span>
-          </div>
-        </div>`;
-
-      if (prepend) group.insertBefore(row, group.children[1] || null);
-      else group.appendChild(row);
-    }
-
-    /* ── Yearbook tile builder ── */
-    function insertYearbookTile(post, prepend) {
-      const container = document.getElementById('dynamicYearbook');
-      if (!container) return;
-
-      const d = new Date(post.date);
-      const monthLabel = d.toLocaleDateString('en-US', { month:'long', year:'numeric' });
-      const monthId    = 'dyn-yb-' + d.getFullYear() + '-' + (d.getMonth()+1);
-
-      let section = document.getElementById(monthId);
-      if (!section) {
-        section = document.createElement('div');
-        section.id = monthId;
-        section.innerHTML = `<div class="yb-month-label">${monthLabel}</div><div class="yb-tile-grid" id="${monthId}-grid"></div>`;
-        if (prepend) container.insertBefore(section, container.firstChild);
-        else container.appendChild(section);
-      }
-
-      const grid = document.getElementById(monthId + '-grid');
-      const excerpt = (post.text || '').replace(/<[^>]+>/g,'').slice(0, 40);
-      const shortDate = d.toLocaleDateString('en-US', { month:'short', day:'numeric' });
-
-      let tileInner = '';
-      if (post.media && post.media.length > 0) {
-        const m = post.media[0];
-        if (m.kind === 'video') {
-          tileInner = `<video src="${m.data}" muted preload="metadata" playsinline></video>
-            <div class="video-pill">Video</div><div class="thumb-play">▶</div>`;
-        } else {
-          tileInner = `<img src="${m.data}" alt="" />`;
-        }
-      } else {
-        tileInner = `<div style="display:flex;align-items:center;justify-content:center;height:100%;padding:0.5rem;font-size:0.72rem;color:var(--ink-3);text-align:center;">${excerpt}</div>`;
-      }
-
-      const tile = document.createElement('div');
-      tile.className = `yb-tile ${post.media && post.media[0]?.kind === 'video' ? 'video' : 'photo'}`;
-      tile.innerHTML = `${tileInner}<div class="yb-tile-tip">${excerpt || 'Post'}<br>${shortDate}</div>`;
-
-      if (prepend) grid.insertBefore(tile, grid.firstChild);
-      else grid.appendChild(tile);
-    }
-
-    async function fileToDataURL(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload  = e => resolve(e.target.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-    }
-
-    // ─── Link Preview ────────────────────────────
-    let pendingLink = null;
-    let linkDebounceTimer = null;
-
-    function toggleLinkInput() {
-      const row = document.getElementById('linkInputRow');
-      const visible = row.style.display !== 'none';
-      row.style.display = visible ? 'none' : 'block';
-      if (visible) { clearLink(); }
-      else { document.getElementById('linkInput').focus(); }
-    }
-
-    function clearLink() {
-      pendingLink = null;
-      document.getElementById('linkPreviewBox').innerHTML = '';
-      const inp = document.getElementById('linkInput');
-      if (inp) inp.value = '';
-    }
-
-    function debounceLinkPreview(val) {
-      clearTimeout(linkDebounceTimer);
-      if (!val.trim()) { pendingLink = null; document.getElementById('linkPreviewBox').innerHTML = ''; return; }
-      linkDebounceTimer = setTimeout(() => fetchLinkPreview(val.trim()), 600);
-    }
-
-    async function fetchLinkPreview(url) {
-      const box = document.getElementById('linkPreviewBox');
-      if (!url.startsWith('http')) url = 'https://' + url;
-
-      // YouTube shortcut
-      const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/))([A-Za-z0-9_-]{11})/);
-      if (ytMatch) {
-        const id = ytMatch[1];
-        const thumb = `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
-        pendingLink = { url, title: 'YouTube Video', description: '', image: thumb, domain: 'youtube.com', ytId: id };
-        renderLinkPreview(box, pendingLink);
-        return;
-      }
-
-      box.innerHTML = '<span style="font-size:0.75rem;color:var(--ink-4);padding:0.3rem 0;display:block;">Loading preview…</span>';
-      try {
-        const api = `https://api.microlink.io/?url=${encodeURIComponent(url)}`;
-        const res = await fetch(api);
-        const json = await res.json();
-        if (json.status === 'success') {
-          const d = json.data;
-          pendingLink = {
-            url,
-            title:       d.title       || '',
-            description: d.description || '',
-            image:       d.image?.url  || '',
-            domain:      d.publisher   || new URL(url).hostname.replace('www.','')
-          };
-          renderLinkPreview(box, pendingLink);
-        } else {
-          pendingLink = { url, title: url, description: '', image: '', domain: new URL(url).hostname.replace('www.','') };
-          renderLinkPreview(box, pendingLink);
-        }
-      } catch {
-        box.innerHTML = '<span style="font-size:0.75rem;color:var(--ink-4);padding:0.3rem 0;display:block;">Could not load preview.</span>';
-      }
-    }
-
-    function renderLinkPreview(box, link) {
-      box.innerHTML = '';
-      const a = document.createElement('a');
-      a.className = 'link-preview-card';
-      a.href = link.url; a.target = '_blank'; a.rel = 'noopener';
-      if (link.image) {
-        const img = document.createElement('img');
-        img.className = 'link-preview-thumb' + (link.ytId ? ' yt' : '');
-        img.src = link.image; img.alt = '';
-        a.appendChild(img);
-      }
-      const info = document.createElement('div'); info.className = 'link-preview-info';
-      if (link.domain) { const d = document.createElement('div'); d.className = 'link-preview-domain'; d.textContent = link.domain; info.appendChild(d); }
-      if (link.title)  { const t = document.createElement('div'); t.className = 'link-preview-title'; t.textContent = link.title; info.appendChild(t); }
-      if (link.description) { const ds = document.createElement('div'); ds.className = 'link-preview-desc'; ds.textContent = link.description; info.appendChild(ds); }
-      a.appendChild(info);
-      const rm = document.createElement('button'); rm.className = 'link-preview-remove'; rm.textContent = '✕';
-      rm.onclick = e => { e.preventDefault(); e.stopPropagation(); clearLink(); document.getElementById('linkInputRow').style.display = 'none'; };
-      a.appendChild(rm);
-      box.appendChild(a);
-    }
-
-    async function submitPost() {
-      const text = document.getElementById('composerText').value.trim();
-      if (!text && mediaFiles.length === 0 && !pendingLink) return;
-
-      // convert files to base64 for storage
-      const media = [];
-      for (const item of mediaFiles) {
-        const data = await fileToDataURL(item.file);
-        media.push({ kind: item.kind, data });
-      }
-
-      const post = {
-        id:   Date.now(),
-        type: postType,
-        text: text ? esc(text) : '',
-        media,
-        link: pendingLink || null,
-        date: new Date().toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' })
-      };
-
-      // save to localStorage
-      const posts = getSavedPosts();
-      posts.unshift(post);
-      savePosts(posts);
-
-      // render
-      const card = buildPostCard(post, true);
-      const feed = document.getElementById('dynamicFeed');
-      feed.insertBefore(card, feed.firstChild);
-      requestAnimationFrame(() => { card.style.opacity = '1'; card.style.transform = 'translateY(0)'; });
-      insertWeeklyRow(post, true);
-      insertYearbookTile(post, true);
-
-      document.getElementById('composerText').value = '';
-      document.getElementById('composerText').style.height = 'auto';
-      mediaFiles = []; renderPreviews();
-      clearLink();
-      document.getElementById('linkInputRow').style.display = 'none';
-    }
-
-    // load saved posts on startup
-    loadSavedPosts();
-
-    // ─── Tab switching ───────────────────────────
-    function switchTab(name) {
-      document.querySelectorAll('.feed-tab').forEach((btn, i) => {
-        const tabs = ['daily','weekly','yearbook'];
-        btn.classList.toggle('active', tabs[i] === name);
-      });
-      document.querySelectorAll('.tab-panel').forEach(panel => {
-        panel.classList.toggle('active', panel.id === 'panel-' + name);
-      });
-    }
-
-    function esc(s) {
-      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
-
-    /* ── My Q ── */
-    const MYQ_TITLE_VAR = 'My Q'; // rename-ready variable
-    const MYQ_COLLAPSED = 3;
-
-    let myqItems = JSON.parse(localStorage.getItem('myqItems') || 'null') || [
-      { id: 1, type: 'loop',   title: 'Canal walk with Trixton', when: 'Tues & Thurs 5:30pm',         vis: 'public'  },
-      { id: 2, type: 'loop',   title: 'Zia Records browse',      when: 'Saturdays, midday',            vis: 'public'  },
-      { id: 3, type: 'invite', title: 'Game night',              when: 'Last Friday of the month',     vis: 'private' },
-      { id: 4, type: 'loop',   title: "Luci's coffee",           when: 'Most weekday mornings',        vis: 'public'  },
-      { id: 5, type: 'invite', title: 'Chase Field — Diamondbacks', when: 'Fri Jun 20, 7:05pm',       vis: 'public'  },
-    ];
-    let myqExpanded = false;
-    let myqNextId = 6;
-    let myqType = 'loop';
-    let myqVis  = 'public';
-
-    function myqSaveStorage() {
-      localStorage.setItem('myqItems', JSON.stringify(myqItems));
-    }
-
-    function myqRender() {
-      // Header date
-      const now = new Date();
-      document.getElementById('myqDayNum').textContent  = now.getDate();
-      document.getElementById('myqDayName').textContent = now.toLocaleDateString('en-US',{weekday:'long'});
-      document.getElementById('myqMonth').textContent   = now.toLocaleDateString('en-US',{month:'long', year:'numeric'});
-      document.getElementById('myqModuleTitle').textContent = MYQ_TITLE_VAR;
-
-      const list = document.getElementById('myqList');
-      list.innerHTML = '';
-      const visible = myqExpanded ? myqItems : myqItems.slice(0, MYQ_COLLAPSED);
-      visible.forEach(item => {
-        const el = document.createElement('div');
-        el.className = 'myq-item';
-        el.innerHTML = `
-          <div class="myq-accent ${item.type}"></div>
-          <div class="myq-body" onclick="myqDetailOpen(${item.id})">
-            <div class="myq-item-top">
-              <div class="myq-item-title">${esc(item.title)}</div>
-              ${item.vis === 'private' ? '<div class="myq-private-dot">P</div>' : ''}
-            </div>
-            <div class="myq-item-when">${esc(item.when)}</div>
-          </div>
-          <button class="myq-item-remove" onclick="myqRemove(${item.id})" title="Remove">×</button>
-        `;
-        list.appendChild(el);
-      });
-
-      const moreBtn = document.getElementById('myqMoreBtn');
-      const hidden  = myqItems.length - MYQ_COLLAPSED;
-      if (myqItems.length > MYQ_COLLAPSED) {
-        moreBtn.style.display = 'block';
-        moreBtn.textContent = myqExpanded ? '− see less' : `+ see more (${hidden})`;
-        moreBtn.onclick = () => { myqExpanded = !myqExpanded; myqRender(); };
-      } else {
-        moreBtn.style.display = 'none';
-      }
-    }
-
-    function myqRemove(id) {
-      myqItems = myqItems.filter(i => i.id !== id);
-      myqSaveStorage();
-      myqRender();
-    }
-
-    function myqOpenModal() {
-      myqType = 'loop'; myqVis = 'public';
-      document.getElementById('myqInputTitle').value   = '';
-      document.getElementById('myqInputWhen').value    = '';
-      document.getElementById('myqInputDetails').value = '';
-      myqSetType('loop'); myqSetVis('public');
-      document.getElementById('myqOverlay').classList.add('open');
-    }
-    function myqCloseModal() {
-      document.getElementById('myqOverlay').classList.remove('open');
-    }
-    function myqSetType(t) {
-      myqType = t;
-      document.getElementById('myqTypeLoop').className   = 'myq-type-btn' + (t==='loop'   ? ' sel-loop'   : '');
-      document.getElementById('myqTypeInvite').className = 'myq-type-btn' + (t==='invite' ? ' sel-invite' : '');
-      document.getElementById('myqWhenLabel').textContent = t === 'loop' ? 'Cadence' : 'When';
-      document.getElementById('myqInputWhen').placeholder = t === 'loop' ? 'e.g. Tues & Thurs 5:30pm' : 'e.g. Fri Jun 20, 7:05pm — Chase Field';
-    }
-    function myqSetVis(v) {
-      myqVis = v;
-      document.getElementById('myqVisPublic').className  = 'myq-vis-btn' + (v==='public'  ? ' active' : '');
-      document.getElementById('myqVisPrivate').className = 'myq-vis-btn' + (v==='private' ? ' active' : '');
-    }
-    function myqSave() {
-      const title = document.getElementById('myqInputTitle').value.trim();
-      const when  = document.getElementById('myqInputWhen').value.trim();
-      if (!title || !when) return;
-      myqItems.push({ id: myqNextId++, type: myqType, title, when, vis: myqVis });
-      myqSaveStorage();
-      myqCloseModal();
-      myqRender();
-    }
-
-    // Close add modal on overlay click
-    document.getElementById('myqOverlay').addEventListener('click', function(e) {
-      if (e.target === this) myqCloseModal();
-    });
-
-    // Detail/edit modal
-    let myqDetailId   = null;
-    let myqDetailVis  = 'public';
-
-    function myqDetailOpen(id) {
-      const item = myqItems.find(i => i.id === id);
-      if (!item) return;
-      myqDetailId = id;
-      // pill
-      const pill = document.getElementById('myqdTypePill');
-      pill.textContent = item.type === 'loop' ? 'Loop' : 'Invite';
-      pill.className   = 'myq-detail-type-pill ' + item.type;
-      // view mode content
-      document.getElementById('myqdTitle').textContent = item.title;
-      document.getElementById('myqdWhen').textContent  = item.when;
-      const detEl = document.getElementById('myqdDetails');
-      if (item.details && item.details.trim()) {
-        detEl.textContent  = item.details;
-        detEl.style.display = 'block';
-      } else {
-        detEl.style.display = 'none';
-      }
-      myqDetailSwitchView();
-      document.getElementById('myqDetailOverlay').classList.add('open');
-    }
-    function myqDetailClose() {
-      document.getElementById('myqDetailOverlay').classList.remove('open');
-      myqDetailId = null;
-    }
-    function myqDetailSwitchView() {
-      document.getElementById('myqdViewMode').style.display = 'block';
-      document.getElementById('myqdEditMode').style.display = 'none';
-    }
-    function myqDetailSwitchEdit() {
-      const item = myqItems.find(i => i.id === myqDetailId);
-      if (!item) return;
-      document.getElementById('myqdEditTitle').value   = item.title;
-      document.getElementById('myqdEditWhen').value    = item.when;
-      document.getElementById('myqdEditDetails').value = item.details || '';
-      document.getElementById('myqdEditWhenLabel').textContent = item.type === 'loop' ? 'Cadence' : 'When';
-      myqDetailVis = item.vis;
-      myqDetailSetVis(item.vis);
-      document.getElementById('myqdViewMode').style.display = 'none';
-      document.getElementById('myqdEditMode').style.display = 'block';
-    }
-    function myqDetailSetVis(v) {
-      myqDetailVis = v;
-      document.getElementById('myqdEditVisPublic').className  = 'myq-vis-btn' + (v==='public'  ? ' active' : '');
-      document.getElementById('myqdEditVisPrivate').className = 'myq-vis-btn' + (v==='private' ? ' active' : '');
-    }
-    function myqDetailSave() {
-      const item = myqItems.find(i => i.id === myqDetailId);
-      if (!item) return;
-      const title = document.getElementById('myqdEditTitle').value.trim();
-      const when  = document.getElementById('myqdEditWhen').value.trim();
-      if (!title || !when) return;
-      item.title   = title;
-      item.when    = when;
-      item.details = document.getElementById('myqdEditDetails').value.trim();
-      item.vis     = myqDetailVis;
-      myqSaveStorage();
-      myqRender();
-      myqDetailClose();
-    }
-    function myqDetailDelete() {
-      myqItems = myqItems.filter(i => i.id !== myqDetailId);
-      myqSaveStorage();
-      myqRender();
-      myqDetailClose();
-    }
-
-    // Close detail modal on overlay click
-    document.getElementById('myqDetailOverlay').addEventListener('click', function(e) {
-      if (e.target === this) myqDetailClose();
-    });
-
-    myqRender();
-
-    // ─── Albums ──────────────────────────────────────
-    const ALBUMS = {
-      'payson-jun15': {
-        title: 'Summer Camping & Fishing in Payson',
-        meta: 'June 15, 2026 · 6 photos',
-        photos: [
-          'candids/IMG_7797.jpg',
-          'candids/IMG_7802.JPG',
-          'candids/IMG_7812.JPG',
-          'candids/IMG_7845.jpg',
-          'candids/IMG_7848.JPG',
-          'candids/IMG_2847.jpeg',
-        ]
-      }
-    };
-
-    function albumOpen(id) {
-      const album = ALBUMS[id];
-      if (!album) return;
-      document.getElementById('albumModalTitle').textContent = album.title;
-      document.getElementById('albumModalMeta').textContent = album.meta;
-      const grid = document.getElementById('albumModalGrid');
-      grid.innerHTML = album.photos.map(src =>
-        `<div class="album-photo" onclick="lbOpen('${src}','image')">
-          <img src="${src}" loading="lazy" />
-        </div>`
-      ).join('');
-      document.getElementById('albumOverlay').classList.add('open');
-    }
-
-    function albumClose() {
-      document.getElementById('albumOverlay').classList.remove('open');
-    }
-
-    document.getElementById('albumOverlay').addEventListener('click', function(e) {
-      if (e.target === this) albumClose();
-    });
-
-    // ─── Lounge ──────────────────────────────────────
-    function loungeOpen(e) {
-      e.preventDefault();
-      document.getElementById('loungeOverlay').classList.add('open');
-    }
-    function loungeClose() {
-      document.getElementById('loungeOverlay').classList.remove('open');
-    }
-    document.getElementById('loungeOverlay').addEventListener('click', function(e) {
-      if (e.target === this) loungeClose();
-    });
-  </script>
-
-  <!-- Album Modal -->
-  <div class="album-overlay" id="albumOverlay">
-    <div class="album-modal">
-      <div class="album-modal-header">
-        <div>
-          <div class="album-modal-title" id="albumModalTitle"></div>
-          <div class="album-modal-meta" id="albumModalMeta"></div>
-        </div>
-        <button class="album-modal-close" onclick="albumClose()">✕</button>
-      </div>
-      <div class="album-modal-grid" id="albumModalGrid"></div>
+  <!-- XP Taskbar -->
+  <div class="xp-taskbar">
+    <button class="xp-start-btn">
+      <span class="xp-start-logo">🪟</span>
+      start
+    </button>
+    <div class="xp-taskbar-item">
+      🌐 &nbsp;Postmarq — Sign In
     </div>
-  </div>
-
-  <!-- Lounge Modal -->
-  <div class="lounge-overlay" id="loungeOverlay">
-    <div class="lounge-modal">
-      <div class="lounge-header">
-        <div class="lounge-title"><i class="ti ti-messages"></i> Lounge</div>
-        <button class="lounge-close" onclick="loungeClose()">✕</button>
-      </div>
-      <div class="lounge-body">
-        Coming soon — IM &amp; community chat will live here.
-      </div>
+    <div class="xp-tray">
+      <span class="xp-clock" id="xpClock">12:00 PM</span>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    (function() {
-      var sb = supabase.createClient(
-        'https://vzvgqkxhhjubylojhohn.supabase.co',
-        'sb_publishable_JFEpFZi63RZja2WorNkBdQ_L3E4mZ6q'
-      );
+    const { createClient } = supabase;
+    const sb = createClient(
+      'https://vzvgqkxhhjubylojhohn.supabase.co',
+      'sb_publishable_JFEpFZi63RZja2WorNkBdQ_L3E4mZ6q'
+    );
 
-      sb.auth.getSession().then(function(r) {
-        if (!r.data.session) window.location.replace('login.html');
-      });
+    sb.auth.getSession().then(function(r) {
+      if (r.data.session) window.location.replace('post.html');
+    });
 
-      document.getElementById('logoutBtn').addEventListener('click', async function(e) {
-        e.preventDefault();
-        await sb.auth.signOut();
-        window.location.href = 'login.html';
-      });
-    })();
+    function tick() {
+      var now = new Date();
+      var h = now.getHours(), m = now.getMinutes();
+      var ampm = h >= 12 ? 'PM' : 'AM';
+      h = h % 12 || 12;
+      document.getElementById('xpClock').textContent =
+        h + ':' + (m < 10 ? '0' : '') + m + ' ' + ampm;
+    }
+    tick();
+    setInterval(tick, 10000);
+
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var email   = document.getElementById('emailInput').value.trim();
+      var pass    = document.getElementById('passInput').value;
+      var errEl   = document.getElementById('errorMsg');
+      var btn     = document.getElementById('signinBtn');
+      var status  = document.getElementById('statusText');
+
+      errEl.classList.remove('show');
+
+      if (!email || !pass) {
+        errEl.textContent = 'Please enter your email address and password.';
+        errEl.classList.add('show');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Signing in...';
+      status.textContent = 'Connecting to Postmarq...';
+
+      var result = await sb.auth.signInWithPassword({ email: email, password: pass });
+
+      if (result.error) {
+        errEl.textContent = 'The email address or password you entered is incorrect.';
+        errEl.classList.add('show');
+        btn.disabled = false;
+        btn.textContent = 'Sign In';
+        status.textContent = 'Sign in failed.';
+      } else {
+        status.textContent = 'Success! Loading your Post...';
+        window.location.href = 'post.html';
+      }
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') document.getElementById('loginForm').requestSubmit();
+    });
   </script>
 
 </body>
