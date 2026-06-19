@@ -553,6 +553,14 @@
                 <button class="vibe-btn" onclick="pickVibe(this)">Cozy</button>
               </div>
             </div>
+            <div class="xp-field">
+              <label class="xp-label">Email:</label>
+              <input class="xp-input" type="email" id="guided-email" placeholder="you@example.com" />
+            </div>
+            <div class="xp-field">
+              <label class="xp-label">Password:</label>
+              <input class="xp-input" type="password" id="guided-password" placeholder="Choose a password" />
+            </div>
           </div>
           <div class="xp-btn-row">
             <button class="xp-btn" onclick="goTo('step-2-personal')">&#8592; Back</button>
@@ -579,6 +587,10 @@
             <div class="xp-field">
               <label class="xp-label">Email:</label>
               <input class="xp-input" type="email" id="diy-email" placeholder="you@example.com" />
+            </div>
+            <div class="xp-field">
+              <label class="xp-label">Password:</label>
+              <input class="xp-input" type="password" id="diy-password" placeholder="Choose a password" />
             </div>
           </div>
           <div class="xp-btn-row">
@@ -615,6 +627,10 @@
               <label class="xp-label">Contact email:</label>
               <input class="xp-input" type="email" id="biz-email" placeholder="hello@coppercup.com" />
             </div>
+            <div class="xp-field">
+              <label class="xp-label">Password:</label>
+              <input class="xp-input" type="password" id="biz-password" placeholder="Choose a password" />
+            </div>
           </div>
           <div class="xp-btn-row">
             <button class="xp-btn" onclick="goTo('step-2-business')">&#8592; Back</button>
@@ -642,6 +658,14 @@
               <label class="xp-label">Describe your Post in plain English:</label>
               <textarea class="xp-input" id="ai-prompt" placeholder="I want a simple, warm homepage that shows my photography, a few links, and a space for people I actually know to check in with me. Minimal. Clean. No clutter."></textarea>
             </div>
+            <div class="xp-field">
+              <label class="xp-label">Email:</label>
+              <input class="xp-input" type="email" id="ai-email" placeholder="you@example.com" />
+            </div>
+            <div class="xp-field">
+              <label class="xp-label">Password:</label>
+              <input class="xp-input" type="password" id="ai-password" placeholder="Choose a password" />
+            </div>
           </div>
           <div class="xp-btn-row">
             <button class="xp-btn" onclick="goTo('step-2-builder')">&#8592; Back</button>
@@ -668,6 +692,10 @@
             <div class="xp-field">
               <label class="xp-label">Email:</label>
               <input class="xp-input" type="email" id="code-email" placeholder="you@example.com" />
+            </div>
+            <div class="xp-field">
+              <label class="xp-label">Password:</label>
+              <input class="xp-input" type="password" id="code-password" placeholder="Choose a password" />
             </div>
           </div>
           <div class="xp-btn-row">
@@ -703,9 +731,9 @@
               <textarea class="xp-input" id="loop-note" placeholder="Hey, I set up my Post on Postmarq. Come check it out — no ads, no algorithm, just us." style="min-height:52px"></textarea>
             </div>
           </div>
-          <div class="xp-btn-row">
-            <button class="xp-link-btn" onclick="goTo('step-done')">Skip for now</button>
-            <button class="xp-btn-primary" onclick="goTo('step-done')">Send the loop &#8594;</button>
+          <div class="xp-btn-row" id="loop-btn-row">
+            <button class="xp-link-btn" onclick="createAccount()">Skip for now</button>
+            <button class="xp-btn-primary" onclick="createAccount()">Send the loop &#8594;</button>
           </div>
         </div>
 
@@ -717,7 +745,7 @@
             <div class="xp-step-sub" style="max-width:320px;">Your Post is live. Decorate it, rearrange it, make it weird — it's yours. The only people who see it are the ones you let in.</div>
           </div>
           <div class="xp-btn-row" style="justify-content:center;">
-            <a href="post.html" class="xp-btn-primary" style="text-decoration:none;">Go to my Post &#8594;</a>
+            <a id="post-link" href="post.html" class="xp-btn-primary" style="text-decoration:none;">Go to my Post &#8594;</a>
           </div>
         </div>
 
@@ -738,6 +766,7 @@
   <div class="xp-tray"><span class="xp-clock" id="xpClock">12:00 PM</span></div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   let currentPath = '';
   let lastStep3 = '';
@@ -812,6 +841,7 @@
       { label: 'Address', value: (val('guided-address') || 'yourname') + '.postmarq' },
       { label: 'Bio',     value: val('guided-bio') },
       { label: 'Vibe',    value: document.querySelector('.vibe-btn.active')?.textContent || '—' },
+      { label: 'Email',   value: val('guided-email') },
     ];
     if (mode === 'diy') return [
       { label: 'Path',    value: 'Personal — DIY' },
@@ -839,6 +869,58 @@
       { label: 'Address', value: (val('code-address') || 'yourname') + '.postmarq' },
       { label: 'Email',   value: val('code-email') },
     ];
+  }
+
+  // ── Supabase account creation ──
+  const SUPABASE_URL = 'https://vzvgqkxhhjubylojhohn.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_JFEpFZi63RZja2WorNkBdQ_L3E4mZ6q';
+
+  function getFormValues() {
+    const mode = lastStep3;
+    if (mode === 'step-3-guided')       return { email: val('guided-email'),  password: val('guided-password'),  username: val('guided-address'),  display_name: val('guided-name') };
+    if (mode === 'step-3-diy')          return { email: val('diy-email'),     password: val('diy-password'),     username: val('diy-address'),     display_name: val('diy-name') };
+    if (mode === 'step-3-business')     return { email: val('biz-email'),     password: val('biz-password'),     username: val('biz-address'),     display_name: val('biz-name') };
+    if (mode === 'step-3-builder-ai')   return { email: val('ai-email'),      password: val('ai-password'),      username: val('ai-address'),      display_name: val('ai-name') };
+    if (mode === 'step-3-builder-code') return { email: val('code-email'),    password: val('code-password'),    username: val('code-address'),    display_name: val('code-name') };
+    return {};
+  }
+
+  async function createAccount() {
+    const { email, password, username, display_name } = getFormValues();
+    if (!email || !password || !username) {
+      alert('Please go back and fill in your email, password, and address.');
+      return;
+    }
+
+    document.getElementById('statusText').textContent = 'Creating your account…';
+
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // 1. Sign up
+    const { data: authData, error: authError } = await sb.auth.signUp({ email, password });
+    if (authError) {
+      document.getElementById('statusText').textContent = 'Error: ' + authError.message;
+      alert('Sign up failed: ' + authError.message);
+      return;
+    }
+
+    // 2. Insert post row
+    const user_id = authData.user.id;
+    const { error: postError } = await sb.from('posts').insert({
+      user_id, username, display_name, html: '', css: '', js: ''
+    });
+    if (postError) {
+      document.getElementById('statusText').textContent = 'Account created but post setup failed.';
+      console.error(postError);
+    }
+
+    // 3. Go to done screen then redirect
+    goTo('step-done');
+    document.getElementById('post-link').href =
+      window.location.hostname === 'localhost'
+        ? '/viewer.html'
+        : 'https://' + username + '.postmarq.org';
+    document.getElementById('post-link').textContent = username + '.postmarq.org →';
   }
 
   function tick() {
