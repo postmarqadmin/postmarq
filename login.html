@@ -500,12 +500,7 @@
     );
 
     async function redirectToPost(userId) {
-      var { data } = await sb.from('posts').select('username').eq('user_id', userId).single();
-      if (data && data.username) {
-        window.location.replace('/' + data.username);
-      } else {
-        window.location.replace('/');
-      }
+      window.location.replace('/my-post.html');
     }
 
     sb.auth.getSession().then(async function(r) {
