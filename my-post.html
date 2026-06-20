@@ -186,8 +186,9 @@
       display: flex; align-items: center; gap: 0.5rem;
       font-size: 0.68rem; font-weight: 700; color: var(--ink-3);
     }
-    .ms-stamp-emoji { font-size: 1.4rem; cursor: pointer; transition: transform 0.15s; }
+    .ms-stamp-emoji { font-size: 1.4rem; cursor: pointer; transition: transform 0.15s; display: inline-flex; align-items: center; }
     .ms-stamp-emoji:hover { transform: scale(1.15); }
+    .ms-stamp-emoji img { width: 1.6rem; height: 1.6rem; object-fit: cover; border-radius: 4px; }
     .ms-stamp-placeholder { font-size: 0.68rem; font-style: italic; color: var(--ink-4); cursor: pointer; }
 
     /* Contact box */
@@ -959,6 +960,15 @@
       <h3>Pick your current stamp</h3>
       <p style="font-size:0.78rem; color:var(--ink-3); margin-bottom:0.5rem">Your stamp shows on your profile. Change it whenever the vibe shifts.</p>
       <div class="stamp-picker" id="stampPicker"></div>
+      <div style="margin-top:0.9rem;padding-top:0.75rem;border-top:1px solid rgba(0,0,0,0.08);display:flex;align-items:center;gap:0.75rem;">
+        <span style="font-size:0.72rem;color:var(--ink-3);font-weight:600;">or upload your own</span>
+        <input type="file" id="stampUploadInput" accept="image/*" style="display:none" onchange="uploadStamp(this)" />
+        <button onclick="document.getElementById('stampUploadInput').click()" style="font-size:0.72rem;font-weight:700;padding:4px 12px;border-radius:8px;border:1.5px dashed var(--ink-4);background:none;color:var(--ink-2);cursor:pointer;">Choose image</button>
+        <div id="stampUploadPreview" style="display:none;align-items:center;gap:0.4rem;">
+          <img id="stampUploadThumb" src="" style="width:1.8rem;height:1.8rem;object-fit:cover;border-radius:6px;border:2px solid var(--amber);" />
+          <span style="font-size:0.7rem;color:var(--amber);font-weight:700;">selected ✓</span>
+        </div>
+      </div>
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeModal('stampModal')">Cancel</button>
         <button class="btn-save" onclick="saveStamp()">Set Stamp</button>
@@ -990,7 +1000,7 @@
     );
 
     let currentUser = null;
-    let localKey = null; // prefix for all localStorage keys
+    let localKey = null;
     let cachedPosts = null;
     let cachedMyStamps = new Set();
     let weeklyRendered = false;
@@ -1052,9 +1062,9 @@
 
       setDate();
       await loadProfile();
-      renderPickSix();
-      renderCandids();
-      renderMyQ();
+      await renderPickSix();
+      await renderCandids();
+      await renderMyQ();
       renderFeed();
     }
 
@@ -1069,14 +1079,12 @@
 
     // ── Profile (Supabase) ──
     async function loadProfile() {
-      const { data: profile } = await sb.from('profiles').select('full_name, handle, bio').eq('id', currentUser.id).single();
+      const { data: profile } = await sb.from('profiles')
+        .select('full_name, handle, bio, avatar_url, city, hood, relationship_status, last_update, stamp')
+        .eq('id', currentUser.id).single();
 
       const fallback = currentUser.user_metadata?.full_name || currentUser.email.split('@')[0];
       const name = profile?.full_name || fallback;
-      const bio  = profile?.bio || '';
-
-      // Load extra local fields
-      const local = getLocal('profile') || {};
 
       // Set name
       document.getElementById('profileName').textContent = name;
@@ -1088,32 +1096,26 @@
       const composerAv = document.getElementById('composerAv');
       composerAv.textContent = initial;
 
-      // Saved avatar
-      const avatarUrl = local.avatarUrl || '';
+      const avatarUrl = profile?.avatar_url || '';
       if (avatarUrl) {
         showAvatar(avatarUrl);
         composerAv.innerHTML = `<img src="${avatarUrl}" alt="" />`;
       }
 
       // Meta fields
-      setMeta('metaCity', local.city || '');
-      setMeta('metaHood', local.hood || '');
-      setMeta('metaRelationship', local.relationship || '');
-      document.getElementById('metaLastUpdate').textContent = local.lastUpdate || '—';
+      setMeta('metaCity', profile?.city || '');
+      setMeta('metaHood', profile?.hood || '');
+      setMeta('metaRelationship', profile?.relationship_status || '');
+      document.getElementById('metaLastUpdate').textContent = profile?.last_update || '—';
 
       // Bio / Marq
-      const marq = bio || local.marq || '';
+      const marq = profile?.bio || '';
       const marqEl = document.getElementById('marqText');
       if (marq) { marqEl.textContent = marq; marqEl.classList.remove('empty'); }
       else { marqEl.textContent = 'Add a short bio — what\'s your deal?'; marqEl.classList.add('empty'); }
 
       // Stamp
-      const stamp = local.stamp || '';
-      if (stamp) {
-        document.getElementById('stampDisplay').textContent = stamp;
-        document.getElementById('stampDisplay').style.display = 'inline';
-        document.getElementById('stampPlaceholder').style.display = 'none';
-      }
+      if (profile?.stamp) applyStampDisplay(profile.stamp);
     }
 
     function setMeta(id, val) {
@@ -1128,29 +1130,33 @@
       img.src = url; img.style.display = 'block'; initials.style.display = 'none';
     }
 
-    function uploadAvatar(input) {
+    async function uploadAvatar(input) {
       const file = input.files[0];
       if (!file) return;
-      const reader = new FileReader();
-      reader.onload = e => {
-        const url = e.target.result;
-        showAvatar(url);
-        const composerAv = document.getElementById('composerAv');
-        composerAv.innerHTML = `<img src="${url}" alt="" />`;
-        const local = getLocal('profile') || {};
-        local.avatarUrl = url;
-        setLocal('profile', local);
-      };
-      reader.readAsDataURL(file);
+
+      // Show local preview immediately
+      const previewUrl = URL.createObjectURL(file);
+      showAvatar(previewUrl);
+      document.getElementById('composerAv').innerHTML = `<img src="${previewUrl}" alt="" />`;
+
+      const ext  = file.name.split('.').pop();
+      const path = `${currentUser.id}/avatar.${ext}`;
+      const { error: upErr } = await sb.storage.from('avatars').upload(path, file, { upsert: true });
+      if (upErr) { console.error('Avatar upload failed:', upErr.message); return; }
+
+      const { data } = sb.storage.from('avatars').getPublicUrl(path);
+      const url = data.publicUrl + '?t=' + Date.now(); // bust cache
+      showAvatar(url);
+      document.getElementById('composerAv').innerHTML = `<img src="${url}" alt="" />`;
+      await sb.from('profiles').upsert({ id: currentUser.id, avatar_url: url }, { onConflict: 'id' });
     }
 
     // ── Profile Modal ──
     function openProfileModal() {
-      const local = getLocal('profile') || {};
       document.getElementById('editName').value = document.getElementById('profileName').textContent;
-      document.getElementById('editCity').value = local.city || '';
-      document.getElementById('editHood').value = local.hood || '';
-      document.getElementById('editRelationship').value = local.relationship || '';
+      document.getElementById('editCity').value = document.getElementById('metaCity').classList.contains('meta-empty') ? '' : document.getElementById('metaCity').textContent;
+      document.getElementById('editHood').value = document.getElementById('metaHood').classList.contains('meta-empty') ? '' : document.getElementById('metaHood').textContent;
+      document.getElementById('editRelationship').value = document.getElementById('metaRelationship').classList.contains('meta-empty') ? '' : document.getElementById('metaRelationship').textContent;
       openModal('profileModal');
     }
 
@@ -1162,15 +1168,14 @@
       if (!name) return;
 
       const handle = name.toLowerCase().replace(/\s+/g, '') + '.postmarq';
-      await sb.from('profiles').upsert({ id: currentUser.id, full_name: name, handle }, { onConflict: 'id' });
-
       const now = new Date();
       const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-      const lastUpdate = months[now.getMonth()] + ' ' + now.getDate() + ', ' + now.getFullYear();
+      const last_update = months[now.getMonth()] + ' ' + now.getDate() + ', ' + now.getFullYear();
 
-      const local = getLocal('profile') || {};
-      Object.assign(local, { city, hood, relationship: rel, lastUpdate });
-      setLocal('profile', local);
+      await sb.from('profiles').upsert({
+        id: currentUser.id, full_name: name, handle,
+        city, hood, relationship_status: rel, last_update
+      }, { onConflict: 'id' });
 
       closeModal('profileModal');
       await loadProfile();
@@ -1178,29 +1183,40 @@
 
     // ── My Marq Modal ──
     function openMarqModal() {
-      const local = getLocal('profile') || {};
-      document.getElementById('editMarq').value = local.marq || '';
+      const current = document.getElementById('marqText').classList.contains('empty') ? '' : document.getElementById('marqText').textContent;
+      document.getElementById('editMarq').value = current;
       openModal('marqModal');
     }
 
     async function saveMarq() {
       const marq = document.getElementById('editMarq').value.trim();
       await sb.from('profiles').upsert({ id: currentUser.id, bio: marq }, { onConflict: 'id' });
-      const local = getLocal('profile') || {};
-      local.marq = marq;
-      setLocal('profile', local);
       closeModal('marqModal');
       await loadProfile();
     }
 
     // ── Stamp Modal ──
     function openStampModal() {
-      const local = getLocal('profile') || {};
-      const current = local.stamp || '';
+      const stampEl = document.getElementById('stampDisplay');
+      const current = stampEl.dataset.stamp || '';
+      const isImg = current.startsWith('img:');
       const picker = document.getElementById('stampPicker');
       picker.innerHTML = STAMPS.map(s =>
-        `<div class="stamp-option${s === current ? ' selected' : ''}" onclick="selectStamp(this,'${s}')">${s}</div>`
+        `<div class="stamp-option${!isImg && s === current ? ' selected' : ''}" onclick="selectStamp(this,'${s}')">${s}</div>`
       ).join('');
+      // Reset upload preview, but show if current stamp is a custom image
+      pendingStamp = '';
+      const preview = document.getElementById('stampUploadPreview');
+      const thumb   = document.getElementById('stampUploadThumb');
+      document.getElementById('stampUploadInput').value = '';
+      if (isImg) {
+        thumb.src = current.slice(4);
+        preview.style.display = 'flex';
+        pendingStamp = current;
+      } else {
+        preview.style.display = 'none';
+        thumb.src = '';
+      }
       openModal('stampModal');
     }
 
@@ -1208,26 +1224,61 @@
     function selectStamp(el, stamp) {
       document.querySelectorAll('.stamp-option').forEach(e => e.classList.remove('selected'));
       el.classList.add('selected');
+      // Clear any pending upload when an emoji is picked
+      document.getElementById('stampUploadPreview').style.display = 'none';
+      document.getElementById('stampUploadThumb').src = '';
       pendingStamp = stamp;
     }
 
-    function saveStamp() {
-      if (!pendingStamp) { closeModal('stampModal'); return; }
-      const local = getLocal('profile') || {};
-      local.stamp = pendingStamp;
-      setLocal('profile', local);
-      document.getElementById('stampDisplay').textContent = pendingStamp;
-      document.getElementById('stampDisplay').style.display = 'inline';
+    function uploadStamp(input) {
+      const file = input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const dataUrl = e.target.result;
+        pendingStamp = 'img:' + dataUrl;
+        // Deselect any emoji, show preview
+        document.querySelectorAll('.stamp-option').forEach(el => el.classList.remove('selected'));
+        const thumb = document.getElementById('stampUploadThumb');
+        thumb.src = dataUrl;
+        document.getElementById('stampUploadPreview').style.display = 'flex';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function applyStampDisplay(stamp) {
+      const el = document.getElementById('stampDisplay');
+      el.dataset.stamp = stamp;
+      if (stamp.startsWith('img:')) {
+        el.innerHTML = `<img src="${stamp.slice(4)}" alt="stamp" />`;
+      } else {
+        el.textContent = stamp;
+      }
+      el.style.display = 'inline-flex';
       document.getElementById('stampPlaceholder').style.display = 'none';
+    }
+
+    async function saveStamp() {
+      if (!pendingStamp) { closeModal('stampModal'); return; }
+      applyStampDisplay(pendingStamp);
+      await sb.from('profiles').upsert({ id: currentUser.id, stamp: pendingStamp }, { onConflict: 'id' });
       closeModal('stampModal');
       pendingStamp = '';
     }
 
     // ── Pick Six ──
-    function renderPickSix() {
-      const slots = getLocal('pickSix') || Array(6).fill(null);
+    let pickSixSlots = Array(6).fill(null);
+
+    async function renderPickSix() {
+      const { data } = await sb.from('pick_six').select('*').eq('user_id', currentUser.id);
+      pickSixSlots = Array(6).fill(null);
+      (data || []).forEach(row => { pickSixSlots[row.slot_index] = { name: row.name, img: row.photo_url, dbId: row.id }; });
+      _drawPickSix();
+    }
+
+    function _drawPickSix() {
       const grid = document.getElementById('pickSixGrid');
-      grid.innerHTML = slots.map((slot, i) => `
+      grid.innerHTML = pickSixSlots.map((slot, i) => `
         <div class="pick-six-tile">
           <div class="pick-six-slot" onclick="pickSixClick(${i})" title="${slot ? 'Change' : 'Add friend'}">
             ${slot?.img ? `<img src="${slot.img}" alt="${slot.name}" />` : '<span class="slot-plus">+</span>'}
@@ -1235,8 +1286,7 @@
           <span class="pick-six-name${slot ? '' : ' empty'}">${slot?.name || 'add friend'}</span>
         </div>
       `).join('');
-      // Yearbook friends count
-      const filled = slots.filter(Boolean).length;
+      const filled = pickSixSlots.filter(Boolean).length;
       const ybFriends = document.getElementById('ybFriends');
       if (ybFriends) ybFriends.textContent = filled;
     }
@@ -1244,82 +1294,80 @@
     let pendingPickSixIdx = -1;
     function pickSixClick(i) {
       pendingPickSixIdx = i;
-      const slots = getLocal('pickSix') || Array(6).fill(null);
-      const slot = slots[i];
+      const slot = pickSixSlots[i];
       document.getElementById('pickSixModalTitle').textContent = slot ? 'Edit slot ' + (i+1) : 'Add to Pick Six';
       document.getElementById('pickSixNameInput').value = slot?.name || '';
       openModal('pickSixModal');
     }
 
-    function savePickSixSlot() {
+    async function savePickSixSlot() {
       const name = document.getElementById('pickSixNameInput').value.trim();
       if (!name) { closeModal('pickSixModal'); return; }
-      // trigger image pick
-      const imgInput = document.getElementById('pickSixImgInput');
-      imgInput.onchange = function() {
-        const file = imgInput.files[0];
-        const reader = new FileReader();
-        reader.onload = e => {
-          const slots = getLocal('pickSix') || Array(6).fill(null);
-          slots[pendingPickSixIdx] = { name, img: e.target.result };
-          setLocal('pickSix', slots);
-          renderPickSix();
-        };
-        if (file) reader.readAsDataURL(file);
-        else {
-          const slots = getLocal('pickSix') || Array(6).fill(null);
-          slots[pendingPickSixIdx] = { name, img: '' };
-          setLocal('pickSix', slots);
-          renderPickSix();
-        }
-      };
       closeModal('pickSixModal');
+
+      const imgInput = document.getElementById('pickSixImgInput');
+      imgInput.onchange = async function() {
+        const file = imgInput.files[0];
+        let photo_url = pickSixSlots[pendingPickSixIdx]?.img || '';
+
+        if (file) {
+          const ext  = file.name.split('.').pop();
+          const path = `${currentUser.id}/slot${pendingPickSixIdx}.${ext}`;
+          await sb.storage.from('my-friends').upload(path, file, { upsert: true });
+          const { data } = sb.storage.from('my-friends').getPublicUrl(path);
+          photo_url = data.publicUrl + '?t=' + Date.now();
+        }
+
+        await sb.from('pick_six').upsert(
+          { user_id: currentUser.id, slot_index: pendingPickSixIdx, name, photo_url },
+          { onConflict: 'user_id,slot_index' }
+        );
+        await renderPickSix();
+      };
       imgInput.click();
     }
 
     // ── Candids ──
-    function addCandids(input) {
+    let candidsCache = [];
+
+    async function addCandids(input) {
       const files = Array.from(input.files);
-      const existing = getLocal('candids') || [];
-      let loaded = 0;
-      files.forEach(file => {
-        const reader = new FileReader();
-        reader.onload = e => {
-          existing.unshift(e.target.result);
-          loaded++;
-          if (loaded === files.length) { setLocal('candids', existing); renderCandids(); }
-        };
-        reader.readAsDataURL(file);
-      });
       input.value = '';
+      for (const file of files) {
+        const ext  = file.name.split('.').pop();
+        const path = `${currentUser.id}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error } = await sb.storage.from('candids').upload(path, file);
+        if (error) { console.error('Candid upload failed:', error.message); continue; }
+        const { data } = sb.storage.from('candids').getPublicUrl(path);
+        await sb.from('candids').insert({ user_id: currentUser.id, photo_url: data.publicUrl });
+      }
+      await renderCandids();
     }
 
-    function renderCandids() {
-      const photos = getLocal('candids') || [];
+    async function renderCandids() {
+      const { data } = await sb.from('candids').select('id, photo_url').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+      candidsCache = data || [];
       const empty = document.getElementById('candidsEmpty');
       const wrap  = document.getElementById('candidsScrollWrap');
       const grid  = document.getElementById('candidsGrid');
-      if (!photos.length) {
+      if (!candidsCache.length) {
         empty.style.display = 'flex'; wrap.style.display = 'none';
       } else {
         empty.style.display = 'none'; wrap.style.display = 'block';
-        grid.innerHTML = photos.map((src, i) => `
-          <div class="candid-tile" onclick="lbOpen('${src}')">
-            <img src="${src}" alt="candid" />
-            <button class="tile-remove" onclick="event.stopPropagation();removeCandid(${i})">✕</button>
+        grid.innerHTML = candidsCache.map(row => `
+          <div class="candid-tile" onclick="lbOpen('${row.photo_url}')">
+            <img src="${row.photo_url}" alt="candid" />
+            <button class="tile-remove" onclick="event.stopPropagation();removeCandid('${row.id}')">✕</button>
           </div>
         `).join('');
-        // update yearbook captures count
         const ybCaptures = document.getElementById('ybCaptures');
-        if (ybCaptures) ybCaptures.textContent = photos.length;
+        if (ybCaptures) ybCaptures.textContent = candidsCache.length;
       }
     }
 
-    function removeCandid(i) {
-      const photos = getLocal('candids') || [];
-      photos.splice(i, 1);
-      setLocal('candids', photos);
-      renderCandids();
+    async function removeCandid(id) {
+      await sb.from('candids').delete().eq('id', id).eq('user_id', currentUser.id);
+      await renderCandids();
     }
 
     // ── My Q ──
@@ -1354,28 +1402,29 @@
       document.getElementById('myqVisPrivate').classList.toggle('active', v === 'private');
     }
 
-    function myqSave() {
+    async function myqSave() {
       const title   = document.getElementById('myqInputTitle').value.trim();
       const when    = document.getElementById('myqInputWhen').value.trim();
       const details = document.getElementById('myqInputDetails').value.trim();
       if (!title) return;
-      const items = getLocal('myq') || [];
-      items.push({ id: Date.now(), type: myqType, title, when, details, vis: myqVis });
-      setLocal('myq', items);
+      await sb.from('myq').insert({
+        user_id: currentUser.id, type: myqType,
+        title, cadence: when, details, visibility: myqVis
+      });
       myqCloseModal();
-      renderMyQ();
+      await renderMyQ();
     }
 
-    function myqRemove(id) {
-      const items = (getLocal('myq') || []).filter(i => i.id !== id);
-      setLocal('myq', items);
-      renderMyQ();
+    async function myqRemove(id) {
+      await sb.from('myq').delete().eq('id', id).eq('user_id', currentUser.id);
+      await renderMyQ();
     }
 
-    function renderMyQ() {
-      const items = getLocal('myq') || [];
-      const list  = document.getElementById('myqList');
-      if (!items.length) {
+    async function renderMyQ() {
+      const { data: items } = await sb.from('myq').select('*')
+        .eq('user_id', currentUser.id).order('created_at', { ascending: true });
+      const list = document.getElementById('myqList');
+      if (!items?.length) {
         list.innerHTML = '<div class="myq-empty-state">Your loops will appear here.<br>Add something you do regularly.</div>';
         return;
       }
@@ -1384,12 +1433,11 @@
           <div class="myq-accent ${item.type}"></div>
           <div class="myq-body">
             <div class="myq-item-top"><span class="myq-item-title">${escHtml(item.title)}</span></div>
-            <div class="myq-item-when">${escHtml(item.when)}</div>
+            <div class="myq-item-when">${escHtml(item.cadence || '')}</div>
           </div>
-          <button class="myq-item-remove" onclick="myqRemove(${item.id})">✕</button>
+          <button class="myq-item-remove" onclick="myqRemove('${item.id}')">✕</button>
         </div>
       `).join('');
-      // Update yearbook loops
       const ybLoops = document.getElementById('ybLoops');
       if (ybLoops) ybLoops.textContent = items.length;
     }
@@ -1434,16 +1482,19 @@
       const btn = document.querySelector('.post-btn');
       btn.disabled = true; btn.textContent = 'Posting…';
 
-      const savedMedia = await Promise.all(mediaFiles.map(m => new Promise(resolve => {
-        const reader = new FileReader();
-        reader.onload = e => resolve({ src: e.target.result, kind: m.kind });
-        reader.readAsDataURL(m.file);
-      })));
+      const savedMedia = await Promise.all(mediaFiles.map(async m => {
+        const ext  = m.file.name.split('.').pop();
+        const path = `${currentUser.id}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error } = await sb.storage.from('post-media').upload(path, m.file);
+        if (error) { console.error('Media upload failed:', error.message); return null; }
+        const { data } = sb.storage.from('post-media').getPublicUrl(path);
+        return { src: data.publicUrl, kind: m.kind };
+      }));
 
       const { error } = await sb.from('posts').insert({
         user_id: currentUser.id,
         body: text,
-        media: savedMedia
+        media: savedMedia.filter(Boolean)
       });
 
       btn.disabled = false; btn.textContent = 'Post';
@@ -1542,9 +1593,8 @@
         return;
       }
 
-      const local     = getLocal('profile') || {};
       const name      = document.getElementById('profileName').textContent;
-      const avatarUrl = local.avatarUrl || '';
+      const avatarUrl = document.getElementById('avatarImg').src || '';
 
       feed.innerHTML = cachedPosts.map(p => buildPostCard(p, name, avatarUrl)).join('');
     }
@@ -1572,9 +1622,8 @@
       startOfWeek.setDate(today.getDate() - today.getDay());
       startOfWeek.setHours(0,0,0,0);
 
-      const local     = getLocal('profile') || {};
       const name      = document.getElementById('profileName').textContent;
-      const avatarUrl = local.avatarUrl || '';
+      const avatarUrl = document.getElementById('avatarImg').src || '';
 
       // Also collect all unique weeks from posts so we can show history
       const allKeys = Object.keys(byDay).sort().reverse();
@@ -1667,10 +1716,6 @@
       currentUser = null; localKey = null;
       document.getElementById('authOverlay').style.display = 'flex';
     }
-
-    // ── localStorage helpers ──
-    function getLocal(key) { try { return JSON.parse(localStorage.getItem(`${localKey}_${key}`)); } catch { return null; } }
-    function setLocal(key, val) { localStorage.setItem(`${localKey}_${key}`, JSON.stringify(val)); }
 
     // ── Util ──
     function escHtml(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
