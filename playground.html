@@ -406,9 +406,9 @@
       <div class="xp-sidebar">
         <div class="xp-sidebar-logo">postmarq</div>
         <div class="xp-sidebar-divider"></div>
-        <div class="xp-sidebar-step" id="sidebarStep">Choose your path</div>
+        <div class="xp-sidebar-step" id="sidebarStep">Claim your Post</div>
         <div class="xp-sidebar-divider"></div>
-        <div class="xp-sidebar-hint" id="sidebarHint">Your Post is a place on the internet that's entirely yours — no ads, no algorithm.</div>
+        <div class="xp-sidebar-hint" id="sidebarHint">Your place on the internet. Build it however you want — no templates, no rules.</div>
       </div>
 
       <!-- Content -->
@@ -419,325 +419,39 @@
           <div class="xp-progress-fill" id="progressBar"></div>
         </div>
 
-        <!-- STEP 1 — Choose path -->
+        <!-- STEP 1 — Claim your Post -->
         <div class="step active" id="step-1" style="padding-top:0.75rem;">
-          <div style="padding: 0 1rem;">
-            <div class="xp-step-title">Welcome to Postmarq — Make it yours.</div>
-            <div class="xp-step-sub">Your Post is a space you build, decorate, and share on your own terms. No templates telling you who to be. No feed deciding what matters.</div>
-
-            <div class="path-grid">
-              <div class="path-card" onclick="selectPath('personal')">
-                <span class="badge">Free</span>
-                <span class="card-icon">🏠</span>
-                <h3>Personal</h3>
-                <p>Your own place on the internet. Fill it, decorate it, make it feel like you.</p>
-              </div>
-              <div class="path-card" onclick="selectPath('builder')">
-                <span class="badge">Power User</span>
-                <span class="card-icon">⚙️</span>
-                <h3>Builder</h3>
-                <p>Full access. Rewire anything, build from scratch, make it entirely your own.</p>
-              </div>
-              <div class="path-card" onclick="selectPath('business')">
-                <span class="badge">Paid</span>
-                <span class="card-icon">🏪</span>
-                <h3>Business</h3>
-                <p>A local shop, studio, or org that belongs in the neighborhood — not a banner ad.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- STEP 2A — Personal: guided vs diy -->
-        <div class="step" id="step-2-personal" style="padding-top:0.75rem;">
-          <div style="padding: 0 1rem; flex:1;">
-            <div class="xp-step-title">Personal Post — How do you want to set it up?</div>
-            <div class="xp-step-sub">Either way, you end up with something that's yours. Pick what feels right.</div>
-            <div class="choice-grid">
-              <div class="choice-card" onclick="goTo('step-3-guided')">
-                <span class="card-icon">🪄</span>
-                <h3>Walk me through it</h3>
-                <p>Answer a few simple questions. We'll handle the rest and you can tweak from there.</p>
-              </div>
-              <div class="choice-card" onclick="goTo('step-3-diy')">
-                <span class="card-icon">🔧</span>
-                <h3>I'll do it myself</h3>
-                <p>Just give me the keys. I know what I want and I'd rather figure it out as I go.</p>
-              </div>
-            </div>
-          </div>
-          <div class="xp-btn-row">
-            <button class="xp-btn" onclick="goTo('step-1')">&#8592; Back</button>
-          </div>
-        </div>
-
-        <!-- STEP 2B — Business -->
-        <div class="step" id="step-2-business" style="padding-top:0.75rem;">
-          <div style="padding: 0 1rem; flex:1;">
-            <div class="xp-step-title">Business Post — Be a neighbor, not a billboard.</div>
-            <div class="xp-step-sub">Your Post is a place people actually want to visit. You grow here the same way anyone does: by being worth knowing.</div>
-            <div class="xp-pricing">
-              <div class="xp-price">$12 <span>/ month</span></div>
-              <div class="xp-price-tag">Everything you need. Nothing you don't.</div>
-              <ul>
-                <li>Verified business badge on your Post</li>
-                <li>Neighborhood Pulse presence — show up where locals actually look</li>
-                <li>Quorum connections — real regulars, not a follower count</li>
-                <li>Loop announcements — events, specials, updates (only to people who want them)</li>
-                <li>See who's looping you in and what's resonating</li>
-              </ul>
-            </div>
-          </div>
-          <div class="xp-btn-row">
-            <button class="xp-btn" onclick="goTo('step-1')">&#8592; Back</button>
-            <button class="xp-btn-primary" onclick="goTo('step-3-business')">Continue &#8594;</button>
-          </div>
-        </div>
-
-        <!-- STEP 2C — Builder -->
-        <div class="step" id="step-2-builder" style="padding-top:0.75rem;">
-          <div style="padding: 0 1rem; flex:1;">
-            <div class="xp-step-title">Builder — Start from zero. End up with something real.</div>
-            <div class="xp-step-sub">Full access to every piece. Rearrange it, rewrite it, make it something nobody else has.</div>
-            <div class="xp-terminal">
-              <span class="prompt">C:\Postmarq&gt;</span> postmarq init my-post<br>
-              <span class="prompt">C:\Postmarq&gt;</span> postmarq add widget clock weather<br>
-              <span class="prompt">C:\Postmarq&gt;</span> postmarq loop @davemichael<br>
-              <span class="prompt">C:\Postmarq&gt;</span> postmarq deploy
-            </div>
-            <div class="choice-grid">
-              <div class="choice-card" onclick="goTo('step-3-builder-ai')">
-                <span class="card-icon">✨</span>
-                <h3>Describe it, we'll build it</h3>
-                <p>Tell us what you're imagining in plain words. We'll set it up and you take it from there.</p>
-              </div>
-              <div class="choice-card" onclick="goTo('step-3-builder-code')">
-                <span class="card-icon">💻</span>
-                <h3>Build it by hand</h3>
-                <p>Raw access. Component library, config files, no guardrails. Make it exactly what you want.</p>
-              </div>
-            </div>
-          </div>
-          <div class="xp-btn-row">
-            <button class="xp-btn" onclick="goTo('step-1')">&#8592; Back</button>
-          </div>
-        </div>
-
-        <!-- STEP 3A — Guided personal setup -->
-        <div class="step" id="step-3-guided" style="padding-top:0.75rem;">
-          <div style="padding: 0 1rem; flex:1;">
-            <div class="xp-step-title">Step 3 of 4 — Let's get your Post ready.</div>
-            <div class="xp-step-sub">A few basics and you're in. You can change every bit of this once you're home.</div>
+          <div style="padding: 0 1rem; flex:1; display:flex; flex-direction:column; gap:0.6rem;">
+            <div class="xp-step-title">Claim your Post.</div>
+            <div class="xp-step-sub">Your address on the internet. Build it however you want — no templates, no rules.</div>
             <div class="xp-field">
               <label class="xp-label">Your name:</label>
-              <input class="xp-input" type="text" id="guided-name" placeholder="Dave Michael" />
+              <input class="xp-input" type="text" id="signup-name" placeholder="Dave Michael" autocomplete="name" />
             </div>
             <div class="xp-field">
               <label class="xp-label">Claim your address:</label>
               <div class="xp-address-row">
-                <input type="text" id="guided-address" placeholder="davemichael" />
-                <span class="xp-address-suffix">.postmarq</span>
-              </div>
-            </div>
-            <div class="xp-field">
-              <label class="xp-label">One line about you:</label>
-              <input class="xp-input" type="text" id="guided-bio" placeholder="Designer. Phoenix. Coffee first." />
-            </div>
-            <div class="xp-field">
-              <label class="xp-label">Pick a vibe:</label>
-              <div class="vibe-grid">
-                <button class="vibe-btn" onclick="pickVibe(this)">Warm</button>
-                <button class="vibe-btn" onclick="pickVibe(this)">Minimal</button>
-                <button class="vibe-btn" onclick="pickVibe(this)">Bold</button>
-                <button class="vibe-btn" onclick="pickVibe(this)">Retro</button>
-                <button class="vibe-btn" onclick="pickVibe(this)">Cozy</button>
-              </div>
-            </div>
-            <div class="xp-field">
-              <label class="xp-label">Email:</label>
-              <input class="xp-input" type="email" id="guided-email" placeholder="you@example.com" />
-            </div>
-            <div class="xp-field">
-              <label class="xp-label">Password:</label>
-              <input class="xp-input" type="password" id="guided-password" placeholder="Choose a password" />
-            </div>
-          </div>
-          <div class="xp-btn-row">
-            <button class="xp-btn" onclick="goTo('step-2-personal')">&#8592; Back</button>
-            <button class="xp-btn-primary" onclick="goToConfirm('guided')">Next &#8594;</button>
-          </div>
-        </div>
-
-        <!-- STEP 3B — DIY personal setup -->
-        <div class="step" id="step-3-diy" style="padding-top:0.75rem;">
-          <div style="padding: 0 1rem; flex:1;">
-            <div class="xp-step-title">Step 3 of 4 — Claim your address. The rest is up to you.</div>
-            <div class="xp-step-sub">Once you're in, every widget, layout, and detail is yours to arrange however you want.</div>
-            <div class="xp-field">
-              <label class="xp-label">Your name:</label>
-              <input class="xp-input" type="text" id="diy-name" placeholder="Dave Michael" />
-            </div>
-            <div class="xp-field">
-              <label class="xp-label">Claim your address:</label>
-              <div class="xp-address-row">
-                <input type="text" id="diy-address" placeholder="davemichael" />
+                <input type="text" id="signup-address" placeholder="davemichael" autocomplete="off" />
                 <span class="xp-address-suffix">.postmarq</span>
               </div>
             </div>
             <div class="xp-field">
               <label class="xp-label">Email:</label>
-              <input class="xp-input" type="email" id="diy-email" placeholder="you@example.com" />
+              <input class="xp-input" type="email" id="signup-email" placeholder="you@example.com" autocomplete="email" />
             </div>
             <div class="xp-field">
               <label class="xp-label">Password:</label>
-              <input class="xp-input" type="password" id="diy-password" placeholder="Choose a password" />
+              <input class="xp-input" type="password" id="signup-password" placeholder="Choose a password" autocomplete="new-password" />
             </div>
+            <div class="xp-error" id="signupError" style="display:none;"></div>
           </div>
           <div class="xp-btn-row">
-            <button class="xp-btn" onclick="goTo('step-2-personal')">&#8592; Back</button>
-            <button class="xp-btn-primary" onclick="goToConfirm('diy')">Create my Post &#8594;</button>
+            <button class="xp-btn" onclick="window.location.href='/'">&#8592; Sign in</button>
+            <button class="xp-btn-primary" id="signupBtn" onclick="createAccount()">Create my Post &#8594;</button>
           </div>
         </div>
 
-        <!-- STEP 3C — Business setup -->
-        <div class="step" id="step-3-business" style="padding-top:0.75rem;">
-          <div style="padding: 0 1rem; flex:1;">
-            <div class="xp-step-title">Step 3 of 4 — Tell us about your place.</div>
-            <div class="xp-step-sub">Your Post should feel like walking through your door — not clicking an ad.</div>
-            <div class="xp-field">
-              <label class="xp-label">Business name:</label>
-              <input class="xp-input" type="text" id="biz-name" placeholder="Copper Cup Coffee" />
-            </div>
-            <div class="xp-field">
-              <label class="xp-label">Claim your address:</label>
-              <div class="xp-address-row">
-                <input type="text" id="biz-address" placeholder="coppercup" />
-                <span class="xp-address-suffix">.postmarq</span>
-              </div>
-            </div>
-            <div class="xp-field">
-              <label class="xp-label">What do you do?</label>
-              <input class="xp-input" type="text" id="biz-tagline" placeholder="Specialty coffee in downtown Phoenix." />
-            </div>
-            <div class="xp-field">
-              <label class="xp-label">Neighborhood:</label>
-              <input class="xp-input" type="text" id="biz-neighborhood" placeholder="Roosevelt Row, Phoenix AZ" />
-            </div>
-            <div class="xp-field">
-              <label class="xp-label">Contact email:</label>
-              <input class="xp-input" type="email" id="biz-email" placeholder="hello@coppercup.com" />
-            </div>
-            <div class="xp-field">
-              <label class="xp-label">Password:</label>
-              <input class="xp-input" type="password" id="biz-password" placeholder="Choose a password" />
-            </div>
-          </div>
-          <div class="xp-btn-row">
-            <button class="xp-btn" onclick="goTo('step-2-business')">&#8592; Back</button>
-            <button class="xp-btn-primary" onclick="goToConfirm('business')">Continue to payment &#8594;</button>
-          </div>
-        </div>
-
-        <!-- STEP 3D — Builder AI -->
-        <div class="step" id="step-3-builder-ai" style="padding-top:0.75rem;">
-          <div style="padding: 0 1rem; flex:1;">
-            <div class="xp-step-title">Builder — Describe it, we'll build it.</div>
-            <div class="xp-step-sub">Write it out like you're explaining it to a friend. We'll turn it into a real starting point.</div>
-            <div class="xp-field">
-              <label class="xp-label">Your name:</label>
-              <input class="xp-input" type="text" id="ai-name" placeholder="Dave Michael" />
-            </div>
-            <div class="xp-field">
-              <label class="xp-label">Claim your address:</label>
-              <div class="xp-address-row">
-                <input type="text" id="ai-address" placeholder="davemichael" />
-                <span class="xp-address-suffix">.postmarq</span>
-              </div>
-            </div>
-            <div class="xp-field">
-              <label class="xp-label">Describe your Post in plain English:</label>
-              <textarea class="xp-input" id="ai-prompt" placeholder="I want a simple, warm homepage that shows my photography, a few links, and a space for people I actually know to check in with me. Minimal. Clean. No clutter."></textarea>
-            </div>
-            <div class="xp-field">
-              <label class="xp-label">Email:</label>
-              <input class="xp-input" type="email" id="ai-email" placeholder="you@example.com" />
-            </div>
-            <div class="xp-field">
-              <label class="xp-label">Password:</label>
-              <input class="xp-input" type="password" id="ai-password" placeholder="Choose a password" />
-            </div>
-          </div>
-          <div class="xp-btn-row">
-            <button class="xp-btn" onclick="goTo('step-2-builder')">&#8592; Back</button>
-            <button class="xp-btn-primary" onclick="goToConfirm('builder-ai')">Build it &#8594;</button>
-          </div>
-        </div>
-
-        <!-- STEP 3E — Builder code -->
-        <div class="step" id="step-3-builder-code" style="padding-top:0.75rem;">
-          <div style="padding: 0 1rem; flex:1;">
-            <div class="xp-step-title">Builder — Code mode.</div>
-            <div class="xp-step-sub">A bare Post, every component available, and nothing locked down. If you can imagine it, you can build it here.</div>
-            <div class="xp-field">
-              <label class="xp-label">Your name:</label>
-              <input class="xp-input" type="text" id="code-name" placeholder="Dave Michael" />
-            </div>
-            <div class="xp-field">
-              <label class="xp-label">Claim your address:</label>
-              <div class="xp-address-row">
-                <input type="text" id="code-address" placeholder="davemichael" />
-                <span class="xp-address-suffix">.postmarq</span>
-              </div>
-            </div>
-            <div class="xp-field">
-              <label class="xp-label">Email:</label>
-              <input class="xp-input" type="email" id="code-email" placeholder="you@example.com" />
-            </div>
-            <div class="xp-field">
-              <label class="xp-label">Password:</label>
-              <input class="xp-input" type="password" id="code-password" placeholder="Choose a password" />
-            </div>
-          </div>
-          <div class="xp-btn-row">
-            <button class="xp-btn" onclick="goTo('step-2-builder')">&#8592; Back</button>
-            <button class="xp-btn-primary" onclick="goToConfirm('builder-code')">Initialize my Post &#8594;</button>
-          </div>
-        </div>
-
-        <!-- STEP 4 — Confirmation -->
-        <div class="step" id="step-confirm" style="padding-top:0.75rem;">
-          <div style="padding: 0 1rem; flex:1;">
-            <div class="xp-step-title">Step 4 of 4 — Looking good. One last check.</div>
-            <div class="xp-step-sub">Here's what you've got so far. Nothing is set in stone — change anything once you're inside.</div>
-            <div class="xp-confirm" id="confirmSummary"></div>
-          </div>
-          <div class="xp-btn-row">
-            <button class="xp-btn" id="confirmBack" onclick="goBack()">&#8592; Edit</button>
-            <button class="xp-btn-primary" onclick="goTo('step-loop')">Loop someone in &#8594;</button>
-          </div>
-        </div>
-
-        <!-- STEP 5 — Loop -->
-        <div class="step" id="step-loop" style="padding-top:0.75rem;">
-          <div style="padding: 0 1rem; flex:1;">
-            <div class="xp-step-title">Final Step — Who gets the first loop?</div>
-            <div class="xp-step-sub">Your Quorum is the handful of people who actually matter to you — not a following, not a list. Invite one to get started, or skip it.</div>
-            <div class="xp-field">
-              <label class="xp-label">Their email or Postmarq address:</label>
-              <input class="xp-input" type="text" id="loop-person" placeholder="friend@example.com or davemichael.postmarq" />
-            </div>
-            <div class="xp-field">
-              <label class="xp-label">A note (optional):</label>
-              <textarea class="xp-input" id="loop-note" placeholder="Hey, I set up my Post on Postmarq. Come check it out — no ads, no algorithm, just us." style="min-height:52px"></textarea>
-            </div>
-          </div>
-          <div class="xp-btn-row" id="loop-btn-row">
-            <button class="xp-link-btn" onclick="createAccount()">Skip for now</button>
-            <button class="xp-btn-primary" onclick="createAccount()">Send the loop &#8594;</button>
-          </div>
-        </div>
-
-        <!-- STEP 6 — Done -->
+        <!-- STEP 2 — Done -->
         <div class="step" id="step-done" style="padding-top:0.75rem;">
           <div style="padding: 0 1rem; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
             <div class="xp-done-icon">✅</div>
@@ -768,130 +482,42 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  let currentPath = '';
-  let lastStep3 = '';
-
-  const SIDEBAR = {
-    'step-1':           { step: 'Choose your path',       hint: 'Your Post is a place on the internet that\'s entirely yours — no ads, no algorithm.' },
-    'step-2-personal':  { step: 'Personal Post',          hint: 'Decide how hands-on you want to be when setting up your Post.' },
-    'step-2-business':  { step: 'Business Post',          hint: 'A business Post is a place people actually want to visit.' },
-    'step-2-builder':   { step: 'Builder Post',           hint: 'Full access to every piece. Build something nobody else has.' },
-    'step-3-guided':    { step: 'Setup — Guided',         hint: 'Answer a few basics and we\'ll put your Post together.' },
-    'step-3-diy':       { step: 'Setup — DIY',            hint: 'Claim your address and jump straight in.' },
-    'step-3-business':  { step: 'Setup — Business',       hint: 'Tell us about your place.' },
-    'step-3-builder-ai':{ step: 'Setup — Describe it',    hint: 'Describe your vision and we\'ll build a starting point.' },
-    'step-3-builder-code':{ step: 'Setup — Code mode',   hint: 'Raw access. No guardrails.' },
-    'step-confirm':     { step: 'Step 4 — Review',        hint: 'Check your details before we create your Post.' },
-    'step-loop':        { step: 'Final Step — Loop in',   hint: 'Invite someone to your Quorum to get started.' },
-    'step-done':        { step: 'You\'re in!',            hint: 'Your Post is ready. Go make it yours.' },
-  };
-
-  const PROGRESS = {
-    'step-1': 8,
-    'step-2-personal': 25, 'step-2-business': 25, 'step-2-builder': 25,
-    'step-3-guided': 55, 'step-3-diy': 55, 'step-3-business': 55,
-    'step-3-builder-ai': 55, 'step-3-builder-code': 55,
-    'step-confirm': 78, 'step-loop': 92, 'step-done': 100,
-  };
+  function val(id) { return (document.getElementById(id)?.value || '').trim(); }
 
   function goTo(id) {
     document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
     const next = document.getElementById(id);
-    if (next) {
-      next.classList.add('active');
-      const pct = PROGRESS[id] ?? 50;
-      document.getElementById('progressBar').style.width = pct + '%';
-      const sb = SIDEBAR[id] || {};
-      document.getElementById('sidebarStep').textContent = sb.step || '';
-      document.getElementById('sidebarHint').textContent = sb.hint || '';
-      document.getElementById('statusText').textContent = sb.step || 'Ready';
-    }
-  }
-
-  function selectPath(path) {
-    currentPath = path;
-    if (path === 'personal') goTo('step-2-personal');
-    if (path === 'business') goTo('step-2-business');
-    if (path === 'builder')  goTo('step-2-builder');
-  }
-
-  function pickVibe(btn) {
-    document.querySelectorAll('.vibe-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  }
-
-  function val(id) { return (document.getElementById(id)?.value || '').trim(); }
-  function truncate(s, n) { return s.length > n ? s.slice(0, n) + '…' : s; }
-
-  function goToConfirm(mode) {
-    lastStep3 = 'step-3-' + { guided:'guided', diy:'diy', business:'business', 'builder-ai':'builder-ai', 'builder-code':'builder-code' }[mode];
-    const rows = buildSummaryRows(mode);
-    document.getElementById('confirmSummary').innerHTML = rows.map(r =>
-      `<div class="confirm-row"><span class="label">${r.label}</span><span class="value">${r.value || '—'}</span></div>`
-    ).join('');
-    goTo('step-confirm');
-  }
-
-  function goBack() { goTo(lastStep3 || 'step-1'); }
-
-  function buildSummaryRows(mode) {
-    if (mode === 'guided') return [
-      { label: 'Path',    value: 'Personal — Guided' },
-      { label: 'Name',    value: val('guided-name') },
-      { label: 'Address', value: (val('guided-address') || 'yourname') + '.postmarq' },
-      { label: 'Bio',     value: val('guided-bio') },
-      { label: 'Vibe',    value: document.querySelector('.vibe-btn.active')?.textContent || '—' },
-      { label: 'Email',   value: val('guided-email') },
-    ];
-    if (mode === 'diy') return [
-      { label: 'Path',    value: 'Personal — DIY' },
-      { label: 'Name',    value: val('diy-name') },
-      { label: 'Address', value: (val('diy-address') || 'yourname') + '.postmarq' },
-      { label: 'Email',   value: val('diy-email') },
-    ];
-    if (mode === 'business') return [
-      { label: 'Path',         value: 'Business (paid)' },
-      { label: 'Business',     value: val('biz-name') },
-      { label: 'Address',      value: (val('biz-address') || 'yourname') + '.postmarq' },
-      { label: 'Tagline',      value: val('biz-tagline') },
-      { label: 'Neighborhood', value: val('biz-neighborhood') },
-      { label: 'Email',        value: val('biz-email') },
-    ];
-    if (mode === 'builder-ai') return [
-      { label: 'Path',    value: 'Builder — AI Mode' },
-      { label: 'Name',    value: val('ai-name') },
-      { label: 'Address', value: (val('ai-address') || 'yourname') + '.postmarq' },
-      { label: 'Prompt',  value: truncate(val('ai-prompt'), 60) },
-    ];
-    return [
-      { label: 'Path',    value: 'Builder — Code Mode' },
-      { label: 'Name',    value: val('code-name') },
-      { label: 'Address', value: (val('code-address') || 'yourname') + '.postmarq' },
-      { label: 'Email',   value: val('code-email') },
-    ];
+    if (next) next.classList.add('active');
+    if (id === 'step-done') document.getElementById('progressBar').style.width = '100%';
   }
 
   // ── Supabase account creation ──
   const SUPABASE_URL = 'https://vzvgqkxhhjubylojhohn.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_JFEpFZi63RZja2WorNkBdQ_L3E4mZ6q';
 
-  function getFormValues() {
-    const mode = lastStep3;
-    if (mode === 'step-3-guided')       return { email: val('guided-email'),  password: val('guided-password'),  username: val('guided-address'),  display_name: val('guided-name') };
-    if (mode === 'step-3-diy')          return { email: val('diy-email'),     password: val('diy-password'),     username: val('diy-address'),     display_name: val('diy-name') };
-    if (mode === 'step-3-business')     return { email: val('biz-email'),     password: val('biz-password'),     username: val('biz-address'),     display_name: val('biz-name') };
-    if (mode === 'step-3-builder-ai')   return { email: val('ai-email'),      password: val('ai-password'),      username: val('ai-address'),      display_name: val('ai-name') };
-    if (mode === 'step-3-builder-code') return { email: val('code-email'),    password: val('code-password'),    username: val('code-address'),    display_name: val('code-name') };
-    return {};
-  }
-
   async function createAccount() {
-    const { email, password, username, display_name } = getFormValues();
+    const email        = val('signup-email');
+    const password     = val('signup-password');
+    const username     = val('signup-address');
+    const display_name = val('signup-name');
+
+    const errEl = document.getElementById('signupError');
+    errEl.style.display = 'none';
+
     if (!email || !password || !username) {
-      alert('Please go back and fill in your email, password, and address.');
+      errEl.textContent = 'Please fill in your name, address, email, and password.';
+      errEl.style.display = 'block';
+      return;
+    }
+    if (password.length < 6) {
+      errEl.textContent = 'Password must be at least 6 characters.';
+      errEl.style.display = 'block';
       return;
     }
 
+    const btn = document.getElementById('signupBtn');
+    btn.disabled = true;
+    btn.textContent = 'Creating your Post…';
     document.getElementById('statusText').textContent = 'Creating your account…';
 
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -899,32 +525,31 @@
     // 1. Sign up
     const { data: authData, error: authError } = await sb.auth.signUp({ email, password });
     if (authError) {
-      document.getElementById('statusText').textContent = 'Error: ' + authError.message;
-      alert('Sign up failed: ' + authError.message);
+      errEl.textContent = authError.message;
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Create my Post →';
+      document.getElementById('statusText').textContent = 'Error.';
       return;
     }
 
     // 2. Sign in immediately to ensure session is active before insert
-    const { error: signInError } = await sb.auth.signInWithPassword({ email, password });
-    if (signInError) {
-      document.getElementById('statusText').textContent = 'Account created — please sign in to finish setup.';
-    }
+    await sb.auth.signInWithPassword({ email, password });
 
-    // 3. Insert post row (now session is guaranteed active)
-    const user_id = authData.user.id;
+    // 3. Insert post row
     const { error: postError } = await sb.from('posts').insert({
-      user_id, username, display_name, html: '', css: '', js: ''
+      user_id: authData.user.id, username, display_name, html: '', css: '', js: ''
     });
     if (postError) {
       document.getElementById('statusText').textContent = 'Account created but post setup failed: ' + postError.message;
       console.error(postError);
     }
 
-    // 3. Go to done screen then redirect
+    // 4. Done
     goTo('step-done');
-    const postUrl = '/' + username;
-    document.getElementById('post-link').href = postUrl;
+    document.getElementById('post-link').href = '/' + username;
     document.getElementById('post-link').textContent = 'postmarq.org/' + username + ' →';
+    document.getElementById('statusText').textContent = 'Your Post is live!';
   }
 
   function tick() {
