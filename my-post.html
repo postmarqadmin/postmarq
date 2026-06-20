@@ -7,523 +7,1467 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --glass-white:  rgba(255, 255, 255, 0.52);
-      --glass-border: rgba(255, 255, 255, 0.75);
-      --glass-shadow: 0 8px 32px rgba(120, 80, 40, 0.10), 0 2px 8px rgba(120,80,40,0.07);
+      --glass-white:  rgba(255,255,255,0.52);
+      --glass-border: rgba(255,255,255,0.75);
+      --glass-shadow: 0 8px 32px rgba(120,80,40,0.10), 0 2px 8px rgba(120,80,40,0.07);
+      --glass-inset:  0 1px 0 rgba(255,255,255,0.9) inset;
       --amber:        #e8992a;
       --amber-light:  #f5c462;
       --amber-pale:   #fef3d8;
       --teal:         #4ab5aa;
       --lavender:     #9b8fd4;
-      --ink:          #26180e;
-      --ink-2:        #5a3e28;
-      --font:         'Nunito', sans-serif;
+      --ink:   #26180e;
+      --ink-2: #5a3e28;
+      --ink-3: #a07d60;
+      --ink-4: #c9aa90;
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 22px;
+      --radius-xl: 28px;
+      --font: 'Nunito', system-ui, sans-serif;
     }
 
     body {
       font-family: var(--font);
+      color: var(--ink);
       min-height: 100vh;
-      background: linear-gradient(135deg, #f5d5a0 0%, #e8aa60 40%, #c87840 100%);
+      padding: 0 0 5rem;
+      background:
+        radial-gradient(ellipse at 80% 10%, rgba(195,160,255,0.30) 0%, transparent 52%),
+        radial-gradient(ellipse at 10% 90%, rgba(255,180,90,0.38) 0%, transparent 52%),
+        radial-gradient(ellipse at 55% 55%, rgba(255,210,150,0.18) 0%, transparent 65%),
+        radial-gradient(ellipse at 30% 20%, rgba(160,210,255,0.20) 0%, transparent 45%),
+        linear-gradient(158deg, #ede5f8 0%, #f8ead8 38%, #fdf4e8 62%, #f3e2cc 100%);
       background-attachment: fixed;
-      padding: 2rem 1rem 4rem;
-      color: var(--ink);
     }
 
-    /* Nav */
-    .nav {
-      max-width: 700px;
-      margin: 0 auto 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .nav-logo { font-size: 1.2rem; font-weight: 800; color: var(--ink); }
-    .nav-actions { display: flex; gap: 0.75rem; align-items: center; }
-    .btn-ghost {
-      background: rgba(255,255,255,0.45);
-      border: 1px solid var(--glass-border);
-      border-radius: 8px;
-      padding: 0.4rem 0.9rem;
-      font-family: var(--font);
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--ink-2);
-      cursor: pointer;
-      text-decoration: none;
-    }
-    .btn-amber {
-      background: linear-gradient(135deg, var(--amber-light), var(--amber));
-      border: none;
-      border-radius: 8px;
-      padding: 0.4rem 0.9rem;
-      font-family: var(--font);
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: white;
-      cursor: pointer;
-    }
-    .btn-amber:hover { opacity: 0.9; }
-
-    /* Card */
-    .card {
+    .glass {
       background: var(--glass-white);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(18px) saturate(1.6);
+      -webkit-backdrop-filter: blur(18px) saturate(1.6);
       border: 1px solid var(--glass-border);
-      box-shadow: var(--glass-shadow);
-      border-radius: 20px;
-      padding: 1.75rem;
-      max-width: 700px;
-      margin: 0 auto 1.25rem;
+      box-shadow: var(--glass-shadow), var(--glass-inset);
     }
 
-    /* Section title */
-    .section-title {
-      font-size: 0.72rem;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--ink-2);
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+    /* ── Site Banner ── */
+    .site-banner {
+      position: sticky; top: 0; z-index: 200;
+      background: linear-gradient(90deg, rgba(78,58,160,0.97) 0%, rgba(50,150,142,0.97) 100%);
+      backdrop-filter: blur(12px);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 1.5rem; height: 44px;
+      box-shadow: 0 2px 12px rgba(60,40,120,0.25);
     }
-    .section-title::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: rgba(255,255,255,0.5);
+    .site-banner-logo { font-size: 1.25rem; font-weight: 900; color: rgba(255,255,255,0.97); letter-spacing: -0.5px; }
+    .site-banner-nav { display: flex; align-items: center; gap: 1.5rem; }
+    .site-banner-nav a {
+      font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.82);
+      text-decoration: none; letter-spacing: 0.04em; text-transform: lowercase; transition: color 0.14s;
     }
+    .site-banner-nav a:hover { color: #fff; }
 
-    /* Profile header */
-    .profile-header {
-      display: flex;
-      align-items: flex-start;
+    /* ── Main Grid ── */
+    .zone-feed { max-width: 1400px; margin: 1.25rem auto 0; padding: 0 1.25rem; }
+    .main-grid {
+      display: grid;
+      grid-template-columns: 280px 1fr 280px;
       gap: 1.25rem;
+      align-items: start;
     }
-    .avatar {
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--amber-light), var(--amber));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.8rem;
-      font-weight: 800;
-      color: white;
-      flex-shrink: 0;
-    }
-    .profile-info { flex: 1; }
-    .profile-name { font-size: 1.4rem; font-weight: 800; color: var(--ink); }
-    .profile-address { font-size: 0.8rem; color: var(--ink-2); margin-top: 0.2rem; }
-    .profile-bio { font-size: 0.88rem; color: var(--ink-2); margin-top: 0.5rem; line-height: 1.5; }
+    .left-col  { display: flex; flex-direction: column; gap: 1rem; }
+    .feed-col  { display: flex; flex-direction: column; gap: 1rem; }
+    .right-col { display: flex; flex-direction: column; gap: 1rem; }
 
-    /* Edit profile */
-    .edit-profile-btn {
-      display: none;
-      margin-top: 0.85rem;
-      background: rgba(255,255,255,0.55);
+    @media (max-width: 1299px) {
+      .main-grid { grid-template-columns: 280px 1fr; }
+      .right-col { grid-column: 1; grid-row: 2; }
+      .feed-col  { grid-column: 2; grid-row: 1 / 3; }
+    }
+    @media (max-width: 699px) {
+      .main-grid { grid-template-columns: 1fr; }
+      .left-col, .feed-col, .right-col { grid-column: 1; }
+    }
+
+    /* ── Room Nav ── */
+    .room-nav {
+      display: flex; border-radius: var(--radius-lg); overflow: hidden;
+      background: var(--glass-white);
+      backdrop-filter: blur(18px) saturate(1.6);
       border: 1px solid var(--glass-border);
-      border-radius: 8px;
-      padding: 0.35rem 0.8rem;
-      font-family: var(--font);
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: var(--ink-2);
-      cursor: pointer;
+      box-shadow: var(--glass-shadow), var(--glass-inset);
     }
-    .owner-only { display: none; }
+    .room-tab {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+      padding: 0.65rem 0.25rem 0.55rem; text-decoration: none; color: var(--ink-3);
+      font-size: 0.6rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+      border-right: 1px solid rgba(255,255,255,0.5); transition: background 0.15s, color 0.15s; cursor: pointer;
+    }
+    .room-tab:last-child { border-right: none; }
+    .room-tab i { font-size: 1.2rem; }
+    .room-tab:hover { background: rgba(255,255,255,0.45); color: var(--ink); }
+    .room-tab.active { background: linear-gradient(160deg, rgba(155,143,212,0.25), rgba(74,181,170,0.18)); color: var(--ink); }
+    .room-tab.active i { color: var(--lavender); }
 
-    /* Edit profile modal */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(38, 24, 14, 0.45);
-      backdrop-filter: blur(4px);
-      z-index: 100;
-      align-items: center;
-      justify-content: center;
+    /* ── Profile Card (MySpace style) ── */
+    .myspace-card {
+      border-radius: 14px; overflow: hidden;
+      background: linear-gradient(135deg, rgba(155,143,212,0.28) 0%, rgba(74,181,170,0.16) 100%);
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.55);
+      box-shadow: 0 4px 24px rgba(80,60,140,0.10);
     }
-    .modal-overlay.open { display: flex; }
-    .modal {
-      background: #fef3d8;
-      border-radius: 20px;
-      padding: 2rem;
-      width: 100%;
-      max-width: 420px;
-      box-shadow: 0 20px 60px rgba(38,24,14,0.25);
-    }
-    .modal h3 { font-size: 1rem; font-weight: 800; color: var(--ink); margin-bottom: 1.25rem; }
-    .modal label {
-      display: block;
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: var(--ink-2);
-      margin-bottom: 0.3rem;
-      margin-top: 0.9rem;
-    }
-    .modal input, .modal textarea {
-      width: 100%;
-      padding: 0.65rem 0.9rem;
-      border-radius: 10px;
-      border: 1px solid rgba(232,153,42,0.35);
-      background: rgba(255,255,255,0.75);
-      font-family: var(--font);
-      font-size: 0.88rem;
-      color: var(--ink);
-      outline: none;
-    }
-    .modal textarea { resize: vertical; min-height: 80px; }
-    .modal input:focus, .modal textarea:focus { border-color: var(--amber); }
-    .modal-actions { display: flex; gap: 0.75rem; margin-top: 1.25rem; }
-    .modal-actions button { flex: 1; padding: 0.7rem; border-radius: 10px; font-family: var(--font); font-size: 0.88rem; font-weight: 700; cursor: pointer; border: none; }
-    .btn-save { background: linear-gradient(135deg, var(--amber-light), var(--amber)); color: white; }
-    .btn-cancel { background: rgba(0,0,0,0.08); color: var(--ink-2); }
 
-    /* Composer */
-    .composer {
-      display: flex;
-      gap: 0.9rem;
-      align-items: flex-start;
+    /* Avatar upload area */
+    .ms-avatar-wrap {
+      position: relative; width: 120px; height: 120px; flex-shrink: 0; cursor: pointer;
+      background: linear-gradient(135deg, var(--amber-light), var(--amber));
     }
+    .ms-avatar-wrap img.ms-photo {
+      width: 120px; height: 120px; object-fit: cover; object-position: center top; display: block;
+    }
+    .ms-avatar-initials {
+      width: 120px; height: 120px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.8rem; font-weight: 900; color: white;
+    }
+    .ms-avatar-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.42);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.18s;
+    }
+    .ms-avatar-wrap:hover .ms-avatar-overlay { opacity: 1; }
+    .ms-avatar-overlay span { font-size: 0.65rem; font-weight: 800; color: white; text-align: center; letter-spacing: 0.04em; }
+
+    .ms-profile { display: grid; grid-template-columns: 120px 1fr; }
+    .ms-info {
+      padding: 0.85rem 1rem; display: flex; flex-direction: column;
+      justify-content: center; gap: 0.18rem;
+    }
+    .ms-name {
+      font-size: 1.15rem; font-weight: 900; color: var(--ink); letter-spacing: -0.3px; line-height: 1.1;
+      cursor: pointer; border-bottom: 1px dashed transparent; transition: border-color 0.15s;
+    }
+    .ms-name:hover { border-color: var(--amber); }
+    .ms-meta { font-size: 0.68rem; font-weight: 600; color: var(--ink-3); line-height: 1.8; }
+    .ms-meta .meta-field {
+      display: flex; align-items: center; gap: 0.3rem;
+    }
+    .ms-meta .meta-label { color: var(--ink-3); }
+    .ms-meta .meta-value {
+      color: var(--ink-2); font-weight: 700; cursor: pointer;
+      border-bottom: 1px dashed transparent; transition: border-color 0.15s;
+    }
+    .ms-meta .meta-value:hover { border-color: var(--amber); }
+    .ms-meta .meta-empty { color: var(--ink-4); font-style: italic; font-weight: 500; cursor: pointer; }
+    .ms-divider { height: 1px; background: rgba(255,255,255,0.45); margin: 0 0.85rem; }
+
+    /* My Marq row */
+    .ms-marq-row {
+      padding: 0.55rem 1rem 0.65rem;
+      display: flex; flex-direction: column; align-items: flex-start; gap: 0.15rem;
+    }
+    .ms-marq-label { font-size: 0.6rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; color: var(--lavender); }
+    .ms-marq-text {
+      font-size: 0.72rem; font-weight: 500; color: var(--ink-2); line-height: 1.45;
+      cursor: pointer; width: 100%;
+    }
+    .ms-marq-text.empty { color: var(--ink-4); font-style: italic; }
+
+    /* Current Stamp row */
+    .ms-stamp-row {
+      padding: 0.55rem 1rem 0.65rem;
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.68rem; font-weight: 700; color: var(--ink-3);
+    }
+    .ms-stamp-emoji { font-size: 1.4rem; cursor: pointer; transition: transform 0.15s; }
+    .ms-stamp-emoji:hover { transform: scale(1.15); }
+    .ms-stamp-placeholder { font-size: 0.68rem; font-style: italic; color: var(--ink-4); cursor: pointer; }
+
+    /* Contact box */
+    .ms-contact-header {
+      background: linear-gradient(90deg, rgba(100,80,180,0.82) 0%, rgba(74,181,170,0.72) 100%);
+      padding: 0.4rem 0.9rem;
+      font-size: 0.68rem; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase;
+      color: rgba(255,255,255,0.96);
+    }
+    .ms-contact-grid { display: grid; grid-template-columns: 1fr 1fr; }
+    .ms-contact-item {
+      display: flex; align-items: center; gap: 0.45rem;
+      padding: 0.48rem 0.9rem;
+      font-size: 0.68rem; font-weight: 700; color: var(--ink-2);
+      cursor: pointer; transition: background 0.14s; text-decoration: none;
+      border-bottom: 1px solid rgba(155,143,212,0.18);
+    }
+    .ms-contact-item:nth-child(odd)  { background: rgba(155,143,212,0.08); }
+    .ms-contact-item:nth-child(even) { background: rgba(74,181,170,0.07); }
+    .ms-contact-item:hover           { background: rgba(155,143,212,0.22); color: var(--ink); }
+    .ms-contact-item i { font-size: 0.95rem; color: var(--lavender); flex-shrink: 0; }
+    .ms-contact-item:nth-last-child(-n+2) { border-bottom: none; }
+
+    /* ── My Q ── */
+    .myq-wrap {
+      border-radius: 14px; overflow: hidden;
+      background: rgba(26,26,31,0.90);
+      border: 0.5px solid rgba(255,255,255,0.08);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.28);
+    }
+    .myq-header {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding: 1.1rem 1.2rem 0.85rem;
+      border-bottom: 0.5px solid rgba(255,255,255,0.07);
+    }
+    .myq-date-block { display: flex; flex-direction: column; line-height: 1; gap: 2px; }
+    .myq-day-num { font-size: 42px; font-weight: 900; color: #fff; line-height: 1; }
+    .myq-day-name {
+      font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+      background: linear-gradient(90deg, #7F77DD, #5aafc2);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .myq-month { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.35); margin-top: 2px; }
+    .myq-title-block { text-align: right; }
+    .myq-title {
+      font-size: 36px; font-weight: 900; line-height: 1;
+      background: linear-gradient(90deg, #7F77DD, #EF9F27);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .myq-subtitle { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-top: 3px; }
+    .myq-list { display: flex; flex-direction: column; padding: 0.5rem 0; }
+    .myq-item {
+      display: flex; align-items: flex-start; gap: 0;
+      padding: 0.55rem 1.2rem; transition: background 0.15s;
+    }
+    .myq-item:hover { background: rgba(255,255,255,0.03); }
+    .myq-accent { width: 3px; border-radius: 999px; flex-shrink: 0; align-self: stretch; margin-right: 10px; min-height: 28px; }
+    .myq-accent.loop   { background: #7F77DD; }
+    .myq-accent.invite { background: #EF9F27; }
+    .myq-body { flex: 1; min-width: 0; cursor: pointer; }
+    .myq-item-top { display: flex; align-items: center; gap: 5px; }
+    .myq-item-title { font-size: 0.82rem; font-weight: 700; color: rgba(255,255,255,0.88); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .myq-item-when { font-size: 0.7rem; font-weight: 500; color: rgba(255,255,255,0.38); margin-top: 1px; }
+    .myq-item-remove {
+      background: none; border: none; cursor: pointer;
+      color: rgba(255,255,255,0.2); font-size: 13px; padding: 0 0 0 6px;
+      flex-shrink: 0; line-height: 1; transition: color 0.15s; align-self: center;
+    }
+    .myq-item-remove:hover { color: rgba(255,80,80,0.7); }
+    .myq-empty-state {
+      padding: 1rem 1.2rem;
+      font-size: 0.72rem; font-weight: 500; color: rgba(255,255,255,0.25); font-style: italic;
+      text-align: center; line-height: 1.5;
+    }
+    .myq-footer {
+      padding: 0.6rem 1.2rem 0.9rem;
+      border-top: 0.5px solid rgba(255,255,255,0.07);
+      display: flex; justify-content: flex-end;
+    }
+    .myq-add-btn {
+      background: rgba(127,119,221,0.15); border: 1px solid rgba(127,119,221,0.35);
+      color: rgba(127,119,221,0.9); border-radius: 8px;
+      font-size: 0.75rem; font-weight: 700; padding: 0.35rem 0.85rem;
+      cursor: pointer; font-family: var(--font); transition: background 0.15s, color 0.15s;
+    }
+    .myq-add-btn:hover { background: rgba(127,119,221,0.28); color: #fff; }
+
+    /* My Q Modal */
+    .myq-modal-overlay {
+      position: fixed; inset: 0; z-index: 2000;
+      background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center;
+    }
+    .myq-modal-overlay.open { display: flex; }
+    .myq-modal {
+      background: #1e1e26; border: 0.5px solid rgba(255,255,255,0.1);
+      border-radius: 16px; padding: 1.5rem; width: 300px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    }
+    .myq-modal h3 { font-size: 1rem; font-weight: 800; color: #fff; margin: 0 0 1rem; }
+    .myq-type-toggle { display: flex; gap: 8px; margin-bottom: 1rem; }
+    .myq-type-btn {
+      flex: 1; padding: 0.4rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5);
+      font-family: var(--font); font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: all 0.15s;
+    }
+    .myq-type-btn.sel-loop   { background: rgba(127,119,221,0.25); border-color: #7F77DD; color: #a09af0; }
+    .myq-type-btn.sel-invite { background: rgba(239,159,39,0.2);   border-color: #EF9F27; color: #f0b84a; }
+    .myq-field-label { font-size: 0.7rem; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
+    .myq-field-wrap { margin-bottom: 0.75rem; }
+    .myq-input, .myq-textarea {
+      width: 100%; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.05); color: #fff; padding: 0.45rem 0.6rem;
+      font-family: var(--font); font-size: 0.8rem; outline: none; transition: border-color 0.15s;
+    }
+    .myq-input:focus, .myq-textarea:focus { border-color: rgba(127,119,221,0.55); }
+    .myq-textarea { resize: vertical; min-height: 60px; }
+    .myq-vis-toggle { display: flex; gap: 8px; margin-bottom: 1rem; }
+    .myq-vis-btn {
+      flex: 1; padding: 0.35rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.4);
+      font-family: var(--font); font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.15s;
+    }
+    .myq-vis-btn.active { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.3); color: #fff; }
+    .myq-modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 0.25rem; }
+    .myq-cancel-btn {
+      background: none; border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.4);
+      border-radius: 8px; padding: 0.4rem 0.9rem;
+      font-family: var(--font); font-size: 0.8rem; font-weight: 700; cursor: pointer;
+    }
+    .myq-save-btn {
+      background: linear-gradient(90deg, #7F77DD, #EF9F27); border: none;
+      color: #fff; border-radius: 8px; padding: 0.4rem 1rem;
+      font-family: var(--font); font-size: 0.8rem; font-weight: 800; cursor: pointer;
+    }
+
+    /* ── Composer ── */
+    .composer { border-radius: var(--radius-lg); padding: 1rem 1.2rem; }
+    .composer-header { display: flex; align-items: flex-start; gap: 0.75rem; }
     .composer-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
+      width: 2.4rem; height: 2.4rem; border-radius: 50%; overflow: hidden;
+      border: 2px solid rgba(255,255,255,0.7); flex-shrink: 0;
       background: linear-gradient(135deg, var(--amber-light), var(--amber));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-      font-weight: 800;
-      color: white;
-      flex-shrink: 0;
-      margin-top: 2px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; font-weight: 900; color: white;
     }
-    .composer-body { flex: 1; }
-    .composer-input {
+    .composer-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+    .composer-right { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+    .composer-textarea {
       width: 100%;
-      border: none;
-      background: transparent;
-      font-family: var(--font);
-      font-size: 0.92rem;
-      color: var(--ink);
-      resize: none;
-      outline: none;
-      min-height: 48px;
-      line-height: 1.55;
+      background: rgba(255,255,255,0.45); border: 1.5px solid rgba(255,255,255,0.7);
+      border-radius: var(--radius-sm); padding: 0.55rem 0.9rem;
+      font-family: var(--font); font-size: 0.9rem; font-weight: 500; color: var(--ink);
+      resize: none; overflow: hidden; outline: none; transition: border-color 0.15s, box-shadow 0.15s;
     }
-    .composer-input::placeholder { color: rgba(90,62,40,0.45); }
-    .composer-footer {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      margin-top: 0.75rem;
-      padding-top: 0.75rem;
-      border-top: 1px solid rgba(255,255,255,0.5);
+    .composer-textarea:focus { border-color: rgba(155,143,212,0.5); box-shadow: 0 0 0 3px rgba(155,143,212,0.14); }
+    .composer-textarea::placeholder { color: var(--ink-4); font-style: italic; }
+    .media-preview-strip { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.6rem; }
+    .media-preview-strip:empty { display: none; }
+    .prev-thumb { position: relative; border-radius: 8px; overflow: hidden; border: 1.5px solid rgba(255,255,255,0.7); }
+    .prev-thumb img, .prev-thumb video { width: 80px; height: 66px; object-fit: cover; display: block; }
+    .prev-remove {
+      position: absolute; top: 3px; right: 3px; width: 18px; height: 18px; border-radius: 50%;
+      background: rgba(0,0,0,0.6); color: white; border: none; font-size: 0.6rem; font-weight: 800;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
     }
-    .char-count { font-size: 0.75rem; color: rgba(90,62,40,0.45); margin-right: auto; }
-    .char-count.warn { color: #c87840; }
-
-    /* Post feed */
-    .post-item {
-      padding: 1.1rem 0;
-      border-bottom: 1px solid rgba(255,255,255,0.45);
+    .composer-toolbar { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.56rem; flex-wrap: wrap; }
+    .tool-btn {
+      display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.8rem;
+      background: rgba(255,255,255,0.42); border: 1px solid rgba(255,255,255,0.65);
+      border-radius: 999px; font-family: var(--font); font-size: 0.72rem; font-weight: 700;
+      color: var(--ink-2); cursor: pointer; transition: all 0.14s; white-space: nowrap;
     }
-    .post-item:last-child { border-bottom: none; padding-bottom: 0; }
-    .post-meta {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      margin-bottom: 0.5rem;
-    }
-    .post-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
+    .tool-btn:hover { background: rgba(255,255,255,0.72); transform: translateY(-1px); }
+    .composer-spacer { flex: 1; }
+    .post-btn {
       background: linear-gradient(135deg, var(--amber-light), var(--amber));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.75rem;
-      font-weight: 800;
-      color: white;
-      flex-shrink: 0;
+      color: white; border: none; border-radius: 999px; padding: 0.5rem 1.4rem;
+      font-family: var(--font); font-size: 0.82rem; font-weight: 800;
+      cursor: pointer; box-shadow: 0 3px 12px rgba(232,153,42,0.32);
+      transition: all 0.18s cubic-bezier(0.34,1.56,0.64,1);
     }
+    .post-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(232,153,42,0.42); }
+    .file-input { display: none; }
+
+    /* ── Feed Tabs ── */
+    .feed-tabs {
+      display: flex; gap: 0;
+      background: linear-gradient(90deg, rgba(78,58,160,0.88) 0%, rgba(50,150,142,0.88) 100%);
+      border-radius: 12px; padding: 5px; margin-bottom: 0;
+      box-shadow: 0 2px 10px rgba(60,40,120,0.18);
+    }
+    .feed-tab {
+      flex: 1; padding: 0.52rem 0.6rem;
+      font-family: inherit; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.03em;
+      border: none; cursor: pointer; border-radius: 8px; background: transparent;
+      color: rgba(255,255,255,0.65); transition: all 0.16s ease;
+    }
+    .feed-tab:hover { color: rgba(255,255,255,0.9); background: rgba(255,255,255,0.12); }
+    .feed-tab.active { background: linear-gradient(135deg, var(--amber-light), var(--amber)); color: #fff; box-shadow: 0 2px 8px rgba(232,153,42,0.45); font-weight: 800; }
+    .tab-panel { display: none; flex-direction: column; gap: 1rem; }
+    .tab-panel.active { display: flex; }
+
+    /* ── Post Cards ── */
+    .post-card { border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; }
+    .post-meta { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.6rem; }
+    .post-av {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--amber-light), var(--amber));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 800; color: white; flex-shrink: 0;
+      overflow: hidden;
+    }
+    .post-av img { width: 100%; height: 100%; object-fit: cover; }
     .post-author { font-size: 0.82rem; font-weight: 800; color: var(--ink); }
-    .post-time { font-size: 0.75rem; color: rgba(90,62,40,0.5); margin-left: auto; }
-    .post-delete {
-      display: none;
-      background: none;
-      border: none;
-      font-size: 0.75rem;
-      color: rgba(90,62,40,0.4);
-      cursor: pointer;
-      padding: 0 0.25rem;
-    }
+    .post-time { font-size: 0.72rem; color: rgba(90,62,40,0.5); margin-left: auto; }
+    .post-delete { background: none; border: none; font-size: 0.75rem; color: rgba(90,62,40,0.4); cursor: pointer; padding: 0 0.25rem; }
     .post-delete:hover { color: #c87840; }
     .post-body { font-size: 0.9rem; color: var(--ink); line-height: 1.6; }
-
-    .empty-feed {
-      text-align: center;
-      padding: 2rem 1rem;
-      color: rgba(90,62,40,0.45);
-      font-size: 0.85rem;
+    .post-media-grid { display: grid; gap: 3px; margin-top: 0.85rem; border-radius: var(--radius-md); overflow: hidden; }
+    .post-media-grid.count-1 { grid-template-columns: 1fr; }
+    .post-media-grid.count-2 { grid-template-columns: 1fr 1fr; }
+    .media-item { position: relative; overflow: hidden; background: rgba(0,0,0,0.03); }
+    .media-item img { display: block; width: 100%; height: auto; }
+    .media-item video { width: 100%; display: block; max-height: 340px; object-fit: contain; background: #000; }
+    .post-footer { display: flex; align-items: center; gap: 1rem; margin-top: 1rem; }
+    .stamp-btn {
+      display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.9rem;
+      border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.5); font-family: var(--font); font-size: 0.75rem;
+      font-weight: 700; color: var(--ink-2); cursor: pointer; transition: all 0.18s cubic-bezier(0.34,1.56,0.64,1);
     }
+    .stamp-btn:hover { background: rgba(255,255,255,0.75); transform: scale(1.04); }
+    .stamp-btn.stamped { background: linear-gradient(135deg, rgba(232,153,42,0.18), rgba(245,196,98,0.22)); border-color: rgba(232,153,42,0.5); color: var(--amber); }
+    .stamp-count { font-size: 0.72rem; font-weight: 600; color: var(--ink-4); }
+    .post-date { font-size: 0.72rem; font-weight: 600; color: var(--ink-4); margin-left: auto; }
 
-    /* Beta banner */
-    .beta-banner {
-      background: rgba(232,153,42,0.12);
-      border: 1px solid rgba(232,153,42,0.3);
-      border-radius: 12px;
-      padding: 0.85rem 1.1rem;
-      margin-bottom: 1.25rem;
-      font-size: 0.82rem;
-      color: var(--ink-2);
-      line-height: 1.5;
+    /* ── Empty states ── */
+    .empty-state {
+      text-align: center; padding: 2.5rem 1.5rem;
+      color: var(--ink-4); font-size: 0.82rem; font-weight: 500; line-height: 1.6;
     }
-    .beta-banner strong { color: var(--ink); }
+    .empty-state .empty-icon { font-size: 2rem; margin-bottom: 0.75rem; opacity: 0.4; }
+    .empty-state .empty-hint { font-size: 0.72rem; color: var(--ink-4); margin-top: 0.35rem; opacity: 0.7; }
+
+    /* ── Yearbook empty ── */
+    .yb-stats {
+      display: grid; grid-template-columns: repeat(5,1fr); gap: 0.5rem; margin-bottom: 0.5rem;
+    }
+    .yb-stat {
+      background: rgba(255,255,255,0.45); border: 1px solid rgba(255,255,255,0.6);
+      border-radius: 10px; padding: 0.7rem 0.5rem; text-align: center;
+    }
+    .yb-stat-num { font-size: 1.4rem; font-weight: 900; color: var(--amber); line-height: 1; }
+    .yb-stat-lbl { font-size: 0.55rem; font-weight: 700; color: var(--ink-3); margin-top: 0.2rem; text-transform: uppercase; letter-spacing: 0.06em; }
+
+    /* ── Pick Six ── */
+    .pick-six-card {
+      border-radius: 14px; overflow: hidden;
+      background: linear-gradient(135deg, rgba(155,143,212,0.28) 0%, rgba(74,181,170,0.16) 100%);
+      backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.55);
+      box-shadow: 0 4px 24px rgba(80,60,140,0.10);
+    }
+    .pick-six-header {
+      padding: 1.1rem 1.25rem 0.75rem; display: flex; justify-content: center;
+    }
+    .pick-six-title { font-size: 1.2rem; font-weight: 900; letter-spacing: -0.4px; color: #3d2a0a; }
+    .pick-six-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+      padding: 0 1rem 1.1rem;
+    }
+    .pick-six-tile { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+    .pick-six-slot {
+      width: 100%; aspect-ratio: 3/4; border-radius: 10px;
+      border: 2px dashed rgba(155,143,212,0.4);
+      background: rgba(155,143,212,0.07);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.18s;
+      position: relative; overflow: hidden;
+    }
+    .pick-six-slot:hover { border-color: rgba(155,143,212,0.7); background: rgba(155,143,212,0.15); }
+    .pick-six-slot img {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; border-radius: 8px;
+      border: 2.5px solid rgba(232,153,42,0.55);
+      box-shadow: 0 2px 10px rgba(232,153,42,0.22);
+    }
+    .pick-six-slot .slot-plus { font-size: 1.5rem; color: rgba(155,143,212,0.5); font-weight: 300; line-height: 1; }
+    .pick-six-slot:hover .slot-plus { color: rgba(155,143,212,0.85); }
+    .pick-six-name {
+      font-size: 0.72rem; font-weight: 700; color: #3d2a0a; text-align: center; line-height: 1.2;
+      text-shadow: 0 1px 2px rgba(255,255,255,0.6);
+    }
+    .pick-six-name.empty { color: var(--ink-4); font-weight: 400; font-style: italic; }
+
+    /* ── Candids Wall ── */
+    .candids-card {
+      border-radius: 14px; overflow: hidden;
+      background: linear-gradient(135deg, rgba(74,181,170,0.22) 0%, rgba(155,143,212,0.22) 100%);
+      backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.55);
+      box-shadow: 0 4px 24px rgba(80,60,140,0.10);
+    }
+    .candids-header { padding: 1.25rem 1.25rem 0.8rem; display: flex; justify-content: center; align-items: center; gap: 0.75rem; }
+    .candids-title { font-size: 1.45rem; font-weight: 900; letter-spacing: -0.5px; color: #2d3a4a; }
+    .candids-add-btn {
+      background: rgba(74,181,170,0.18); border: 1px solid rgba(74,181,170,0.4);
+      color: #2e8a82; border-radius: 8px; padding: 0.3rem 0.7rem;
+      font-size: 0.68rem; font-weight: 800; cursor: pointer; font-family: var(--font);
+      transition: background 0.15s;
+    }
+    .candids-add-btn:hover { background: rgba(74,181,170,0.32); }
+    .candids-scroll-wrap {
+      height: 320px; overflow-y: scroll; overflow-x: hidden;
+      scrollbar-width: thin; scrollbar-color: rgba(180,140,100,0.35) transparent;
+    }
+    .candids-scroll-wrap::-webkit-scrollbar { width: 4px; }
+    .candids-scroll-wrap::-webkit-scrollbar-thumb { background: rgba(180,140,100,0.35); border-radius: 2px; }
+    .candids-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
+    .candid-tile { position: relative; aspect-ratio: 4/5; overflow: hidden; cursor: pointer; background: rgba(0,0,0,0.08); }
+    .candid-tile img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.28s ease; }
+    .candid-tile:hover img { transform: scale(1.05); }
+    .candid-tile .tile-remove {
+      position: absolute; top: 4px; right: 4px; width: 20px; height: 20px;
+      background: rgba(0,0,0,0.6); border: none; border-radius: 50%;
+      color: white; font-size: 0.6rem; font-weight: 800; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.15s;
+    }
+    .candid-tile:hover .tile-remove { opacity: 1; }
+    .candids-empty {
+      height: 320px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 0.75rem; color: var(--ink-4); font-size: 0.78rem; font-weight: 500; text-align: center; padding: 1rem;
+    }
+    .candids-empty i { font-size: 2rem; opacity: 0.3; }
+
+    /* ── Generic Modal ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 500;
+      background: rgba(38,24,14,0.45); backdrop-filter: blur(4px);
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: #fef3d8; border-radius: 20px; padding: 2rem;
+      width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(38,24,14,0.25);
+    }
+    .modal-box h3 { font-size: 1rem; font-weight: 800; color: var(--ink); margin-bottom: 1.25rem; }
+    .modal-label {
+      display: block; font-size: 0.78rem; font-weight: 700; color: var(--ink-2);
+      margin-bottom: 0.3rem; margin-top: 0.9rem;
+    }
+    .modal-input, .modal-textarea {
+      width: 100%; padding: 0.65rem 0.9rem; border-radius: 10px;
+      border: 1px solid rgba(232,153,42,0.35); background: rgba(255,255,255,0.75);
+      font-family: var(--font); font-size: 0.88rem; color: var(--ink); outline: none;
+    }
+    .modal-textarea { resize: vertical; min-height: 80px; }
+    .modal-input:focus, .modal-textarea:focus { border-color: var(--amber); }
+    .modal-actions { display: flex; gap: 0.75rem; margin-top: 1.25rem; }
+    .modal-actions button { flex: 1; padding: 0.7rem; border-radius: 10px; font-family: var(--font); font-size: 0.88rem; font-weight: 700; cursor: pointer; border: none; }
+    .btn-save   { background: linear-gradient(135deg, var(--amber-light), var(--amber)); color: white; }
+    .btn-cancel { background: rgba(0,0,0,0.08); color: var(--ink-2); }
+
+    /* ── Stamp picker ── */
+    .stamp-picker {
+      display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.5rem; margin-top: 0.75rem;
+    }
+    .stamp-option {
+      font-size: 1.5rem; text-align: center; cursor: pointer; padding: 0.4rem;
+      border-radius: 8px; transition: background 0.15s; border: 2px solid transparent;
+    }
+    .stamp-option:hover { background: rgba(232,153,42,0.15); }
+    .stamp-option.selected { border-color: var(--amber); background: rgba(232,153,42,0.15); }
+
+    /* Lightbox */
+    .lightbox {
+      position: fixed; inset: 0; z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.22s ease;
+    }
+    .lightbox.open { opacity: 1; pointer-events: all; }
+    .lb-backdrop {
+      position: absolute; inset: 0; background: rgba(20,12,5,0.92);
+      backdrop-filter: blur(10px); cursor: zoom-out;
+    }
+    .lb-wrap {
+      position: relative; z-index: 1; max-width: 92vw; max-height: 88vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transform: scale(0.94); transition: transform 0.22s cubic-bezier(0.34,1.3,0.64,1);
+    }
+    .lightbox.open .lb-wrap { transform: scale(1); }
+    .lb-wrap img { max-width: 92vw; max-height: 82vh; border-radius: var(--radius-lg); box-shadow: 0 24px 80px rgba(0,0,0,0.55); }
+    .lb-close {
+      position: absolute; top: -14px; right: -14px;
+      width: 34px; height: 34px; border-radius: 50%;
+      background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3);
+      color: white; font-size: 0.85rem; font-weight: 800; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; backdrop-filter: blur(6px);
+    }
   </style>
 </head>
 <body>
 
-  <nav class="nav">
-    <div class="nav-logo">Postmarq</div>
-    <div class="nav-actions">
-      <span id="userEmail" style="font-size:0.78rem; color:var(--ink-2); font-weight:600;"></span>
-      <button class="btn-ghost" id="logoutBtn" onclick="logOut()">Log out</button>
-    </div>
-  </nav>
-
-  <!-- Profile card -->
-  <div class="card">
-    <div class="beta-banner owner-only">
-      <strong>Welcome to your Post — beta access.</strong> You're one of the first people here. Edit your profile below, then start posting.
-    </div>
-    <div class="profile-header">
-      <div class="avatar" id="avatarInitial">?</div>
-      <div class="profile-info">
-        <div class="profile-name" id="profileName">Your Name</div>
-        <div class="profile-address" id="profileAddress">—.postmarq</div>
-        <div class="profile-bio" id="profileBio">Tell people a little about yourself.</div>
-        <button class="edit-profile-btn owner-only" onclick="openEditModal()">Edit Profile</button>
-      </div>
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox">
+    <div class="lb-backdrop" onclick="lbClose()"></div>
+    <div class="lb-wrap">
+      <img id="lbImg" src="" alt="" />
+      <button class="lb-close" onclick="lbClose()">✕</button>
     </div>
   </div>
 
-  <!-- Composer (owner only) -->
-  <div class="card owner-only" id="composerCard">
-    <div class="composer">
-      <div class="composer-avatar" id="composerAvatar">?</div>
-      <div class="composer-body">
-        <textarea
-          class="composer-input"
-          id="composerInput"
-          placeholder="What's on your mind?"
-          rows="2"
-          maxlength="500"
-          oninput="onComposerInput()"
-        ></textarea>
-        <div class="composer-footer">
-          <span class="char-count" id="charCount">0 / 500</span>
-          <button class="btn-amber" onclick="publishPost()">Post</button>
+  <!-- Site Banner -->
+  <div class="site-banner">
+    <div class="site-banner-logo">Postmarq</div>
+    <nav class="site-banner-nav">
+      <a href="post.html">home</a>
+      <a href="#" onclick="alert('Coming soon')">townsquare</a>
+      <a href="#" onclick="alert('Coming soon')">neighborhood</a>
+      <a href="#" id="logoutBtn">logout</a>
+    </nav>
+  </div>
+
+  <div class="zone-feed">
+    <div class="main-grid">
+
+      <!-- ══ LEFT COLUMN ══ -->
+      <div class="left-col">
+
+        <!-- Room Nav -->
+        <div class="room-nav">
+          <a class="room-tab active" href="my-post.html" title="Home"><i class="ti ti-home-2"></i><span>Home</span></a>
+          <a class="room-tab" href="living-room.html" title="Living Room"><i class="ti ti-sofa"></i><span>Living Room</span></a>
+          <a class="room-tab" href="office.html" title="Office"><i class="ti ti-briefcase"></i><span>Office</span></a>
+          <a class="room-tab" href="playground.html" title="Playground"><i class="ti ti-assembly"></i><span>Playground</span></a>
+          <a class="room-tab" href="lounge.html" title="Lounge" onclick="event.preventDefault();window.open('lounge.html','postmarq-lounge','width=780,height=620,resizable=yes')"><i class="ti ti-messages"></i><span>Lounge</span></a>
         </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- Feed -->
-  <div class="card">
-    <div class="section-title">Posts</div>
-    <div id="feedContainer">
-      <div class="empty-feed" id="emptyFeed">No posts yet. Say something.</div>
-    </div>
-  </div>
+        <!-- Profile Card -->
+        <div class="myspace-card">
 
-  <!-- Edit profile modal -->
-  <div class="modal-overlay" id="editModal">
-    <div class="modal">
+          <div class="ms-profile">
+            <!-- Avatar -->
+            <div class="ms-avatar-wrap" onclick="document.getElementById('avatarInput').click()" title="Change photo">
+              <img class="ms-photo" id="avatarImg" src="" alt="" style="display:none;" />
+              <div class="ms-avatar-initials" id="avatarInitials">?</div>
+              <div class="ms-avatar-overlay"><span>Change<br>photo</span></div>
+            </div>
+            <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="uploadAvatar(this)" />
+
+            <div class="ms-info">
+              <div class="ms-name" id="profileName" onclick="openProfileModal()">Your Name</div>
+              <div class="ms-meta">
+                <div class="meta-field">
+                  <span class="meta-label">My Townsquare:&nbsp;</span>
+                  <span class="meta-value meta-empty" id="metaCity" onclick="openProfileModal()">add city</span>
+                </div>
+                <div class="meta-field">
+                  <span class="meta-label">My Hood:&nbsp;</span>
+                  <span class="meta-value meta-empty" id="metaHood" onclick="openProfileModal()">add neighborhood</span>
+                </div>
+                <div class="meta-field">
+                  <span class="meta-label">Relationship:&nbsp;</span>
+                  <span class="meta-value meta-empty" id="metaRelationship" onclick="openProfileModal()">add status</span>
+                </div>
+                <div class="meta-field">
+                  <span class="meta-label">Last Update:&nbsp;</span>
+                  <span class="meta-value" id="metaLastUpdate">—</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ms-divider"></div>
+
+          <!-- My Marq -->
+          <div class="ms-marq-row">
+            <span class="ms-marq-label">My Marq</span>
+            <span class="ms-marq-text empty" id="marqText" onclick="openMarqModal()">Add a short bio — what's your deal?</span>
+          </div>
+
+          <div class="ms-divider"></div>
+
+          <!-- Current Stamp -->
+          <div class="ms-stamp-row">
+            <span style="color:var(--ink-3)">Current Stamp:</span>
+            <span class="ms-stamp-emoji" id="stampDisplay" onclick="openStampModal()" title="Pick your stamp" style="display:none">🔖</span>
+            <span class="ms-stamp-placeholder" id="stampPlaceholder" onclick="openStampModal()">pick a stamp</span>
+          </div>
+
+          <div class="ms-divider"></div>
+
+          <!-- Contacting -->
+          <div class="ms-contact-header" id="contactHeader">Contacting You</div>
+          <div class="ms-contact-grid">
+            <a class="ms-contact-item" href="#"><i class="ti ti-mail"></i> Send Message</a>
+            <a class="ms-contact-item" href="#"><i class="ti ti-share"></i> Forward to Friend</a>
+            <a class="ms-contact-item" href="#"><i class="ti ti-user-plus"></i> Add to Friends</a>
+            <a class="ms-contact-item" href="#"><i class="ti ti-heart"></i> Add to Favorites</a>
+            <a class="ms-contact-item" href="#"><i class="ti ti-message-circle"></i> IM / Call</a>
+            <a class="ms-contact-item" href="#"><i class="ti ti-ban"></i> Block User</a>
+          </div>
+
+        </div><!-- /myspace-card -->
+
+        <!-- My Q -->
+        <div class="myq-wrap">
+          <div class="myq-header">
+            <div class="myq-date-block">
+              <div class="myq-day-num" id="myqDayNum"></div>
+              <div class="myq-day-name" id="myqDayName"></div>
+              <div class="myq-month" id="myqMonth"></div>
+            </div>
+            <div class="myq-title-block">
+              <div class="myq-title">My Q</div>
+              <div class="myq-subtitle">loop schedule</div>
+            </div>
+          </div>
+          <div class="myq-list" id="myqList">
+            <div class="myq-empty-state">Your loops will appear here.<br>Add something you do regularly.</div>
+          </div>
+          <div class="myq-footer">
+            <button class="myq-add-btn" onclick="myqOpenModal()">+ Add</button>
+          </div>
+        </div>
+
+        <!-- My Q Add Modal -->
+        <div class="myq-modal-overlay" id="myqOverlay">
+          <div class="myq-modal">
+            <h3>New item</h3>
+            <div class="myq-type-toggle">
+              <button class="myq-type-btn sel-loop" id="myqTypeLoop" onclick="myqSetType('loop')">Loop</button>
+              <button class="myq-type-btn" id="myqTypeInvite" onclick="myqSetType('invite')">Invite</button>
+            </div>
+            <div class="myq-field-wrap">
+              <div class="myq-field-label">Title</div>
+              <input class="myq-input" id="myqInputTitle" type="text" placeholder="e.g. Canal walk with friends" />
+            </div>
+            <div class="myq-field-wrap">
+              <div class="myq-field-label" id="myqWhenLabel">Cadence</div>
+              <input class="myq-input" id="myqInputWhen" type="text" placeholder="e.g. Tues & Thurs 5:30pm" />
+            </div>
+            <div class="myq-field-wrap">
+              <div class="myq-field-label">Details (optional)</div>
+              <textarea class="myq-textarea" id="myqInputDetails" placeholder="Anything else..."></textarea>
+            </div>
+            <div class="myq-field-wrap">
+              <div class="myq-field-label">Visibility</div>
+              <div class="myq-vis-toggle">
+                <button class="myq-vis-btn active" id="myqVisPublic" onclick="myqSetVis('public')">Public</button>
+                <button class="myq-vis-btn" id="myqVisPrivate" onclick="myqSetVis('private')">Private</button>
+              </div>
+            </div>
+            <div class="myq-modal-actions">
+              <button class="myq-cancel-btn" onclick="myqCloseModal()">Cancel</button>
+              <button class="myq-save-btn" onclick="myqSave()">Save</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /left-col -->
+
+
+      <!-- ══ FEED COLUMN ══ -->
+      <div class="feed-col">
+
+        <!-- Composer -->
+        <div class="composer glass" id="composerCard">
+          <div class="composer-header">
+            <div class="composer-avatar" id="composerAv">?</div>
+            <div class="composer-right">
+              <textarea class="composer-textarea" id="composerText" placeholder="What's on your mind?" rows="1"
+                oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+              <div class="media-preview-strip" id="mediaPreviews"></div>
+              <div class="composer-toolbar">
+                <button class="tool-btn" onclick="document.getElementById('photoInput').click()">📷 Photo</button>
+                <button class="tool-btn" onclick="document.getElementById('videoInput').click()">🎬 Video</button>
+                <div class="composer-spacer"></div>
+                <button class="post-btn" onclick="submitPost()">Post</button>
+              </div>
+            </div>
+          </div>
+          <input type="file" id="photoInput" class="file-input" accept="image/*" multiple onchange="addMedia(this,'image')" />
+          <input type="file" id="videoInput" class="file-input" accept="video/*" onchange="addMedia(this,'video')" />
+        </div>
+
+        <!-- Feed Tabs -->
+        <div class="feed-tabs">
+          <button class="feed-tab active" onclick="switchTab('daily')">Daily</button>
+          <button class="feed-tab" onclick="switchTab('weekly')">Weekly</button>
+          <button class="feed-tab" onclick="switchTab('yearbook')">My Yearbook</button>
+        </div>
+
+        <!-- Daily Panel -->
+        <div class="tab-panel active" id="panel-daily">
+          <div id="dailyFeed">
+            <div class="glass" style="border-radius:var(--radius-lg)">
+              <div class="empty-state">
+                <div class="empty-icon">✉️</div>
+                <div>Nothing posted yet.</div>
+                <div class="empty-hint">Use the composer above to share something.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Weekly Panel -->
+        <div class="tab-panel" id="panel-weekly">
+          <div class="glass" style="border-radius:var(--radius-lg)">
+            <div class="empty-state">
+              <div class="empty-icon">📅</div>
+              <div>Your weekly view will fill in as you post.</div>
+              <div class="empty-hint">Posts are grouped by day here.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Yearbook Panel -->
+        <div class="tab-panel" id="panel-yearbook">
+          <div class="yb-stats">
+            <div class="yb-stat"><div class="yb-stat-num" id="ybCaptures">0</div><div class="yb-stat-lbl">Captures</div></div>
+            <div class="yb-stat"><div class="yb-stat-num" id="ybPosts">0</div><div class="yb-stat-lbl">Posts<br>Created</div></div>
+            <div class="yb-stat"><div class="yb-stat-num" id="ybLoops">0</div><div class="yb-stat-lbl">Connected<br>Loops</div></div>
+            <div class="yb-stat"><div class="yb-stat-num" id="ybStamps">0</div><div class="yb-stat-lbl">Stamps<br>Sent</div></div>
+            <div class="yb-stat"><div class="yb-stat-num" id="ybFriends">0</div><div class="yb-stat-lbl">Pick Six<br>Friends</div></div>
+          </div>
+          <div class="glass" style="border-radius:var(--radius-lg)">
+            <div class="empty-state">
+              <div class="empty-icon">📖</div>
+              <div>Your Yearbook is empty.</div>
+              <div class="empty-hint">Photos and posts you share will be archived here.</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /feed-col -->
+
+
+      <!-- ══ RIGHT COLUMN ══ -->
+      <div class="right-col">
+
+        <!-- My Pick Six -->
+        <div class="pick-six-card">
+          <div class="pick-six-header">
+            <div class="pick-six-title">My Pick Six</div>
+          </div>
+          <div class="pick-six-grid" id="pickSixGrid">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Candids Wall -->
+        <div class="candids-card">
+          <div class="candids-header">
+            <div class="candids-title">Candids Wall</div>
+            <button class="candids-add-btn" onclick="document.getElementById('candidsInput').click()">+ Add</button>
+          </div>
+          <input type="file" id="candidsInput" class="file-input" accept="image/*" multiple onchange="addCandids(this)" />
+          <div id="candidsWrap">
+            <div class="candids-empty" id="candidsEmpty">
+              <i class="ti ti-polaroid"></i>
+              <div>Your candids wall is empty.</div>
+              <div style="font-size:0.68rem; opacity:0.6">Add photos from your life.</div>
+            </div>
+            <div class="candids-scroll-wrap" id="candidsScrollWrap" style="display:none">
+              <div class="candids-grid" id="candidsGrid"></div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /right-col -->
+
+    </div><!-- /main-grid -->
+  </div><!-- /zone-feed -->
+
+
+  <!-- ── Profile Edit Modal ── -->
+  <div class="modal-overlay" id="profileModal">
+    <div class="modal-box">
       <h3>Edit your profile</h3>
-      <label for="editName">Display name</label>
-      <input type="text" id="editName" placeholder="Your name" maxlength="40" />
-      <label for="editBio">Bio</label>
-      <textarea id="editBio" placeholder="Tell people about yourself..." maxlength="200"></textarea>
+      <label class="modal-label" for="editName">Display Name</label>
+      <input class="modal-input" type="text" id="editName" maxlength="40" placeholder="Your name" />
+      <label class="modal-label" for="editCity">City (My Townsquare)</label>
+      <input class="modal-input" type="text" id="editCity" maxlength="40" placeholder="e.g. Phoenix, AZ" />
+      <label class="modal-label" for="editHood">Neighborhood (My Hood)</label>
+      <input class="modal-input" type="text" id="editHood" maxlength="40" placeholder="e.g. Uptown PHX" />
+      <label class="modal-label" for="editRelationship">Relationship Status</label>
+      <input class="modal-input" type="text" id="editRelationship" maxlength="40" placeholder="e.g. In a Relationship: 1 Year" />
       <div class="modal-actions">
-        <button class="btn-cancel" onclick="closeEditModal()">Cancel</button>
-        <button class="btn-save" onclick="saveProfile()">Save</button>
+        <button class="btn-cancel" onclick="closeModal('profileModal')">Cancel</button>
+        <button class="btn-save" onclick="saveProfileModal()">Save</button>
       </div>
     </div>
   </div>
+
+  <!-- ── My Marq Modal ── -->
+  <div class="modal-overlay" id="marqModal">
+    <div class="modal-box">
+      <h3>My Marq</h3>
+      <label class="modal-label" for="editMarq">Your bio / tagline</label>
+      <textarea class="modal-textarea" id="editMarq" maxlength="200" placeholder="What's your deal? What are you about?"></textarea>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal('marqModal')">Cancel</button>
+        <button class="btn-save" onclick="saveMarq()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Stamp Modal ── -->
+  <div class="modal-overlay" id="stampModal">
+    <div class="modal-box">
+      <h3>Pick your current stamp</h3>
+      <p style="font-size:0.78rem; color:var(--ink-3); margin-bottom:0.5rem">Your stamp shows on your profile. Change it whenever the vibe shifts.</p>
+      <div class="stamp-picker" id="stampPicker"></div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal('stampModal')">Cancel</button>
+        <button class="btn-save" onclick="saveStamp()">Set Stamp</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Pick Six Name Modal ── -->
+  <div class="modal-overlay" id="pickSixModal">
+    <div class="modal-box">
+      <h3 id="pickSixModalTitle">Add to Pick Six</h3>
+      <label class="modal-label" for="pickSixName">Name</label>
+      <input class="modal-input" type="text" id="pickSixNameInput" maxlength="30" placeholder="Their name" />
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal('pickSixModal')">Cancel</button>
+        <button class="btn-save" onclick="savePickSixSlot()">Save</button>
+      </div>
+    </div>
+  </div>
+  <input type="file" id="pickSixImgInput" class="file-input" accept="image/*" />
+
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const { createClient } = supabase;
-    const client = createClient(
+    const sb = createClient(
       'https://vzvgqkxhhjubylojhohn.supabase.co',
       'sb_publishable_JFEpFZi63RZja2WorNkBdQ_L3E4mZ6q'
     );
 
     let currentUser = null;
-    let profileKey = null;
-    let postsKey = null;
+    let localKey = null; // prefix for all localStorage keys
 
+    // ── Stamps palette ──
+    const STAMPS = ['⬡','📬','🔖','🎯','🌀','🌊','🔥','🌱','⚡','🎸','📷','🎬','🏔','🌙','☀️','🎲','🧩','🦋','🌵','🎨','🍀','🦊','🐕','🌸','✨','🏄'];
+
+    // ── Init ──
     async function init() {
-      const { data: { session } } = await client.auth.getSession();
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { window.location.href = '/login.html'; return; }
+      currentUser = session.user;
+      localKey = `pm_${currentUser.id}`;
 
-      if (!session) {
-        window.location.href = '/login.html';
-        return;
+      document.getElementById('logoutBtn').onclick = logOut;
+
+      setDate();
+      await loadProfile();
+      renderPickSix();
+      renderCandids();
+      renderMyQ();
+      renderFeed();
+    }
+
+    function setDate() {
+      const now = new Date();
+      const days = ['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
+      const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      document.getElementById('myqDayNum').textContent  = now.getDate();
+      document.getElementById('myqDayName').textContent = days[now.getDay()];
+      document.getElementById('myqMonth').textContent   = months[now.getMonth()] + ' ' + now.getFullYear();
+    }
+
+    // ── Profile (Supabase) ──
+    async function loadProfile() {
+      const { data: profile } = await sb.from('profiles').select('full_name, handle, bio').eq('id', currentUser.id).single();
+
+      const fallback = currentUser.user_metadata?.full_name || currentUser.email.split('@')[0];
+      const name = profile?.full_name || fallback;
+      const bio  = profile?.bio || '';
+
+      // Load extra local fields
+      const local = getLocal('profile') || {};
+
+      // Set name
+      document.getElementById('profileName').textContent = name;
+      document.getElementById('contactHeader').textContent = 'Contacting ' + name.split(' ')[0];
+
+      // Set initials / avatar
+      const initial = name.charAt(0).toUpperCase();
+      document.getElementById('avatarInitials').textContent = initial;
+      const composerAv = document.getElementById('composerAv');
+      composerAv.textContent = initial;
+
+      // Saved avatar
+      const avatarUrl = local.avatarUrl || '';
+      if (avatarUrl) {
+        showAvatar(avatarUrl);
+        composerAv.innerHTML = `<img src="${avatarUrl}" alt="" />`;
       }
 
-      currentUser = session.user;
-      profileKey = `pm_profile_${currentUser.id}`;
-      postsKey   = `pm_posts_${currentUser.id}`;
+      // Meta fields
+      setMeta('metaCity', local.city || '');
+      setMeta('metaHood', local.hood || '');
+      setMeta('metaRelationship', local.relationship || '');
+      document.getElementById('metaLastUpdate').textContent = local.lastUpdate || '—';
 
-      // Show owner-only elements
-      document.querySelectorAll('.owner-only').forEach(el => el.style.display = 'block');
-      document.querySelectorAll('.edit-profile-btn').forEach(el => el.style.display = 'inline-block');
+      // Bio / Marq
+      const marq = bio || local.marq || '';
+      const marqEl = document.getElementById('marqText');
+      if (marq) { marqEl.textContent = marq; marqEl.classList.remove('empty'); }
+      else { marqEl.textContent = 'Add a short bio — what\'s your deal?'; marqEl.classList.add('empty'); }
 
-      document.getElementById('userEmail').textContent = currentUser.email;
-
-      loadProfile();
-      loadFeed();
+      // Stamp
+      const stamp = local.stamp || '';
+      if (stamp) {
+        document.getElementById('stampDisplay').textContent = stamp;
+        document.getElementById('stampDisplay').style.display = 'inline';
+        document.getElementById('stampPlaceholder').style.display = 'none';
+      }
     }
 
-    async function loadProfile() {
-      const { data: profile } = await client
-        .from('profiles')
-        .select('full_name, handle, bio')
-        .eq('id', currentUser.id)
-        .single();
-
-      const fallbackName = currentUser.user_metadata?.full_name || currentUser.email.split('@')[0];
-      const name    = profile?.full_name || fallbackName;
-      const bio     = profile?.bio || '';
-      const handle  = profile?.handle || (name.toLowerCase().replace(/\s+/g, '') + '.postmarq');
-      const initial = name.charAt(0).toUpperCase();
-
-      document.getElementById('avatarInitial').textContent  = initial;
-      document.getElementById('composerAvatar').textContent = initial;
-      document.getElementById('profileName').textContent    = name;
-      document.getElementById('profileAddress').textContent = handle;
-      document.getElementById('profileBio').textContent     = bio || 'Tell people a little about yourself.';
+    function setMeta(id, val) {
+      const el = document.getElementById(id);
+      if (val) { el.textContent = val; el.classList.remove('meta-empty'); }
+      else { el.textContent = id === 'metaCity' ? 'add city' : id === 'metaHood' ? 'add neighborhood' : 'add status'; el.classList.add('meta-empty'); }
     }
 
-    async function openEditModal() {
-      const { data: profile } = await client
-        .from('profiles')
-        .select('full_name, bio')
-        .eq('id', currentUser.id)
-        .single();
-
-      const fallbackName = currentUser.user_metadata?.full_name || currentUser.email.split('@')[0];
-      document.getElementById('editName').value = profile?.full_name || fallbackName;
-      document.getElementById('editBio').value  = profile?.bio || '';
-      document.getElementById('editModal').classList.add('open');
+    function showAvatar(url) {
+      const img = document.getElementById('avatarImg');
+      const initials = document.getElementById('avatarInitials');
+      img.src = url; img.style.display = 'block'; initials.style.display = 'none';
     }
 
-    function closeEditModal() {
-      document.getElementById('editModal').classList.remove('open');
+    function uploadAvatar(input) {
+      const file = input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const url = e.target.result;
+        showAvatar(url);
+        const composerAv = document.getElementById('composerAv');
+        composerAv.innerHTML = `<img src="${url}" alt="" />`;
+        const local = getLocal('profile') || {};
+        local.avatarUrl = url;
+        setLocal('profile', local);
+      };
+      reader.readAsDataURL(file);
     }
 
-    async function saveProfile() {
+    // ── Profile Modal ──
+    function openProfileModal() {
+      const local = getLocal('profile') || {};
+      document.getElementById('editName').value = document.getElementById('profileName').textContent;
+      document.getElementById('editCity').value = local.city || '';
+      document.getElementById('editHood').value = local.hood || '';
+      document.getElementById('editRelationship').value = local.relationship || '';
+      openModal('profileModal');
+    }
+
+    async function saveProfileModal() {
       const name = document.getElementById('editName').value.trim();
-      const bio  = document.getElementById('editBio').value.trim();
+      const city = document.getElementById('editCity').value.trim();
+      const hood = document.getElementById('editHood').value.trim();
+      const rel  = document.getElementById('editRelationship').value.trim();
       if (!name) return;
 
       const handle = name.toLowerCase().replace(/\s+/g, '') + '.postmarq';
-      await client.from('profiles').update({ full_name: name, handle, bio }).eq('id', currentUser.id);
+      await sb.from('profiles').update({ full_name: name, handle }).eq('id', currentUser.id);
 
-      closeEditModal();
-      loadProfile();
+      const now = new Date();
+      const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      const lastUpdate = months[now.getMonth()] + ' ' + now.getDate() + ', ' + now.getFullYear();
+
+      const local = getLocal('profile') || {};
+      Object.assign(local, { city, hood, relationship: rel, lastUpdate });
+      setLocal('profile', local);
+
+      closeModal('profileModal');
+      await loadProfile();
     }
 
-    // Close modal on overlay click
-    document.getElementById('editModal').addEventListener('click', function(e) {
-      if (e.target === this) closeEditModal();
-    });
-
-    function onComposerInput() {
-      const val = document.getElementById('composerInput').value;
-      const el  = document.getElementById('charCount');
-      el.textContent = `${val.length} / 500`;
-      el.className   = 'char-count' + (val.length > 450 ? ' warn' : '');
+    // ── My Marq Modal ──
+    function openMarqModal() {
+      const local = getLocal('profile') || {};
+      document.getElementById('editMarq').value = local.marq || '';
+      openModal('marqModal');
     }
 
-    function publishPost() {
-      const text = document.getElementById('composerInput').value.trim();
-      if (!text) return;
+    async function saveMarq() {
+      const marq = document.getElementById('editMarq').value.trim();
+      await sb.from('profiles').update({ bio: marq }).eq('id', currentUser.id);
+      const local = getLocal('profile') || {};
+      local.marq = marq;
+      setLocal('profile', local);
+      closeModal('marqModal');
+      await loadProfile();
+    }
 
-      const name = document.getElementById('profileName').textContent;
+    // ── Stamp Modal ──
+    function openStampModal() {
+      const local = getLocal('profile') || {};
+      const current = local.stamp || '';
+      const picker = document.getElementById('stampPicker');
+      picker.innerHTML = STAMPS.map(s =>
+        `<div class="stamp-option${s === current ? ' selected' : ''}" onclick="selectStamp(this,'${s}')">${s}</div>`
+      ).join('');
+      openModal('stampModal');
+    }
 
-      const posts = JSON.parse(localStorage.getItem(postsKey) || '[]');
-      posts.unshift({ id: Date.now(), text, name, ts: Date.now() });
-      localStorage.setItem(postsKey, JSON.stringify(posts));
+    let pendingStamp = '';
+    function selectStamp(el, stamp) {
+      document.querySelectorAll('.stamp-option').forEach(e => e.classList.remove('selected'));
+      el.classList.add('selected');
+      pendingStamp = stamp;
+    }
 
-      document.getElementById('composerInput').value = '';
-      document.getElementById('charCount').textContent = '0 / 500';
-      loadFeed();
+    function saveStamp() {
+      if (!pendingStamp) { closeModal('stampModal'); return; }
+      const local = getLocal('profile') || {};
+      local.stamp = pendingStamp;
+      setLocal('profile', local);
+      document.getElementById('stampDisplay').textContent = pendingStamp;
+      document.getElementById('stampDisplay').style.display = 'inline';
+      document.getElementById('stampPlaceholder').style.display = 'none';
+      closeModal('stampModal');
+      pendingStamp = '';
+    }
+
+    // ── Pick Six ──
+    function renderPickSix() {
+      const slots = getLocal('pickSix') || Array(6).fill(null);
+      const grid = document.getElementById('pickSixGrid');
+      grid.innerHTML = slots.map((slot, i) => `
+        <div class="pick-six-tile">
+          <div class="pick-six-slot" onclick="pickSixClick(${i})" title="${slot ? 'Change' : 'Add friend'}">
+            ${slot?.img ? `<img src="${slot.img}" alt="${slot.name}" />` : '<span class="slot-plus">+</span>'}
+          </div>
+          <span class="pick-six-name${slot ? '' : ' empty'}">${slot?.name || 'add friend'}</span>
+        </div>
+      `).join('');
+      // Yearbook friends count
+      const filled = slots.filter(Boolean).length;
+      const ybFriends = document.getElementById('ybFriends');
+      if (ybFriends) ybFriends.textContent = filled;
+    }
+
+    let pendingPickSixIdx = -1;
+    function pickSixClick(i) {
+      pendingPickSixIdx = i;
+      const slots = getLocal('pickSix') || Array(6).fill(null);
+      const slot = slots[i];
+      document.getElementById('pickSixModalTitle').textContent = slot ? 'Edit slot ' + (i+1) : 'Add to Pick Six';
+      document.getElementById('pickSixNameInput').value = slot?.name || '';
+      openModal('pickSixModal');
+    }
+
+    function savePickSixSlot() {
+      const name = document.getElementById('pickSixNameInput').value.trim();
+      if (!name) { closeModal('pickSixModal'); return; }
+      // trigger image pick
+      const imgInput = document.getElementById('pickSixImgInput');
+      imgInput.onchange = function() {
+        const file = imgInput.files[0];
+        const reader = new FileReader();
+        reader.onload = e => {
+          const slots = getLocal('pickSix') || Array(6).fill(null);
+          slots[pendingPickSixIdx] = { name, img: e.target.result };
+          setLocal('pickSix', slots);
+          renderPickSix();
+        };
+        if (file) reader.readAsDataURL(file);
+        else {
+          const slots = getLocal('pickSix') || Array(6).fill(null);
+          slots[pendingPickSixIdx] = { name, img: '' };
+          setLocal('pickSix', slots);
+          renderPickSix();
+        }
+      };
+      closeModal('pickSixModal');
+      imgInput.click();
+    }
+
+    // ── Candids ──
+    function addCandids(input) {
+      const files = Array.from(input.files);
+      const existing = getLocal('candids') || [];
+      let loaded = 0;
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          existing.unshift(e.target.result);
+          loaded++;
+          if (loaded === files.length) { setLocal('candids', existing); renderCandids(); }
+        };
+        reader.readAsDataURL(file);
+      });
+      input.value = '';
+    }
+
+    function renderCandids() {
+      const photos = getLocal('candids') || [];
+      const empty = document.getElementById('candidsEmpty');
+      const wrap  = document.getElementById('candidsScrollWrap');
+      const grid  = document.getElementById('candidsGrid');
+      if (!photos.length) {
+        empty.style.display = 'flex'; wrap.style.display = 'none';
+      } else {
+        empty.style.display = 'none'; wrap.style.display = 'block';
+        grid.innerHTML = photos.map((src, i) => `
+          <div class="candid-tile" onclick="lbOpen('${src}')">
+            <img src="${src}" alt="candid" />
+            <button class="tile-remove" onclick="event.stopPropagation();removeCandid(${i})">✕</button>
+          </div>
+        `).join('');
+        // update yearbook captures count
+        const ybCaptures = document.getElementById('ybCaptures');
+        if (ybCaptures) ybCaptures.textContent = photos.length;
+      }
+    }
+
+    function removeCandid(i) {
+      const photos = getLocal('candids') || [];
+      photos.splice(i, 1);
+      setLocal('candids', photos);
+      renderCandids();
+    }
+
+    // ── My Q ──
+    let myqType = 'loop';
+    let myqVis  = 'public';
+
+    function myqOpenModal() {
+      myqType = 'loop'; myqVis = 'public';
+      document.getElementById('myqInputTitle').value   = '';
+      document.getElementById('myqInputWhen').value    = '';
+      document.getElementById('myqInputDetails').value = '';
+      document.getElementById('myqTypeLoop').className   = 'myq-type-btn sel-loop';
+      document.getElementById('myqTypeInvite').className = 'myq-type-btn';
+      document.getElementById('myqVisPublic').classList.add('active');
+      document.getElementById('myqVisPrivate').classList.remove('active');
+      document.getElementById('myqWhenLabel').textContent = 'Cadence';
+      document.getElementById('myqOverlay').classList.add('open');
+    }
+
+    function myqCloseModal() { document.getElementById('myqOverlay').classList.remove('open'); }
+
+    function myqSetType(t) {
+      myqType = t;
+      document.getElementById('myqTypeLoop').className   = t === 'loop'   ? 'myq-type-btn sel-loop'   : 'myq-type-btn';
+      document.getElementById('myqTypeInvite').className = t === 'invite' ? 'myq-type-btn sel-invite' : 'myq-type-btn';
+      document.getElementById('myqWhenLabel').textContent = t === 'loop' ? 'Cadence' : 'Date / Time';
+    }
+
+    function myqSetVis(v) {
+      myqVis = v;
+      document.getElementById('myqVisPublic').classList.toggle('active',  v === 'public');
+      document.getElementById('myqVisPrivate').classList.toggle('active', v === 'private');
+    }
+
+    function myqSave() {
+      const title   = document.getElementById('myqInputTitle').value.trim();
+      const when    = document.getElementById('myqInputWhen').value.trim();
+      const details = document.getElementById('myqInputDetails').value.trim();
+      if (!title) return;
+      const items = getLocal('myq') || [];
+      items.push({ id: Date.now(), type: myqType, title, when, details, vis: myqVis });
+      setLocal('myq', items);
+      myqCloseModal();
+      renderMyQ();
+    }
+
+    function myqRemove(id) {
+      const items = (getLocal('myq') || []).filter(i => i.id !== id);
+      setLocal('myq', items);
+      renderMyQ();
+    }
+
+    function renderMyQ() {
+      const items = getLocal('myq') || [];
+      const list  = document.getElementById('myqList');
+      if (!items.length) {
+        list.innerHTML = '<div class="myq-empty-state">Your loops will appear here.<br>Add something you do regularly.</div>';
+        return;
+      }
+      list.innerHTML = items.slice(0, 5).map(item => `
+        <div class="myq-item">
+          <div class="myq-accent ${item.type}"></div>
+          <div class="myq-body">
+            <div class="myq-item-top"><span class="myq-item-title">${escHtml(item.title)}</span></div>
+            <div class="myq-item-when">${escHtml(item.when)}</div>
+          </div>
+          <button class="myq-item-remove" onclick="myqRemove(${item.id})">✕</button>
+        </div>
+      `).join('');
+      // Update yearbook loops
+      const ybLoops = document.getElementById('ybLoops');
+      if (ybLoops) ybLoops.textContent = items.length;
+    }
+
+    // ── Post Feed ──
+    let mediaFiles = [];
+
+    function addMedia(input, kind) {
+      Array.from(input.files).forEach(file => {
+        const url  = URL.createObjectURL(file);
+        const mime = file.type;
+        mediaFiles.push({ url, mime, kind, file });
+        const strip = document.getElementById('mediaPreviews');
+        const thumb = document.createElement('div');
+        thumb.className = 'prev-thumb';
+        const idx = mediaFiles.length - 1;
+        if (kind === 'image') thumb.innerHTML = `<img src="${url}" /><button class="prev-remove" onclick="removeMedia(${idx})">✕</button>`;
+        else                  thumb.innerHTML = `<video src="${url}" muted></video><button class="prev-remove" onclick="removeMedia(${idx})">✕</button>`;
+        strip.appendChild(thumb);
+      });
+      input.value = '';
+    }
+
+    function removeMedia(i) {
+      mediaFiles.splice(i, 1);
+      // Re-render strip
+      const strip = document.getElementById('mediaPreviews');
+      strip.innerHTML = '';
+      mediaFiles.forEach((m, idx) => {
+        const thumb = document.createElement('div');
+        thumb.className = 'prev-thumb';
+        if (m.kind === 'image') thumb.innerHTML = `<img src="${m.url}" /><button class="prev-remove" onclick="removeMedia(${idx})">✕</button>`;
+        else                    thumb.innerHTML = `<video src="${m.url}" muted></video><button class="prev-remove" onclick="removeMedia(${idx})">✕</button>`;
+        strip.appendChild(thumb);
+      });
+    }
+
+    function submitPost() {
+      const text = document.getElementById('composerText').value.trim();
+      if (!text && !mediaFiles.length) return;
+
+      const name    = document.getElementById('profileName').textContent;
+      const initial = name.charAt(0).toUpperCase();
+      const local   = getLocal('profile') || {};
+      const avatarUrl = local.avatarUrl || '';
+
+      // Convert media to base64 for persistence
+      const savedMedia = [];
+      let pending = mediaFiles.length;
+
+      function finalize() {
+        const posts = getLocal('posts') || [];
+        posts.unshift({ id: Date.now(), text, name, initial, avatarUrl, media: savedMedia, ts: Date.now(), stamps: 0 });
+        setLocal('posts', posts);
+        document.getElementById('composerText').value = '';
+        document.getElementById('composerText').style.height = 'auto';
+        document.getElementById('mediaPreviews').innerHTML = '';
+        mediaFiles = [];
+        renderFeed();
+      }
+
+      if (!pending) { finalize(); return; }
+
+      mediaFiles.forEach((m, i) => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          savedMedia[i] = { src: e.target.result, kind: m.kind };
+          pending--;
+          if (pending === 0) finalize();
+        };
+        reader.readAsDataURL(m.file);
+      });
     }
 
     function deletePost(id) {
-      const posts = JSON.parse(localStorage.getItem(postsKey) || '[]').filter(p => p.id !== id);
-      localStorage.setItem(postsKey, JSON.stringify(posts));
-      loadFeed();
+      const posts = (getLocal('posts') || []).filter(p => p.id !== id);
+      setLocal('posts', posts);
+      renderFeed();
     }
 
-    function loadFeed() {
-      const posts     = JSON.parse(localStorage.getItem(postsKey) || '[]');
-      const container = document.getElementById('feedContainer');
-      const name      = document.getElementById('profileName').textContent || '?';
-      const initial   = name.charAt(0).toUpperCase();
+    function toggleStamp(btn, id) {
+      btn.classList.toggle('stamped');
+      const posts = getLocal('posts') || [];
+      const post = posts.find(p => p.id === id);
+      if (post) { post.stamps = (post.stamps || 0) + (btn.classList.contains('stamped') ? 1 : -1); }
+      setLocal('posts', posts);
+      const countEl = btn.nextElementSibling;
+      const stamps = post ? post.stamps : 0;
+      if (countEl) countEl.textContent = stamps + ' stamp' + (stamps !== 1 ? 's' : '');
+    }
+
+    function renderFeed() {
+      const posts   = getLocal('posts') || [];
+      const feed    = document.getElementById('dailyFeed');
+      const ybPosts = document.getElementById('ybPosts');
+      if (ybPosts) ybPosts.textContent = posts.length;
 
       if (!posts.length) {
-        container.innerHTML = '<div class="empty-feed" id="emptyFeed">No posts yet. Say something.</div>';
+        feed.innerHTML = `<div class="glass" style="border-radius:var(--radius-lg)"><div class="empty-state"><div class="empty-icon">✉️</div><div>Nothing posted yet.</div><div class="empty-hint">Use the composer above to share something.</div></div></div>`;
         return;
       }
 
-      container.innerHTML = posts.map(p => `
-        <div class="post-item">
-          <div class="post-meta">
-            <div class="post-avatar">${initial}</div>
-            <span class="post-author">${p.name || name}</span>
-            <span class="post-time">${timeAgo(p.ts)}</span>
-            <button class="post-delete owner-only" style="display:inline;" onclick="deletePost(${p.id})">✕</button>
-          </div>
-          <div class="post-body">${escapeHtml(p.text)}</div>
-        </div>
-      `).join('');
+      feed.innerHTML = posts.map(p => {
+        const avHtml = p.avatarUrl
+          ? `<div class="post-av"><img src="${p.avatarUrl}" alt="" /></div>`
+          : `<div class="post-av">${p.initial || '?'}</div>`;
+        const mediaHtml = p.media?.length
+          ? `<div class="post-media-grid count-${Math.min(p.media.length, 2)}">${p.media.map(m =>
+              `<div class="media-item">${m.kind === 'image' ? `<img src="${m.src}" onclick="lbOpen('${m.src}')" style="cursor:zoom-in" />` : `<video src="${m.src}" controls playsinline></video>`}</div>`
+            ).join('')}</div>` : '';
+        return `
+          <div class="post-card glass">
+            <div class="post-meta">
+              ${avHtml}
+              <span class="post-author">${escHtml(p.name)}</span>
+              <span class="post-time">${timeAgo(p.ts)}</span>
+              <button class="post-delete" onclick="deletePost(${p.id})">✕</button>
+            </div>
+            ${p.text ? `<div class="post-body">${escHtml(p.text).replace(/\n/g,'<br>')}</div>` : ''}
+            ${mediaHtml}
+            <div class="post-footer">
+              <button class="stamp-btn${p.stamps > 0 ? ' stamped' : ''}" onclick="toggleStamp(this,${p.id})">
+                <span>⬡</span> Stamp
+              </button>
+              <span class="stamp-count">${p.stamps || 0} stamp${p.stamps !== 1 ? 's' : ''}</span>
+              <span class="post-date">${formatDate(p.ts)}</span>
+            </div>
+          </div>`;
+      }).join('');
     }
+
+    // ── Tab switching ──
+    function switchTab(name) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.feed-tab').forEach(b => b.classList.remove('active'));
+      document.getElementById('panel-' + name).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    // ── Lightbox ──
+    function lbOpen(src) {
+      document.getElementById('lbImg').src = src;
+      document.getElementById('lightbox').classList.add('open');
+    }
+    function lbClose() { document.getElementById('lightbox').classList.remove('open'); }
+
+    // ── Modal helpers ──
+    function openModal(id)  { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+    document.addEventListener('click', e => {
+      if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('open');
+    });
+
+    // ── Logout ──
+    async function logOut() { await sb.auth.signOut(); window.location.href = '/login.html'; }
+
+    // ── localStorage helpers ──
+    function getLocal(key) { try { return JSON.parse(localStorage.getItem(`${localKey}_${key}`)); } catch { return null; } }
+    function setLocal(key, val) { localStorage.setItem(`${localKey}_${key}`, JSON.stringify(val)); }
+
+    // ── Util ──
+    function escHtml(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
     function timeAgo(ts) {
-      const diff = Date.now() - ts;
-      const m = Math.floor(diff / 60000);
-      if (m < 1)  return 'just now';
-      if (m < 60) return `${m}m ago`;
+      const m = Math.floor((Date.now() - ts) / 60000);
+      if (m < 1) return 'just now';
+      if (m < 60) return m + 'm ago';
       const h = Math.floor(m / 60);
-      if (h < 24) return `${h}h ago`;
-      return `${Math.floor(h / 24)}d ago`;
+      if (h < 24) return h + 'h ago';
+      return Math.floor(h / 24) + 'd ago';
     }
 
-    function escapeHtml(str) {
-      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+    function formatDate(ts) {
+      const d = new Date(ts);
+      const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
     }
 
-    async function logOut() {
-      await client.auth.signOut();
-      window.location.href = '/login.html';
-    }
-
-    // Submit on Cmd/Ctrl + Enter
+    // Cmd/Ctrl + Enter to post
     document.addEventListener('keydown', e => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') publishPost();
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') submitPost();
     });
 
     init();
