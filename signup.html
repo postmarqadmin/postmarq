@@ -210,7 +210,7 @@
       btn.disabled = true;
       btn.textContent = 'Creating your Post...';
 
-      const { error } = await client.auth.signUp({
+      const { data, error } = await client.auth.signUp({
         email,
         password,
         options: { data: { full_name: name } }
@@ -221,11 +221,23 @@
         msg.textContent = error.message;
         btn.disabled = false;
         btn.textContent = 'Create My Post';
-      } else {
-        msg.className = 'message success';
-        msg.textContent = 'Check your email to confirm your account, then log in.';
-        btn.textContent = 'Done!';
+        return;
       }
+
+      // Create default profile row
+      if (data?.user) {
+        const handle = name.toLowerCase().replace(/\s+/g, '') + '.postmarq';
+        await client.from('profiles').insert({
+          id: data.user.id,
+          full_name: name,
+          handle,
+          bio: ''
+        });
+      }
+
+      msg.className = 'message success';
+      msg.textContent = 'Check your email to confirm your account, then log in.';
+      btn.textContent = 'Done!';
     }
   </script>
 </body>

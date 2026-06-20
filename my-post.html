@@ -396,26 +396,36 @@
       loadFeed();
     }
 
-    function loadProfile() {
-      const saved = JSON.parse(localStorage.getItem(profileKey) || '{}');
+    async function loadProfile() {
+      const { data: profile } = await client
+        .from('profiles')
+        .select('full_name, handle, bio')
+        .eq('id', currentUser.id)
+        .single();
+
       const fallbackName = currentUser.user_metadata?.full_name || currentUser.email.split('@')[0];
-      const name    = saved.name || fallbackName;
-      const bio     = saved.bio  || 'Tell people a little about yourself.';
+      const name    = profile?.full_name || fallbackName;
+      const bio     = profile?.bio || '';
+      const handle  = profile?.handle || (name.toLowerCase().replace(/\s+/g, '') + '.postmarq');
       const initial = name.charAt(0).toUpperCase();
-      const handle  = name.toLowerCase().replace(/\s+/g, '') + '.postmarq';
 
       document.getElementById('avatarInitial').textContent  = initial;
       document.getElementById('composerAvatar').textContent = initial;
       document.getElementById('profileName').textContent    = name;
       document.getElementById('profileAddress').textContent = handle;
-      document.getElementById('profileBio').textContent     = bio;
+      document.getElementById('profileBio').textContent     = bio || 'Tell people a little about yourself.';
     }
 
-    function openEditModal() {
-      const saved = JSON.parse(localStorage.getItem(profileKey) || '{}');
+    async function openEditModal() {
+      const { data: profile } = await client
+        .from('profiles')
+        .select('full_name, bio')
+        .eq('id', currentUser.id)
+        .single();
+
       const fallbackName = currentUser.user_metadata?.full_name || currentUser.email.split('@')[0];
-      document.getElementById('editName').value = saved.name || fallbackName;
-      document.getElementById('editBio').value  = saved.bio  || '';
+      document.getElementById('editName').value = profile?.full_name || fallbackName;
+      document.getElementById('editBio').value  = profile?.bio || '';
       document.getElementById('editModal').classList.add('open');
     }
 
@@ -423,11 +433,14 @@
       document.getElementById('editModal').classList.remove('open');
     }
 
-    function saveProfile() {
+    async function saveProfile() {
       const name = document.getElementById('editName').value.trim();
       const bio  = document.getElementById('editBio').value.trim();
       if (!name) return;
-      localStorage.setItem(profileKey, JSON.stringify({ name, bio }));
+
+      const handle = name.toLowerCase().replace(/\s+/g, '') + '.postmarq';
+      await client.from('profiles').update({ full_name: name, handle, bio }).eq('id', currentUser.id);
+
       closeEditModal();
       loadProfile();
     }
@@ -448,9 +461,7 @@
       const text = document.getElementById('composerInput').value.trim();
       if (!text) return;
 
-      const saved = JSON.parse(localStorage.getItem(profileKey) || '{}');
-      const fallbackName = currentUser.user_metadata?.full_name || currentUser.email.split('@')[0];
-      const name = saved.name || fallbackName;
+      const name = document.getElementById('profileName').textContent;
 
       const posts = JSON.parse(localStorage.getItem(postsKey) || '[]');
       posts.unshift({ id: Date.now(), text, name, ts: Date.now() });
@@ -470,9 +481,7 @@
     function loadFeed() {
       const posts     = JSON.parse(localStorage.getItem(postsKey) || '[]');
       const container = document.getElementById('feedContainer');
-      const saved     = JSON.parse(localStorage.getItem(profileKey) || '{}');
-      const fallbackName = currentUser?.user_metadata?.full_name || currentUser?.email?.split('@')[0] || '?';
-      const name      = saved.name || fallbackName;
+      const name      = document.getElementById('profileName').textContent || '?';
       const initial   = name.charAt(0).toUpperCase();
 
       if (!posts.length) {
