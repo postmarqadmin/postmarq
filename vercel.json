@@ -14,7 +14,7 @@
     }
   ],
   "rewrites": [
-    { "source": "/", "destination": "/my-post.html" },
+    { "source": "/", "destination": "/login.html" },
     { "source": "/home", "destination": "/my-post.html" },
     { "source": "/login", "destination": "/login.html" },
     { "source": "/((?!.*\\.).*)", "destination": "/viewer.html" }
