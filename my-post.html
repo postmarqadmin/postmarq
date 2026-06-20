@@ -591,6 +591,21 @@
 </head>
 <body>
 
+  <!-- Auth Overlay — shown when no session detected -->
+  <div id="authOverlay" style="display:none;position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#f5d5a0 0%,#e8aa60 40%,#c87840 100%);display:flex;align-items:center;justify-content:center;padding:2rem;">
+    <div style="background:rgba(255,255,255,0.52);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.75);box-shadow:0 8px 32px rgba(120,80,40,0.10);border-radius:20px;padding:2.5rem;width:100%;max-width:400px;">
+      <div style="font-size:1.5rem;font-weight:800;color:#26180e;margin-bottom:0.25rem;">Postmarq</div>
+      <div style="font-size:0.85rem;color:#5a3e28;margin-bottom:2rem;">Sign in to your Post</div>
+      <label style="display:block;font-size:0.8rem;font-weight:700;color:#5a3e28;margin-bottom:0.4rem;">Email</label>
+      <input id="olEmail" type="email" placeholder="you@example.com" style="width:100%;padding:0.75rem 1rem;border-radius:10px;border:1px solid rgba(255,255,255,0.75);background:rgba(255,255,255,0.6);font-family:inherit;font-size:0.9rem;color:#26180e;outline:none;margin-bottom:1rem;" />
+      <label style="display:block;font-size:0.8rem;font-weight:700;color:#5a3e28;margin-bottom:0.4rem;">Password</label>
+      <input id="olPass" type="password" placeholder="Password" style="width:100%;padding:0.75rem 1rem;border-radius:10px;border:1px solid rgba(255,255,255,0.75);background:rgba(255,255,255,0.6);font-family:inherit;font-size:0.9rem;color:#26180e;outline:none;" />
+      <div id="olError" style="display:none;margin-top:0.75rem;padding:0.6rem 0.9rem;border-radius:8px;background:rgba(200,92,58,0.12);color:#a03820;border:1px solid rgba(200,92,58,0.3);font-size:0.83rem;font-weight:600;"></div>
+      <button id="olBtn" onclick="overlayLogin()" style="width:100%;margin-top:1.25rem;padding:0.85rem;background:linear-gradient(135deg,#f5c462,#e8992a);border:none;border-radius:10px;font-family:inherit;font-size:0.95rem;font-weight:700;color:white;cursor:pointer;">Sign In</button>
+      <div style="text-align:center;margin-top:1.25rem;font-size:0.82rem;color:#5a3e28;">Don't have an account? <a href="/signup" style="color:#e8992a;font-weight:700;text-decoration:none;">Sign up</a></div>
+    </div>
+  </div>
+
   <!-- Lightbox -->
   <div class="lightbox" id="lightbox">
     <div class="lb-backdrop" onclick="lbClose()"></div>
@@ -938,6 +953,24 @@
     // ── Stamps palette ──
     const STAMPS = ['⬡','📬','🔖','🎯','🌀','🌊','🔥','🌱','⚡','🎸','📷','🎬','🏔','🌙','☀️','🎲','🧩','🦋','🌵','🎨','🍀','🦊','🐕','🌸','✨','🏄'];
 
+    // ── Overlay login (no redirect needed) ──
+    async function overlayLogin() {
+      const email = document.getElementById('olEmail').value.trim();
+      const pass  = document.getElementById('olPass').value;
+      const btn   = document.getElementById('olBtn');
+      const err   = document.getElementById('olError');
+      err.style.display = 'none';
+      if (!email || !pass) { err.textContent = 'Please enter your email and password.'; err.style.display = 'block'; return; }
+      btn.disabled = true; btn.textContent = 'Signing in…';
+      const { data, error } = await sb.auth.signInWithPassword({ email, pass });
+      if (error) {
+        err.textContent = 'Incorrect email or password.'; err.style.display = 'block';
+        btn.disabled = false; btn.textContent = 'Sign In'; return;
+      }
+      document.getElementById('authOverlay').style.display = 'none';
+      await startApp(data.session);
+    }
+
     // ── Init ──
     async function init() {
       const session = await new Promise(resolve => {
@@ -946,7 +979,14 @@
         });
       });
 
-      if (!session) { window.location.href = '/login'; return; }
+      if (!session) {
+        document.getElementById('authOverlay').style.display = 'flex';
+        return;
+      }
+      await startApp(session);
+    }
+
+    async function startApp(session) {
       currentUser = session.user;
       localKey = `pm_${currentUser.id}`;
 
@@ -1462,7 +1502,11 @@
     });
 
     // ── Logout ──
-    async function logOut() { await sb.auth.signOut(); window.location.href = '/login'; }
+    async function logOut() {
+      await sb.auth.signOut();
+      currentUser = null; localKey = null;
+      document.getElementById('authOverlay').style.display = 'flex';
+    }
 
     // ── localStorage helpers ──
     function getLocal(key) { try { return JSON.parse(localStorage.getItem(`${localKey}_${key}`)); } catch { return null; } }
