@@ -505,27 +505,8 @@
 
     sb.auth.getSession().then(async function(r) {
       if (!r.data.session) return;
-      var session = r.data.session;
-      var { data: post } = await sb.from('posts').select('username').eq('user_id', session.user.id).single();
-      var username = post ? post.username : null;
-
-      // Show "already signed in" state instead of auto-redirecting
-      document.getElementById('loginForm').style.display = 'none';
-      document.getElementById('forgotLink').style.display = 'none';
-      document.getElementById('signedInState').style.display = 'flex';
-      document.getElementById('signedInEmail').textContent = session.user.email;
-      document.getElementById('statusText').textContent = 'Signed in as ' + session.user.email;
-
-      document.getElementById('goToPostBtn').onclick = function() {
-        redirectToPost(session.user.id);
-      };
-      document.getElementById('signOutBtn').onclick = async function() {
-        await sb.auth.signOut();
-        document.getElementById('signedInState').style.display = 'none';
-        document.getElementById('loginForm').style.display = '';
-        document.getElementById('forgotLink').style.display = '';
-        document.getElementById('statusText').textContent = 'Signed out.';
-      };
+      // Already signed in — go straight home
+      window.location.replace('/home');
     });
 
     function tick() {
