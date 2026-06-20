@@ -490,14 +490,11 @@
     );
 
     async function redirectToPost(userId) {
-      await sb.auth.refreshSession();
       window.location.replace('/home');
     }
 
     sb.auth.getSession().then(async function(r) {
       if (!r.data.session) return;
-      // Refresh tokens so my-post.html reads fresh ones from localStorage
-      await sb.auth.refreshSession();
       window.location.replace('/home');
     });
 
