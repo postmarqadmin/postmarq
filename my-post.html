@@ -592,7 +592,7 @@
 <body>
 
   <!-- Auth Overlay — shown when no session detected -->
-  <div id="authOverlay" style="display:none;position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#f5d5a0 0%,#e8aa60 40%,#c87840 100%);display:flex;align-items:center;justify-content:center;padding:2rem;">
+  <div id="authOverlay" style="display:none;position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#f5d5a0 0%,#e8aa60 40%,#c87840 100%);align-items:center;justify-content:center;padding:2rem;">
     <div style="background:rgba(255,255,255,0.52);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.75);box-shadow:0 8px 32px rgba(120,80,40,0.10);border-radius:20px;padding:2.5rem;width:100%;max-width:400px;">
       <div style="font-size:1.5rem;font-weight:800;color:#26180e;margin-bottom:0.25rem;">Postmarq</div>
       <div style="font-size:0.85rem;color:#5a3e28;margin-bottom:2rem;">Sign in to your Post</div>
@@ -962,7 +962,7 @@
       err.style.display = 'none';
       if (!email || !pass) { err.textContent = 'Please enter your email and password.'; err.style.display = 'block'; return; }
       btn.disabled = true; btn.textContent = 'Signing in…';
-      const { data, error } = await sb.auth.signInWithPassword({ email, pass });
+      const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
       if (error) {
         err.textContent = 'Incorrect email or password.'; err.style.display = 'block';
         btn.disabled = false; btn.textContent = 'Sign In'; return;
