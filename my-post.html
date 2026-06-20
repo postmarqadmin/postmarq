@@ -941,7 +941,7 @@
     // ── Init ──
     async function init() {
       const { data: { session } } = await sb.auth.getSession();
-      if (!session) { window.location.href = '/login.html'; return; }
+      if (!session) { window.location.href = '/login'; return; }
       currentUser = session.user;
       localKey = `pm_${currentUser.id}`;
 
@@ -1457,7 +1457,7 @@
     });
 
     // ── Logout ──
-    async function logOut() { await sb.auth.signOut(); window.location.href = '/login.html'; }
+    async function logOut() { await sb.auth.signOut(); window.location.href = '/login'; }
 
     // ── localStorage helpers ──
     function getLocal(key) { try { return JSON.parse(localStorage.getItem(`${localKey}_${key}`)); } catch { return null; } }
