@@ -295,11 +295,26 @@
 
   function renderContent(content, displayName) {
     const root = document.getElementById('post-root');
-    let out = '';
-    if (content.css) out += `<style>${content.css}</style>`;
-    out += content.html || '';
-    if (content.js)  out += `<script>${content.js}<\/script>`;
-    root.innerHTML = out;
+    root.innerHTML = '';
+
+    if (content.css) {
+      const style = document.createElement('style');
+      style.textContent = content.css;
+      root.appendChild(style);
+    }
+
+    if (content.html) {
+      const div = document.createElement('div');
+      div.innerHTML = content.html;
+      root.appendChild(div);
+    }
+
+    if (content.js) {
+      const script = document.createElement('script');
+      script.textContent = content.js;
+      root.appendChild(script);
+    }
+
     const nameEl = document.getElementById('post-username');
     if (nameEl) nameEl.textContent = displayName;
   }
