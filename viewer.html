@@ -272,8 +272,8 @@
     document.getElementById('pill-username').textContent = session.user.email;
 
     if (session.user.id === post.user_id) {
-      isOwner = true;
-      showEditUI();
+      window.location.replace('/my-post.html');
+      return;
     } else {
       const { data: myPost } = await sb.from('posts').select('username').eq('user_id', session.user.id).single();
       document.getElementById('visitor-bar').classList.add('visible');
