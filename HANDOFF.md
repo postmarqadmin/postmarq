@@ -71,8 +71,8 @@ Currently avatars and candid photos are stored as base64 strings in localStorage
 - Update `renderMyQ()` and related functions in my-post.html to read/write Supabase
 
 ## Supabase credentials
-- URL: `https://vzvgqkxhhjubylojhohn.supabase.co`
-- Anon key: `sb_publishable_JFEpFZi63RZja2WorNkBdQ_L3E4mZ6q`
+- URL: `https://udlbdccvspxqlzizpkda.supabase.co`
+- Anon key: `sb_publishable_co1yq79BF8oR9Mg651DG5w_ESuACdqn`
 
 ## Git / deployment
 - GitHub repo: `postmarqadmin/postmarq` (main branch)
