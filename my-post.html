@@ -991,6 +991,9 @@
 
     let currentUser = null;
     let localKey = null; // prefix for all localStorage keys
+    let cachedPosts = null;
+    let cachedMyStamps = new Set();
+    let weeklyRendered = false;
 
     // ── Stamps palette ──
     const STAMPS = ['⬡','📬','🔖','🎯','🌀','🌊','🔥','🌱','⚡','🎸','📷','🎬','🏔','🌙','☀️','🎲','🧩','🦋','🌵','🎨','🍀','🦊','🐕','🌸','✨','🏄'];
@@ -1159,7 +1162,7 @@
       if (!name) return;
 
       const handle = name.toLowerCase().replace(/\s+/g, '') + '.postmarq';
-      await sb.from('profiles').update({ full_name: name, handle }).eq('id', currentUser.id);
+      await sb.from('profiles').upsert({ id: currentUser.id, full_name: name, handle }, { onConflict: 'id' });
 
       const now = new Date();
       const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -1182,7 +1185,7 @@
 
     async function saveMarq() {
       const marq = document.getElementById('editMarq').value.trim();
-      await sb.from('profiles').update({ bio: marq }).eq('id', currentUser.id);
+      await sb.from('profiles').upsert({ id: currentUser.id, bio: marq }, { onConflict: 'id' });
       const local = getLocal('profile') || {};
       local.marq = marq;
       setLocal('profile', local);
@@ -1471,67 +1474,168 @@
       if (countEl) countEl.textContent = (count || 0) + ' stamp' + (count !== 1 ? 's' : '');
     }
 
-    async function renderFeed() {
-      const feed = document.getElementById('dailyFeed');
-      feed.innerHTML = `<div class="glass" style="border-radius:var(--radius-lg)"><div class="empty-state"><div class="empty-icon" style="font-size:1.2rem;opacity:0.3">⏳</div><div>Loading…</div></div></div>`;
-
+    async function loadPosts() {
       const { data: posts } = await sb
         .from('posts')
         .select('id, body, media, created_at, stamps(count)')
         .eq('user_id', currentUser.id)
         .order('created_at', { ascending: false });
 
-      // Which posts has the current user stamped?
-      const postIds = (posts || []).map(p => p.id);
-      let myStamps = new Set();
+      cachedPosts = posts || [];
+
+      const postIds = cachedPosts.map(p => p.id);
       if (postIds.length) {
         const { data: sd } = await sb.from('stamps').select('post_id').eq('user_id', currentUser.id).in('post_id', postIds);
-        myStamps = new Set((sd || []).map(s => s.post_id));
+        cachedMyStamps = new Set((sd || []).map(s => s.post_id));
       }
 
+      // Yearbook stats
       const ybPosts = document.getElementById('ybPosts');
-      if (ybPosts) ybPosts.textContent = (posts || []).length;
+      if (ybPosts) ybPosts.textContent = cachedPosts.length;
 
-      if (!posts?.length) {
+      const { count: stampsSent } = await sb.from('stamps').select('*', { count: 'exact', head: true }).eq('user_id', currentUser.id);
+      const ybStamps = document.getElementById('ybStamps');
+      if (ybStamps) ybStamps.textContent = stampsSent || 0;
+    }
+
+    function buildPostCard(p, name, avatarUrl) {
+      const stampCount = p.stamps?.[0]?.count || 0;
+      const stamped    = cachedMyStamps.has(p.id);
+      const initial    = name.charAt(0).toUpperCase();
+      const avHtml     = avatarUrl
+        ? `<div class="post-av"><img src="${avatarUrl}" alt="" /></div>`
+        : `<div class="post-av">${initial}</div>`;
+      const media = p.media || [];
+      const mediaHtml = media.length
+        ? `<div class="post-media-grid count-${Math.min(media.length, 2)}">${media.map(m =>
+            `<div class="media-item">${m.kind === 'image' ? `<img src="${m.src}" onclick="lbOpen('${m.src}')" style="cursor:zoom-in" />` : `<video src="${m.src}" controls playsinline></video>`}</div>`
+          ).join('')}</div>` : '';
+      return `
+        <div class="post-card glass" data-id="${p.id}">
+          <div class="post-meta">
+            ${avHtml}
+            <span class="post-author">${escHtml(name)}</span>
+            <span class="post-time">${timeAgo(new Date(p.created_at).getTime())}</span>
+            <button class="post-delete" onclick="deletePost('${p.id}')">✕</button>
+          </div>
+          ${p.body ? `<div class="post-body">${escHtml(p.body).replace(/\n/g,'<br>')}</div>` : ''}
+          ${mediaHtml}
+          <div class="post-footer">
+            <button class="stamp-btn${stamped ? ' stamped' : ''}" onclick="toggleStamp(this,'${p.id}')">
+              <span>⬡</span> Stamp
+            </button>
+            <span class="stamp-count">${stampCount} stamp${stampCount !== 1 ? 's' : ''}</span>
+            <span class="post-date">${formatDate(new Date(p.created_at).getTime())}</span>
+          </div>
+        </div>`;
+    }
+
+    async function renderFeed() {
+      const feed = document.getElementById('dailyFeed');
+      feed.innerHTML = `<div class="glass" style="border-radius:var(--radius-lg)"><div class="empty-state"><div class="empty-icon" style="font-size:1.2rem;opacity:0.3">⏳</div><div>Loading…</div></div></div>`;
+
+      await loadPosts();
+      weeklyRendered = false;
+
+      if (!cachedPosts.length) {
         feed.innerHTML = `<div class="glass" style="border-radius:var(--radius-lg)"><div class="empty-state"><div class="empty-icon">✉️</div><div>Nothing posted yet.</div><div class="empty-hint">Use the composer above to share something.</div></div></div>`;
         return;
       }
 
-      const local      = getLocal('profile') || {};
-      const name       = document.getElementById('profileName').textContent;
-      const initial    = name.charAt(0).toUpperCase();
-      const avatarUrl  = local.avatarUrl || '';
+      const local     = getLocal('profile') || {};
+      const name      = document.getElementById('profileName').textContent;
+      const avatarUrl = local.avatarUrl || '';
 
-      feed.innerHTML = posts.map(p => {
-        const stampCount = p.stamps?.[0]?.count || 0;
-        const stamped    = myStamps.has(p.id);
-        const avHtml     = avatarUrl
-          ? `<div class="post-av"><img src="${avatarUrl}" alt="" /></div>`
-          : `<div class="post-av">${initial}</div>`;
-        const media = p.media || [];
-        const mediaHtml = media.length
-          ? `<div class="post-media-grid count-${Math.min(media.length, 2)}">${media.map(m =>
-              `<div class="media-item">${m.kind === 'image' ? `<img src="${m.src}" onclick="lbOpen('${m.src}')" style="cursor:zoom-in" />` : `<video src="${m.src}" controls playsinline></video>`}</div>`
-            ).join('')}</div>` : '';
-        return `
-          <div class="post-card glass" data-id="${p.id}">
-            <div class="post-meta">
-              ${avHtml}
-              <span class="post-author">${escHtml(name)}</span>
-              <span class="post-time">${timeAgo(new Date(p.created_at).getTime())}</span>
-              <button class="post-delete" onclick="deletePost('${p.id}')">✕</button>
-            </div>
-            ${p.body ? `<div class="post-body">${escHtml(p.body).replace(/\n/g,'<br>')}</div>` : ''}
-            ${mediaHtml}
-            <div class="post-footer">
-              <button class="stamp-btn${stamped ? ' stamped' : ''}" onclick="toggleStamp(this,'${p.id}')">
-                <span>⬡</span> Stamp
-              </button>
-              <span class="stamp-count">${stampCount} stamp${stampCount !== 1 ? 's' : ''}</span>
-              <span class="post-date">${formatDate(new Date(p.created_at).getTime())}</span>
-            </div>
+      feed.innerHTML = cachedPosts.map(p => buildPostCard(p, name, avatarUrl)).join('');
+    }
+
+    function renderWeekly() {
+      if (weeklyRendered) return;
+      weeklyRendered = true;
+
+      const panel = document.getElementById('panel-weekly');
+      const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+      // Build a map: "YYYY-MM-DD" → [posts]
+      const byDay = {};
+      (cachedPosts || []).forEach(p => {
+        const d = new Date(p.created_at);
+        const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+        if (!byDay[key]) byDay[key] = [];
+        byDay[key].push(p);
+      });
+
+      // Build the current week (Sun→Sat)
+      const today = new Date();
+      const startOfWeek = new Date(today);
+      startOfWeek.setDate(today.getDate() - today.getDay());
+      startOfWeek.setHours(0,0,0,0);
+
+      const local     = getLocal('profile') || {};
+      const name      = document.getElementById('profileName').textContent;
+      const avatarUrl = local.avatarUrl || '';
+
+      // Also collect all unique weeks from posts so we can show history
+      const allKeys = Object.keys(byDay).sort().reverse();
+
+      // Current week days
+      const weekDays = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(startOfWeek);
+        d.setDate(startOfWeek.getDate() + i);
+        return d;
+      });
+
+      const weekLabel = MONTH_NAMES[startOfWeek.getMonth()] + ' ' + startOfWeek.getDate() +
+        ' – ' + MONTH_NAMES[weekDays[6].getMonth()] + ' ' + weekDays[6].getDate() + ', ' + weekDays[6].getFullYear();
+
+      let html = `<div style="font-size:0.72rem;font-weight:700;color:var(--ink-3);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:0.75rem;padding-left:2px;">This week · ${weekLabel}</div>`;
+
+      let thisWeekHasPost = false;
+      weekDays.forEach(d => {
+        const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+        const posts = byDay[key] || [];
+        const isToday = key === (today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0'));
+        const isFuture = d > today;
+
+        html += `<div style="display:flex;gap:0.75rem;align-items:flex-start;margin-bottom:0.6rem;">
+          <div style="flex-shrink:0;width:44px;text-align:center;padding-top:2px;">
+            <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;color:${isToday ? 'var(--amber)' : 'var(--ink-3)'};">${DAY_NAMES[d.getDay()].slice(0,3)}</div>
+            <div style="font-size:1.1rem;font-weight:800;color:${isToday ? 'var(--amber)' : isFuture ? 'var(--ink-4)' : 'var(--ink-2)'};">${d.getDate()}</div>
+          </div>
+          <div style="flex:1;min-width:0;">`;
+
+        if (isFuture) {
+          html += `<div class="glass" style="border-radius:var(--radius-md);padding:0.65rem 1rem;font-size:0.78rem;color:var(--ink-4);font-style:italic;">—</div>`;
+        } else if (!posts.length) {
+          html += `<div class="glass" style="border-radius:var(--radius-md);padding:0.65rem 1rem;font-size:0.78rem;color:var(--ink-4);font-style:italic;">Quiet day.</div>`;
+        } else {
+          thisWeekHasPost = true;
+          html += posts.map(p => buildPostCard(p, name, avatarUrl)).join('');
+        }
+
+        html += `</div></div>`;
+      });
+
+      // Past posts (outside current week)
+      const pastKeys = allKeys.filter(k => {
+        const d = new Date(k + 'T12:00:00');
+        return d < startOfWeek;
+      });
+
+      if (pastKeys.length) {
+        html += `<div style="font-size:0.72rem;font-weight:700;color:var(--ink-3);letter-spacing:0.06em;text-transform:uppercase;margin:1.25rem 0 0.75rem;padding-left:2px;">Earlier</div>`;
+        pastKeys.forEach(key => {
+          const d = new Date(key + 'T12:00:00');
+          const posts = byDay[key];
+          html += `<div style="margin-bottom:0.75rem;">
+            <div style="font-size:0.72rem;font-weight:700;color:var(--ink-3);margin-bottom:0.4rem;">${DAY_NAMES[d.getDay()]}, ${MONTH_NAMES[d.getMonth()]} ${d.getDate()}</div>
+            ${posts.map(p => buildPostCard(p, name, avatarUrl)).join('')}
           </div>`;
-      }).join('');
+        });
+      }
+
+      panel.innerHTML = html;
     }
 
     // ── Tab switching ──
@@ -1540,6 +1644,7 @@
       document.querySelectorAll('.feed-tab').forEach(b => b.classList.remove('active'));
       document.getElementById('panel-' + name).classList.add('active');
       event.currentTarget.classList.add('active');
+      if (name === 'weekly') renderWeekly();
     }
 
     // ── Lightbox ──
