@@ -1098,8 +1098,10 @@
 
       const avatarUrl = profile?.avatar_url || '';
       if (avatarUrl) {
-        showAvatar(avatarUrl);
-        composerAv.innerHTML = `<img src="${avatarUrl}" alt="" />`;
+        const displayUrl = avatarUrl + '?t=' + Date.now();
+        document.getElementById('avatarImg').dataset.url = avatarUrl;
+        showAvatar(displayUrl);
+        composerAv.innerHTML = `<img src="${displayUrl}" alt="" />`;
       }
 
       // Meta fields
@@ -1134,7 +1136,7 @@
       const file = input.files[0];
       if (!file) return;
 
-      // Show local preview immediately
+      // Show local preview immediately so it feels instant
       const previewUrl = URL.createObjectURL(file);
       showAvatar(previewUrl);
       document.getElementById('composerAv').innerHTML = `<img src="${previewUrl}" alt="" />`;
@@ -1142,13 +1144,23 @@
       const ext  = file.name.split('.').pop();
       const path = `${currentUser.id}/avatar.${ext}`;
       const { error: upErr } = await sb.storage.from('avatars').upload(path, file, { upsert: true });
-      if (upErr) { console.error('Avatar upload failed:', upErr.message); return; }
+      if (upErr) {
+        alert('Photo upload failed: ' + upErr.message);
+        return;
+      }
 
+      // Save clean URL (no timestamp) to DB; use timestamped version only for display cache-bust
       const { data } = sb.storage.from('avatars').getPublicUrl(path);
-      const url = data.publicUrl + '?t=' + Date.now(); // bust cache
-      showAvatar(url);
-      document.getElementById('composerAv').innerHTML = `<img src="${url}" alt="" />`;
-      await sb.from('profiles').upsert({ id: currentUser.id, avatar_url: url }, { onConflict: 'id' });
+      const cleanUrl = data.publicUrl;
+      const displayUrl = cleanUrl + '?t=' + Date.now();
+
+      showAvatar(displayUrl);
+      document.getElementById('composerAv').innerHTML = `<img src="${displayUrl}" alt="" />`;
+      // Store the display URL in a data attribute for feed card use
+      document.getElementById('avatarImg').dataset.url = cleanUrl;
+
+      const { error: dbErr } = await sb.from('profiles').upsert({ id: currentUser.id, avatar_url: cleanUrl }, { onConflict: 'id' });
+      if (dbErr) alert('Could not save photo to profile: ' + dbErr.message);
     }
 
     // ── Profile Modal ──
@@ -1190,7 +1202,8 @@
 
     async function saveMarq() {
       const marq = document.getElementById('editMarq').value.trim();
-      await sb.from('profiles').upsert({ id: currentUser.id, bio: marq }, { onConflict: 'id' });
+      const { error } = await sb.from('profiles').upsert({ id: currentUser.id, bio: marq }, { onConflict: 'id' });
+      if (error) { alert('Could not save bio: ' + error.message); return; }
       closeModal('marqModal');
       await loadProfile();
     }
@@ -1594,7 +1607,8 @@
       }
 
       const name      = document.getElementById('profileName').textContent;
-      const avatarUrl = document.getElementById('avatarImg').src || '';
+      const avatarImg = document.getElementById('avatarImg');
+      const avatarUrl = avatarImg.dataset.url || '';
 
       feed.innerHTML = cachedPosts.map(p => buildPostCard(p, name, avatarUrl)).join('');
     }
@@ -1623,7 +1637,8 @@
       startOfWeek.setHours(0,0,0,0);
 
       const name      = document.getElementById('profileName').textContent;
-      const avatarUrl = document.getElementById('avatarImg').src || '';
+      const avatarImg = document.getElementById('avatarImg');
+      const avatarUrl = avatarImg.dataset.url || '';
 
       // Also collect all unique weeks from posts so we can show history
       const allKeys = Object.keys(byDay).sort().reverse();
