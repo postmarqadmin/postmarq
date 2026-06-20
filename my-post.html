@@ -1324,95 +1324,111 @@
       });
     }
 
-    function submitPost() {
+    async function submitPost() {
       const text = document.getElementById('composerText').value.trim();
       if (!text && !mediaFiles.length) return;
 
-      const name    = document.getElementById('profileName').textContent;
-      const initial = name.charAt(0).toUpperCase();
-      const local   = getLocal('profile') || {};
-      const avatarUrl = local.avatarUrl || '';
+      const btn = document.querySelector('.post-btn');
+      btn.disabled = true; btn.textContent = 'Posting…';
 
-      // Convert media to base64 for persistence
-      const savedMedia = [];
-      let pending = mediaFiles.length;
+      const savedMedia = await Promise.all(mediaFiles.map(m => new Promise(resolve => {
+        const reader = new FileReader();
+        reader.onload = e => resolve({ src: e.target.result, kind: m.kind });
+        reader.readAsDataURL(m.file);
+      })));
 
-      function finalize() {
-        const posts = getLocal('posts') || [];
-        posts.unshift({ id: Date.now(), text, name, initial, avatarUrl, media: savedMedia, ts: Date.now(), stamps: 0 });
-        setLocal('posts', posts);
+      const { error } = await sb.from('posts').insert({
+        user_id: currentUser.id,
+        body: text,
+        media: savedMedia
+      });
+
+      btn.disabled = false; btn.textContent = 'Post';
+      if (!error) {
         document.getElementById('composerText').value = '';
         document.getElementById('composerText').style.height = 'auto';
         document.getElementById('mediaPreviews').innerHTML = '';
         mediaFiles = [];
         renderFeed();
       }
-
-      if (!pending) { finalize(); return; }
-
-      mediaFiles.forEach((m, i) => {
-        const reader = new FileReader();
-        reader.onload = e => {
-          savedMedia[i] = { src: e.target.result, kind: m.kind };
-          pending--;
-          if (pending === 0) finalize();
-        };
-        reader.readAsDataURL(m.file);
-      });
     }
 
-    function deletePost(id) {
-      const posts = (getLocal('posts') || []).filter(p => p.id !== id);
-      setLocal('posts', posts);
+    async function deletePost(id) {
+      await sb.from('posts').delete().eq('id', id).eq('user_id', currentUser.id);
       renderFeed();
     }
 
-    function toggleStamp(btn, id) {
+    async function toggleStamp(btn, id) {
+      const wasStamped = btn.classList.contains('stamped');
       btn.classList.toggle('stamped');
-      const posts = getLocal('posts') || [];
-      const post = posts.find(p => p.id === id);
-      if (post) { post.stamps = (post.stamps || 0) + (btn.classList.contains('stamped') ? 1 : -1); }
-      setLocal('posts', posts);
+      if (wasStamped) {
+        await sb.from('stamps').delete().eq('post_id', id).eq('user_id', currentUser.id);
+      } else {
+        await sb.from('stamps').insert({ post_id: id, user_id: currentUser.id });
+      }
+      const { count } = await sb.from('stamps').select('*', { count: 'exact', head: true }).eq('post_id', id);
       const countEl = btn.nextElementSibling;
-      const stamps = post ? post.stamps : 0;
-      if (countEl) countEl.textContent = stamps + ' stamp' + (stamps !== 1 ? 's' : '');
+      if (countEl) countEl.textContent = (count || 0) + ' stamp' + (count !== 1 ? 's' : '');
     }
 
-    function renderFeed() {
-      const posts   = getLocal('posts') || [];
-      const feed    = document.getElementById('dailyFeed');
-      const ybPosts = document.getElementById('ybPosts');
-      if (ybPosts) ybPosts.textContent = posts.length;
+    async function renderFeed() {
+      const feed = document.getElementById('dailyFeed');
+      feed.innerHTML = `<div class="glass" style="border-radius:var(--radius-lg)"><div class="empty-state"><div class="empty-icon" style="font-size:1.2rem;opacity:0.3">⏳</div><div>Loading…</div></div></div>`;
 
-      if (!posts.length) {
+      const { data: posts } = await sb
+        .from('posts')
+        .select('id, body, media, created_at, stamps(count)')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false });
+
+      // Which posts has the current user stamped?
+      const postIds = (posts || []).map(p => p.id);
+      let myStamps = new Set();
+      if (postIds.length) {
+        const { data: sd } = await sb.from('stamps').select('post_id').eq('user_id', currentUser.id).in('post_id', postIds);
+        myStamps = new Set((sd || []).map(s => s.post_id));
+      }
+
+      const ybPosts = document.getElementById('ybPosts');
+      if (ybPosts) ybPosts.textContent = (posts || []).length;
+
+      if (!posts?.length) {
         feed.innerHTML = `<div class="glass" style="border-radius:var(--radius-lg)"><div class="empty-state"><div class="empty-icon">✉️</div><div>Nothing posted yet.</div><div class="empty-hint">Use the composer above to share something.</div></div></div>`;
         return;
       }
 
+      const local      = getLocal('profile') || {};
+      const name       = document.getElementById('profileName').textContent;
+      const initial    = name.charAt(0).toUpperCase();
+      const avatarUrl  = local.avatarUrl || '';
+
       feed.innerHTML = posts.map(p => {
-        const avHtml = p.avatarUrl
-          ? `<div class="post-av"><img src="${p.avatarUrl}" alt="" /></div>`
-          : `<div class="post-av">${p.initial || '?'}</div>`;
-        const mediaHtml = p.media?.length
-          ? `<div class="post-media-grid count-${Math.min(p.media.length, 2)}">${p.media.map(m =>
+        const stampCount = p.stamps?.[0]?.count || 0;
+        const stamped    = myStamps.has(p.id);
+        const avHtml     = avatarUrl
+          ? `<div class="post-av"><img src="${avatarUrl}" alt="" /></div>`
+          : `<div class="post-av">${initial}</div>`;
+        const media = p.media || [];
+        const mediaHtml = media.length
+          ? `<div class="post-media-grid count-${Math.min(media.length, 2)}">${media.map(m =>
               `<div class="media-item">${m.kind === 'image' ? `<img src="${m.src}" onclick="lbOpen('${m.src}')" style="cursor:zoom-in" />` : `<video src="${m.src}" controls playsinline></video>`}</div>`
             ).join('')}</div>` : '';
         return `
-          <div class="post-card glass">
+          <div class="post-card glass" data-id="${p.id}">
             <div class="post-meta">
               ${avHtml}
-              <span class="post-author">${escHtml(p.name)}</span>
-              <span class="post-time">${timeAgo(p.ts)}</span>
-              <button class="post-delete" onclick="deletePost(${p.id})">✕</button>
+              <span class="post-author">${escHtml(name)}</span>
+              <span class="post-time">${timeAgo(new Date(p.created_at).getTime())}</span>
+              <button class="post-delete" onclick="deletePost('${p.id}')">✕</button>
             </div>
-            ${p.text ? `<div class="post-body">${escHtml(p.text).replace(/\n/g,'<br>')}</div>` : ''}
+            ${p.body ? `<div class="post-body">${escHtml(p.body).replace(/\n/g,'<br>')}</div>` : ''}
             ${mediaHtml}
             <div class="post-footer">
-              <button class="stamp-btn${p.stamps > 0 ? ' stamped' : ''}" onclick="toggleStamp(this,${p.id})">
+              <button class="stamp-btn${stamped ? ' stamped' : ''}" onclick="toggleStamp(this,'${p.id}')">
                 <span>⬡</span> Stamp
               </button>
-              <span class="stamp-count">${p.stamps || 0} stamp${p.stamps !== 1 ? 's' : ''}</span>
-              <span class="post-date">${formatDate(p.ts)}</span>
+              <span class="stamp-count">${stampCount} stamp${stampCount !== 1 ? 's' : ''}</span>
+              <span class="post-date">${formatDate(new Date(p.created_at).getTime())}</span>
             </div>
           </div>`;
       }).join('');
