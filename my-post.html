@@ -591,18 +591,60 @@
 </head>
 <body>
 
-  <!-- Auth Overlay — shown when no session detected -->
-  <div id="authOverlay" style="display:none;position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#f5d5a0 0%,#e8aa60 40%,#c87840 100%);align-items:center;justify-content:center;padding:2rem;">
-    <div style="background:rgba(255,255,255,0.52);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.75);box-shadow:0 8px 32px rgba(120,80,40,0.10);border-radius:20px;padding:2.5rem;width:100%;max-width:400px;">
-      <div style="font-size:1.5rem;font-weight:800;color:#26180e;margin-bottom:0.25rem;">Postmarq</div>
-      <div style="font-size:0.85rem;color:#5a3e28;margin-bottom:2rem;">Sign in to your Post</div>
-      <label style="display:block;font-size:0.8rem;font-weight:700;color:#5a3e28;margin-bottom:0.4rem;">Email</label>
-      <input id="olEmail" type="email" placeholder="you@example.com" style="width:100%;padding:0.75rem 1rem;border-radius:10px;border:1px solid rgba(255,255,255,0.75);background:rgba(255,255,255,0.6);font-family:inherit;font-size:0.9rem;color:#26180e;outline:none;margin-bottom:1rem;" />
-      <label style="display:block;font-size:0.8rem;font-weight:700;color:#5a3e28;margin-bottom:0.4rem;">Password</label>
-      <input id="olPass" type="password" placeholder="Password" style="width:100%;padding:0.75rem 1rem;border-radius:10px;border:1px solid rgba(255,255,255,0.75);background:rgba(255,255,255,0.6);font-family:inherit;font-size:0.9rem;color:#26180e;outline:none;" />
-      <div id="olError" style="display:none;margin-top:0.75rem;padding:0.6rem 0.9rem;border-radius:8px;background:rgba(200,92,58,0.12);color:#a03820;border:1px solid rgba(200,92,58,0.3);font-size:0.83rem;font-weight:600;"></div>
-      <button id="olBtn" onclick="overlayLogin()" style="width:100%;margin-top:1.25rem;padding:0.85rem;background:linear-gradient(135deg,#f5c462,#e8992a);border:none;border-radius:10px;font-family:inherit;font-size:0.95rem;font-weight:700;color:white;cursor:pointer;">Sign In</button>
-      <div style="text-align:center;margin-top:1.25rem;font-size:0.82rem;color:#5a3e28;">Don't have an account? <a href="/signup" style="color:#e8992a;font-weight:700;text-decoration:none;">Sign up</a></div>
+  <!-- Auth Overlay — XP-style login shown when no session detected -->
+  <div id="authOverlay" style="display:none;position:fixed;inset:0;z-index:9999;font-family:'Tahoma','Arial',sans-serif;font-size:11px;background:url('Login screen.jpg') center center / cover no-repeat;align-items:center;justify-content:center;">
+    <div style="width:540px;display:flex;flex-direction:column;border-radius:8px 8px 4px 4px;box-shadow:4px 4px 20px rgba(0,0,0,0.55);border:1px solid #244797;overflow:hidden;">
+      <!-- Title bar -->
+      <div style="display:flex;align-items:center;gap:5px;padding:4px 6px 5px;height:30px;background:linear-gradient(180deg,#5896E8 0%,#3A74D8 4%,#1F5FBE 8%,#1A54B2 30%,#1F5FBE 55%,#2870D0 75%,#5A96E8 90%,#C8DCFA 100%);border-bottom:1px solid #1040A0;">
+        <span style="font-size:14px;">🌐</span>
+        <span style="flex:1;font-size:12px;font-weight:bold;color:white;text-shadow:1px 1px 2px rgba(0,0,40,0.7);">Postmarq — Sign In</span>
+        <div style="display:flex;gap:2px;">
+          <button style="width:21px;height:21px;font-size:10px;border-radius:3px;border:1px solid rgba(255,255,255,0.5);background:linear-gradient(180deg,#6AAAF8 0%,#4A8AE8 30%,#3A78D8 50%,#4A8AE8 100%);color:white;cursor:pointer;">&#8722;</button>
+          <button style="width:21px;height:21px;font-size:10px;border-radius:3px;border:1px solid rgba(255,255,255,0.5);background:linear-gradient(180deg,#6AAAF8 0%,#4A8AE8 30%,#3A78D8 50%,#4A8AE8 100%);color:white;cursor:pointer;">&#9633;</button>
+          <button style="width:21px;height:21px;font-size:10px;border-radius:3px;border:1px solid rgba(255,255,255,0.5);background:linear-gradient(180deg,#F87070 0%,#D84040 30%,#C83030 50%,#D84040 100%);color:white;cursor:pointer;">&#10005;</button>
+        </div>
+      </div>
+      <!-- Body -->
+      <div style="display:flex;background:#ECE9D8;min-height:200px;">
+        <!-- Sidebar -->
+        <div style="width:160px;flex-shrink:0;padding:1.25rem 1rem;display:flex;flex-direction:column;gap:0.75rem;background:linear-gradient(180deg,#2060C8 0%,#1848A8 40%,#1040A0 100%);border-right:2px solid #1040A0;">
+          <div style="font-size:22px;font-weight:bold;color:white;text-shadow:0 1px 4px rgba(0,0,60,0.5);">postmarq</div>
+          <p style="font-size:10px;color:rgba(200,220,255,0.85);line-height:1.5;">Your place on the internet.</p>
+          <div style="height:1px;background:rgba(255,255,255,0.2);margin:0.5rem 0;"></div>
+          <p style="font-size:9px;color:rgba(180,210,255,0.7);line-height:1.5;font-style:italic;">Sign in to access your Post, your Quorum, and your Neighborhood.</p>
+        </div>
+        <!-- Form -->
+        <div style="flex:1;padding:1.1rem 1.25rem;display:flex;flex-direction:column;gap:0.7rem;">
+          <div style="font-size:13px;font-weight:bold;color:#0A246A;padding-bottom:0.5rem;border-bottom:1px solid #808080;">Sign in to your Post</div>
+          <div style="display:flex;flex-direction:column;gap:0.6rem;">
+            <div style="display:flex;flex-direction:column;gap:3px;">
+              <label style="font-size:11px;font-weight:bold;color:#1a1a1a;">Email address:</label>
+              <input id="olEmail" type="email" autocomplete="email" style="width:100%;padding:3px 4px;font-family:Tahoma,Arial,sans-serif;font-size:11px;color:#1a1a1a;background:white;border:2px solid;border-color:#808080 #fff #fff #808080;outline:none;" />
+            </div>
+            <div style="display:flex;flex-direction:column;gap:3px;">
+              <label style="font-size:11px;font-weight:bold;color:#1a1a1a;">Password:</label>
+              <input id="olPass" type="password" autocomplete="current-password" style="width:100%;padding:3px 4px;font-family:Tahoma,Arial,sans-serif;font-size:11px;color:#1a1a1a;background:white;border:2px solid;border-color:#808080 #fff #fff #808080;outline:none;" />
+            </div>
+            <div id="olError" style="display:none;font-size:11px;color:#CC0000;background:#FFF0F0;border:1px solid #CC8888;padding:3px 6px;"></div>
+            <div style="display:flex;gap:6px;justify-content:flex-end;margin-top:0.3rem;padding-top:0.6rem;border-top:1px solid #808080;">
+              <button id="olBtn" onclick="overlayLogin()" style="min-width:75px;padding:4px 10px;font-family:Tahoma,Arial,sans-serif;font-size:11px;color:white;font-weight:bold;cursor:pointer;background:linear-gradient(180deg,#6AAAF8 0%,#4A88E8 25%,#2A68D0 50%,#3A78DC 75%,#6AAAF8 100%);border:2px solid;border-color:#8ABCFA #1040A0 #1040A0 #8ABCFA;text-shadow:0 1px 1px rgba(0,0,80,0.5);">Sign In</button>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;padding:0.4rem 0;border-top:1px solid #808080;">
+            <a href="/signup" style="font-size:11px;color:#316AC5;text-decoration:underline;cursor:pointer;">Don't have a Post? Claim your Post...</a>
+          </div>
+        </div>
+      </div>
+      <!-- Status bar -->
+      <div style="background:#ECE9D8;border-top:1px solid #808080;padding:2px 6px;">
+        <span id="olStatus" style="font-size:10px;color:#444;border:1px solid;border-color:#808080 #fff #fff #808080;padding:1px 6px;">Ready</span>
+      </div>
+    </div>
+    <!-- Taskbar -->
+    <div style="position:fixed;bottom:0;left:0;right:0;height:34px;display:flex;align-items:center;background:linear-gradient(180deg,#2E6FBE 0%,#1850A4 8%,#1850A4 90%,#5898D8 100%);border-top:1px solid #5898E8;padding:0 4px;gap:6px;z-index:10;">
+      <button style="height:28px;padding:0 12px 0 8px;display:flex;align-items:center;gap:5px;border-radius:0 14px 14px 0;border:1px solid #1A6A18;background:linear-gradient(180deg,#60C840 0%,#30980E 50%,#60C840 100%);color:white;font-family:Tahoma,Arial,sans-serif;font-size:13px;font-weight:bold;font-style:italic;cursor:pointer;">🪟 start</button>
+      <div style="height:24px;min-width:120px;display:flex;align-items:center;padding:0 8px;font-size:11px;font-weight:bold;color:white;background:linear-gradient(180deg,#1A50A0 0%,#2468C0 50%,#1A50A0 100%);border:1px solid #3878D0;border-radius:2px;">🌐 &nbsp;Postmarq — Sign In</div>
+      <div style="margin-left:auto;display:flex;align-items:center;height:26px;padding:0 8px;background:rgba(0,30,100,0.3);border:1px solid rgba(255,255,255,0.15);border-radius:2px;"><span id="olClock" style="font-size:11px;color:white;font-family:Tahoma,Arial,sans-serif;"></span></div>
     </div>
   </div>
 
@@ -952,6 +994,19 @@
 
     // ── Stamps palette ──
     const STAMPS = ['⬡','📬','🔖','🎯','🌀','🌊','🔥','🌱','⚡','🎸','📷','🎬','🏔','🌙','☀️','🎲','🧩','🦋','🌵','🎨','🍀','🦊','🐕','🌸','✨','🏄'];
+
+    // ── Overlay clock ──
+    function tickOverlayClock() {
+      const el = document.getElementById('olClock');
+      if (!el) return;
+      const now = new Date();
+      let h = now.getHours(), m = now.getMinutes();
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      h = h % 12 || 12;
+      el.textContent = h + ':' + (m < 10 ? '0' : '') + m + ' ' + ampm;
+    }
+    tickOverlayClock();
+    setInterval(tickOverlayClock, 10000);
 
     // ── Overlay login (no redirect needed) ──
     async function overlayLogin() {
