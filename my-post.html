@@ -940,7 +940,19 @@
 
     // ── Init ──
     async function init() {
-      const { data: { session } } = await sb.auth.getSession();
+      let { data: { session } } = await sb.auth.getSession();
+
+      // If getSession() returned null right after a login redirect, wait for
+      // onAuthStateChange to fire with the real session (up to 3 seconds).
+      if (!session) {
+        session = await new Promise(resolve => {
+          const timer = setTimeout(() => resolve(null), 3000);
+          const { data: { subscription } } = sb.auth.onAuthStateChange((_event, s) => {
+            if (s) { clearTimeout(timer); subscription.unsubscribe(); resolve(s); }
+          });
+        });
+      }
+
       if (!session) { window.location.href = '/login'; return; }
       currentUser = session.user;
       localKey = `pm_${currentUser.id}`;
