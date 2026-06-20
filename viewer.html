@@ -272,7 +272,7 @@
     document.getElementById('pill-username').textContent = session.user.email;
 
     if (session.user.id === post.user_id) {
-      window.location.replace('/my-post.html');
+      window.location.replace('/home');
       return;
     } else {
       const { data: myPost } = await sb.from('posts').select('username').eq('user_id', session.user.id).single();
