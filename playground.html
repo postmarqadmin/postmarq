@@ -3,563 +3,509 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Claim Your Post — Postmarq</title>
+  <title>Playground — Postmarq</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --xp-gray:      #ECE9D8;
-      --xp-gray-dk:   #D4D0C8;
-      --xp-blue-deep: #0A246A;
-      --xp-blue-mid:  #2268D0;
-      --xp-border-lt: #FFFFFF;
-      --xp-border-dk: #808080;
-      --xp-border-dkk:#404040;
-      --font: 'Tahoma', 'Arial', sans-serif;
+      --glass-white:  rgba(255,255,255,0.52);
+      --glass-border: rgba(255,255,255,0.75);
+      --glass-shadow: 0 8px 32px rgba(120,80,40,0.10), 0 2px 8px rgba(120,80,40,0.07);
+      --glass-inset:  0 1px 0 rgba(255,255,255,0.9) inset;
+      --amber:        #e8992a;
+      --amber-light:  #f5c462;
+      --teal:         #4ab5aa;
+      --lavender:     #9b8fd4;
+      --ink:          #26180e;
+      --ink-2:        #5a3e28;
+      --ink-3:        #a07d60;
+      --ink-4:        #c9aa90;
+      --radius-md:    16px;
+      --radius-lg:    22px;
+      --radius-xl:    28px;
+      --font:         'Nunito', system-ui, sans-serif;
     }
 
-    html, body {
-      height: 100%; width: 100%;
+    html { scroll-behavior: smooth; }
+
+    body {
       font-family: var(--font);
-      font-size: 11px;
-      overflow: hidden;
-      background: url('Login screen.jpg') center center / cover no-repeat;
+      color: var(--ink);
+      min-height: 100vh;
+      padding: 0 0 5rem;
+      background:
+        radial-gradient(ellipse at 80% 10%, rgba(120,200,255,0.28) 0%, transparent 52%),
+        radial-gradient(ellipse at 10% 90%, rgba(255,180,90,0.38) 0%, transparent 52%),
+        radial-gradient(ellipse at 55% 55%, rgba(180,255,200,0.15) 0%, transparent 65%),
+        radial-gradient(ellipse at 30% 20%, rgba(195,160,255,0.22) 0%, transparent 45%),
+        linear-gradient(158deg, #e8f5f0 0%, #f8ead8 38%, #fdf4e8 62%, #e8f0fa 100%);
+      background-attachment: fixed;
     }
 
-    /* ── Desktop ── */
-    .desktop {
-      width: 100%; height: 100vh;
+    /* ─── Address Bar ─── */
+    .address-bar {
+      position: sticky; top: 0; z-index: 100;
       display: flex; align-items: center; justify-content: center;
+      padding: 0.65rem 1rem;
+      background: rgba(255,255,255,0.55);
+      backdrop-filter: blur(20px) saturate(1.8);
+      -webkit-backdrop-filter: blur(20px) saturate(1.8);
+      border-bottom: 1px solid rgba(255,255,255,0.6);
+      box-shadow: 0 1px 12px rgba(120,80,40,0.07);
     }
+    .address-inner {
+      display: flex; align-items: center; gap: 0.55rem;
+      background: rgba(255,255,255,0.6);
+      border: 1px solid rgba(255,255,255,0.8);
+      border-radius: 999px;
+      padding: 0.3rem 1rem 0.3rem 0.75rem;
+    }
+    .address-dot { width: 8px; height: 8px; border-radius: 50%; background: linear-gradient(135deg, #78d6b0, #4ab5aa); }
+    .address-text { font-size: 0.78rem; font-weight: 500; color: var(--ink-3); letter-spacing: 0.02em; }
+    .address-text strong { color: var(--ink-2); font-weight: 700; }
 
-    /* ── XP Wizard Window ── */
-    .xp-window {
-      width: 600px;
-      max-height: 92vh;
-      display: flex; flex-direction: column;
-      border-radius: 8px 8px 4px 4px;
-      box-shadow: 4px 4px 20px rgba(0,0,0,0.55);
-      border: 1px solid #244797;
-      overflow: hidden;
-    }
+    /* ─── Page Wrap ─── */
+    .page-wrap { max-width: 900px; margin: 0 auto; padding: 2rem 1.25rem 0; }
 
-    /* ── Title Bar ── */
-    .xp-titlebar {
-      display: flex; align-items: center; gap: 5px;
-      padding: 4px 6px 5px; height: 30px;
-      flex-shrink: 0; user-select: none;
-      background: linear-gradient(180deg,
-        #5896E8 0%, #3A74D8 4%, #1F5FBE 8%,
-        #1A54B2 30%, #1F5FBE 55%, #2870D0 75%,
-        #5A96E8 90%, #C8DCFA 100%
-      );
-      border-bottom: 1px solid #1040A0;
+    /* ─── Room Nav ─── */
+    .room-nav {
+      display: flex; border-radius: var(--radius-lg); overflow: hidden;
+      background: var(--glass-white);
+      backdrop-filter: blur(18px) saturate(1.6);
+      -webkit-backdrop-filter: blur(18px) saturate(1.6);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow), var(--glass-inset);
+      margin-bottom: 1.5rem;
     }
-    .xp-titlebar-icon { font-size: 14px; flex-shrink: 0; }
-    .xp-titlebar-text {
-      flex: 1; font-size: 12px; font-weight: bold; color: white;
-      text-shadow: 1px 1px 2px rgba(0,0,40,0.7);
+    .room-tab {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+      padding: 0.65rem 0.25rem 0.55rem;
+      text-decoration: none; color: var(--ink-3);
+      font-size: 0.6rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+      border-right: 1px solid rgba(255,255,255,0.5);
+      transition: background 0.15s, color 0.15s; cursor: pointer;
     }
-    .xp-titlebar-btns { display: flex; gap: 2px; }
-    .xp-tb-btn {
-      width: 21px; height: 21px; font-size: 10px; font-weight: bold;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; border-radius: 3px;
-      border: 1px solid rgba(255,255,255,0.5);
-      background: linear-gradient(180deg, #6AAAF8 0%, #4A8AE8 30%, #3A78D8 50%, #4A8AE8 100%);
-      color: white; text-shadow: 0 1px 1px rgba(0,0,60,0.5);
-    }
-    .xp-tb-btn.close {
-      background: linear-gradient(180deg, #F87070 0%, #D84040 30%, #C83030 50%, #D84040 100%);
-    }
+    .room-tab:last-child { border-right: none; }
+    .room-tab i { font-size: 1.2rem; }
+    .room-tab:hover { background: rgba(255,255,255,0.45); color: var(--ink); }
+    .room-tab.active { background: linear-gradient(160deg, rgba(74,181,170,0.22), rgba(120,200,255,0.18)); color: var(--ink); }
+    .room-tab.active i { color: var(--teal); }
 
-    /* ── Wizard Body ── */
-    .xp-wizard-body {
-      display: flex; flex: 1; overflow: hidden;
-    }
-
-    /* ── Left Sidebar ── */
-    .xp-sidebar {
-      width: 160px; flex-shrink: 0;
-      background: linear-gradient(180deg, #2060C8 0%, #1848A8 40%, #1040A0 100%);
-      border-right: 2px solid #1040A0;
-      display: flex; flex-direction: column;
-      padding: 1.5rem 1rem 1rem;
-      gap: 0.75rem;
-    }
-    .xp-sidebar-logo {
-      font-size: 20px; font-weight: bold; color: white;
-      text-shadow: 0 1px 4px rgba(0,0,60,0.5);
-    }
-    .xp-sidebar-step {
-      font-size: 10px; color: rgba(180,210,255,0.8); font-style: italic;
-      line-height: 1.5;
-    }
-    .xp-sidebar-divider { height: 1px; background: rgba(255,255,255,0.2); margin: 0.4rem 0; }
-    .xp-sidebar-hint {
-      font-size: 9px; color: rgba(160,200,255,0.65);
-      line-height: 1.6;
-    }
-
-    /* ── Content Pane ── */
-    .xp-content {
-      flex: 1; background: var(--xp-gray);
-      overflow-y: auto;
-      display: flex; flex-direction: column;
-    }
-
-    /* ── Progress Bar (XP style) ── */
-    .xp-progress-wrap {
-      height: 14px; margin: 0.75rem 1rem 0;
-      border: 2px solid;
-      border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk);
-      background: white; flex-shrink: 0;
-    }
-    .xp-progress-fill {
-      height: 100%;
-      background: repeating-linear-gradient(
-        90deg,
-        #316AC5 0px, #316AC5 10px,
-        #4A8AE8 10px, #4A8AE8 12px
-      );
-      transition: width 0.4s ease;
-      width: 0%;
-    }
-
-    /* ── Step ── */
-    .step { display: none; flex-direction: column; padding: 0.9rem 1rem 0; flex: 1; }
-    .step.active { display: flex; }
-
-    .xp-step-title {
-      font-size: 13px; font-weight: bold; color: var(--xp-blue-deep);
-      border-bottom: 1px solid var(--xp-border-dk);
-      padding-bottom: 0.4rem; margin-bottom: 0.75rem;
-    }
-    .xp-step-sub {
-      font-size: 11px; color: #333; line-height: 1.5; margin-bottom: 0.9rem;
-    }
-
-    /* ── Path Cards (XP raised panels) ── */
-    .path-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 0.5rem; margin-bottom: 0.75rem;
-    }
-    .path-card {
-      background: var(--xp-gray);
-      border: 2px solid;
-      border-color: var(--xp-border-lt) var(--xp-border-dk) var(--xp-border-dk) var(--xp-border-lt);
-      padding: 0.75rem 0.6rem;
-      cursor: pointer; text-align: left;
-    }
-    .path-card:hover { background: white; }
-    .path-card.selected {
-      border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk);
-      background: #DDD9C8;
-      outline: 1px dotted #316AC5;
-      outline-offset: -3px;
-    }
-    .path-card .badge {
-      display: inline-block; font-size: 9px; font-weight: bold;
-      text-transform: uppercase; letter-spacing: 0.06em;
-      padding: 1px 5px; margin-bottom: 0.4rem;
-      border: 1px solid; color: #444;
-      border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk);
-      background: var(--xp-gray-dk);
-    }
-    .path-card .card-icon { font-size: 20px; display: block; margin-bottom: 0.4rem; }
-    .path-card h3 { font-size: 11px; font-weight: bold; margin-bottom: 0.25rem; color: #000; }
-    .path-card p  { font-size: 10px; color: #444; line-height: 1.4; }
-
-    /* ── Choice Cards ── */
-    .choice-grid {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 0.5rem; margin-bottom: 0.75rem;
-    }
-    .choice-card {
-      background: var(--xp-gray);
-      border: 2px solid;
-      border-color: var(--xp-border-lt) var(--xp-border-dk) var(--xp-border-dk) var(--xp-border-lt);
-      padding: 0.9rem 0.75rem;
-      cursor: pointer; text-align: left;
-    }
-    .choice-card:hover { background: white; }
-    .choice-card .card-icon { font-size: 20px; display: block; margin-bottom: 0.4rem; }
-    .choice-card h3 { font-size: 11px; font-weight: bold; margin-bottom: 0.3rem; }
-    .choice-card p  { font-size: 10px; color: #444; line-height: 1.4; }
-
-    /* ── Form Fields ── */
-    .xp-field { margin-bottom: 0.65rem; }
-    .xp-label {
-      display: block; font-size: 11px; font-weight: bold;
-      color: #1a1a1a; margin-bottom: 3px;
-    }
-    .xp-input {
-      width: 100%; padding: 3px 4px;
-      font-family: var(--font); font-size: 11px; color: #1a1a1a;
-      background: white;
-      border: 2px solid;
-      border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk);
-      outline: none;
-    }
-    .xp-input:focus {
-      border-color: #316AC5 var(--xp-border-lt) var(--xp-border-lt) #316AC5;
-    }
-    textarea.xp-input { resize: vertical; min-height: 60px; }
-
-    /* ── Address row ── */
-    .xp-address-row {
-      display: flex; align-items: center;
-      border: 2px solid;
-      border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk);
-      background: white;
-    }
-    .xp-address-row input {
-      flex: 1; padding: 3px 4px;
-      font-family: var(--font); font-size: 11px; color: #1a1a1a;
-      border: none; background: transparent; outline: none;
-    }
-    .xp-address-suffix {
-      padding: 3px 6px 3px 0;
-      font-size: 11px; font-weight: bold; color: #316AC5;
-      white-space: nowrap;
-    }
-
-    /* ── Vibe pills (XP checkboxes look) ── */
-    .vibe-grid { display: flex; gap: 5px; flex-wrap: wrap; }
-    .vibe-btn {
-      padding: 3px 10px;
-      font-family: var(--font); font-size: 11px; color: #1a1a1a;
-      cursor: pointer;
-      background: var(--xp-gray);
-      border: 2px solid;
-      border-color: var(--xp-border-lt) var(--xp-border-dk) var(--xp-border-dk) var(--xp-border-lt);
-    }
-    .vibe-btn:hover { background: white; }
-    .vibe-btn.active {
-      border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk);
-      background: #DDD9C8;
-      outline: 1px dotted #316AC5;
-      outline-offset: -3px;
-    }
-
-    /* ── Pricing box ── */
-    .xp-pricing {
-      border: 2px solid;
-      border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk);
-      background: white; padding: 0.75rem; margin-bottom: 0.75rem;
-    }
-    .xp-price { font-size: 18px; font-weight: bold; color: #000; margin-bottom: 3px; }
-    .xp-price span { font-size: 11px; font-weight: normal; color: #555; }
-    .xp-price-tag { font-size: 10px; color: #555; margin-bottom: 0.6rem; }
-    .xp-pricing ul { list-style: none; display: flex; flex-direction: column; gap: 4px; }
-    .xp-pricing ul li { font-size: 11px; color: #333; display: flex; gap: 6px; align-items: flex-start; }
-    .xp-pricing ul li::before { content: '✓'; color: #316AC5; font-weight: bold; flex-shrink: 0; }
-
-    /* ── Terminal hint ── */
-    .xp-terminal {
-      border: 2px solid;
-      border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk);
-      background: #000; padding: 0.75rem;
-      font-family: 'Courier New', monospace; font-size: 11px;
-      color: #C0C0C0; line-height: 1.7;
+    /* ─── Section Label ─── */
+    .section-label {
+      font-size: 0.65rem; font-weight: 900; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--ink-4);
+      display: flex; align-items: center; gap: 0.6rem;
       margin-bottom: 0.75rem;
     }
-    .xp-terminal .prompt { color: #00C000; }
+    .section-label::after { content:''; flex:1; height:1px; background:rgba(255,255,255,0.55); }
 
-    /* ── Confirm summary ── */
-    .xp-confirm {
-      border: 2px solid;
-      border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk);
-      background: white; margin-bottom: 0.75rem; overflow: hidden;
-    }
-    .confirm-row {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 4px 8px;
-      border-bottom: 1px solid var(--xp-gray-dk);
-      font-size: 11px;
-    }
-    .confirm-row:last-child { border-bottom: none; }
-    .confirm-row .label { color: #316AC5; font-weight: bold; text-transform: uppercase; font-size: 9px; letter-spacing: 0.06em; }
-    .confirm-row .value { font-weight: bold; color: #000; }
-
-    /* ── Done icon ── */
-    .xp-done-icon {
-      font-size: 32px; text-align: center;
-      margin: 0.5rem 0 0.75rem;
+    /* ─── Cards ─── */
+    .pg-card {
+      border-radius: var(--radius-xl);
+      background: var(--glass-white);
+      backdrop-filter: blur(18px) saturate(1.6);
+      -webkit-backdrop-filter: blur(18px) saturate(1.6);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow), var(--glass-inset);
+      padding: 1.5rem 1.75rem;
+      margin-bottom: 1.25rem;
     }
 
-    /* ── Buttons ── */
-    .xp-btn-row {
-      display: flex; gap: 6px; justify-content: flex-end;
-      margin-top: auto;
-      padding: 0.6rem 1rem;
-      border-top: 1px solid var(--xp-border-dk);
-      background: var(--xp-gray);
-      flex-shrink: 0;
+    /* ─── Hero banner ─── */
+    .pg-hero {
+      border-radius: var(--radius-xl);
+      background: linear-gradient(135deg, rgba(74,181,170,0.28) 0%, rgba(120,200,255,0.22) 50%, rgba(155,143,212,0.18) 100%);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.55);
+      box-shadow: 0 4px 24px rgba(74,181,170,0.12);
+      padding: 2rem 2.25rem;
+      margin-bottom: 1.25rem;
+      display: flex; align-items: center; gap: 1.5rem;
     }
-    .xp-btn {
-      min-width: 75px; padding: 4px 10px;
-      font-family: var(--font); font-size: 11px; color: #1a1a1a;
-      cursor: pointer; text-align: center;
-      background: linear-gradient(180deg, #F8F6F2 0%, #ECE9D8 50%, #DDD9C8 100%);
-      border: 2px solid;
-      border-color: var(--xp-border-lt) var(--xp-border-dk) var(--xp-border-dk) var(--xp-border-lt);
-      box-shadow: 1px 1px 0 var(--xp-border-dkk);
+    .pg-hero-icon {
+      font-size: 3rem; flex-shrink: 0; line-height: 1;
+      filter: drop-shadow(0 2px 8px rgba(74,181,170,0.3));
     }
-    .xp-btn:hover { background: linear-gradient(180deg, #FFFFF8 0%, #F4F2E8 50%, #EAE8D8 100%); }
-    .xp-btn:active {
-      border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk);
-      padding: 5px 9px 3px 11px;
-    }
-    .xp-btn-primary {
-      min-width: 75px; padding: 4px 10px;
-      font-family: var(--font); font-size: 11px; color: white; font-weight: bold;
-      cursor: pointer; text-align: center;
-      background: linear-gradient(180deg, #6AAAF8 0%, #4A88E8 25%, #2A68D0 50%, #3A78DC 75%, #6AAAF8 100%);
-      border: 2px solid;
-      border-color: #8ABCFA #1040A0 #1040A0 #8ABCFA;
-      box-shadow: 1px 1px 0 #0A2470;
-      text-shadow: 0 1px 1px rgba(0,0,80,0.5);
-    }
-    .xp-btn-primary:hover {
-      background: linear-gradient(180deg, #8ACAFA 0%, #6AAAF0 25%, #4A88E8 50%, #5A98F0 75%, #8ACAFA 100%);
-    }
-    .xp-btn-primary:active {
-      border-color: #1040A0 #8ABCFA #8ABCFA #1040A0;
-      padding: 5px 9px 3px 11px;
-    }
-    .xp-link-btn {
-      background: none; border: none; font-family: var(--font); font-size: 11px;
-      color: #316AC5; text-decoration: underline; cursor: pointer; padding: 4px 6px;
+    .pg-hero-title { font-size: 1.75rem; font-weight: 800; color: var(--ink); letter-spacing: -0.02em; line-height: 1; }
+    .pg-hero-sub { font-size: 0.88rem; color: var(--ink-2); line-height: 1.55; margin-top: 0.4rem; max-width: 480px; }
+    .pg-hero-badge {
+      display: inline-flex; align-items: center; gap: 0.3rem; margin-top: 0.75rem;
+      font-size: 0.65rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+      background: rgba(74,181,170,0.15); border: 1px solid rgba(74,181,170,0.35); color: var(--teal);
+      padding: 0.22rem 0.7rem; border-radius: 999px;
     }
 
-    /* ── Status Bar ── */
-    .xp-statusbar {
-      background: var(--xp-gray); border-top: 1px solid var(--xp-border-dk);
-      padding: 2px 6px; flex-shrink: 0;
+    /* ─── Widget grid ─── */
+    .widget-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
     }
-    .xp-status-panel {
-      font-size: 10px; color: #444;
-      border: 1px solid;
-      border-color: var(--xp-border-dk) var(--xp-border-lt) var(--xp-border-lt) var(--xp-border-dk);
-      padding: 1px 6px; display: inline-block;
+    @media (max-width: 640px) { .widget-grid { grid-template-columns: 1fr 1fr; } }
+
+    .widget-tile {
+      border-radius: var(--radius-lg);
+      background: rgba(255,255,255,0.55);
+      border: 1px solid rgba(255,255,255,0.75);
+      box-shadow: 0 2px 12px rgba(80,140,80,0.07);
+      padding: 1.1rem 1.25rem;
+      display: flex; flex-direction: column; gap: 0.5rem;
+      cursor: pointer; transition: transform 0.18s, box-shadow 0.18s, background 0.15s;
+      position: relative;
+    }
+    .widget-tile:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(74,181,170,0.18); background: rgba(255,255,255,0.75); }
+    .widget-tile-icon { font-size: 1.6rem; line-height: 1; }
+    .widget-tile-name { font-size: 0.82rem; font-weight: 800; color: var(--ink); }
+    .widget-tile-desc { font-size: 0.73rem; color: var(--ink-3); line-height: 1.45; }
+    .widget-tile-tag {
+      display: inline-flex; align-items: center;
+      font-size: 0.58rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase;
+      padding: 0.18rem 0.5rem; border-radius: 999px; margin-top: auto;
+      width: fit-content;
+    }
+    .tag-mine { background: rgba(74,181,170,0.15); color: var(--teal); border: 1px solid rgba(74,181,170,0.3); }
+    .tag-shared { background: rgba(155,143,212,0.15); color: var(--lavender); border: 1px solid rgba(155,143,212,0.3); }
+    .tag-new { background: rgba(232,153,42,0.15); color: var(--amber); border: 1px solid rgba(232,153,42,0.3); }
+    .widget-add-btn {
+      border-radius: var(--radius-lg);
+      border: 2px dashed rgba(74,181,170,0.35);
+      background: rgba(74,181,170,0.05);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 0.4rem; padding: 1.5rem;
+      cursor: pointer; transition: all 0.18s; color: var(--teal); min-height: 110px;
+    }
+    .widget-add-btn:hover { border-color: rgba(74,181,170,0.7); background: rgba(74,181,170,0.1); }
+    .widget-add-btn i { font-size: 1.5rem; }
+    .widget-add-btn span { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.04em; }
+
+    /* ─── Share card modal ─── */
+    .modal-overlay { display: none; position: fixed; inset: 0; z-index: 300; background: rgba(30,50,30,0.45); backdrop-filter: blur(8px); align-items: center; justify-content: center; padding: 1.5rem; }
+    .modal-overlay.open { display: flex; }
+    .modal-box { width: min(440px, 96vw); border-radius: var(--radius-xl); background: rgba(26,40,30,0.95); border: 0.5px solid rgba(255,255,255,0.12); box-shadow: 0 24px 64px rgba(0,0,0,0.4); overflow: hidden; }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; background: linear-gradient(90deg, rgba(74,181,170,0.95), rgba(78,120,200,0.95)); }
+    .modal-title { font-size: 0.95rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 0.5rem; }
+    .modal-close { background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.7); font-size: 1.1rem; line-height: 1; }
+    .modal-close:hover { color: #fff; }
+    .modal-body { padding: 1.25rem; display: flex; flex-direction: column; gap: 0.85rem; }
+    .modal-label { font-size: 0.65rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 0.3rem; display: block; }
+    .modal-input { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 0.5rem 0.75rem; font-family: var(--font); font-size: 0.85rem; color: #fff; outline: none; width: 100%; }
+    .modal-input:focus { border-color: rgba(74,181,170,0.5); }
+    .modal-input::placeholder { color: rgba(255,255,255,0.25); }
+    .modal-textarea { resize: vertical; min-height: 70px; }
+    .modal-footer { padding: 0 1.25rem 1.25rem; display: flex; gap: 0.6rem; justify-content: flex-end; }
+    .modal-btn-cancel { background: none; border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.4); border-radius: 8px; padding: 0.45rem 1rem; font-family: var(--font); font-size: 0.8rem; font-weight: 700; cursor: pointer; }
+    .modal-btn-ok { background: linear-gradient(90deg, rgba(74,181,170,0.95), rgba(78,120,200,0.95)); border: none; color: #fff; border-radius: 8px; padding: 0.45rem 1.2rem; font-family: var(--font); font-size: 0.8rem; font-weight: 800; cursor: pointer; }
+
+    /* ─── Create-widget modal ─── */
+    .editor-wrap { background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.5rem; }
+    .editor-wrap textarea.modal-input { font-family: 'Courier New', monospace; font-size: 0.78rem; min-height: 100px; }
+
+    /* ─── Coming soon chip ─── */
+    .cs-chip {
+      position: absolute; top: 0.65rem; right: 0.65rem;
+      font-size: 0.55rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase;
+      background: rgba(232,153,42,0.18); border: 1px solid rgba(232,153,42,0.35); color: var(--amber);
+      padding: 0.15rem 0.45rem; border-radius: 999px;
     }
 
-    /* ── Taskbar ── */
-    .xp-taskbar {
-      position: fixed; bottom: 0; left: 0; right: 0; height: 34px;
-      display: flex; align-items: center; z-index: 100;
-      background: linear-gradient(180deg,
-        #2E6FBE 0%, #2060B0 4%, #1A54A8 8%, #1850A4 30%,
-        #1A54A8 55%, #2060B4 75%, #2E6FBE 90%, #5898D8 100%
-      );
-      border-top: 1px solid #5898E8; padding: 0 4px; gap: 6px;
+    /* ─── Copy confirm ─── */
+    .copy-confirm {
+      position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
+      background: rgba(26,40,30,0.97); border: 1px solid rgba(74,181,170,0.3);
+      color: var(--teal); font-size: 0.8rem; font-weight: 700;
+      padding: 0.6rem 1.25rem; border-radius: 999px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+      z-index: 500;
     }
-    .xp-start-btn {
-      height: 28px; padding: 0 12px 0 8px;
-      display: flex; align-items: center; gap: 5px;
-      border-radius: 0 14px 14px 0;
-      border: 1px solid #1A6A18; border-left: none;
-      background: linear-gradient(180deg, #60C840 0%, #40A820 30%, #30980E 50%, #40A820 70%, #60C840 100%);
-      color: white; font-family: var(--font); font-size: 13px;
-      font-weight: bold; font-style: italic; cursor: pointer;
-      box-shadow: 2px 0 8px rgba(0,120,0,0.4);
-      text-shadow: 0 1px 2px rgba(0,60,0,0.6);
+    .copy-confirm.show { opacity: 1; }
+
+    /* ─── Two-col ─── */
+    .pg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; align-items: start; }
+    @media (max-width: 640px) { .pg-grid { grid-template-columns: 1fr; } }
+
+    /* ─── Empty state ─── */
+    .empty-state { text-align: center; padding: 2rem 1rem; }
+    .empty-state i { font-size: 2.5rem; color: var(--ink-4); }
+    .empty-state p { font-size: 0.82rem; color: var(--ink-4); margin-top: 0.5rem; font-style: italic; }
+
+    /* ─── Pill tags ─── */
+    .pill-row { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
+    .pill {
+      font-size: 0.7rem; font-weight: 700;
+      padding: 0.22rem 0.65rem; border-radius: 999px;
+      background: rgba(255,255,255,0.55); border: 1px solid rgba(255,255,255,0.75); color: var(--ink-2);
     }
-    .xp-taskbar-item {
-      height: 24px; min-width: 140px; padding: 0 8px;
-      display: flex; align-items: center; gap: 5px;
-      font-size: 11px; font-weight: bold; color: white;
-      background: linear-gradient(180deg, #1A50A0 0%, #2468C0 50%, #1A50A0 100%);
-      border: 1px solid; border-color: #1848A0 #3878D0 #3878D0 #1848A0;
-      border-radius: 2px; cursor: default;
-      overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
-      text-shadow: 0 1px 1px rgba(0,0,60,0.5);
-    }
-    .xp-tray {
-      margin-left: auto; display: flex; align-items: center;
-      height: 26px; padding: 0 8px;
-      background: rgba(0,30,100,0.3);
-      border: 1px solid rgba(255,255,255,0.15); border-radius: 2px;
-    }
-    .xp-clock { font-size: 11px; color: white; font-family: var(--font); }
   </style>
 </head>
 <body>
 
-<div class="desktop">
-  <div class="xp-window">
+  <!-- Address Bar -->
+  <div class="address-bar">
+    <div class="address-inner">
+      <div class="address-dot"></div>
+      <div class="address-text"><span id="addressHandle">postmarq</span> · <strong>Playground</strong></div>
+    </div>
+  </div>
 
-    <div class="xp-titlebar">
-      <div class="xp-titlebar-icon">🌐</div>
-      <span class="xp-titlebar-text">Postmarq — Claim Your Post</span>
-      <div class="xp-titlebar-btns">
-        <button class="xp-tb-btn">&#8722;</button>
-        <button class="xp-tb-btn">&#9633;</button>
-        <button class="xp-tb-btn close" onclick="window.location.href='index.html'">&#10005;</button>
+  <div class="page-wrap">
+
+    <!-- Room Nav -->
+    <nav class="room-nav">
+      <a class="room-tab" href="index.html"><i class="ti ti-home-2"></i><span>Home</span></a>
+      <a class="room-tab" href="living-room.html"><i class="ti ti-sofa"></i><span>Living Room</span></a>
+      <a class="room-tab" href="office.html"><i class="ti ti-briefcase"></i><span>Office</span></a>
+      <a class="room-tab active" href="playground.html"><i class="ti ti-assembly"></i><span>Playground</span></a>
+      <a class="room-tab" href="lounge.html"><i class="ti ti-messages"></i><span>Lounge</span></a>
+    </nav>
+
+    <!-- Hero -->
+    <div class="pg-hero">
+      <div class="pg-hero-icon">🧩</div>
+      <div>
+        <div class="pg-hero-title">Playground</div>
+        <div class="pg-hero-sub">Build custom widgets for your Post — clocks, feeds, countdowns, anything. Share them with friends so they can copy them onto their own Post.</div>
+        <div class="pg-hero-badge"><i class="ti ti-sparkles"></i> Widget Studio</div>
       </div>
     </div>
 
-    <div class="xp-wizard-body">
+    <!-- My Widgets -->
+    <div class="section-label">
+      My Widgets
+      <button onclick="openCreate()" style="background:none;border:none;cursor:pointer;font-family:var(--font);font-size:0.7rem;font-weight:800;color:var(--teal);display:inline-flex;align-items:center;gap:0.2rem;margin-left:auto;"><i class="ti ti-plus"></i> New</button>
+    </div>
+    <div class="pg-card" style="padding: 1.25rem;">
+      <div class="widget-grid" id="myWidgetGrid">
+        <div class="widget-add-btn" onclick="openCreate()">
+          <i class="ti ti-plus"></i>
+          <span>Create Widget</span>
+        </div>
+      </div>
+    </div>
 
-      <!-- Sidebar -->
-      <div class="xp-sidebar">
-        <div class="xp-sidebar-logo">postmarq</div>
-        <div class="xp-sidebar-divider"></div>
-        <div class="xp-sidebar-step" id="sidebarStep">Claim your Post</div>
-        <div class="xp-sidebar-divider"></div>
-        <div class="xp-sidebar-hint" id="sidebarHint">Your place on the internet. Build it however you want — no templates, no rules.</div>
+    <!-- Shared With Me / Community -->
+    <div class="pg-grid">
+      <div>
+        <div class="section-label">Shared With Me</div>
+        <div class="pg-card" style="padding: 1.25rem;">
+          <div id="sharedList">
+            <div class="empty-state">
+              <i class="ti ti-users"></i>
+              <p>Widgets friends share with you<br>will appear here.</p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- Content -->
-      <div class="xp-content">
-
-        <!-- Progress bar -->
-        <div class="xp-progress-wrap">
-          <div class="xp-progress-fill" id="progressBar"></div>
-        </div>
-
-        <!-- STEP 1 — Claim your Post -->
-        <div class="step active" id="step-1" style="padding-top:0.75rem;">
-          <div style="padding: 0 1rem; flex:1; display:flex; flex-direction:column; gap:0.6rem;">
-            <div class="xp-step-title">Claim your Post.</div>
-            <div class="xp-step-sub">Your address on the internet. Build it however you want — no templates, no rules.</div>
-            <div class="xp-field">
-              <label class="xp-label">Your name:</label>
-              <input class="xp-input" type="text" id="signup-name" placeholder="Dave Michael" autocomplete="name" />
+      <div>
+        <div class="section-label">Community Picks</div>
+        <div class="pg-card" style="padding: 1.25rem;">
+          <div class="widget-grid" id="communityGrid">
+            <!-- Seeded community widgets -->
+            <div class="widget-tile" onclick="copyToPost('clock')">
+              <div class="widget-tile-icon">🕐</div>
+              <div class="widget-tile-name">Live Clock</div>
+              <div class="widget-tile-desc">Real-time clock with seconds. Great for the top of your Living Room.</div>
+              <span class="widget-tile-tag tag-new">Popular</span>
             </div>
-            <div class="xp-field">
-              <label class="xp-label">Claim your address:</label>
-              <div class="xp-address-row">
-                <input type="text" id="signup-address" placeholder="davemichael" autocomplete="off" />
-                <span class="xp-address-suffix">.postmarq</span>
-              </div>
+            <div class="widget-tile" onclick="copyToPost('weather')">
+              <div class="widget-tile-icon">🌤</div>
+              <div class="widget-tile-name">Weather Card</div>
+              <div class="widget-tile-desc">Current conditions + 3-day forecast for your city.</div>
+              <span class="cs-chip">Soon</span>
+              <span class="widget-tile-tag tag-shared">Community</span>
             </div>
-            <div class="xp-field">
-              <label class="xp-label">Email:</label>
-              <input class="xp-input" type="email" id="signup-email" placeholder="you@example.com" autocomplete="email" />
+            <div class="widget-tile" onclick="copyToPost('countdown')">
+              <div class="widget-tile-icon">⏳</div>
+              <div class="widget-tile-name">Countdown</div>
+              <div class="widget-tile-desc">Count down to any event — a trip, a release, a birthday.</div>
+              <span class="cs-chip">Soon</span>
+              <span class="widget-tile-tag tag-shared">Community</span>
             </div>
-            <div class="xp-field">
-              <label class="xp-label">Password:</label>
-              <input class="xp-input" type="password" id="signup-password" placeholder="Choose a password" autocomplete="new-password" />
-            </div>
-            <div class="xp-error" id="signupError" style="display:none;"></div>
-          </div>
-          <div class="xp-btn-row">
-            <button class="xp-btn" onclick="window.location.href='/'">&#8592; Sign in</button>
-            <button class="xp-btn-primary" id="signupBtn" onclick="createAccount()">Create my Post &#8594;</button>
           </div>
         </div>
+      </div>
+    </div>
 
-        <!-- STEP 2 — Done -->
-        <div class="step" id="step-done" style="padding-top:0.75rem;">
-          <div style="padding: 0 1rem; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
-            <div class="xp-done-icon">✅</div>
-            <div class="xp-step-title" style="border:none; text-align:center; font-size:15px;">Welcome home.</div>
-            <div class="xp-step-sub" style="max-width:320px;">Your Post is live. Decorate it, rearrange it, make it weird — it's yours. The only people who see it are the ones you let in.</div>
-          </div>
-          <div class="xp-btn-row" style="justify-content:center;">
-            <a id="post-link" href="post.html" class="xp-btn-primary" style="text-decoration:none;">Go to my Post &#8594;</a>
-          </div>
+  </div><!-- /page-wrap -->
+
+  <!-- Copy confirm toast -->
+  <div class="copy-confirm" id="copyConfirm">✓ Widget copied to your Living Room</div>
+
+  <!-- Create Widget Modal -->
+  <div class="modal-overlay" id="createModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title"><i class="ti ti-assembly"></i> New Widget</div>
+        <button class="modal-close" onclick="closeCreate()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div>
+          <span class="modal-label">Widget Name</span>
+          <input class="modal-input" id="wName" placeholder="e.g. Motivational Quote" />
         </div>
-
-        <div class="xp-statusbar">
-          <span class="xp-status-panel" id="statusText">Ready</span>
+        <div>
+          <span class="modal-label">Description <span style="opacity:.4;font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></span>
+          <input class="modal-input" id="wDesc" placeholder="What does it do?" />
         </div>
+        <div>
+          <span class="modal-label">Emoji Icon</span>
+          <input class="modal-input" id="wIcon" placeholder="🎯" maxlength="4" style="font-size:1.2rem;" />
+        </div>
+        <div>
+          <span class="modal-label">Tags <span style="opacity:.4;font-weight:400;text-transform:none;letter-spacing:0;">(comma separated)</span></span>
+          <input class="modal-input" id="wTags" placeholder="clock, weather, fun…" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn-cancel" onclick="closeCreate()">Cancel</button>
+        <button class="modal-btn-ok" onclick="saveWidget()">Create Widget</button>
+      </div>
+    </div>
+  </div>
 
-      </div><!-- /xp-content -->
-    </div><!-- /xp-wizard-body -->
+  <!-- Share Widget Modal -->
+  <div class="modal-overlay" id="shareModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title"><i class="ti ti-share"></i> Share Widget</div>
+        <button class="modal-close" onclick="closeShare()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div>
+          <span class="modal-label">Share with (Postmarq handle)</span>
+          <input class="modal-input" id="shareHandle" placeholder="friend.postmarq" />
+        </div>
+        <div>
+          <span class="modal-label">Note <span style="opacity:.4;font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></span>
+          <textarea class="modal-input modal-textarea" id="shareNote" placeholder="Hey, made this for you…"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn-cancel" onclick="closeShare()">Cancel</button>
+        <button class="modal-btn-ok" onclick="sendShare()">Send</button>
+      </div>
+    </div>
+  </div>
 
-  </div><!-- /xp-window -->
-</div><!-- /desktop -->
 
-<!-- Taskbar -->
-<div class="xp-taskbar">
-  <button class="xp-start-btn">🪟 start</button>
-  <div class="xp-taskbar-item">🌐 &nbsp;Postmarq — Claim Your Post</div>
-  <div class="xp-tray"><span class="xp-clock" id="xpClock">12:00 PM</span></div>
-</div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const { createClient } = supabase;
+    const sb = createClient(
+      'https://udlbdccvspxqlzizpkda.supabase.co',
+      'sb_publishable_co1yq79BF8oR9Mg651DG5w_ESuACdqn'
+    );
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  function val(id) { return (document.getElementById(id)?.value || '').trim(); }
+    let currentUser = null;
+    let shareTargetId = null;
 
-  function goTo(id) {
-    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-    const next = document.getElementById(id);
-    if (next) next.classList.add('active');
-    if (id === 'step-done') document.getElementById('progressBar').style.width = '100%';
-  }
+    function pgKey(k) { return 'pm_pg_' + (currentUser?.id || 'anon') + '_' + k; }
+    function pgGet(k) { try { return JSON.parse(localStorage.getItem(pgKey(k))); } catch { return null; } }
+    function pgSet(k, v) { localStorage.setItem(pgKey(k), JSON.stringify(v)); }
+    function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-  // ── Supabase account creation ──
-  const SUPABASE_URL = 'https://udlbdccvspxqlzizpkda.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_co1yq79BF8oR9Mg651DG5w_ESuACdqn';
-
-  async function createAccount() {
-    const email        = val('signup-email');
-    const password     = val('signup-password');
-    const username     = val('signup-address');
-    const display_name = val('signup-name');
-
-    const errEl = document.getElementById('signupError');
-    errEl.style.display = 'none';
-
-    if (!email || !password || !username) {
-      errEl.textContent = 'Please fill in your name, address, email, and password.';
-      errEl.style.display = 'block';
-      return;
+    /* ── Render my widgets ── */
+    function renderMyWidgets() {
+      const widgets = pgGet('widgets') || [];
+      const grid = document.getElementById('myWidgetGrid');
+      const tiles = widgets.map((w, i) => `
+        <div class="widget-tile">
+          <div class="widget-tile-icon">${esc(w.icon || '🧩')}</div>
+          <div class="widget-tile-name">${esc(w.name)}</div>
+          <div class="widget-tile-desc">${esc(w.desc || '')}</div>
+          ${w.tags?.length ? `<div class="pill-row">${w.tags.map(t => `<span class="pill">${esc(t)}</span>`).join('')}</div>` : ''}
+          <div style="display:flex;gap:0.4rem;margin-top:0.5rem;">
+            <button onclick="openShare(${i})" style="background:none;border:none;cursor:pointer;font-family:var(--font);font-size:0.68rem;font-weight:800;color:var(--teal);padding:0;display:inline-flex;align-items:center;gap:0.2rem;"><i class="ti ti-share"></i> Share</button>
+            <button onclick="removeWidget(${i})" style="background:none;border:none;cursor:pointer;font-family:var(--font);font-size:0.68rem;font-weight:700;color:rgba(162,40,65,0.6);padding:0;margin-left:auto;"><i class="ti ti-trash"></i></button>
+          </div>
+          <span class="widget-tile-tag tag-mine">Mine</span>
+        </div>`).join('');
+      grid.innerHTML = tiles + `
+        <div class="widget-add-btn" onclick="openCreate()">
+          <i class="ti ti-plus"></i>
+          <span>Create Widget</span>
+        </div>`;
     }
-    if (password.length < 6) {
-      errEl.textContent = 'Password must be at least 6 characters.';
-      errEl.style.display = 'block';
-      return;
+
+    function removeWidget(i) {
+      const widgets = pgGet('widgets') || [];
+      widgets.splice(i, 1);
+      pgSet('widgets', widgets);
+      renderMyWidgets();
     }
 
-    const btn = document.getElementById('signupBtn');
-    btn.disabled = true;
-    btn.textContent = 'Creating your Post…';
-    document.getElementById('statusText').textContent = 'Creating your account…';
-
-    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    // 1. Sign up
-    const { data: authData, error: authError } = await sb.auth.signUp({ email, password });
-    if (authError) {
-      errEl.textContent = authError.message;
-      errEl.style.display = 'block';
-      btn.disabled = false;
-      btn.textContent = 'Create my Post →';
-      document.getElementById('statusText').textContent = 'Error.';
-      return;
+    /* ── Create widget modal ── */
+    function openCreate() {
+      ['wName','wDesc','wIcon','wTags'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('createModal').classList.add('open');
+    }
+    function closeCreate() { document.getElementById('createModal').classList.remove('open'); }
+    function saveWidget() {
+      const name = document.getElementById('wName').value.trim();
+      if (!name) { document.getElementById('wName').focus(); return; }
+      const icon = document.getElementById('wIcon').value.trim() || '🧩';
+      const desc = document.getElementById('wDesc').value.trim();
+      const tags = document.getElementById('wTags').value.split(',').map(t => t.trim()).filter(Boolean);
+      const widgets = pgGet('widgets') || [];
+      widgets.unshift({ name, icon, desc, tags, id: Date.now() });
+      pgSet('widgets', widgets);
+      renderMyWidgets();
+      closeCreate();
     }
 
-    // 2. Sign in immediately to ensure session is active before insert
-    await sb.auth.signInWithPassword({ email, password });
-
-    // 3. Insert post row
-    const { error: postError } = await sb.from('posts').insert({
-      user_id: authData.user.id, username, display_name, html: '', css: '', js: ''
-    });
-    if (postError) {
-      document.getElementById('statusText').textContent = 'Account created but post setup failed: ' + postError.message;
-      console.error(postError);
+    /* ── Share modal ── */
+    function openShare(i) {
+      shareTargetId = i;
+      document.getElementById('shareHandle').value = '';
+      document.getElementById('shareNote').value = '';
+      document.getElementById('shareModal').classList.add('open');
+    }
+    function closeShare() { document.getElementById('shareModal').classList.remove('open'); shareTargetId = null; }
+    function sendShare() {
+      const handle = document.getElementById('shareHandle').value.trim();
+      if (!handle) { document.getElementById('shareHandle').focus(); return; }
+      closeShare();
+      showToast('Widget shared with ' + handle + '!');
     }
 
-    // 4. Done
-    goTo('step-done');
-    document.getElementById('post-link').href = '/' + username;
-    document.getElementById('post-link').textContent = 'postmarq.org/' + username + ' →';
-    document.getElementById('statusText').textContent = 'Your Post is live!';
-  }
+    /* ── Community copy ── */
+    function copyToPost(type) {
+      showToast('Widget added to your Living Room');
+    }
 
-  function tick() {
-    var now = new Date(), h = now.getHours(), m = now.getMinutes();
-    var ampm = h >= 12 ? 'PM' : 'AM';
-    h = h % 12 || 12;
-    document.getElementById('xpClock').textContent = h + ':' + (m < 10 ? '0' : '') + m + ' ' + ampm;
-  }
-  tick(); setInterval(tick, 10000);
-</script>
+    /* ── Toast ── */
+    function showToast(msg) {
+      const el = document.getElementById('copyConfirm');
+      el.textContent = '✓ ' + msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 2800);
+    }
+
+    /* ── Close modals on backdrop ── */
+    document.getElementById('createModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeCreate(); });
+    document.getElementById('shareModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeShare(); });
+
+    /* ── Init ── */
+    async function init() {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { window.location.href = '/login'; return; }
+      currentUser = session.user;
+
+      const { data: profile } = await sb.from('profiles').select('handle').eq('id', currentUser.id).single();
+      const handle = profile?.handle || currentUser.email.split('@')[0] + '.postmarq';
+      document.getElementById('addressHandle').textContent = handle;
+
+      renderMyWidgets();
+    }
+
+    init();
+  </script>
 
 </body>
 </html>
