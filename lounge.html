@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lounge — davemichael.postmarq</title>
+  <title>Lounge — Postmarq</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -582,7 +582,7 @@
   <div class="address-bar">
     <div class="address-inner">
       <div class="address-dot"></div>
-      <div class="address-text">davemichael.postmarq / <strong>lounge</strong></div>
+      <div class="address-text"><span id="addressHandle">postmarq</span> / <strong>lounge</strong></div>
     </div>
   </div>
 
@@ -613,12 +613,12 @@
       <!-- Me -->
       <div class="sidebar-me">
         <div class="avatar">
-          <img src="Profile Pic_01x.JPG" alt="Dave Michael" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-          <div class="avatar-placeholder" style="display:none">DM</div>
+          <img id="sidebarAvatar" src="" alt="" style="display:none" onerror="this.style.display='none';document.getElementById('sidebarInitials').style.display='flex'">
+          <div class="avatar-placeholder" id="sidebarInitials">?</div>
           <div class="status-dot" id="myStatusDot"></div>
         </div>
         <div class="me-info">
-          <div class="me-name">Dave Michael</div>
+          <div class="me-name" id="sidebarName">Loading…</div>
           <div class="me-away" id="myAwayMsg" onclick="openPersonality()">Here to make real connections ✌️</div>
         </div>
         <button class="btn-icon" title="Personality" onclick="togglePersonality()">
@@ -776,86 +776,25 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-  /* ═══════════════════════════════════════════
-     DATA LAYER
-     — Replace with real API/WebSocket calls when backend is ready.
-     — Each convo has: id, type ('dm'|'group'), name, avatar (emoji or initials),
-       color, status, members, messages[], unread
-  ═══════════════════════════════════════════ */
+  const { createClient } = supabase;
+  const sb = createClient(
+    'https://udlbdccvspxqlzizpkda.supabase.co',
+    'sb_publishable_co1yq79BF8oR9Mg651DG5w_ESuACdqn'
+  );
 
   const ME = {
-    id: 'dave',
-    name: 'Dave Michael',
-    initials: 'DM',
+    id: null,
+    name: '',
+    initials: '?',
     status: 'online',
     awayMsg: 'Here to make real connections ✌️',
     bubbleColor: '#6b4fbb',
     font: 'Nunito',
   };
 
-  let convos = [
-    {
-      id: 'q-phx',
-      type: 'group',
-      name: 'PHX Crew',
-      avatar: '🌵',
-      color: '#4e3aa0',
-      members: ['Jordan','Mia','Carlos','Dave'],
-      unread: 3,
-      messages: [
-        { id:1, from:'Jordan', fromId:'jordan', text:'Anyone down for Taco Tuesday?', ts:'Yesterday 6:48 PM' },
-        { id:2, from:'Mia',    fromId:'mia',    text:'Always 🌮', ts:'Yesterday 6:49 PM' },
-        { id:3, from:'Carlos', fromId:'carlos', text:'Can we do Los Olivos?', ts:'Yesterday 6:52 PM' },
-        { id:4, from:'Jordan', fromId:'jordan', gif: 'https://media.giphy.com/media/l0HlNQ03J5JxX6lva/giphy.gif', ts:'Yesterday 6:53 PM' },
-        { id:5, from:'Dave',   fromId:'dave',   text:'YES. 7pm?', ts:'Yesterday 7:01 PM' },
-        { id:6, from:'Mia',    fromId:'mia',    text:'Perfect 🙌', ts:'Yesterday 7:02 PM' },
-      ]
-    },
-    {
-      id: 'q-music',
-      type: 'group',
-      name: 'Playlist Lords',
-      avatar: '🎵',
-      color: '#326e8e',
-      members: ['Dave','Sasha','Renee'],
-      unread: 0,
-      messages: [
-        { id:1, from:'Sasha', fromId:'sasha', text:'New ODESZA track dropped 🔥', ts:'Mon 2:14 PM' },
-        { id:2, from:'Dave',  fromId:'dave',  text:'Already on repeat', ts:'Mon 2:20 PM' },
-        { id:3, from:'Renee', fromId:'renee', text:'Adding to the collab playlist now', ts:'Mon 2:21 PM',
-          link: { title: 'Spotify Collab: Late Night Drives', url: 'spotify.com/playlist/collab' } },
-      ]
-    },
-    {
-      id: 'dm-mia',
-      type: 'dm',
-      name: 'Mia Torres',
-      initials: 'MT',
-      color: '#c85c3a',
-      status: 'online',
-      unread: 1,
-      messages: [
-        { id:1, from:'Mia',  fromId:'mia',  text:'Hey! Did you see the game last night?', ts:'Today 10:32 AM' },
-        { id:2, from:'Dave', fromId:'dave', text:'I missed it — Dbacks win?', ts:'Today 10:45 AM' },
-        { id:3, from:'Mia',  fromId:'mia',  text:'Walk-off. It was INSANE', ts:'Today 10:46 AM' },
-      ]
-    },
-    {
-      id: 'dm-jordan',
-      type: 'dm',
-      name: 'Jordan Lee',
-      initials: 'JL',
-      color: '#4ab5aa',
-      status: 'away',
-      unread: 0,
-      messages: [
-        { id:1, from:'Jordan', fromId:'jordan', text:'Yo you ever gonna finish that side project? 😂', ts:'Sun 4:10 PM' },
-        { id:2, from:'Dave',   fromId:'dave',   text:'I\'m literally building it right now lol', ts:'Sun 4:22 PM' },
-        { id:3, from:'Jordan', fromId:'jordan', text:'Based', ts:'Sun 4:23 PM' },
-      ]
-    },
-  ];
+  let convos = [];
 
   let activeConvoId = null;
   let pendingGif = null;
@@ -936,7 +875,7 @@
     if (c.messages.length > 0) {
       window._typingTimer = setTimeout(() => {
         const typer = c.type === 'group'
-          ? c.members.filter(m => m !== 'Dave')[Math.floor(Math.random() * (c.members.length - 1))]
+          ? c.members.filter(m => m !== ME.name)[Math.floor(Math.random() * (c.members.length - 1))]
           : c.name.split(' ')[0];
         typingText.textContent = `${typer} is typing…`;
         typingEl.style.opacity = '1';
@@ -952,7 +891,7 @@
     let prevDate = null;
 
     c.messages.forEach((msg, i) => {
-      const isMe = msg.fromId === 'dave';
+      const isMe = msg.fromId === ME.id;
       const dateStr = msg.ts.split(' ').slice(0, -2).join(' ') || msg.ts.split(' ')[0];
 
       if (dateStr !== prevDate) {
@@ -1017,8 +956,8 @@
 
     const msg = {
       id: Date.now(),
-      from: 'Dave Michael',
-      fromId: 'dave',
+      from: ME.name,
+      fromId: ME.id,
       ts: timeStr,
     };
     if (pendingGif) {
@@ -1203,7 +1142,7 @@
     convos.unshift({
       id, type: 'group', name,
       avatar: '💬', color: '#4e3aa0',
-      members: ['Dave'], unread: 0, messages: [],
+      members: [ME.name], unread: 0, messages: [],
     });
     closeNewLounge();
     document.getElementById('newLoungeName').value = '';
@@ -1239,7 +1178,34 @@
      INIT
   ═══════════════════════════════════════════ */
 
-  (function init() {
+  async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = '/login'; return; }
+
+    const user = session.user;
+    ME.id = user.id;
+
+    // Load profile
+    const { data: profile } = await sb.from('profiles').select('full_name, handle, avatar_url').eq('id', user.id).single();
+    ME.name = profile?.full_name || user.email.split('@')[0];
+    const handle = profile?.handle || ME.name.toLowerCase().replace(/\s+/g,'') + '.postmarq';
+
+    // Update address bar
+    document.getElementById('addressHandle').textContent = handle;
+
+    // Update sidebar
+    document.getElementById('sidebarName').textContent = ME.name;
+    ME.initials = ME.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || '?';
+    document.getElementById('sidebarInitials').textContent = ME.initials;
+
+    if (profile?.avatar_url) {
+      const img = document.getElementById('sidebarAvatar');
+      img.src = profile.avatar_url + '?t=' + Date.now();
+      img.alt = ME.name;
+      img.style.display = 'block';
+      document.getElementById('sidebarInitials').style.display = 'none';
+    }
+
     // Restore saved personality
     const savedBubble = localStorage.getItem('pm_bubble');
     if (savedBubble) { ME.bubbleColor = savedBubble; document.documentElement.style.setProperty('--bubble-me', savedBubble); }
@@ -1253,12 +1219,14 @@
       document.documentElement.style.setProperty('--status-color', colors[savedStatus] || colors.online);
       document.getElementById('myStatusDot').style.background = colors[savedStatus] || colors.online;
     }
+
     renderSidebar();
 
-    // Auto-open convo if launched with a hash (e.g. from Living Room widget)
     const hash = location.hash.slice(1);
     if (hash && convos.find(c => c.id === hash)) openConvo(hash);
-  })();
+  }
+
+  init();
   </script>
 
 </body>
