@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Living Room — davemichael.postmarq</title>
+  <title>Living Room — Postmarq</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -413,7 +413,7 @@
   <div class="address-bar">
     <div class="address-inner">
       <div class="address-dot"></div>
-      <span class="address-text"><strong>davemichael</strong>.postmarq / <strong>Living Room</strong></span>
+      <span class="address-text"><span id="addressHandle">postmarq</span> / <strong>Living Room</strong></span>
     </div>
   </div>
 
@@ -463,8 +463,18 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/gridstack@10/dist/gridstack-all.js"></script>
   <script>
+  const { createClient } = supabase;
+  const sb = createClient(
+    'https://udlbdccvspxqlzizpkda.supabase.co',
+    'sb_publishable_co1yq79BF8oR9Mg651DG5w_ESuACdqn'
+  );
+  let currentUserId = null;
+  function lrKey(k) { return 'pm_lr_' + (currentUserId || 'anon') + '_' + k; }
+  function lsGet(k) { return localStorage.getItem(lrKey(k)); }
+  function lsSet(k, v) { localStorage.setItem(lrKey(k), v); }
   /* ═══════════════════════════════════════════
      CONSTANTS
   ═══════════════════════════════════════════ */
@@ -485,20 +495,7 @@
 
   const LAYOUT_VERSION = 3;
 
-  const SEED_LAYOUT = [
-    { type:'clock',        x:0, y:0,  w:3, h:2 },
-    { type:'weather',      x:3, y:0,  w:3, h:3 },
-    { type:'gmail',        x:6, y:0,  w:6, h:3 },
-    { type:'youtube',      x:0, y:2,  w:6, h:5 },
-    { type:'friendfeed',   x:6, y:3,  w:6, h:5 },
-    { type:'im',           x:6, y:8,  w:6, h:3 },
-    { type:'quicknotes',   x:0, y:7,  w:2, h:3 },
-    { type:'neighborhood', x:2, y:7,  w:4, h:2 },
-    { type:'newsfeed',     x:0, y:11, w:4, h:3, rss:'https://feeds.npr.org/1001/rss.xml' },
-    { type:'newsfeed',     x:4, y:11, w:4, h:3, rss:'https://www.theverge.com/rss/index.xml' },
-    { type:'newsfeed',     x:8, y:11, w:4, h:3, rss:'https://www.espn.com/espn/rss/news' },
-    { type:'reddit',       x:0, y:14, w:6, h:5 },
-  ];
+  const SEED_LAYOUT = [];
 
   /* ═══════════════════════════════════════════
      WIDGET HTML BUILDERS
@@ -506,7 +503,7 @@
   function buildWidget(type, id) {
     const def = WIDGET_DEFS[type];
     const isNews = type === 'newsfeed';
-    const newsTitle = isNews ? rssFeedName(localStorage.getItem('pm_lr_rss_'+id) || DEFAULT_RSS) : def.title;
+    const newsTitle = isNews ? rssFeedName(lsGet('rss_'+id) || DEFAULT_RSS) : def.title;
     return `
       <div class="widget-wrap" data-widget-type="${type}" data-widget-id="${id}" tabindex="0">
         <div class="widget-header${isNews ? ' news-header' : ''}">
@@ -864,11 +861,11 @@
   function initNotes(id) {
     const ta = document.getElementById('notes-'+id);
     if(!ta) return;
-    ta.value = localStorage.getItem('pm_lr_note_'+id) || '';
+    ta.value = lsGet('note_'+id) || '';
   }
   function saveNote(id) {
     const ta = document.getElementById('notes-'+id);
-    if(ta) localStorage.setItem('pm_lr_note_'+id, ta.value);
+    if(ta) lsSet('note_'+id, ta.value);
   }
 
   // ── News Feed ──────────────────────────────
@@ -894,15 +891,15 @@
   }
   const DEFAULT_REDDIT = 'https://www.reddit.com/r/popular/hot.rss';
   async function initReddit(id) {
-    const saved = localStorage.getItem('pm_lr_rd_'+id) || DEFAULT_REDDIT;
+    const saved = lsGet('rd_'+id) || DEFAULT_REDDIT;
     await fetchReddit(id, saved);
   }
   async function fetchReddit(id, urlOverride) {
     const inputEl = document.getElementById('ws-rd-'+id);
-    let rss = urlOverride || (inputEl && inputEl.value.trim()) || localStorage.getItem('pm_lr_rd_'+id) || DEFAULT_REDDIT;
+    let rss = urlOverride || (inputEl && inputEl.value.trim()) || lsGet('rd_'+id) || DEFAULT_REDDIT;
     if (!rss.startsWith('http')) rss = 'https://' + rss;
-    if (inputEl && inputEl.value.trim()) localStorage.setItem('pm_lr_rd_'+id, rss);
-    else if (!urlOverride) localStorage.setItem('pm_lr_rd_'+id, rss);
+    if (inputEl && inputEl.value.trim()) lsSet('rd_'+id, rss);
+    else if (!urlOverride) lsSet('rd_'+id, rss);
     const loading = document.getElementById('rdl-'+id);
     const list    = document.getElementById('rdlist-'+id);
     if (loading) loading.style.display = '';
@@ -941,8 +938,8 @@
   async function initNews(id) { await fetchNews(id); }
   async function fetchNews(id) {
     const inputEl = document.getElementById('ws-rss-'+id);
-    const rss = (inputEl && inputEl.value.trim()) || localStorage.getItem('pm_lr_rss_'+id) || DEFAULT_RSS;
-    if(inputEl && inputEl.value.trim()) localStorage.setItem('pm_lr_rss_'+id, rss);
+    const rss = (inputEl && inputEl.value.trim()) || lsGet('rss_'+id) || DEFAULT_RSS;
+    if(inputEl && inputEl.value.trim()) lsSet('rss_'+id, rss);
     const titleEl = document.getElementById('wtitle-'+id);
     if(titleEl) titleEl.textContent = rssFeedName(rss);
     const loading = document.getElementById('nl-'+id);
@@ -1056,14 +1053,14 @@
 
   // ── Google Calendar ────────────────────────
   function initCalendar(id) {
-    const saved = localStorage.getItem('pm_lr_cal_'+id);
+    const saved = lsGet('cal_'+id);
     if(saved) loadCalendar(id, saved);
   }
   function loadCalendar(id, urlOverride) {
     const inputEl = document.getElementById('ws-cal-'+id);
     const url = urlOverride || (inputEl && inputEl.value.trim());
     if(!url) return;
-    localStorage.setItem('pm_lr_cal_'+id, url);
+    lsSet('cal_'+id, url);
     const ph = document.getElementById('cal-ph-'+id);
     const frame = document.getElementById('cal-frame-'+id);
     if(ph) ph.style.display='none';
@@ -1105,8 +1102,8 @@
     if(!def) return;
     const id = `w${++widgetCount}`;
     // Pre-seed config values before init runs
-    if(opts.rss) localStorage.setItem('pm_lr_rss_'+id, opts.rss);
-    if(opts.rd)  localStorage.setItem('pm_lr_rd_'+id, opts.rd);
+    if(opts.rss) lsSet('rss_'+id, opts.rss);
+    if(opts.rd)  lsSet('rd_'+id, opts.rd);
     const el = grid.addWidget({
       x: opts.x, y: opts.y,
       w: opts.w || def.defaultW,
@@ -1131,14 +1128,14 @@
       if(!n) return;
       items.push({ type: el.dataset.widgetType, x:n.x, y:n.y, w:n.w, h:n.h });
     });
-    localStorage.setItem('pm_lr_layout', JSON.stringify(items));
+    lsSet('layout', JSON.stringify(items));
   }
 
   function loadLayout() {
-    const saved   = localStorage.getItem('pm_lr_layout');
-    const version = parseInt(localStorage.getItem('pm_lr_layout_v') || '1');
+    const saved   = lsGet('layout');
+    const version = parseInt(lsGet('layout_v') || '1');
     const layout  = (saved && version === LAYOUT_VERSION) ? JSON.parse(saved) : SEED_LAYOUT;
-    localStorage.setItem('pm_lr_layout_v', LAYOUT_VERSION);
+    lsSet('layout_v', LAYOUT_VERSION);
     layout.forEach(item => addWidget(item.type, item));
   }
 
@@ -1153,7 +1150,7 @@
       document.getElementById('col-btn-'+i)?.classList.toggle('active', i === n);
     });
     grid.column(COL_MAP[n]);
-    localStorage.setItem('pm_lr_cols', n);
+    lsSet('cols', n);
   }
 
   function toggleEditMode() {
@@ -1214,16 +1211,26 @@
     draggable: { handle: '.widget-header' },
   }, '#grid');
 
-  grid.setStatic(true); // start locked; edit mode unlocks
-
+  grid.setStatic(true);
   grid.on('dragstop resizestop', saveLayout);
 
-  // Restore saved column preference
-  const savedCols = parseInt(localStorage.getItem('pm_lr_cols') || '3');
-  setColumns(savedCols);
+  async function initApp() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = '/login'; return; }
 
-  loadLayout();
-  setTimeout(saveLayout, 100); // persist initial layout immediately
+    currentUserId = session.user.id;
+
+    const { data: profile } = await sb.from('profiles').select('handle').eq('id', currentUserId).single();
+    const handle = profile?.handle || session.user.email.split('@')[0] + '.postmarq';
+    document.getElementById('addressHandle').textContent = handle;
+
+    const savedCols = parseInt(lsGet('cols') || '3');
+    setColumns(savedCols);
+    loadLayout();
+    setTimeout(saveLayout, 100);
+  }
+
+  initApp();
   </script>
 </body>
 </html>
