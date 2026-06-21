@@ -227,14 +227,21 @@
       // Create default profile row
       if (data?.user) {
         const handle = name.toLowerCase().replace(/\s+/g, '') + '.postmarq';
-        await client.from('profiles').insert({
+        await client.from('profiles').upsert({
           id: data.user.id,
           full_name: name,
           handle,
           bio: ''
-        });
+        }, { onConflict: 'id' });
       }
 
+      // If session exists (email confirmation off), go straight to home
+      if (data?.session) {
+        window.location.href = '/home';
+        return;
+      }
+
+      // Otherwise prompt email confirmation
       msg.className = 'message success';
       msg.textContent = 'Check your email to confirm your account, then log in.';
       btn.textContent = 'Done!';

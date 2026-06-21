@@ -55,6 +55,49 @@
       box-shadow: var(--glass-shadow), var(--glass-inset);
     }
 
+    /* ── Welcome Banner ── */
+    .welcome-banner {
+      display: none;
+      background: linear-gradient(135deg, rgba(78,58,160,0.92) 0%, rgba(50,150,142,0.92) 100%);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+      padding: 1.25rem 1.5rem;
+      position: relative;
+    }
+    .welcome-banner.visible { display: block; }
+    .wb-inner { max-width: 860px; margin: 0 auto; }
+    .wb-greeting {
+      font-size: 1.1rem; font-weight: 800; color: white;
+      margin-bottom: 0.5rem; letter-spacing: -0.3px;
+    }
+    .wb-sub {
+      font-size: 0.8rem; color: rgba(255,255,255,0.75);
+      margin-bottom: 1rem; line-height: 1.5;
+    }
+    .wb-sections {
+      display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;
+    }
+    .wb-pill {
+      background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 20px; padding: 0.35rem 0.75rem;
+      font-size: 0.72rem; color: rgba(255,255,255,0.9); font-weight: 600;
+    }
+    .wb-dismiss {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: rgba(255,255,255,0.18); border: 1.5px solid rgba(255,255,255,0.35);
+      border-radius: 20px; padding: 0.45rem 1.1rem;
+      font-size: 0.78rem; font-weight: 700; color: white;
+      cursor: pointer; font-family: var(--font); transition: background 0.15s;
+    }
+    .wb-dismiss:hover { background: rgba(255,255,255,0.28); }
+    .wb-close {
+      position: absolute; top: 0.75rem; right: 1rem;
+      background: none; border: none; color: rgba(255,255,255,0.5);
+      font-size: 1.1rem; cursor: pointer; font-family: var(--font);
+      transition: color 0.15s;
+    }
+    .wb-close:hover { color: white; }
+
     /* ── Site Banner ── */
     .site-banner {
       position: sticky; top: 0; z-index: 200;
@@ -658,6 +701,23 @@
     </div>
   </div>
 
+  <!-- Welcome Banner -->
+  <div class="welcome-banner" id="welcomeBanner">
+    <div class="wb-inner">
+      <div class="wb-greeting">Welcome to your Post, <span id="wbName">friend</span>. 👋</div>
+      <div class="wb-sub">This is your place on the internet — no algorithm, no ads, just you. Here's what each part of your home is for:</div>
+      <div class="wb-sections">
+        <span class="wb-pill">🪪 Profile → who you are</span>
+        <span class="wb-pill">⬡ My Friends → your six people</span>
+        <span class="wb-pill">📷 Candids → real moments from your life</span>
+        <span class="wb-pill">📅 My Q → what you do on the regular</span>
+        <span class="wb-pill">✉️ Feed → what's on your mind</span>
+      </div>
+      <button class="wb-dismiss" onclick="dismissWelcome()">Got it, let's go →</button>
+    </div>
+    <button class="wb-close" onclick="dismissWelcome()">✕</button>
+  </div>
+
   <!-- Site Banner -->
   <div class="site-banner">
     <div class="site-banner-logo">Postmarq</div>
@@ -765,7 +825,7 @@
             </div>
           </div>
           <div class="myq-list" id="myqList">
-            <div class="myq-empty-state">Your loops will appear here.<br>Add something you do regularly.</div>
+            <div class="myq-empty-state">The things you do on the regular.<br>A walk, a coffee run, a game night — add a loop.</div>
           </div>
           <div class="myq-footer">
             <button class="myq-add-btn" onclick="myqOpenModal()">+ Add</button>
@@ -845,8 +905,8 @@
             <div class="glass" style="border-radius:var(--radius-lg)">
               <div class="empty-state">
                 <div class="empty-icon">✉️</div>
-                <div>Nothing posted yet.</div>
-                <div class="empty-hint">Use the composer above to share something.</div>
+                <div>Your posts will live here.</div>
+                <div class="empty-hint">Photos, thoughts, moments — whatever's on your mind. Use the composer above to share something.</div>
               </div>
             </div>
           </div>
@@ -870,7 +930,7 @@
             <div class="yb-stat"><div class="yb-stat-num" id="ybPosts">0</div><div class="yb-stat-lbl">Posts<br>Created</div></div>
             <div class="yb-stat"><div class="yb-stat-num" id="ybLoops">0</div><div class="yb-stat-lbl">Connected<br>Loops</div></div>
             <div class="yb-stat"><div class="yb-stat-num" id="ybStamps">0</div><div class="yb-stat-lbl">Stamps<br>Sent</div></div>
-            <div class="yb-stat"><div class="yb-stat-num" id="ybFriends">0</div><div class="yb-stat-lbl">Pick Six<br>Friends</div></div>
+            <div class="yb-stat"><div class="yb-stat-num" id="ybFriends">0</div><div class="yb-stat-lbl">My<br>Friends</div></div>
           </div>
           <div class="glass" style="border-radius:var(--radius-lg)">
             <div class="empty-state">
@@ -890,7 +950,8 @@
         <!-- My Pick Six -->
         <div class="pick-six-card">
           <div class="pick-six-header">
-            <div class="pick-six-title">My Pick Six</div>
+            <div class="pick-six-title">My Friends</div>
+            <div style="font-size:0.68rem;color:var(--ink-3);margin-top:0.2rem;">The six people you actually talk to.</div>
           </div>
           <div class="pick-six-grid" id="pickSixGrid">
             <!-- Rendered by JS -->
@@ -900,7 +961,10 @@
         <!-- Candids Wall -->
         <div class="candids-card">
           <div class="candids-header">
-            <div class="candids-title">Candids Wall</div>
+            <div style="display:flex;align-items:center;gap:0.4rem;">
+              <div class="candids-title" id="candidsTitle">Candids Wall</div>
+              <button onclick="openCandidsRename()" title="Rename" style="background:none;border:none;cursor:pointer;font-size:0.8rem;opacity:0.4;padding:0;line-height:1;color:var(--ink-2);">✏️</button>
+            </div>
             <button class="candids-add-btn" onclick="document.getElementById('candidsInput').click()">+ Add</button>
           </div>
           <input type="file" id="candidsInput" class="file-input" accept="image/*" multiple onchange="addCandids(this)" />
@@ -908,7 +972,7 @@
             <div class="candids-empty" id="candidsEmpty">
               <i class="ti ti-polaroid"></i>
               <div>Your candids wall is empty.</div>
-              <div style="font-size:0.68rem; opacity:0.6">Add photos from your life.</div>
+              <div style="font-size:0.68rem; opacity:0.6">Real photos from your life. No filters required.</div>
             </div>
             <div class="candids-scroll-wrap" id="candidsScrollWrap" style="display:none">
               <div class="candids-grid" id="candidsGrid"></div>
@@ -972,6 +1036,19 @@
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeModal('stampModal')">Cancel</button>
         <button class="btn-save" onclick="saveStamp()">Set Stamp</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Candids Rename Modal ── -->
+  <div class="modal-overlay" id="candidsRenameModal">
+    <div class="modal-box">
+      <h3>Rename this section</h3>
+      <label class="modal-label" for="candidsTitleInput">Section name</label>
+      <input class="modal-input" type="text" id="candidsTitleInput" maxlength="30" placeholder="e.g. Photo Wall, My Life, Moments" />
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal('candidsRenameModal')">Cancel</button>
+        <button class="btn-save" onclick="saveCandidsTitle()">Save</button>
       </div>
     </div>
   </div>
@@ -1062,10 +1139,27 @@
 
       setDate();
       await loadProfile();
+      showWelcomeBanner();
       await renderPickSix();
       await renderCandids();
       await renderMyQ();
       renderFeed();
+    }
+
+    function showWelcomeBanner() {
+      const dismissed = localStorage.getItem(`pm_welcome_dismissed_${currentUser.id}`);
+      if (dismissed) return;
+      const name = document.getElementById('profileName').textContent.split(' ')[0];
+      document.getElementById('wbName').textContent = name || 'friend';
+      document.getElementById('welcomeBanner').classList.add('visible');
+    }
+
+    function dismissWelcome() {
+      localStorage.setItem(`pm_welcome_dismissed_${currentUser.id}`, '1');
+      const banner = document.getElementById('welcomeBanner');
+      banner.style.transition = 'opacity 0.3s ease';
+      banner.style.opacity = '0';
+      setTimeout(() => banner.classList.remove('visible'), 300);
     }
 
     function setDate() {
@@ -1080,7 +1174,7 @@
     // ── Profile (Supabase) ──
     async function loadProfile() {
       const { data: profile } = await sb.from('profiles')
-        .select('full_name, handle, bio, avatar_url, city, hood, relationship_status, last_update, stamp')
+        .select('full_name, handle, bio, avatar_url, city, hood, relationship_status, last_update, stamp, candids_label')
         .eq('id', currentUser.id).single();
 
       const fallback = currentUser.user_metadata?.full_name || currentUser.email.split('@')[0];
@@ -1118,6 +1212,9 @@
 
       // Stamp
       if (profile?.stamp) applyStampDisplay(profile.stamp);
+
+      // Candids label
+      if (profile?.candids_label) document.getElementById('candidsTitle').textContent = profile.candids_label;
     }
 
     function setMeta(id, val) {
@@ -1338,6 +1435,20 @@
         await renderPickSix();
       };
       imgInput.click();
+    }
+
+    // ── Candids title ──
+    function openCandidsRename() {
+      document.getElementById('candidsTitleInput').value = document.getElementById('candidsTitle').textContent;
+      openModal('candidsRenameModal');
+    }
+
+    async function saveCandidsTitle() {
+      const label = document.getElementById('candidsTitleInput').value.trim();
+      if (!label) return;
+      document.getElementById('candidsTitle').textContent = label;
+      await sb.from('profiles').upsert({ id: currentUser.id, candids_label: label }, { onConflict: 'id' });
+      closeModal('candidsRenameModal');
     }
 
     // ── Candids ──
@@ -1602,7 +1713,7 @@
       weeklyRendered = false;
 
       if (!cachedPosts.length) {
-        feed.innerHTML = `<div class="glass" style="border-radius:var(--radius-lg)"><div class="empty-state"><div class="empty-icon">✉️</div><div>Nothing posted yet.</div><div class="empty-hint">Use the composer above to share something.</div></div></div>`;
+        feed.innerHTML = `<div class="glass" style="border-radius:var(--radius-lg)"><div class="empty-state"><div class="empty-icon">✉️</div><div>Your posts will live here.</div><div class="empty-hint">Photos, thoughts, moments — whatever's on your mind.</div></div></div>`;
         return;
       }
 
