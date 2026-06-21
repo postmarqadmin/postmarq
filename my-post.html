@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" />
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -119,7 +120,7 @@
     .zone-feed { max-width: 1400px; margin: 1.25rem auto 0; padding: 0 1.25rem; }
     .main-grid {
       display: grid;
-      grid-template-columns: 280px 1fr 280px;
+      grid-template-columns: 320px 1fr 280px;
       gap: 1.25rem;
       align-items: start;
     }
@@ -198,18 +199,32 @@
       cursor: pointer; border-bottom: 1px dashed transparent; transition: border-color 0.15s;
     }
     .ms-name:hover { border-color: var(--amber); }
-    .ms-meta { font-size: 0.68rem; font-weight: 600; color: var(--ink-3); line-height: 1.8; }
+    .ms-meta { font-size: 0.68rem; font-weight: 600; color: var(--ink-3); }
     .ms-meta .meta-field {
-      display: flex; align-items: center; gap: 0.3rem;
+      display: grid; grid-template-columns: max-content 1fr; gap: 0.35rem; align-items: baseline; line-height: 1.75;
     }
     .ms-meta .meta-label { color: var(--ink-3); white-space: nowrap; }
     .ms-meta .meta-value {
-      color: var(--ink-2); font-weight: 700; cursor: pointer;
+      color: var(--ink-2); font-weight: 700; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
       border-bottom: 1px dashed transparent; transition: border-color 0.15s;
     }
     .ms-meta .meta-value:hover { border-color: var(--amber); }
     .ms-meta .meta-empty { color: var(--ink-4); font-style: italic; font-weight: 500; cursor: pointer; }
     .ms-divider { height: 1px; background: rgba(255,255,255,0.45); margin: 0 0.85rem; }
+
+    /* Crop modal */
+    #cropModal .modal-box { max-width: 480px; }
+    #cropContainer { width: 100%; max-height: 340px; overflow: hidden; background: #000; border-radius: 8px; }
+    #cropContainer img { display: block; max-width: 100%; }
+
+    /* Custom fields */
+    .custom-fields-list { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.5rem; }
+    .custom-field-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 0.4rem; align-items: center; }
+    .custom-field-row input { font-size: 0.75rem; padding: 0.3rem 0.5rem; border: 1px solid rgba(0,0,0,0.15); border-radius: 6px; background: rgba(255,255,255,0.7); }
+    .custom-field-row .remove-field { background: none; border: none; cursor: pointer; color: var(--ink-3); font-size: 1rem; padding: 0 0.2rem; }
+    .custom-field-row .remove-field:hover { color: #c0392b; }
+    .add-field-btn { margin-top: 0.4rem; font-size: 0.72rem; color: var(--lavender); background: none; border: 1px dashed var(--lavender); border-radius: 6px; padding: 0.28rem 0.7rem; cursor: pointer; font-weight: 700; }
+    .add-field-btn:hover { background: rgba(155,143,212,0.1); }
 
     /* My Marq row */
     .ms-marq-row {
@@ -776,6 +791,7 @@
                   <span class="meta-label">Last Update:&nbsp;</span>
                   <span class="meta-value" id="metaLastUpdate">—</span>
                 </div>
+                <div id="customFieldsDisplay"></div>
               </div>
             </div>
           </div>
@@ -987,6 +1003,18 @@
   </div><!-- /zone-feed -->
 
 
+  <!-- ── Avatar Crop Modal ── -->
+  <div class="modal-overlay" id="cropModal">
+    <div class="modal-box">
+      <h3>Crop your photo</h3>
+      <div id="cropContainer"><img id="cropImage" src="" alt="crop" /></div>
+      <div class="modal-actions" style="margin-top:1rem">
+        <button class="btn-cancel" onclick="cancelCrop()">Cancel</button>
+        <button class="btn-save" onclick="confirmCrop()">Crop & Save</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ── Profile Edit Modal ── -->
   <div class="modal-overlay" id="profileModal">
     <div class="modal-box">
@@ -999,6 +1027,9 @@
       <input class="modal-input" type="text" id="editHood" maxlength="40" placeholder="e.g. Uptown PHX" />
       <label class="modal-label" for="editRelationship">Relationship Status</label>
       <input class="modal-input" type="text" id="editRelationship" maxlength="40" placeholder="e.g. In a Relationship: 1 Year" />
+      <label class="modal-label" style="margin-top:0.6rem">Extra Info Lines</label>
+      <div class="custom-fields-list" id="customFieldsList"></div>
+      <button class="add-field-btn" onclick="addCustomFieldRow()">+ Add info line</button>
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeModal('profileModal')">Cancel</button>
         <button class="btn-save" onclick="saveProfileModal()">Save</button>
@@ -1070,6 +1101,7 @@
 
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
   <script>
     const { createClient } = supabase;
     const sb = createClient(
@@ -1204,6 +1236,8 @@
       setMeta('metaHood', profile?.hood || '');
       setMeta('metaRelationship', profile?.relationship_status || '');
       document.getElementById('metaLastUpdate').textContent = profile?.last_update || '—';
+      currentCustomFields = profile?.custom_fields || [];
+      renderCustomFieldsDisplay(currentCustomFields);
 
       // Bio / Marq
       const marq = profile?.bio || '';
@@ -1230,35 +1264,89 @@
       img.src = url; img.style.display = 'block'; initials.style.display = 'none';
     }
 
-    async function uploadAvatar(input) {
+    // ── Avatar Crop ──
+    let cropper = null;
+
+    function uploadAvatar(input) {
       const file = input.files[0];
       if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const cropImg = document.getElementById('cropImage');
+        cropImg.src = e.target.result;
+        openModal('cropModal');
+        if (cropper) { cropper.destroy(); cropper = null; }
+        cropImg.onload = () => {
+          cropper = new Cropper(cropImg, { aspectRatio: 1, viewMode: 1, autoCropArea: 0.9 });
+        };
+      };
+      reader.readAsDataURL(file);
+      input.value = '';
+    }
 
-      // Show local preview immediately so it feels instant
-      const previewUrl = URL.createObjectURL(file);
-      showAvatar(previewUrl);
-      document.getElementById('composerAv').innerHTML = `<img src="${previewUrl}" alt="" />`;
+    function cancelCrop() {
+      if (cropper) { cropper.destroy(); cropper = null; }
+      closeModal('cropModal');
+    }
 
-      const ext  = file.name.split('.').pop();
-      const path = `${currentUser.id}/avatar.${ext}`;
-      const { error: upErr } = await sb.storage.from('avatars').upload(path, file, { upsert: true });
-      if (upErr) {
-        alert('Photo upload failed: ' + upErr.message);
-        return;
-      }
+    async function confirmCrop() {
+      if (!cropper) return;
+      const canvas = cropper.getCroppedCanvas({ width: 400, height: 400 });
+      canvas.toBlob(async blob => {
+        cropper.destroy(); cropper = null;
+        closeModal('cropModal');
 
-      // Save clean URL (no timestamp) to DB; use timestamped version only for display cache-bust
-      const { data } = sb.storage.from('avatars').getPublicUrl(path);
-      const cleanUrl = data.publicUrl;
-      const displayUrl = cleanUrl + '?t=' + Date.now();
+        const previewUrl = URL.createObjectURL(blob);
+        showAvatar(previewUrl);
+        document.getElementById('composerAv').innerHTML = `<img src="${previewUrl}" alt="" />`;
 
-      showAvatar(displayUrl);
-      document.getElementById('composerAv').innerHTML = `<img src="${displayUrl}" alt="" />`;
-      // Store the display URL in a data attribute for feed card use
-      document.getElementById('avatarImg').dataset.url = cleanUrl;
+        const path = `${currentUser.id}/avatar.jpg`;
+        const { error: upErr } = await sb.storage.from('avatars').upload(path, blob, { upsert: true, contentType: 'image/jpeg' });
+        if (upErr) { alert('Photo upload failed: ' + upErr.message); return; }
 
-      const { error: dbErr } = await sb.from('profiles').upsert({ id: currentUser.id, avatar_url: cleanUrl }, { onConflict: 'id' });
-      if (dbErr) alert('Could not save photo to profile: ' + dbErr.message);
+        const { data } = sb.storage.from('avatars').getPublicUrl(path);
+        const cleanUrl = data.publicUrl;
+        const displayUrl = cleanUrl + '?t=' + Date.now();
+        showAvatar(displayUrl);
+        document.getElementById('composerAv').innerHTML = `<img src="${displayUrl}" alt="" />`;
+        document.getElementById('avatarImg').dataset.url = cleanUrl;
+
+        const { error: dbErr } = await sb.from('profiles').upsert({ id: currentUser.id, avatar_url: cleanUrl }, { onConflict: 'id' });
+        if (dbErr) alert('Could not save photo to profile: ' + dbErr.message);
+      }, 'image/jpeg', 0.92);
+    }
+
+    // ── Custom Fields ──
+    let currentCustomFields = [];
+
+    function renderCustomFieldsDisplay(fields) {
+      const container = document.getElementById('customFieldsDisplay');
+      container.innerHTML = '';
+      (fields || []).forEach(f => {
+        if (!f.label && !f.value) return;
+        const div = document.createElement('div');
+        div.className = 'meta-field';
+        div.innerHTML = `<span class="meta-label">${f.label}:&nbsp;</span><span class="meta-value" onclick="openProfileModal()">${f.value}</span>`;
+        container.appendChild(div);
+      });
+    }
+
+    function addCustomFieldRow(label = '', value = '') {
+      const list = document.getElementById('customFieldsList');
+      const row = document.createElement('div');
+      row.className = 'custom-field-row';
+      row.innerHTML = `
+        <input type="text" placeholder="Label" maxlength="30" value="${label}" />
+        <input type="text" placeholder="Value" maxlength="60" value="${value}" />
+        <button class="remove-field" onclick="this.parentElement.remove()">✕</button>`;
+      list.appendChild(row);
+    }
+
+    function getCustomFieldsFromModal() {
+      return Array.from(document.querySelectorAll('#customFieldsList .custom-field-row')).map(row => {
+        const [labelInput, valueInput] = row.querySelectorAll('input');
+        return { label: labelInput.value.trim(), value: valueInput.value.trim() };
+      }).filter(f => f.label || f.value);
     }
 
     // ── Profile Modal ──
@@ -1267,6 +1355,9 @@
       document.getElementById('editCity').value = document.getElementById('metaCity').classList.contains('meta-empty') ? '' : document.getElementById('metaCity').textContent;
       document.getElementById('editHood').value = document.getElementById('metaHood').classList.contains('meta-empty') ? '' : document.getElementById('metaHood').textContent;
       document.getElementById('editRelationship').value = document.getElementById('metaRelationship').classList.contains('meta-empty') ? '' : document.getElementById('metaRelationship').textContent;
+      const list = document.getElementById('customFieldsList');
+      list.innerHTML = '';
+      currentCustomFields.forEach(f => addCustomFieldRow(f.label, f.value));
       openModal('profileModal');
     }
 
@@ -1281,10 +1372,12 @@
       const now = new Date();
       const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
       const last_update = months[now.getMonth()] + ' ' + now.getDate() + ', ' + now.getFullYear();
+      const custom_fields = getCustomFieldsFromModal();
+      currentCustomFields = custom_fields;
 
       await sb.from('profiles').upsert({
         id: currentUser.id, full_name: name, handle,
-        city, hood, relationship_status: rel, last_update
+        city, hood, relationship_status: rel, last_update, custom_fields
       }, { onConflict: 'id' });
 
       closeModal('profileModal');
