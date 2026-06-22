@@ -785,10 +785,10 @@
           <div class="ms-contact-grid">
             <a class="ms-contact-item" href="#" onclick="openMessageModal();return false;"><i class="ti ti-mail"></i> Send Message</a>
             <a class="ms-contact-item" href="lounge.html"><i class="ti ti-sofa"></i> Lounge</a>
-            <a class="ms-contact-item" href="#" onclick="alert('Coming soon');return false;"><i class="ti ti-user-plus"></i> Add to Friends</a>
+            <a class="ms-contact-item" href="#" onclick="sendFriendRequest();return false;"><i class="ti ti-user-plus"></i> Add to Friends</a>
             <a class="ms-contact-item" href="#" onclick="openBizCard();return false;"><i class="ti ti-id-badge-2"></i> My Business Card</a>
-            <a class="ms-contact-item" href="#" onclick="alert('Coming soon');return false;"><i class="ti ti-send"></i> Send Invite</a>
-            <a class="ms-contact-item" href="#" onclick="alert('Coming soon');return false;"><i class="ti ti-ban"></i> Block User</a>
+            <a class="ms-contact-item" href="#" onclick="openInviteModal();return false;"><i class="ti ti-send"></i> Send Invite</a>
+            <a class="ms-contact-item" href="#" onclick="blockUser();return false;"><i class="ti ti-ban"></i> Block User</a>
           </div>
 
         </div><!-- /myspace-card -->
@@ -1009,6 +1009,31 @@
         <div class="msg-sent-sub">Dave will see it when he checks in.</div>
         <div class="modal-actions" style="justify-content:center; margin-top:1rem">
           <button class="btn-save" onclick="closeModal('messageModal')">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Send Invite Modal ── -->
+  <div class="modal-overlay" id="inviteModal">
+    <div class="modal-box">
+      <div id="inviteFormState">
+        <h3>Invite someone to Postmarq</h3>
+        <label class="modal-label" for="inviteEmail">Their email address</label>
+        <input class="modal-input" type="email" id="inviteEmail" placeholder="friend@example.com" />
+        <label class="modal-label" for="inviteNote" style="margin-top:0.6rem">Personal note <span style="opacity:0.4;font-weight:400">(optional)</span></label>
+        <textarea class="modal-textarea" id="inviteNote" maxlength="200" placeholder="Hey, I think you'd like this..." style="height:80px"></textarea>
+        <div class="modal-actions">
+          <button class="btn-cancel" onclick="closeModal('inviteModal')">Cancel</button>
+          <button class="btn-save" onclick="sendInvite()">Send Invite</button>
+        </div>
+      </div>
+      <div id="inviteSentState" class="msg-sent-state" style="display:none">
+        <div class="msg-sent-icon">📬</div>
+        <div class="msg-sent-title">Invite sent!</div>
+        <div class="msg-sent-sub">They'll get an email to join Postmarq.</div>
+        <div class="modal-actions" style="justify-content:center;margin-top:1rem">
+          <button class="btn-save" onclick="closeModal('inviteModal')">Done</button>
         </div>
       </div>
     </div>
@@ -1953,6 +1978,61 @@
     }
 
 
+    // ── Add to Friends ──
+    async function sendFriendRequest() {
+      if (!currentUser) { alert('You need to be logged in to add friends.'); return; }
+      const { data: dave } = await sb.from('profiles').select('id').eq('handle', 'davemichael.postmarq').single();
+      if (!dave) return;
+      if (currentUser.id === dave.id) { alert("That's you!"); return; }
+      const { error } = await sb.from('friend_requests').insert({
+        from_user_id: currentUser.id,
+        to_user_id: dave.id
+      });
+      if (error?.code === '23505') { alert('You already sent a friend request.'); return; }
+      if (error) { alert('Error: ' + error.message); return; }
+      alert('Friend request sent! Dave will see it when he checks in. ✓');
+    }
+
+    // ── Send Invite ──
+    function openInviteModal() {
+      if (!currentUser) { alert('You need to be logged in to send invites.'); return; }
+      document.getElementById('inviteEmail').value = '';
+      document.getElementById('inviteNote').value = '';
+      document.getElementById('inviteFormState').style.display = '';
+      document.getElementById('inviteSentState').style.display = 'none';
+      openModal('inviteModal');
+    }
+
+    async function sendInvite() {
+      const email = document.getElementById('inviteEmail').value.trim();
+      if (!email || !email.includes('@')) { alert('Please enter a valid email.'); return; }
+      const note = document.getElementById('inviteNote').value.trim();
+      const { error } = await sb.from('invites').insert({
+        from_user_id: currentUser.id,
+        to_email: email,
+        note: note || null
+      });
+      if (error) { alert('Failed to send invite: ' + error.message); return; }
+      document.getElementById('inviteFormState').style.display = 'none';
+      document.getElementById('inviteSentState').style.display = '';
+    }
+
+    // ── Block User ──
+    async function blockUser() {
+      if (!currentUser) { alert('You need to be logged in to block users.'); return; }
+      const { data: dave } = await sb.from('profiles').select('id').eq('handle', 'davemichael.postmarq').single();
+      if (!dave) return;
+      if (currentUser.id === dave.id) { alert("You can't block yourself."); return; }
+      if (!confirm('Block Dave? He will no longer be able to send you messages.')) return;
+      const { error } = await sb.from('blocks').insert({
+        blocker_id: currentUser.id,
+        blocked_id: dave.id
+      });
+      if (error?.code === '23505') { alert('You already blocked this user.'); return; }
+      if (error) { alert('Error: ' + error.message); return; }
+      alert('User blocked.');
+    }
+
     // ── Biz Card ──
     function openBizCard() {
       const inRolodex = localStorage.getItem('pm_bizcard_rolodex') === '1';
@@ -2000,8 +2080,12 @@
 
       const { data: dave } = await sb.from('profiles')
         .select('id').eq('handle', 'davemichael.postmarq').single();
-
       if (!dave) { alert('Could not find recipient.'); return; }
+
+      // Check if sender is blocked
+      const { data: block } = await sb.from('blocks')
+        .select('id').eq('blocker_id', dave.id).eq('blocked_id', currentUser.id).maybeSingle();
+      if (block) { alert('Unable to send message.'); return; }
 
       const { error } = await sb.from('messages').insert({
         from_user_id: currentUser.id,
