@@ -272,8 +272,8 @@
     document.getElementById('pill-username').textContent = session.user.email;
 
     if (session.user.id === post.user_id) {
-      window.location.replace('/home');
-      return;
+      document.getElementById('edit-toolbar').classList.add('visible');
+      document.body.style.paddingTop = '36px';
     } else {
       const { data: myPost } = await sb.from('pages').select('username').eq('user_id', session.user.id).single();
       document.getElementById('visitor-bar').classList.add('visible');
