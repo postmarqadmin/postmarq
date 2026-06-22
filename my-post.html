@@ -56,48 +56,6 @@
       box-shadow: var(--glass-shadow), var(--glass-inset);
     }
 
-    /* ── Welcome Banner ── */
-    .welcome-banner {
-      display: none;
-      background: linear-gradient(135deg, rgba(78,58,160,0.92) 0%, rgba(50,150,142,0.92) 100%);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(255,255,255,0.15);
-      padding: 1.25rem 1.5rem;
-      position: relative;
-    }
-    .welcome-banner.visible { display: block; }
-    .wb-inner { max-width: 860px; margin: 0 auto; }
-    .wb-greeting {
-      font-size: 1.1rem; font-weight: 800; color: white;
-      margin-bottom: 0.5rem; letter-spacing: -0.3px;
-    }
-    .wb-sub {
-      font-size: 0.8rem; color: rgba(255,255,255,0.75);
-      margin-bottom: 1rem; line-height: 1.5;
-    }
-    .wb-sections {
-      display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;
-    }
-    .wb-pill {
-      background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 20px; padding: 0.35rem 0.75rem;
-      font-size: 0.72rem; color: rgba(255,255,255,0.9); font-weight: 600;
-    }
-    .wb-dismiss {
-      display: inline-flex; align-items: center; gap: 0.4rem;
-      background: rgba(255,255,255,0.18); border: 1.5px solid rgba(255,255,255,0.35);
-      border-radius: 20px; padding: 0.45rem 1.1rem;
-      font-size: 0.78rem; font-weight: 700; color: white;
-      cursor: pointer; font-family: var(--font); transition: background 0.15s;
-    }
-    .wb-dismiss:hover { background: rgba(255,255,255,0.28); }
-    .wb-close {
-      position: absolute; top: 0.75rem; right: 1rem;
-      background: none; border: none; color: rgba(255,255,255,0.5);
-      font-size: 1.1rem; cursor: pointer; font-family: var(--font);
-      transition: color 0.15s;
-    }
-    .wb-close:hover { color: white; }
 
     /* ── Site Banner ── */
     .site-banner {
@@ -582,6 +540,51 @@
     }
     .candids-empty i { font-size: 2rem; opacity: 0.3; }
 
+    /* ── Resume Card ── */
+    .resume-card {
+      border-radius: 14px; overflow: hidden;
+      background: linear-gradient(135deg, rgba(155,143,212,0.22) 0%, rgba(74,181,170,0.12) 100%);
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.55);
+      box-shadow: 0 4px 24px rgba(80,60,140,0.10);
+      padding: 0.9rem 1rem;
+    }
+    .resume-card-header {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;
+    }
+    .resume-card-title { font-size: 0.6rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; color: var(--lavender); }
+    .resume-upload-btn {
+      font-size: 0.65rem; font-weight: 700; color: var(--lavender);
+      background: none; border: 1px dashed var(--lavender); border-radius: 6px;
+      padding: 0.2rem 0.55rem; cursor: pointer; font-family: var(--font);
+    }
+    .resume-upload-btn:hover { background: rgba(155,143,212,0.12); }
+    .resume-empty { font-size: 0.72rem; color: var(--ink-4); font-style: italic; }
+    .resume-file-row {
+      display: flex; align-items: center; gap: 0.6rem;
+      background: rgba(255,255,255,0.45); border-radius: 8px; padding: 0.55rem 0.7rem;
+    }
+    .resume-file-icon { font-size: 1.4rem; flex-shrink: 0; }
+    .resume-file-info { flex: 1; min-width: 0; }
+    .resume-file-name { font-size: 0.72rem; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .resume-file-actions { display: flex; gap: 0.4rem; margin-top: 0.45rem; flex-wrap: wrap; }
+    .resume-btn {
+      font-size: 0.65rem; font-weight: 700; padding: 0.22rem 0.55rem; border-radius: 6px;
+      cursor: pointer; font-family: var(--font); border: none; transition: opacity 0.15s;
+    }
+    .resume-btn:hover { opacity: 0.8; }
+    .resume-btn-view { background: var(--lavender); color: white; }
+    .resume-btn-dl   { background: var(--teal); color: white; }
+    .resume-btn-del  { background: none; border: 1px solid rgba(0,0,0,0.15); color: var(--ink-3); }
+    .resume-toggle-row {
+      display: flex; align-items: center; gap: 0.5rem; margin-top: 0.55rem;
+      font-size: 0.65rem; font-weight: 600; color: var(--ink-3);
+    }
+    .resume-toggle { appearance: none; width: 28px; height: 16px; border-radius: 8px; background: rgba(0,0,0,0.15); cursor: pointer; position: relative; flex-shrink: 0; transition: background 0.2s; }
+    .resume-toggle:checked { background: var(--teal); }
+    .resume-toggle::after { content:''; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: white; transition: left 0.2s; }
+    .resume-toggle:checked::after { left: 14px; }
+
     /* ── Generic Modal ── */
     .modal-overlay {
       display: none; position: fixed; inset: 0; z-index: 500;
@@ -716,28 +719,11 @@
     </div>
   </div>
 
-  <!-- Welcome Banner -->
-  <div class="welcome-banner" id="welcomeBanner">
-    <div class="wb-inner">
-      <div class="wb-greeting">Welcome to your Post, <span id="wbName">friend</span>. 👋</div>
-      <div class="wb-sub">This is your place on the internet — no algorithm, no ads, just you. Here's what each part of your home is for:</div>
-      <div class="wb-sections">
-        <span class="wb-pill">🪪 Profile → who you are</span>
-        <span class="wb-pill">⬡ My Friends → your six people</span>
-        <span class="wb-pill">📷 Candids → real moments from your life</span>
-        <span class="wb-pill">📅 My Q → what you do on the regular</span>
-        <span class="wb-pill">✉️ Feed → what's on your mind</span>
-      </div>
-      <button class="wb-dismiss" onclick="dismissWelcome()">Got it, let's go →</button>
-    </div>
-    <button class="wb-close" onclick="dismissWelcome()">✕</button>
-  </div>
-
   <!-- Site Banner -->
   <div class="site-banner">
     <div class="site-banner-logo">Postmarq</div>
     <nav class="site-banner-nav">
-      <a href="post.html">home</a>
+      <a href="my-post.html">home</a>
       <a href="#" onclick="alert('Coming soon')">townsquare</a>
       <a href="#" onclick="alert('Coming soon')">neighborhood</a>
       <a href="edit.html" style="background:linear-gradient(135deg,rgba(155,143,212,0.9),rgba(74,181,170,0.9));color:#fff;padding:0.28rem 0.85rem;border-radius:999px;font-weight:800;letter-spacing:0.02em;">✏️ Edit My Post</a>
@@ -880,6 +866,31 @@
               <button class="myq-cancel-btn" onclick="myqCloseModal()">Cancel</button>
               <button class="myq-save-btn" onclick="myqSave()">Save</button>
             </div>
+          </div>
+        </div>
+
+        <!-- Resume Card -->
+        <div class="resume-card">
+          <div class="resume-card-header">
+            <span class="resume-card-title">Resume</span>
+            <button class="resume-upload-btn" onclick="document.getElementById('resumeInput').click()">+ Upload</button>
+            <input type="file" id="resumeInput" accept=".pdf" style="display:none" onchange="uploadResume(this)" />
+          </div>
+          <div id="resumeEmpty" class="resume-empty">No resume uploaded yet.</div>
+          <div id="resumeFileRow" class="resume-file-row" style="display:none">
+            <div class="resume-file-icon">📄</div>
+            <div class="resume-file-info">
+              <div class="resume-file-name" id="resumeFileName">resume.pdf</div>
+              <div class="resume-file-actions">
+                <button class="resume-btn resume-btn-view" onclick="viewResume()">View</button>
+                <button class="resume-btn resume-btn-dl" id="resumeDlBtn" onclick="downloadResume()">Download</button>
+                <button class="resume-btn resume-btn-del" onclick="removeResume()">Remove</button>
+              </div>
+            </div>
+          </div>
+          <div class="resume-toggle-row" id="resumeToggleRow" style="display:none">
+            <input type="checkbox" class="resume-toggle" id="resumeDownloadToggle" onchange="saveResumeSettings()" checked />
+            <label for="resumeDownloadToggle">Allow visitors to download</label>
           </div>
         </div>
 
@@ -1172,28 +1183,13 @@
 
       setDate();
       await loadProfile();
-      showWelcomeBanner();
+
       await renderPickSix();
       await renderCandids();
       await renderMyQ();
       renderFeed();
     }
 
-    function showWelcomeBanner() {
-      const dismissed = localStorage.getItem(`pm_welcome_dismissed_${currentUser.id}`);
-      if (dismissed) return;
-      const name = document.getElementById('profileName').textContent.split(' ')[0];
-      document.getElementById('wbName').textContent = name || 'friend';
-      document.getElementById('welcomeBanner').classList.add('visible');
-    }
-
-    function dismissWelcome() {
-      localStorage.setItem(`pm_welcome_dismissed_${currentUser.id}`, '1');
-      const banner = document.getElementById('welcomeBanner');
-      banner.style.transition = 'opacity 0.3s ease';
-      banner.style.opacity = '0';
-      setTimeout(() => banner.classList.remove('visible'), 300);
-    }
 
     function setDate() {
       const now = new Date();
@@ -1207,7 +1203,7 @@
     // ── Profile (Supabase) ──
     async function loadProfile() {
       const { data: profile } = await sb.from('profiles')
-        .select('full_name, handle, bio, avatar_url, city, hood, relationship_status, last_update, stamp, candids_label')
+        .select('full_name, handle, bio, avatar_url, city, hood, relationship_status, last_update, stamp, candids_label, resume_url, resume_downloadable, custom_fields')
         .eq('id', currentUser.id).single();
 
       const fallback = currentUser.user_metadata?.full_name || currentUser.email.split('@')[0];
@@ -1250,6 +1246,9 @@
 
       // Candids label
       if (profile?.candids_label) document.getElementById('candidsTitle').textContent = profile.candids_label;
+
+      // Resume
+      renderResume(profile?.resume_url || null, profile?.resume_downloadable !== false);
     }
 
     function setMeta(id, val) {
@@ -1953,6 +1952,70 @@
       const d = new Date(ts);
       const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
       return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+    }
+
+    // ── Resume ──
+    let currentResumeUrl = null;
+
+    function renderResume(url, downloadable) {
+      currentResumeUrl = url;
+      const empty = document.getElementById('resumeEmpty');
+      const fileRow = document.getElementById('resumeFileRow');
+      const toggleRow = document.getElementById('resumeToggleRow');
+      const dlBtn = document.getElementById('resumeDlBtn');
+      const toggle = document.getElementById('resumeDownloadToggle');
+      if (url) {
+        empty.style.display = 'none';
+        fileRow.style.display = 'flex';
+        toggleRow.style.display = 'flex';
+        toggle.checked = downloadable;
+        dlBtn.style.display = downloadable ? '' : 'none';
+      } else {
+        empty.style.display = '';
+        fileRow.style.display = 'none';
+        toggleRow.style.display = 'none';
+      }
+    }
+
+    async function uploadResume(input) {
+      const file = input.files[0];
+      if (!file) return;
+      input.value = '';
+      const path = `${currentUser.id}/resume.pdf`;
+      const { error: upErr } = await sb.storage.from('resumes').upload(path, file, { upsert: true, contentType: 'application/pdf' });
+      if (upErr) { alert('Resume upload failed: ' + upErr.message); return; }
+      const { data } = sb.storage.from('resumes').getPublicUrl(path);
+      const url = data.publicUrl;
+      const downloadable = document.getElementById('resumeDownloadToggle').checked;
+      await sb.from('profiles').upsert({ id: currentUser.id, resume_url: url, resume_downloadable: downloadable }, { onConflict: 'id' });
+      renderResume(url, downloadable);
+    }
+
+    async function saveResumeSettings() {
+      if (!currentResumeUrl) return;
+      const downloadable = document.getElementById('resumeDownloadToggle').checked;
+      document.getElementById('resumeDlBtn').style.display = downloadable ? '' : 'none';
+      await sb.from('profiles').upsert({ id: currentUser.id, resume_downloadable: downloadable }, { onConflict: 'id' });
+    }
+
+    function viewResume() {
+      if (currentResumeUrl) window.open(currentResumeUrl, '_blank');
+    }
+
+    function downloadResume() {
+      if (!currentResumeUrl) return;
+      const a = document.createElement('a');
+      a.href = currentResumeUrl;
+      a.download = 'resume.pdf';
+      a.click();
+    }
+
+    async function removeResume() {
+      if (!confirm('Remove your resume?')) return;
+      const path = `${currentUser.id}/resume.pdf`;
+      await sb.storage.from('resumes').remove([path]);
+      await sb.from('profiles').upsert({ id: currentUser.id, resume_url: null }, { onConflict: 'id' });
+      renderResume(null, true);
     }
 
     // Cmd/Ctrl + Enter to post
