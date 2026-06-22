@@ -238,8 +238,8 @@
 
     document.title = username + (currentRoom ? '/' + currentRoom : '') + ' — Postmarq';
 
-    // 1. Fetch post data first
-    const { data: post, error } = await sb.from('posts').select('*').eq('username', username).single();
+    // 1. Fetch page data
+    const { data: post, error } = await sb.from('pages').select('*').eq('username', username).single();
     if (error || !post) { showNotFound(); return; }
     postData = post;
 
@@ -275,7 +275,7 @@
       window.location.replace('/home');
       return;
     } else {
-      const { data: myPost } = await sb.from('posts').select('username').eq('user_id', session.user.id).single();
+      const { data: myPost } = await sb.from('pages').select('username').eq('user_id', session.user.id).single();
       document.getElementById('visitor-bar').classList.add('visible');
       document.getElementById('visitorUsername').textContent = myPost?.username || session.user.email;
       const myPostLink = document.getElementById('myPostLink');
