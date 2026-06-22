@@ -542,12 +542,12 @@
       const js   = document.getElementById('code-js').value;
 
       const { error } = await sb
-        .from('posts')
-        .upsert({ user_id: currentUser.id, username: postUsername, html, css, js }, { onConflict: 'user_id' });
+        .from('pages')
+        .upsert({ user_id: currentUser.id, username: postUsername, html, css, js, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
 
       if (error) {
         setStatus('error', 'Save failed');
-        console.error(error);
+        alert('Save error: ' + error.message + ' | code: ' + error.code);
       } else {
         setStatus('saved', 'Saved');
         isDirty = false;
@@ -628,7 +628,7 @@
       document.getElementById('previewLink').href = `https://postmarq.org/${postUsername}`;
 
       // Load existing post content
-      const { data: post } = await sb.from('posts')
+      const { data: post } = await sb.from('pages')
         .select('html, css, js')
         .eq('user_id', currentUser.id)
         .single();
