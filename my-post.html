@@ -541,6 +541,29 @@
     .candids-empty i { font-size: 2rem; opacity: 0.3; }
 
 
+    /* ── Biz Card Modal ── */
+    .bizcard-overlay { display:none; position:fixed; inset:0; z-index:600; background:rgba(20,10,40,0.55); backdrop-filter:blur(6px); align-items:center; justify-content:center; }
+    .bizcard-overlay.open { display:flex; }
+    .bizcard-modal { background:#1e1a2e; border-radius:18px; width:100%; max-width:360px; overflow:hidden; box-shadow:0 24px 64px rgba(0,0,0,0.45); }
+    .bizcard-header { display:flex; align-items:center; justify-content:space-between; padding:0.8rem 1rem; background:rgba(155,143,212,0.15); border-bottom:1px solid rgba(255,255,255,0.08); }
+    .bizcard-header-title { font-size:0.82rem; font-weight:800; color:#fff; display:flex; align-items:center; gap:0.4rem; }
+    .bizcard-close { background:none; border:none; color:rgba(255,255,255,0.5); font-size:1.1rem; cursor:pointer; }
+    .bizcard-close:hover { color:#fff; }
+    .bizcard-img-wrap { padding:1.25rem 1.25rem 0.75rem; }
+    .bizcard-img-wrap img { width:100%; border-radius:10px; display:block; box-shadow:0 8px 32px rgba(0,0,0,0.35); }
+    .bizcard-actions { display:flex; flex-direction:column; gap:0.5rem; padding:0.75rem 1.25rem 1.25rem; }
+    .bizcard-btn { display:flex; align-items:center; justify-content:center; gap:0.45rem; padding:0.55rem 1rem; border-radius:10px; font-size:0.78rem; font-weight:700; cursor:pointer; font-family:var(--font); border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.85); transition:opacity 0.15s, transform 0.15s; }
+    .bizcard-btn:hover { opacity:0.85; transform:translateY(-1px); }
+    .bizcard-btn-rolodex { background:rgba(155,143,212,0.18); border-color:rgba(155,143,212,0.35); color:var(--lavender); }
+    .bizcard-btn-rolodex.saved { background:rgba(74,181,170,0.18); color:var(--teal); border-color:rgba(74,181,170,0.35); }
+    .bizcard-btn-block { background:rgba(180,40,40,0.15); border-color:rgba(180,40,40,0.3); color:#e07070; }
+
+    /* ── Message Modal ── */
+    .msg-sent-state { text-align:center; padding:1.5rem 0 0.5rem; }
+    .msg-sent-icon { font-size:2.5rem; margin-bottom:0.5rem; }
+    .msg-sent-title { font-size:1rem; font-weight:800; color:var(--ink); margin-bottom:0.3rem; }
+    .msg-sent-sub { font-size:0.75rem; color:var(--ink-3); }
+
     /* ── Generic Modal ── */
     .modal-overlay {
       display: none; position: fixed; inset: 0; z-index: 500;
@@ -758,14 +781,14 @@
           <div class="ms-divider"></div>
 
           <!-- Contacting -->
-          <div class="ms-contact-header" id="contactHeader">Contacting You</div>
+          <div class="ms-contact-header" id="contactHeader">Contacting Dave</div>
           <div class="ms-contact-grid">
-            <a class="ms-contact-item" href="#"><i class="ti ti-mail"></i> Send Message</a>
-            <a class="ms-contact-item" href="#"><i class="ti ti-share"></i> Forward to Friend</a>
-            <a class="ms-contact-item" href="#"><i class="ti ti-user-plus"></i> Add to Friends</a>
-            <a class="ms-contact-item" href="#"><i class="ti ti-heart"></i> Add to Favorites</a>
-            <a class="ms-contact-item" href="#"><i class="ti ti-message-circle"></i> IM / Call</a>
-            <a class="ms-contact-item" href="#"><i class="ti ti-ban"></i> Block User</a>
+            <a class="ms-contact-item" href="#" onclick="openMessageModal();return false;"><i class="ti ti-mail"></i> Send Message</a>
+            <a class="ms-contact-item" href="lounge.html"><i class="ti ti-sofa"></i> Lounge</a>
+            <a class="ms-contact-item" href="#" onclick="alert('Coming soon');return false;"><i class="ti ti-user-plus"></i> Add to Friends</a>
+            <a class="ms-contact-item" href="#" onclick="openBizCard();return false;"><i class="ti ti-id-badge-2"></i> My Business Card</a>
+            <a class="ms-contact-item" href="#" onclick="alert('Coming soon');return false;"><i class="ti ti-send"></i> Send Invite</a>
+            <a class="ms-contact-item" href="#" onclick="alert('Coming soon');return false;"><i class="ti ti-ban"></i> Block User</a>
           </div>
 
         </div><!-- /myspace-card -->
@@ -946,6 +969,50 @@
     </div><!-- /main-grid -->
   </div><!-- /zone-feed -->
 
+
+  <!-- ── Biz Card Modal ── -->
+  <div class="bizcard-overlay" id="bizcardOverlay">
+    <div class="bizcard-modal">
+      <div class="bizcard-header">
+        <div class="bizcard-header-title"><i class="ti ti-id-badge-2"></i> Dave M. Contreras</div>
+        <button class="bizcard-close" onclick="closeBizCard()">✕</button>
+      </div>
+      <div class="bizcard-img-wrap">
+        <img src="Biz card_v1.png" alt="Dave Contreras Business Card" />
+      </div>
+      <div class="bizcard-actions">
+        <button class="bizcard-btn bizcard-btn-rolodex" id="bizcardRolodexBtn" onclick="bizcardAddRolodex()">
+          <i class="ti ti-address-book"></i> Add to My Rolodex
+        </button>
+        <button class="bizcard-btn bizcard-btn-block" onclick="bizcardBlock()">
+          <i class="ti ti-ban"></i> Block — stop messages from this user
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Send Message Modal ── -->
+  <div class="modal-overlay" id="messageModal">
+    <div class="modal-box">
+      <div id="msgFormState">
+        <h3>Send Dave a Message</h3>
+        <label class="modal-label" for="msgBody">Your message</label>
+        <textarea class="modal-textarea" id="msgBody" maxlength="500" placeholder="What's on your mind?"></textarea>
+        <div class="modal-actions">
+          <button class="btn-cancel" onclick="closeModal('messageModal')">Cancel</button>
+          <button class="btn-save" onclick="sendMessage()">Send</button>
+        </div>
+      </div>
+      <div id="msgSentState" class="msg-sent-state" style="display:none">
+        <div class="msg-sent-icon">✉️</div>
+        <div class="msg-sent-title">Message sent!</div>
+        <div class="msg-sent-sub">Dave will see it when he checks in.</div>
+        <div class="modal-actions" style="justify-content:center; margin-top:1rem">
+          <button class="btn-save" onclick="closeModal('messageModal')">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ── Avatar Crop Modal ── -->
   <div class="modal-overlay" id="cropModal">
@@ -1885,6 +1952,68 @@
       return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
     }
 
+
+    // ── Biz Card ──
+    function openBizCard() {
+      const inRolodex = localStorage.getItem('pm_bizcard_rolodex') === '1';
+      const btn = document.getElementById('bizcardRolodexBtn');
+      btn.textContent = inRolodex ? '✓ In your Rolodex' : '＋ Add to My Rolodex';
+      btn.classList.toggle('saved', inRolodex);
+      document.getElementById('bizcardOverlay').classList.add('open');
+    }
+
+    function closeBizCard() {
+      document.getElementById('bizcardOverlay').classList.remove('open');
+    }
+
+    function bizcardAddRolodex() {
+      localStorage.setItem('pm_bizcard_rolodex', '1');
+      const btn = document.getElementById('bizcardRolodexBtn');
+      btn.innerHTML = '<i class="ti ti-check"></i> In your Rolodex';
+      btn.classList.add('saved');
+    }
+
+    function bizcardBlock() {
+      if (confirm('Block Dave from sending you messages?')) {
+        localStorage.setItem('pm_bizcard_blocked', '1');
+        closeBizCard();
+        alert('Blocked. Dave can no longer message you.');
+      }
+    }
+
+    document.getElementById('bizcardOverlay').addEventListener('click', e => {
+      if (e.target === document.getElementById('bizcardOverlay')) closeBizCard();
+    });
+
+    // ── Send Message ──
+    function openMessageModal() {
+      if (!currentUser) { alert('You need to be logged in to send a message.'); return; }
+      document.getElementById('msgBody').value = '';
+      document.getElementById('msgFormState').style.display = '';
+      document.getElementById('msgSentState').style.display = 'none';
+      openModal('messageModal');
+    }
+
+    async function sendMessage() {
+      const body = document.getElementById('msgBody').value.trim();
+      if (!body) return;
+
+      const { data: dave } = await sb.from('profiles')
+        .select('id').eq('handle', 'davemichael.postmarq').single();
+
+      if (!dave) { alert('Could not find recipient.'); return; }
+
+      const { error } = await sb.from('messages').insert({
+        from_user_id: currentUser.id,
+        to_user_id: dave.id,
+        from_name: document.getElementById('profileName').textContent,
+        body
+      });
+
+      if (error) { alert('Failed to send: ' + error.message); return; }
+      document.getElementById('msgFormState').style.display = 'none';
+      document.getElementById('msgSentState').style.display = '';
+    }
 
     // Cmd/Ctrl + Enter to post
     document.addEventListener('keydown', e => {
