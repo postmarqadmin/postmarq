@@ -68,6 +68,61 @@
     }
     .site-banner-logo { font-size: 1.25rem; font-weight: 900; color: rgba(255,255,255,0.97); letter-spacing: -0.5px; }
     .site-banner-nav { display: flex; align-items: center; gap: 1.5rem; }
+
+    /* Inbox bell */
+    .inbox-bell-btn {
+      position: relative; background: none; border: none; cursor: pointer;
+      color: rgba(255,255,255,0.82); font-size: 1.1rem; display: flex; align-items: center;
+      padding: 0; transition: color 0.15s;
+    }
+    .inbox-bell-btn:hover { color: #fff; }
+    .inbox-badge {
+      position: absolute; top: -5px; right: -7px;
+      background: #e8992a; color: #fff;
+      font-size: 0.55rem; font-weight: 900; line-height: 1;
+      padding: 2px 4px; border-radius: 99px; min-width: 14px; text-align: center;
+      display: none;
+    }
+    .inbox-badge.has-items { display: block; }
+
+    /* Inbox panel */
+    .inbox-panel {
+      display: none; position: fixed; top: 44px; right: 0; z-index: 300;
+      width: 340px; max-height: calc(100vh - 60px);
+      background: #fef3d8; border-left: 1px solid rgba(155,143,212,0.3);
+      border-bottom: 1px solid rgba(155,143,212,0.3); border-radius: 0 0 0 16px;
+      box-shadow: -4px 8px 32px rgba(80,60,140,0.18);
+      overflow-y: auto; flex-direction: column;
+    }
+    .inbox-panel.open { display: flex; }
+    .inbox-panel-header {
+      padding: 0.9rem 1rem 0.6rem; font-size: 0.78rem; font-weight: 900;
+      color: var(--ink); border-bottom: 1px solid rgba(155,143,212,0.2);
+      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+    }
+    .inbox-panel-close { background: none; border: none; cursor: pointer; font-size: 1rem; color: var(--ink-3); }
+    .inbox-section-label {
+      font-size: 0.58rem; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--lavender); padding: 0.65rem 1rem 0.25rem;
+    }
+    .inbox-item {
+      padding: 0.6rem 1rem; border-bottom: 1px solid rgba(155,143,212,0.12);
+      display: flex; flex-direction: column; gap: 0.2rem;
+    }
+    .inbox-item:last-child { border-bottom: none; }
+    .inbox-item-from { font-size: 0.72rem; font-weight: 800; color: var(--ink); }
+    .inbox-item-body { font-size: 0.7rem; color: var(--ink-2); line-height: 1.45; }
+    .inbox-item-time { font-size: 0.6rem; color: var(--ink-4); }
+    .inbox-item-actions { display: flex; gap: 0.4rem; margin-top: 0.3rem; }
+    .inbox-action-btn {
+      font-size: 0.62rem; font-weight: 700; padding: 0.18rem 0.5rem; border-radius: 6px;
+      border: none; cursor: pointer; font-family: var(--font); transition: opacity 0.15s;
+    }
+    .inbox-action-btn:hover { opacity: 0.8; }
+    .inbox-btn-accept { background: var(--teal); color: white; }
+    .inbox-btn-decline { background: rgba(0,0,0,0.1); color: var(--ink-3); }
+    .inbox-empty { font-size: 0.72rem; color: var(--ink-4); font-style: italic; padding: 0.6rem 1rem 0.8rem; }
+
     .site-banner-nav a {
       font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.82);
       text-decoration: none; letter-spacing: 0.04em; text-transform: lowercase; transition: color 0.14s;
@@ -706,8 +761,22 @@
       <a href="#" onclick="alert('Coming soon')">townsquare</a>
       <a href="#" onclick="alert('Coming soon')">neighborhood</a>
       <a href="edit.html" style="background:linear-gradient(135deg,rgba(155,143,212,0.9),rgba(74,181,170,0.9));color:#fff;padding:0.28rem 0.85rem;border-radius:999px;font-weight:800;letter-spacing:0.02em;">✏️ Edit My Post</a>
+      <button class="inbox-bell-btn" id="inboxBellBtn" style="display:none" onclick="toggleInbox()">
+        <i class="ti ti-bell"></i>
+        <span class="inbox-badge" id="inboxBadge"></span>
+      </button>
       <a href="#" id="logoutBtn">logout</a>
     </nav>
+  </div>
+
+  <!-- Inbox Panel -->
+  <div class="inbox-panel" id="inboxPanel">
+    <div class="inbox-panel-header">
+      <span>Inbox</span>
+      <button class="inbox-panel-close" onclick="toggleInbox()">✕</button>
+    </div>
+    <div id="inboxMessages"></div>
+    <div id="inboxRequests"></div>
   </div>
 
   <div class="zone-feed">
@@ -1213,6 +1282,7 @@
       await renderCandids();
       await renderMyQ();
       renderFeed();
+      loadInbox();
     }
 
 
@@ -1977,6 +2047,71 @@
       return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
     }
 
+
+    // ── Inbox ──
+    let inboxOpen = false;
+
+    async function loadInbox() {
+      const bell = document.getElementById('inboxBellBtn');
+      const badge = document.getElementById('inboxBadge');
+      bell.style.display = '';
+
+      const [{ data: messages }, { data: requests }] = await Promise.all([
+        sb.from('messages').select('*').eq('to_user_id', currentUser.id).order('created_at', { ascending: false }),
+        sb.from('friend_requests').select('*, profiles:from_user_id(full_name, handle)').eq('to_user_id', currentUser.id).eq('status', 'pending').order('created_at', { ascending: false })
+      ]);
+
+      const total = (messages?.length || 0) + (requests?.length || 0);
+      badge.textContent = total;
+      badge.classList.toggle('has-items', total > 0);
+
+      renderInboxMessages(messages || []);
+      renderInboxRequests(requests || []);
+    }
+
+    function renderInboxMessages(messages) {
+      const el = document.getElementById('inboxMessages');
+      if (!messages.length) {
+        el.innerHTML = '<div class="inbox-section-label">Messages</div><div class="inbox-empty">No messages yet.</div>';
+        return;
+      }
+      el.innerHTML = '<div class="inbox-section-label">Messages</div>' + messages.map(m => `
+        <div class="inbox-item">
+          <div class="inbox-item-from">${m.from_name || 'Someone'}</div>
+          <div class="inbox-item-body">${m.body}</div>
+          <div class="inbox-item-time">${new Date(m.created_at).toLocaleDateString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })}</div>
+        </div>`).join('');
+    }
+
+    function renderInboxRequests(requests) {
+      const el = document.getElementById('inboxRequests');
+      if (!requests.length) {
+        el.innerHTML = '<div class="inbox-section-label">Friend Requests</div><div class="inbox-empty">No pending requests.</div>';
+        return;
+      }
+      el.innerHTML = '<div class="inbox-section-label">Friend Requests</div>' + requests.map(r => `
+        <div class="inbox-item" id="req-${r.id}">
+          <div class="inbox-item-from">${r.profiles?.full_name || r.profiles?.handle || 'Someone'}</div>
+          <div class="inbox-item-body">wants to add you as a friend</div>
+          <div class="inbox-item-time">${new Date(r.created_at).toLocaleDateString('en-US', { month:'short', day:'numeric' })}</div>
+          <div class="inbox-item-actions">
+            <button class="inbox-action-btn inbox-btn-accept" onclick="respondFriendRequest('${r.id}', 'accepted')">Accept</button>
+            <button class="inbox-action-btn inbox-btn-decline" onclick="respondFriendRequest('${r.id}', 'declined')">Decline</button>
+          </div>
+        </div>`).join('');
+    }
+
+    async function respondFriendRequest(id, status) {
+      await sb.from('friend_requests').update({ status }).eq('id', id);
+      const el = document.getElementById('req-' + id);
+      if (el) el.innerHTML = `<div class="inbox-item-body" style="color:var(--teal);font-weight:700">${status === 'accepted' ? '✓ Accepted' : 'Declined'}</div>`;
+      await loadInbox();
+    }
+
+    function toggleInbox() {
+      inboxOpen = !inboxOpen;
+      document.getElementById('inboxPanel').classList.toggle('open', inboxOpen);
+    }
 
     // ── Add to Friends ──
     async function sendFriendRequest() {
