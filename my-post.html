@@ -2197,7 +2197,6 @@
 
     function renderNowPlaying(el, widget) {
       const d = widget.data || {};
-      const isOwner = currentUser && profileData?.id === currentUser.id;
       const statusLabel = { playing: 'Now Playing', looping: 'On Repeat', paused: 'Paused' }[d.status] || 'Now Playing';
       const pipClass = d.status === 'paused' ? 'paused' : d.status === 'looping' ? 'looping' : '';
 
@@ -2207,7 +2206,7 @@
           <div class="np-info">
             <span class="np-empty">Nothing playing yet.</span>
           </div>
-          ${isOwner ? `<button class="np-edit-btn" onclick="openNpModal('${widget.id}')">Edit</button>` : ''}
+          <button class="np-edit-btn" onclick="openNpModal('${widget.id}')">Edit</button>
         </div>`;
         return;
       }
@@ -2231,7 +2230,7 @@
           ${d.artist ? `<div class="np-artist">${d.artist}</div>` : ''}
           ${d.album ? `<div class="np-album">${d.album}</div>` : ''}
         </div>
-        ${isOwner ? `<button class="np-edit-btn" onclick="openNpModal('${widget.id}')">Edit</button>` : ''}
+        <button class="np-edit-btn" onclick="openNpModal('${widget.id}')">Edit</button>
       </div>`;
     }
 
