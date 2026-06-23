@@ -2517,7 +2517,6 @@
 
     async function submitPost() {
       const text = document.getElementById('composerText').value.trim();
-      console.log('[submitPost] called, text:', text, 'currentUser:', currentUser?.id);
       if (!text && !mediaFiles.length) return;
 
       if (!currentUser) { alert('Not logged in — please refresh.'); return; }
@@ -2615,7 +2614,7 @@
     }
 
     async function loadPosts() {
-      let query = sb.from('posts').select('id, user_id, body, media, created_at');
+      let query = sb.from('posts').select('id, user_id, body, media, created_at, stamps(count), profiles:user_id(full_name, avatar_url)');
 
       if (feedPrefs.audience === 'me') {
         query = query.eq('user_id', currentUser.id);
@@ -2630,7 +2629,6 @@
       }
 
       const { data: posts, error: fetchError } = await query.order('created_at', { ascending: false }).limit(50);
-      if (fetchError) console.error('[loadPosts] error:', fetchError.message, fetchError.details, fetchError.hint);
       cachedPosts = posts || [];
 
       const key = `${localKey}_feedFetchedAt`;
@@ -2695,7 +2693,6 @@
         feed.innerHTML = `<div class="glass" style="border-radius:var(--radius-lg)"><div class="empty-state"><div class="empty-icon">⚠️</div><div>Feed error: ${e.message}</div></div></div>`;
         return;
       }
-      console.log('[renderFeed] cachedPosts count:', cachedPosts.length);
       weeklyRendered = false;
 
       if (!cachedPosts.length) {
