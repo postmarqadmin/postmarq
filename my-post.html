@@ -128,6 +128,20 @@
       text-decoration: none; letter-spacing: 0.04em; text-transform: lowercase; transition: color 0.14s;
     }
     .site-banner-nav a:hover { color: #fff; }
+    .edit-post-btn {
+      background: #080d1e;
+      border: 1.5px solid #1a3aff;
+      box-shadow: 0 0 10px rgba(26,58,255,0.45), 0 0 22px rgba(0,194,255,0.2);
+      color: #a8c4ff !important; padding: 0.28rem 0.85rem;
+      border-radius: 8px; font-weight: 800; font-size: 0.75rem;
+      letter-spacing: 0.02em; white-space: nowrap; transition: box-shadow 0.2s;
+    }
+    .edit-post-btn:hover {
+      box-shadow: 0 0 18px rgba(26,58,255,0.7), 0 0 36px rgba(0,194,255,0.3);
+    }
+    @media (max-width: 699px) {
+      .edit-post-btn { font-size: 0.68rem; padding: 0.22rem 0.6rem; }
+    }
 
     /* ── Main Grid ── */
     .zone-feed { max-width: 1400px; margin: 1.25rem auto 0; padding: 0 1.25rem; }
@@ -611,6 +625,7 @@
     }
     .sites-card-wrap {
       border-radius: 15px; padding: 1.5px; position: relative;
+      width: 100%;
       background: conic-gradient(from var(--angle, 0deg), #1a3aff, #00c2ff, #a259ff, #ff6b35, #1a3aff);
       animation: sites-glow-spin 4s linear infinite;
       box-shadow: 0 0 28px rgba(26,58,255,0.35), 0 0 56px rgba(0,194,255,0.18);
@@ -864,7 +879,7 @@
       <a href="my-post.html">home</a>
       <a href="#" onclick="alert('Coming soon')">townsquare</a>
       <a href="#" onclick="alert('Coming soon')">neighborhood</a>
-      <a href="edit.html" style="background:linear-gradient(135deg,rgba(155,143,212,0.9),rgba(74,181,170,0.9));color:#fff;padding:0.28rem 0.85rem;border-radius:999px;font-weight:800;letter-spacing:0.02em;">✏️ Edit My Post</a>
+      <a href="edit.html" class="edit-post-btn">Edit My Post</a>
       <button class="inbox-bell-btn" id="inboxBellBtn" style="display:none" onclick="toggleInbox()">
         <i class="ti ti-bell"></i>
         <span class="inbox-badge" id="inboxBadge"></span>
