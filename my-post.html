@@ -2097,7 +2097,27 @@
 
       // Action button per type
       let actionHtml = '';
-      if (item.key === 'my-sites') actionHtml = `<button class="widget-card-action" onclick="createNewSite()">+ New</button>`;
+      // My Sites gets its own dark sapphire shell
+      if (item.key === 'my-sites') {
+        card.className = 'widget-card widget-card--sites';
+        card.innerHTML = `
+          <div class="sites-card-wrap">
+            <div class="sites-card">
+              <div class="sites-header">
+                <span class="widget-drag-handle" style="color:rgba(255,255,255,0.25);margin-right:0.4rem">&#8942;&#8942;</span>
+                <div class="sites-title">My Sites</div>
+                <button class="sites-add-btn" onclick="createNewSite()">+ New</button>
+                <button class="widget-card-remove" style="color:rgba(255,255,255,0.25);margin-left:0.5rem" onclick="hideWidgetCard('${item.key}')">Remove</button>
+              </div>
+              <div class="sites-list" id="sitesList">
+                <div class="sites-empty" id="sitesEmpty">No sites yet. Create one to get started.</div>
+              </div>
+            </div>
+          </div>`;
+        loadSites();
+        return card;
+      }
+
       if (item.key === 'pick-six') actionHtml = `<button class="widget-card-action" onclick="editPickSix()">Edit</button>`;
       if (item.key === 'candids')  actionHtml = `<button class="widget-card-action" onclick="document.getElementById('candidsInput').click()">+ Add</button>`;
 
@@ -2142,8 +2162,12 @@
           </div>`;
         if (typeof renderCandids === 'function') renderCandids();
       } else if (item.widget) {
-        el.innerHTML = `<div id="widget-render-${item.widget.id}"></div>`;
-        renderWidgetContent(item.widget);
+        const inner = document.createElement('div');
+        inner.id = `widget-render-${item.widget.id}`;
+        el.appendChild(inner);
+        // render directly into the element (not yet in DOM, so getElementById won't find it)
+        if (item.widget.widget_type === 'movie-shelf') renderMovieShelf(inner, item.widget);
+        if (item.widget.widget_type === 'now-playing') renderNowPlaying(inner, item.widget);
       }
     }
 
