@@ -586,7 +586,12 @@
     }
 
     if (p.stamp) {
-      document.getElementById('stampDisplay').textContent = p.stamp;
+      const stampEl = document.getElementById('stampDisplay');
+      if (p.stamp.startsWith('data:') || p.stamp.startsWith('http')) {
+        stampEl.innerHTML = `<img src="${p.stamp}" />`;
+      } else {
+        stampEl.textContent = p.stamp;
+      }
       document.getElementById('stampRow').style.display = '';
       document.getElementById('stampDivider').style.display = '';
     }
