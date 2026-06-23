@@ -169,6 +169,7 @@
 <div id="visitor-bar">
   <span>You're signed in as <strong id="visitorUsername"></strong></span>
   <div class="tb-spacer"></div>
+  <button class="tb-btn" id="loopInBtn" onclick="loopIn()" style="display:none">+ Loop in</button>
   <button class="vb-link" id="myPostLink">Go to my Post</button>
   &nbsp;·&nbsp;
   <button class="vb-link" onclick="signOut()">Sign out</button>
@@ -339,6 +340,36 @@
         myPostLink.style.display = 'none';
       }
       document.body.style.paddingTop = '28px';
+
+      // Check friend request status
+      viewerUserId = session.user.id;
+      profileUserId = post.user_id;
+      const { data: existing } = await sb.from('friend_requests')
+        .select('status')
+        .or(`and(from_user_id.eq.${viewerUserId},to_user_id.eq.${profileUserId}),and(from_user_id.eq.${profileUserId},to_user_id.eq.${viewerUserId})`)
+        .maybeSingle();
+
+      const btn = document.getElementById('loopInBtn');
+      if (!existing) {
+        btn.style.display = '';
+      } else if (existing.status === 'pending') {
+        btn.style.display = ''; btn.textContent = 'Request sent'; btn.disabled = true;
+      } else if (existing.status === 'accepted') {
+        btn.style.display = ''; btn.textContent = '✓ Friends'; btn.disabled = true;
+      }
+    }
+  }
+
+  let viewerUserId = null, profileUserId = null;
+
+  async function loopIn() {
+    const btn = document.getElementById('loopInBtn');
+    btn.disabled = true; btn.textContent = 'Sending…';
+    const { error } = await sb.from('friend_requests').insert({ from_user_id: viewerUserId, to_user_id: profileUserId });
+    if (error?.code === '23505' || !error) {
+      btn.textContent = 'Request sent';
+    } else {
+      btn.textContent = '+ Loop in'; btn.disabled = false;
     }
   }
 
