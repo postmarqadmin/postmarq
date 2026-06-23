@@ -1439,9 +1439,9 @@
 
         <!-- My Pick Six -->
         <div class="pick-six-card">
-          <div class="pick-six-header">
+          <div class="pick-six-header" style="display:flex;justify-content:space-between;align-items:center">
             <div class="pick-six-title">My Friends</div>
-            <div style="font-size:0.68rem;color:var(--ink-3);margin-top:0.2rem;">The six people you actually talk to.</div>
+            <button onclick="editPickSix()" style="font-size:0.68rem;font-weight:700;color:var(--ink-3);background:none;border:none;cursor:pointer;font-family:var(--font);padding:0;transition:color 0.15s" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--ink-3)'">Edit</button>
           </div>
           <div class="pick-six-grid" id="pickSixGrid">
             <!-- Rendered by JS -->
@@ -2303,7 +2303,7 @@
     async function renderPickSix() {
       const { data } = await sb.from('pick_six').select('*').eq('user_id', currentUser.id);
       pickSixSlots = Array(6).fill(null);
-      (data || []).forEach(row => { pickSixSlots[row.slot_index] = { name: row.name, img: row.photo_url, dbId: row.id, profileId: row.profile_id }; });
+      (data || []).forEach(row => { pickSixSlots[row.slot_index] = { name: row.name, img: row.photo_url, dbId: row.id, profileId: row.profile_id, handle: row.handle }; });
       _drawPickSix();
     }
 
@@ -2311,7 +2311,7 @@
       const grid = document.getElementById('pickSixGrid');
       grid.innerHTML = pickSixSlots.map((slot, i) => `
         <div class="pick-six-tile">
-          <div class="pick-six-slot" onclick="pickSixClick(${i})" title="${slot ? 'Change' : 'Add friend'}">
+          <div class="pick-six-slot" id="pslot-${i}" onclick="${slot ? `goToFriend('${slot.handle || ''}')` : `pickSixClick(${i})`}" title="${slot ? 'Visit ' + slot.name : 'Add friend'}" style="cursor:${slot ? 'pointer' : 'pointer'}">
             ${slot?.img ? `<img src="${slot.img}" alt="${slot.name}" />` : '<span class="slot-plus">+</span>'}
           </div>
           <span class="pick-six-name${slot ? '' : ' empty'}">${slot?.name || 'add friend'}</span>
@@ -2383,7 +2383,7 @@
       if (!friend) return;
       closeModal('pickSixModal');
       await sb.from('pick_six').upsert(
-        { user_id: currentUser.id, slot_index: pendingPickSixIdx, name: friend.full_name || friend.handle, photo_url: friend.avatar_url || '', profile_id: friend.id },
+        { user_id: currentUser.id, slot_index: pendingPickSixIdx, name: friend.full_name || friend.handle, photo_url: friend.avatar_url || '', profile_id: friend.id, handle: friend.handle },
         { onConflict: 'user_id,slot_index' }
       );
       await renderPickSix();
@@ -2394,6 +2394,17 @@
       const slot = pickSixSlots[pendingPickSixIdx];
       if (slot?.dbId) await sb.from('pick_six').delete().eq('id', slot.dbId);
       await renderPickSix();
+    }
+
+    function goToFriend(handle) {
+      if (!handle) return;
+      const username = handle.replace('.postmarq', '');
+      window.location.href = '/' + username;
+    }
+
+    function editPickSix() {
+      // Open slot 0 picker as entry point — user can navigate slots from there
+      pickSixClick(pickSixSlots.findIndex(s => !s) !== -1 ? pickSixSlots.findIndex(s => !s) : 0);
     }
 
     // ── Candids title ──
