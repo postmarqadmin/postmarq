@@ -2311,8 +2311,8 @@
       const grid = document.getElementById('pickSixGrid');
       grid.innerHTML = pickSixSlots.map((slot, i) => `
         <div class="pick-six-tile">
-          <div class="pick-six-slot" id="pslot-${i}" onclick="${slot ? `goToFriend('${slot.handle || ''}')` : `pickSixClick(${i})`}" title="${slot ? 'Visit ' + slot.name : 'Add friend'}" style="cursor:${slot ? 'pointer' : 'pointer'}">
-            ${slot?.img ? `<img src="${slot.img}" alt="${slot.name}" />` : '<span class="slot-plus">+</span>'}
+          <div class="pick-six-slot" data-slot="${i}" data-handle="${slot?.handle || ''}" data-filled="${slot ? '1' : '0'}" onclick="pickSixTileClick(this)" title="${slot ? 'Visit ' + (slot.name || '') : 'Add friend'}">
+            ${slot?.img ? `<img src="${slot.img}" alt="${slot.name || ''}" />` : '<span class="slot-plus">+</span>'}
           </div>
           <span class="pick-six-name${slot ? '' : ' empty'}">${slot?.name || 'add friend'}</span>
         </div>
@@ -2396,10 +2396,20 @@
       await renderPickSix();
     }
 
+    function pickSixTileClick(el) {
+      const i = parseInt(el.dataset.slot);
+      const filled = el.dataset.filled === '1';
+      const handle = el.dataset.handle;
+      if (filled && handle) {
+        window.location.href = '/' + handle.replace('.postmarq', '');
+      } else {
+        pickSixClick(i);
+      }
+    }
+
     function goToFriend(handle) {
       if (!handle) return;
-      const username = handle.replace('.postmarq', '');
-      window.location.href = '/' + username;
+      window.location.href = '/' + handle.replace('.postmarq', '');
     }
 
     function editPickSix() {
