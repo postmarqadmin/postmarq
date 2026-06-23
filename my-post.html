@@ -2557,6 +2557,16 @@
       renderFeed();
     }
 
+    async function hidePost(id, btn) {
+      btn.disabled = true;
+      const { error } = await sb.from('hidden_posts').insert({ user_id: currentUser.id, post_id: id });
+      if (!error) {
+        btn.closest('.post-card').remove();
+      } else {
+        btn.disabled = false;
+      }
+    }
+
     async function toggleStamp(btn, id) {
       const wasStamped = btn.classList.contains('stamped');
       btn.classList.toggle('stamped');
@@ -2628,6 +2638,10 @@
         query = query.in('user_id', friendIds);
       }
 
+      const { data: hidden } = await sb.from('hidden_posts').select('post_id').eq('user_id', currentUser.id);
+      const hiddenIds = (hidden || []).map(h => h.post_id);
+      if (hiddenIds.length) query = query.not('id', 'in', `(${hiddenIds.join(',')})`);
+
       const { data: posts, error: fetchError } = await query.order('created_at', { ascending: false }).limit(50);
       cachedPosts = posts || [];
 
@@ -2668,7 +2682,7 @@
             ${avHtml}
             <span class="post-author">${escHtml(name)}</span>
             <span class="post-time">${timeAgo(new Date(p.created_at).getTime())}</span>
-            <button class="post-delete" onclick="deletePost('${p.id}')">✕</button>
+            <button class="post-delete" onclick="${p.user_id === currentUser.id ? `deletePost('${p.id}')` : `hidePost('${p.id}', this)`}" title="${p.user_id === currentUser.id ? 'Delete post' : 'Hide from feed'}">✕</button>
           </div>
           ${p.body ? `<div class="post-body">${escHtml(p.body).replace(/\n/g,'<br>')}</div>` : ''}
           ${mediaHtml}
