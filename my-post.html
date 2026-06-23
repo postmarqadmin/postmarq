@@ -761,31 +761,55 @@
       border-top: 0.5px solid rgba(255,255,255,0.06);
     }
 
-    /* ── Widget Manager ── */
-    .widget-section {
+    /* ── Widget Canvas ── */
+    .widget-canvas { display: flex; flex-direction: column; gap: 1rem; }
+    .widget-card {
       border-radius: 14px; overflow: hidden;
       background: var(--glass-white); backdrop-filter: blur(18px);
       border: 1px solid var(--glass-border);
       box-shadow: var(--glass-shadow), var(--glass-inset);
     }
-    .widget-section-header {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 1.1rem 1.25rem 0.85rem;
+    .widget-card-header {
+      display: flex; align-items: center; gap: 0.55rem;
+      padding: 0.85rem 1.1rem 0.75rem;
       border-bottom: 1px solid rgba(255,255,255,0.4);
+      cursor: default; user-select: none;
     }
-    .widget-section-title { font-size: 0.95rem; font-weight: 900; color: var(--ink); letter-spacing: -0.2px; }
-    .widget-add-btn {
-      background: rgba(155,143,212,0.14); border: 1px solid rgba(155,143,212,0.35);
-      color: var(--lavender); border-radius: 8px; padding: 0.28rem 0.75rem;
-      font-size: 0.7rem; font-weight: 800; cursor: pointer; font-family: var(--font);
-      transition: background 0.15s;
+    .widget-drag-handle {
+      cursor: grab; color: var(--ink-4); font-size: 1.1rem; line-height: 1;
+      flex-shrink: 0; padding: 0 2px;
     }
-    .widget-add-btn:hover { background: rgba(155,143,212,0.28); }
-    .widget-list { display: flex; flex-direction: column; }
-    .widget-empty {
-      padding: 1.5rem 1.25rem; font-size: 0.75rem; color: var(--ink-4);
-      font-style: italic; text-align: center; line-height: 1.6;
+    .widget-drag-handle:active { cursor: grabbing; }
+    .widget-card-title { font-size: 0.88rem; font-weight: 900; color: var(--ink); flex: 1; letter-spacing: -0.2px; }
+    .widget-card-action {
+      background: none; border: 1px solid rgba(155,143,212,0.35);
+      color: var(--lavender); border-radius: 7px; padding: 0.22rem 0.6rem;
+      font-size: 0.68rem; font-weight: 800; cursor: pointer; font-family: var(--font);
+      transition: background 0.15s; flex-shrink: 0;
     }
+    .widget-card-action:hover { background: rgba(155,143,212,0.14); }
+    .widget-card-remove {
+      background: none; border: none; cursor: pointer; flex-shrink: 0;
+      font-size: 0.65rem; font-weight: 700; color: var(--ink-4);
+      font-family: var(--font); padding: 0.2rem 0.45rem;
+      border-radius: 6px; transition: color 0.15s, background 0.15s;
+    }
+    .widget-card-remove:hover { color: #c83030; background: rgba(200,48,48,0.07); }
+    .widget-card-body { padding: 1rem 1.1rem; }
+    .widget-card-body--flush { padding: 0; }
+    .sortable-ghost { opacity: 0.35; }
+    .sortable-drag { box-shadow: 0 16px 40px rgba(0,0,0,0.22); }
+
+    /* Add widget button at bottom of canvas */
+    .widget-add-fab {
+      width: 100%; padding: 0.7rem;
+      background: rgba(155,143,212,0.07);
+      border: 1.5px dashed rgba(155,143,212,0.35);
+      border-radius: 14px; font-size: 0.78rem; font-weight: 800;
+      color: var(--lavender); cursor: pointer; font-family: var(--font);
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .widget-add-fab:hover { background: rgba(155,143,212,0.16); border-color: rgba(155,143,212,0.6); }
 
     /* Widget Library overlay */
     .widget-library-overlay {
@@ -1393,8 +1417,8 @@
                 oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
               <div class="media-preview-strip" id="mediaPreviews"></div>
               <div class="composer-toolbar">
-                <button class="tool-btn" onclick="document.getElementById('photoInput').click()">📷 Photo</button>
-                <button class="tool-btn" onclick="document.getElementById('videoInput').click()">🎬 Video</button>
+                <button class="tool-btn" onclick="document.getElementById('photoInput').click()">Photo</button>
+                <button class="tool-btn" onclick="document.getElementById('videoInput').click()">Video</button>
                 <div class="composer-spacer"></div>
                 <button class="post-btn" onclick="submitPost()">Post</button>
               </div>
@@ -1479,67 +1503,12 @@
 
 
       <!-- ══ RIGHT COLUMN ══ -->
-      <div class="right-col">
-
-        <!-- My Sites -->
-        <div class="sites-card-wrap">
-          <div class="sites-card">
-            <div class="sites-header">
-              <div class="sites-title">My Sites</div>
-              <button class="sites-add-btn" onclick="createNewSite()">+ New Site</button>
-            </div>
-            <div class="sites-list" id="sitesList">
-              <div class="sites-empty" id="sitesEmpty">No sites yet. Create one to get started.</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Widgets -->
-        <div class="widget-section">
-          <div class="widget-section-header">
-            <div class="widget-section-title">Widgets</div>
-            <button class="widget-add-btn" onclick="openWidgetLibrary()">+ Add Widget</button>
-          </div>
-          <div class="widget-list" id="widgetList">
-            <div class="widget-empty" id="widgetEmpty">No widgets yet. Add one to personalize your profile.</div>
-          </div>
-        </div>
-
-        <!-- My Pick Six -->
-        <div class="pick-six-card">
-          <div class="pick-six-header" style="display:flex;justify-content:space-between;align-items:center">
-            <div class="pick-six-title">My Friends</div>
-            <button onclick="editPickSix()" style="font-size:0.68rem;font-weight:700;color:var(--ink-3);background:none;border:none;cursor:pointer;font-family:var(--font);padding:0;transition:color 0.15s" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--ink-3)'">Edit</button>
-          </div>
-          <div class="pick-six-grid" id="pickSixGrid">
-            <!-- Rendered by JS -->
-          </div>
-        </div>
-
-        <!-- Candids Wall -->
-        <div class="candids-card">
-          <div class="candids-header">
-            <div style="display:flex;align-items:center;gap:0.4rem;">
-              <div class="candids-title" id="candidsTitle">Candids Wall</div>
-              <button onclick="openCandidsRename()" title="Rename" style="background:none;border:none;cursor:pointer;font-size:0.8rem;opacity:0.4;padding:0;line-height:1;color:var(--ink-2);">✏️</button>
-            </div>
-            <button class="candids-add-btn" onclick="document.getElementById('candidsInput').click()">+ Add</button>
-          </div>
-          <input type="file" id="candidsInput" class="file-input" accept="image/*" multiple onchange="addCandids(this)" />
-          <div id="candidsWrap">
-            <div class="candids-empty" id="candidsEmpty">
-              <i class="ti ti-polaroid"></i>
-              <div>Your candids wall is empty.</div>
-              <div style="font-size:0.68rem; opacity:0.6">Real photos from your life. No filters required.</div>
-            </div>
-            <div class="candids-scroll-wrap" id="candidsScrollWrap" style="display:none">
-              <div class="candids-grid" id="candidsGrid"></div>
-            </div>
-          </div>
-        </div>
-
-
+      <div class="right-col widget-canvas" id="widgetCanvas">
+        <!-- populated by renderWidgetCanvas() -->
       </div><!-- /right-col -->
+
+      <!-- hidden file input for candids, lives outside canvas so it persists across re-renders -->
+      <input type="file" id="candidsInput" class="file-input" accept="image/*" multiple onchange="addCandids(this)" />
 
     </div><!-- /main-grid -->
   </div><!-- /zone-feed -->
@@ -1635,7 +1604,7 @@
   <!-- ── Backdrop Layer ── -->
   <div id="backdrop-layer"></div>
   <div id="backdrop-frost"></div>
-  <button id="backdrop-btn" onclick="openBackdropPanel()">🎨 Backdrop</button>
+  <button id="backdrop-btn" onclick="openBackdropPanel()">Backdrop</button>
 
   <!-- ── Backdrop Panel ── -->
   <div id="backdrop-panel">
@@ -1728,7 +1697,7 @@
         </div>
       </div>
       <div id="inviteSentState" class="msg-sent-state" style="display:none">
-        <div class="msg-sent-icon">📬</div>
+        <div class="msg-sent-icon"><i class="ti ti-send"></i></div>
         <div class="msg-sent-title">Invite sent!</div>
         <div class="msg-sent-sub">They'll get an email to join Postmarq.</div>
         <div class="modal-actions" style="justify-content:center;margin-top:1rem">
@@ -1842,6 +1811,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script>
     const { createClient } = supabase;
     const sb = createClient(
@@ -1916,15 +1886,12 @@
       setDate();
       await loadProfile();
 
-      await renderPickSix();
-      await renderCandids();
       await renderMyQ();
       initFeedControls();
       await renderFeed();
       setInterval(updateLastUpdatedLabel, 60000);
       loadInbox();
-      await loadSites();
-      await loadWidgets();
+      await loadWidgets(); // builds canvas → triggers renderPickSix, renderCandids, loadSites
       initLoungeNotifications();
     }
 
@@ -1984,7 +1951,7 @@
             const { data: prof } = await sb.from('profiles').select('full_name').eq('id', msg.from_user_id).single();
             const sender = prof?.full_name || 'Someone';
             const n = new Notification(`${sender} sent you a message`, {
-              body: msg.body || '🖼 GIF',
+              body: msg.body || 'Sent a GIF',
               icon: '/favicon.ico',
               tag: 'lounge-msg',
             });
@@ -2018,7 +1985,7 @@
           </a>
           <div class="site-controls">
             <button class="site-toggle ${r.published ? 'published' : ''}" onclick="togglePublished('${r.room_name}', this)">${r.published ? '● Live' : '○ Private'}</button>
-            <button class="site-edit-btn" onclick="window.location.href='/${currentHandle}/${r.room_name}'">edit ✏️</button>
+            <button class="site-edit-btn" onclick="window.location.href='/${currentHandle}/${r.room_name}'">Edit</button>
           </div>`;
         list.appendChild(row);
       });
@@ -2048,8 +2015,145 @@
     // ── Widget Engine ──────────────────────────────────────────
     let widgetTypes = [];
     let userWidgets = [];
-    let pendingWidgetType = null;
     let editingMshelfWidgetId = null;
+
+    const BUILTIN_SECTIONS = [
+      { key: 'my-sites',  title: 'My Sites'   },
+      { key: 'pick-six',  title: 'My Friends'  },
+      { key: 'candids',   title: 'Candids'     },
+    ];
+
+    function getCanvasLayout() {
+      try { return JSON.parse(localStorage.getItem(`pm_${currentUser.id}_canvas`) || 'null'); } catch { return null; }
+    }
+    function saveCanvasLayout(order, hidden) {
+      localStorage.setItem(`pm_${currentUser.id}_canvas`, JSON.stringify({ order, hidden }));
+    }
+
+    function renderWidgetCanvas() {
+      const canvas = document.getElementById('widgetCanvas');
+
+      // Build master ordered list: built-ins first, then DB widgets
+      const allItems = [
+        ...BUILTIN_SECTIONS.map(s => ({ key: s.key, title: s.title, builtin: true })),
+        ...userWidgets.map(w => ({
+          key: `db-${w.id}`,
+          title: widgetTypes.find(t => t.id === w.widget_type)?.name || w.widget_type,
+          builtin: false,
+          widget: w
+        }))
+      ];
+
+      const layout = getCanvasLayout();
+      const hidden = new Set(layout?.hidden || []);
+
+      let ordered = allItems;
+      if (layout?.order?.length) {
+        const orderMap = new Map(layout.order.map((k, i) => [k, i]));
+        ordered = [...allItems].sort((a, b) => {
+          const ai = orderMap.has(a.key) ? orderMap.get(a.key) : 999;
+          const bi = orderMap.has(b.key) ? orderMap.get(b.key) : 999;
+          return ai - bi;
+        });
+      }
+
+      // Keep existing nodes to avoid re-painting stable cards
+      const existing = new Map([...canvas.querySelectorAll('.widget-card')].map(el => [el.dataset.key, el]));
+      canvas.innerHTML = '';
+
+      ordered.forEach(item => {
+        if (hidden.has(item.key)) return;
+        let card = existing.get(item.key);
+        if (!card) card = buildWidgetCard(item);
+        canvas.appendChild(card);
+      });
+
+      const fab = document.createElement('button');
+      fab.className = 'widget-add-fab';
+      fab.textContent = '+ Add Widget';
+      fab.onclick = openWidgetLibrary;
+      canvas.appendChild(fab);
+
+      if (window.Sortable) {
+        Sortable.create(canvas, {
+          animation: 150,
+          handle: '.widget-drag-handle',
+          filter: '.widget-add-fab',
+          ghostClass: 'sortable-ghost',
+          dragClass: 'sortable-drag',
+          onEnd() {
+            const keys = [...canvas.querySelectorAll('.widget-card')].map(el => el.dataset.key);
+            const l = getCanvasLayout() || {};
+            saveCanvasLayout(keys, l.hidden || []);
+          }
+        });
+      }
+    }
+
+    function buildWidgetCard(item) {
+      const card = document.createElement('div');
+      card.className = 'widget-card';
+      card.dataset.key = item.key;
+
+      // Action button per type
+      let actionHtml = '';
+      if (item.key === 'my-sites') actionHtml = `<button class="widget-card-action" onclick="createNewSite()">+ New</button>`;
+      if (item.key === 'pick-six') actionHtml = `<button class="widget-card-action" onclick="editPickSix()">Edit</button>`;
+      if (item.key === 'candids')  actionHtml = `<button class="widget-card-action" onclick="document.getElementById('candidsInput').click()">+ Add</button>`;
+
+      const bodyFlush = item.key === 'candids' ? ' widget-card-body--flush' : '';
+      const safeKey = item.key.replace(/[^a-z0-9-]/g, '-');
+
+      card.innerHTML = `
+        <div class="widget-card-header">
+          <span class="widget-drag-handle">&#8942;&#8942;</span>
+          <span class="widget-card-title">${item.title}</span>
+          ${actionHtml}
+          <button class="widget-card-remove" onclick="hideWidgetCard('${item.key}')">Remove</button>
+        </div>
+        <div class="widget-card-body${bodyFlush}" id="wbody-${safeKey}"></div>`;
+
+      populateWidgetBody(card.querySelector(`#wbody-${safeKey}`), item);
+      return card;
+    }
+
+    function populateWidgetBody(el, item) {
+      if (!el) return;
+      if (item.key === 'my-sites') {
+        el.innerHTML = `
+          <div class="sites-list" id="sitesList">
+            <div class="sites-empty" id="sitesEmpty">No sites yet. Create one to get started.</div>
+          </div>`;
+        loadSites();
+      } else if (item.key === 'pick-six') {
+        el.innerHTML = `<div class="pick-six-grid" id="pickSixGrid"></div>`;
+        if (typeof renderPickSix === 'function') renderPickSix();
+      } else if (item.key === 'candids') {
+        el.innerHTML = `
+          <div id="candidsWrap">
+            <div class="candids-empty" id="candidsEmpty">
+              <i class="ti ti-polaroid"></i>
+              <div>Your candids wall is empty.</div>
+              <div style="font-size:0.68rem;opacity:0.6">Real photos from your life. No filters required.</div>
+            </div>
+            <div class="candids-scroll-wrap" id="candidsScrollWrap" style="display:none">
+              <div class="candids-grid" id="candidsGrid"></div>
+            </div>
+          </div>`;
+        if (typeof renderCandids === 'function') renderCandids();
+      } else if (item.widget) {
+        el.innerHTML = `<div id="widget-render-${item.widget.id}"></div>`;
+        renderWidgetContent(item.widget);
+      }
+    }
+
+    function hideWidgetCard(key) {
+      const l = getCanvasLayout() || {};
+      const hidden = [...new Set([...(l.hidden || []), key])];
+      const order = [...document.querySelectorAll('#widgetCanvas .widget-card')].map(el => el.dataset.key);
+      saveCanvasLayout(order, hidden);
+      document.querySelector(`#widgetCanvas .widget-card[data-key="${key}"]`)?.remove();
+    }
 
     async function loadWidgets() {
       const [{ data: types }, { data: instances }] = await Promise.all([
@@ -2058,29 +2162,7 @@
       ]);
       widgetTypes = types || [];
       userWidgets = instances || [];
-      renderWidgetList();
-    }
-
-    function renderWidgetList() {
-      const list = document.getElementById('widgetList');
-      const empty = document.getElementById('widgetEmpty');
-      list.querySelectorAll('.widget-row').forEach(el => el.remove());
-      if (!userWidgets.length) { empty.style.display = ''; return; }
-      empty.style.display = 'none';
-      userWidgets.forEach(w => {
-        const row = document.createElement('div');
-        row.className = 'widget-row';
-        row.dataset.id = w.id;
-        const type = widgetTypes.find(t => t.id === w.widget_type);
-        row.innerHTML = `
-          <div class="widget-row-header">
-            <span class="widget-row-name">${type?.icon || '▪'} ${w.label || type?.name || w.widget_type}</span>
-            <button class="widget-row-remove" onclick="removeWidget('${w.id}')">✕ Remove</button>
-          </div>
-          <div id="widget-render-${w.id}"></div>`;
-        list.appendChild(row);
-        renderWidgetContent(w);
-      });
+      renderWidgetCanvas();
     }
 
     function renderWidgetContent(w) {
@@ -2094,11 +2176,37 @@
     function openWidgetLibrary() {
       const grid = document.getElementById('widgetTypeGrid');
       grid.innerHTML = '';
+
+      const layout = getCanvasLayout();
+      const hidden = new Set(layout?.hidden || []);
+
+      // Section for re-adding hidden built-ins
+      const hiddenBuiltins = BUILTIN_SECTIONS.filter(s => hidden.has(s.key));
+      if (hiddenBuiltins.length) {
+        const label = document.createElement('div');
+        label.style.cssText = 'font-size:0.68rem;font-weight:800;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.4rem';
+        label.textContent = 'Hidden Sections';
+        grid.appendChild(label);
+        hiddenBuiltins.forEach(s => {
+          const card = document.createElement('div');
+          card.className = 'widget-type-card';
+          card.innerHTML = `<div class="widget-type-info"><div class="widget-type-name">${s.title}</div><div class="widget-type-desc">Restore this section to your profile.</div></div>`;
+          card.onclick = () => { unhideSection(s.key); closeWidgetLibrary(); };
+          grid.appendChild(card);
+        });
+        const divider = document.createElement('div');
+        divider.style.cssText = 'border-top:1px solid rgba(160,125,96,0.15);margin:0.8rem 0';
+        grid.appendChild(divider);
+        const label2 = document.createElement('div');
+        label2.style.cssText = 'font-size:0.68rem;font-weight:800;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.4rem';
+        label2.textContent = 'Add Widget';
+        grid.appendChild(label2);
+      }
+
       widgetTypes.forEach(t => {
         const card = document.createElement('div');
         card.className = 'widget-type-card';
         card.innerHTML = `
-          <div class="widget-type-icon">${t.icon}</div>
           <div class="widget-type-info">
             <div class="widget-type-name">${t.name}</div>
             <div class="widget-type-desc">${t.description}</div>
@@ -2106,6 +2214,7 @@
         card.onclick = () => addWidget(t.id);
         grid.appendChild(card);
       });
+
       document.getElementById('widgetLibraryOverlay').classList.add('open');
     }
 
@@ -2113,27 +2222,37 @@
       document.getElementById('widgetLibraryOverlay').classList.remove('open');
     }
 
+    function unhideSection(key) {
+      const l = getCanvasLayout() || {};
+      const hidden = (l.hidden || []).filter(k => k !== key);
+      saveCanvasLayout(l.order || [], hidden);
+      renderWidgetCanvas();
+    }
+
     async function addWidget(typeId) {
       closeWidgetLibrary();
       const type = widgetTypes.find(t => t.id === typeId);
+      const defaultData = typeId === 'movie-shelf' ? { items: [] }
+        : typeId === 'now-playing' ? { track: '', artist: '', album: '', status: 'playing', cover_url: '', link: '' }
+        : {};
       const { data, error } = await sb.from('widgets').insert({
-        user_id: currentUser.id,
-        widget_type: typeId,
-        label: type?.name,
-        page: 'profile',
-        position: userWidgets.length,
-        data: typeId === 'movie-shelf' ? { items: [] } : typeId === 'now-playing' ? { track: '', artist: '', album: '', status: 'playing', cover_url: '', link: '' } : {}
+        user_id: currentUser.id, widget_type: typeId, label: type?.name,
+        page: 'profile', position: userWidgets.length, data: defaultData
       }).select().single();
       if (error) { alert('Could not add widget: ' + error.message); return; }
       userWidgets.push(data);
-      renderWidgetList();
+      renderWidgetCanvas();
     }
 
     async function removeWidget(id) {
       if (!confirm('Remove this widget?')) return;
       await sb.from('widgets').delete().eq('id', id);
       userWidgets = userWidgets.filter(w => w.id !== id);
-      renderWidgetList();
+      // Also remove from layout hidden list if it was there
+      const key = `db-${id}`;
+      const l = getCanvasLayout() || {};
+      saveCanvasLayout((l.order || []).filter(k => k !== key), (l.hidden || []).filter(k => k !== key));
+      renderWidgetCanvas();
     }
 
     // ── Movie Shelf renderer ──
@@ -2145,7 +2264,7 @@
         html += `<div class="mshelf-tile" title="${item.title} (${item.year || ''})">
           ${item.poster_url
             ? `<img class="mshelf-poster" src="${item.poster_url}" alt="${item.title}" />`
-            : `<div class="mshelf-poster-empty">🎬</div>`}
+            : `<div class="mshelf-poster-empty"><i class="ti ti-device-tv"></i></div>`}
           ${item.status ? `<span class="mshelf-status ${item.status}">${statusLabel}</span>` : ''}
           <div class="mshelf-title">${item.title}</div>
         </div>`;
@@ -2202,7 +2321,7 @@
 
       if (!d.track) {
         el.innerHTML = `<div class="np-card">
-          <div class="np-cover-empty">🎵</div>
+          <div class="np-cover-empty"><i class="ti ti-music"></i></div>
           <div class="np-info">
             <span class="np-empty">Nothing playing yet.</span>
           </div>
@@ -2213,7 +2332,7 @@
 
       const coverHtml = d.cover_url
         ? `<img class="np-cover" src="${d.cover_url}" alt="album art" />`
-        : `<div class="np-cover-empty">🎵</div>`;
+        : `<div class="np-cover-empty"><i class="ti ti-music"></i></div>`;
 
       const trackHtml = d.link
         ? `<a class="np-track" href="${d.link}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;">${d.track}</a>`
