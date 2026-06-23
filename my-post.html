@@ -908,6 +908,87 @@
       border: 1px solid rgba(160,125,96,0.3); color: var(--ink-3);
     }
 
+    /* ── Backdrop Editor ── */
+    #backdrop-layer {
+      display: none; position: fixed; inset: 0; z-index: 0;
+      background-size: cover; background-position: center;
+      background-attachment: fixed;
+    }
+    #backdrop-layer.visible { display: block; }
+    #backdrop-frost {
+      position: fixed; inset: 0; z-index: 1;
+      backdrop-filter: blur(0px);
+      -webkit-backdrop-filter: blur(0px);
+      background: rgba(255,255,255,0);
+      pointer-events: none;
+    }
+    body.has-backdrop { background: transparent !important; }
+    body.has-backdrop .zone-feed { position: relative; z-index: 2; }
+    body.has-backdrop .site-banner { z-index: 202; }
+
+    #backdrop-btn {
+      display: none; position: fixed; bottom: 52px; right: 14px; z-index: 9999;
+      background: rgba(255,255,255,0.85); backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.9);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+      border-radius: 20px; padding: 0.3rem 0.75rem;
+      font-family: var(--font); font-size: 0.68rem; font-weight: 800;
+      color: var(--ink-2); cursor: pointer; transition: box-shadow 0.15s;
+    }
+    #backdrop-btn.visible { display: block; }
+    #backdrop-btn:hover { box-shadow: 0 4px 18px rgba(0,0,0,0.18); }
+
+    #backdrop-panel {
+      display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 10001;
+      background: rgba(255,255,255,0.96); backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 -8px 40px rgba(0,0,0,0.12);
+      padding: 1.25rem 1.5rem 2rem;
+      border-radius: 20px 20px 0 0;
+      transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.32,0.72,0,1);
+    }
+    #backdrop-panel.open { display: block; transform: translateY(0); }
+    .bdp-handle { width: 36px; height: 4px; border-radius: 2px; background: rgba(0,0,0,0.12); margin: 0 auto 1.1rem; }
+    .bdp-title { font-size: 0.95rem; font-weight: 900; color: var(--ink); margin-bottom: 1.1rem; letter-spacing: -0.2px; }
+    .bdp-row { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
+    .bdp-label { font-size: 0.65rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-3); }
+    .bdp-input {
+      width: 100%; padding: 0.55rem 0.85rem; border-radius: 10px;
+      border: 1px solid rgba(0,0,0,0.12); font-family: var(--font);
+      font-size: 0.82rem; color: var(--ink); background: rgba(255,255,255,0.8);
+      outline: none; transition: border-color 0.15s;
+    }
+    .bdp-input:focus { border-color: rgba(155,143,212,0.6); }
+    .bdp-toggle-row { display: flex; gap: 8px; }
+    .bdp-toggle-btn {
+      flex: 1; padding: 0.45rem; border-radius: 8px; font-family: var(--font);
+      font-size: 0.72rem; font-weight: 700; cursor: pointer; border: 1px solid rgba(0,0,0,0.12);
+      background: rgba(0,0,0,0.04); color: var(--ink-3); transition: all 0.15s;
+    }
+    .bdp-toggle-btn.active {
+      background: var(--ink); color: #fff; border-color: var(--ink);
+    }
+    .bdp-slider-row { display: flex; align-items: center; gap: 0.75rem; }
+    .bdp-slider { flex: 1; accent-color: var(--lavender); }
+    .bdp-slider-val { font-size: 0.72rem; font-weight: 800; color: var(--ink-2); min-width: 28px; text-align: right; }
+    .bdp-actions { display: flex; gap: 0.6rem; margin-top: 0.5rem; }
+    .bdp-save {
+      flex: 1; padding: 0.65rem; border-radius: 12px; font-family: var(--font);
+      font-size: 0.85rem; font-weight: 800; cursor: pointer; border: none;
+      background: var(--ink); color: #fff; transition: opacity 0.15s;
+    }
+    .bdp-save:hover { opacity: 0.85; }
+    .bdp-clear {
+      padding: 0.65rem 1rem; border-radius: 12px; font-family: var(--font);
+      font-size: 0.85rem; cursor: pointer; background: none;
+      border: 1px solid rgba(0,0,0,0.12); color: var(--ink-3);
+    }
+    .bdp-cancel {
+      padding: 0.65rem 1rem; border-radius: 12px; font-family: var(--font);
+      font-size: 0.85rem; cursor: pointer; background: none;
+      border: 1px solid rgba(0,0,0,0.12); color: var(--ink-3);
+    }
+
     /* ── Biz Card Modal ── */
     .bizcard-overlay { display:none; position:fixed; inset:0; z-index:600; background:rgba(20,10,40,0.55); backdrop-filter:blur(6px); align-items:center; justify-content:center; }
     .bizcard-overlay.open { display:flex; }
@@ -1444,6 +1525,41 @@
     </div>
   </div>
 
+  <!-- ── Backdrop Layer ── -->
+  <div id="backdrop-layer"></div>
+  <div id="backdrop-frost"></div>
+  <button id="backdrop-btn" onclick="openBackdropPanel()">🎨 Backdrop</button>
+
+  <!-- ── Backdrop Panel ── -->
+  <div id="backdrop-panel">
+    <div class="bdp-handle"></div>
+    <div class="bdp-title">Background</div>
+    <div class="bdp-row">
+      <div class="bdp-label">Image URL</div>
+      <input class="bdp-input" id="bdpUrl" type="url" placeholder="Paste any image URL…" oninput="previewBackdrop()" />
+    </div>
+    <div class="bdp-row">
+      <div class="bdp-label">Fit</div>
+      <div class="bdp-toggle-row">
+        <button class="bdp-toggle-btn active" id="bdpCoverBtn" onclick="setBackdropFit('cover', this)">Cover</button>
+        <button class="bdp-toggle-btn" id="bdpTileBtn" onclick="setBackdropFit('tile', this)">Tile</button>
+      </div>
+    </div>
+    <div class="bdp-row">
+      <div class="bdp-label">Frost — <span id="bdpBlurLabel">8px</span></div>
+      <div class="bdp-slider-row">
+        <span style="font-size:0.7rem;color:var(--ink-3)">None</span>
+        <input class="bdp-slider" id="bdpBlur" type="range" min="0" max="20" value="8" oninput="previewBackdrop()" />
+        <span style="font-size:0.7rem;color:var(--ink-3)">Max</span>
+      </div>
+    </div>
+    <div class="bdp-actions">
+      <button class="bdp-clear" onclick="clearBackdrop()">Clear</button>
+      <button class="bdp-cancel" onclick="closeBackdropPanel()">Cancel</button>
+      <button class="bdp-save" onclick="saveBackdrop()">Save</button>
+    </div>
+  </div>
+
   <!-- ── Biz Card Modal ── -->
   <div class="bizcard-overlay" id="bizcardOverlay">
     <div class="bizcard-modal">
@@ -1908,8 +2024,11 @@
     // ── Profile (Supabase) ──
     async function loadProfile() {
       const { data: profile } = await sb.from('profiles')
-        .select('full_name, handle, bio, avatar_url, city, hood, relationship_status, last_update, stamp, candids_label, custom_fields')
+        .select('full_name, handle, bio, avatar_url, city, hood, relationship_status, last_update, stamp, candids_label, custom_fields, bg_image_url, bg_blur, bg_repeat')
         .eq('id', currentUser.id).single();
+
+      if (profile?.bg_image_url) applyBackdrop(profile.bg_image_url, profile.bg_blur ?? 8, profile.bg_repeat ?? false);
+      document.getElementById('backdrop-btn').classList.add('visible');
 
       currentHandle = (profile?.handle || '').replace('.postmarq', '');
       const fallback = currentUser.user_metadata?.full_name || currentUser.email.split('@')[0];
@@ -2914,6 +3033,86 @@
     });
 
     init();
+
+    // ── Backdrop Editor ──
+    let bdpFit = 'cover';
+
+    function applyBackdrop(url, blur, repeat) {
+      const layer = document.getElementById('backdrop-layer');
+      const frost = document.getElementById('backdrop-frost');
+      layer.style.backgroundImage = `url('${url}')`;
+      layer.style.backgroundSize = repeat ? 'auto' : 'cover';
+      layer.style.backgroundRepeat = repeat ? 'repeat' : 'no-repeat';
+      layer.classList.add('visible');
+      const blurVal = blur ?? 8;
+      frost.style.backdropFilter = `blur(${blurVal}px)`;
+      frost.style.webkitBackdropFilter = `blur(${blurVal}px)`;
+      frost.style.background = `rgba(255,255,255,${Math.round(blurVal * 0.018 * 100) / 100})`;
+      document.body.classList.add('has-backdrop');
+    }
+
+    function clearBackdropDisplay() {
+      document.getElementById('backdrop-layer').classList.remove('visible');
+      document.getElementById('backdrop-layer').style.backgroundImage = '';
+      const frost = document.getElementById('backdrop-frost');
+      frost.style.backdropFilter = 'blur(0px)';
+      frost.style.webkitBackdropFilter = 'blur(0px)';
+      frost.style.background = 'rgba(255,255,255,0)';
+      document.body.classList.remove('has-backdrop');
+    }
+
+    function openBackdropPanel() {
+      const panel = document.getElementById('backdrop-panel');
+      const layer = document.getElementById('backdrop-layer');
+      document.getElementById('bdpUrl').value = layer.style.backgroundImage.replace(/url\(['"]?(.*?)['"]?\)/, '$1');
+      const frost = document.getElementById('backdrop-frost');
+      const currentBlur = parseInt(frost.style.backdropFilter?.replace(/[^0-9]/g, '') || '8');
+      document.getElementById('bdpBlur').value = currentBlur;
+      document.getElementById('bdpBlurLabel').textContent = currentBlur + 'px';
+      bdpFit = layer.style.backgroundRepeat === 'repeat' ? 'tile' : 'cover';
+      document.getElementById('bdpCoverBtn').classList.toggle('active', bdpFit === 'cover');
+      document.getElementById('bdpTileBtn').classList.toggle('active', bdpFit === 'tile');
+      panel.classList.add('open');
+    }
+
+    function closeBackdropPanel() {
+      document.getElementById('backdrop-panel').classList.remove('open');
+    }
+
+    function setBackdropFit(val, btn) {
+      bdpFit = val;
+      document.getElementById('bdpCoverBtn').classList.toggle('active', val === 'cover');
+      document.getElementById('bdpTileBtn').classList.toggle('active', val === 'tile');
+      previewBackdrop();
+    }
+
+    function previewBackdrop() {
+      const url = document.getElementById('bdpUrl').value.trim();
+      const blur = parseInt(document.getElementById('bdpBlur').value);
+      document.getElementById('bdpBlurLabel').textContent = blur + 'px';
+      if (url) applyBackdrop(url, blur, bdpFit === 'tile');
+      else clearBackdropDisplay();
+    }
+
+    async function saveBackdrop() {
+      const url = document.getElementById('bdpUrl').value.trim();
+      const blur = parseInt(document.getElementById('bdpBlur').value);
+      const repeat = bdpFit === 'tile';
+      const { error } = await sb.from('profiles').upsert({
+        id: currentUser.id, bg_image_url: url || null, bg_blur: blur, bg_repeat: repeat
+      }, { onConflict: 'id' });
+      if (error) { alert('Could not save: ' + error.message); return; }
+      if (url) applyBackdrop(url, blur, repeat);
+      else clearBackdropDisplay();
+      closeBackdropPanel();
+    }
+
+    async function clearBackdrop() {
+      await sb.from('profiles').upsert({ id: currentUser.id, bg_image_url: null }, { onConflict: 'id' });
+      document.getElementById('bdpUrl').value = '';
+      clearBackdropDisplay();
+      closeBackdropPanel();
+    }
   </script>
 </body>
 </html>
