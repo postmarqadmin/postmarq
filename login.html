@@ -398,7 +398,7 @@
 
         <!-- Form -->
         <div class="xp-form-area">
-          <div class="xp-form-title">Sign in to your Post</div>
+          <div class="xp-form-title" id="xpFormTitle">Sign in to your Post</div>
 
           <!-- Sign in form -->
           <form id="loginForm" novalidate>
@@ -452,10 +452,37 @@
             <button class="xp-link" type="button" id="forgotLink" onclick="showReset()">Forgot your password?</button>
           </div>
 
-          <div class="xp-new-account-row">
+          <div class="xp-new-account-row" id="xpNewAccRow">
             <span class="xp-new-account-label">Don't have a Post?</span>
-            <button class="xp-btn" style="min-width:unset;padding:3px 10px;" onclick="window.location.href='playground.html'">Claim your Post...</button>
+            <button class="xp-btn" style="min-width:unset;padding:3px 10px;" onclick="showSignup()">Claim your Post...</button>
           </div>
+
+          <!-- Signup form (hidden by default) -->
+          <form id="signupForm" novalidate style="display:none;">
+            <div style="font-size:12px;font-weight:700;color:#0A246A;margin-bottom:8px;">Create your Post</div>
+            <div style="display:flex;flex-direction:column;gap:0.6rem;">
+              <div class="xp-field">
+                <label class="xp-label" for="signupName">Your name:</label>
+                <input class="xp-input" type="text" id="signupName" autocomplete="name" placeholder="e.g. Dave Michael" />
+              </div>
+              <div class="xp-field">
+                <label class="xp-label" for="signupEmail">Email address:</label>
+                <input class="xp-input" type="email" id="signupEmail" autocomplete="email" />
+              </div>
+              <div class="xp-field">
+                <label class="xp-label" for="signupPass">Password <span style="font-weight:400;color:#666">(8+ characters)</span>:</label>
+                <input class="xp-input" type="password" id="signupPass" autocomplete="new-password" />
+              </div>
+              <div class="xp-error" id="signupError"></div>
+              <div id="signupSuccess" style="display:none;font-size:11px;color:#006600;background:#F0FFF0;border:1px solid #88CC88;padding:3px 6px;">
+                Check your email to confirm, then sign in.
+              </div>
+              <div class="xp-btn-row">
+                <button type="button" class="xp-btn" onclick="showLogin()">&#8592; Back</button>
+                <button type="submit" class="xp-btn-primary" id="signupBtn">Create My Post</button>
+              </div>
+            </div>
+          </form>
 
         </div>
       </div>
@@ -544,17 +571,79 @@
     });
 
     function showReset() {
-      document.getElementById('loginForm').style.display = 'none';
-      document.getElementById('resetForm').style.display = '';
-      document.getElementById('forgotLink').style.display = 'none';
-      document.getElementById('statusText').textContent = 'Ready';
+      document.getElementById('loginForm').style.display   = 'none';
+      document.getElementById('resetForm').style.display   = '';
+      document.getElementById('signupForm').style.display  = 'none';
+      document.getElementById('forgotLink').style.display  = 'none';
+      document.getElementById('xpFormTitle').textContent   = 'Reset your password';
+      document.getElementById('statusText').textContent    = 'Ready';
     }
 
     function showLogin() {
-      document.getElementById('resetForm').style.display = 'none';
-      document.getElementById('loginForm').style.display = '';
-      document.getElementById('forgotLink').style.display = '';
+      document.getElementById('resetForm').style.display   = 'none';
+      document.getElementById('signupForm').style.display  = 'none';
+      document.getElementById('loginForm').style.display   = '';
+      document.getElementById('forgotLink').style.display  = '';
+      document.getElementById('xpNewAccRow').style.display = '';
+      document.getElementById('xpFormTitle').textContent   = 'Sign in to your Post';
     }
+
+    function showSignup() {
+      document.getElementById('loginForm').style.display   = 'none';
+      document.getElementById('resetForm').style.display   = 'none';
+      document.getElementById('forgotLink').style.display  = 'none';
+      document.getElementById('xpNewAccRow').style.display = 'none';
+      document.getElementById('signupForm').style.display  = '';
+      document.getElementById('xpFormTitle').textContent   = 'Create your Post';
+      document.getElementById('statusText').textContent    = 'Ready';
+    }
+
+    document.getElementById('signupForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var name  = document.getElementById('signupName').value.trim();
+      var email = document.getElementById('signupEmail').value.trim();
+      var pass  = document.getElementById('signupPass').value;
+      var errEl = document.getElementById('signupError');
+      var okEl  = document.getElementById('signupSuccess');
+      var btn   = document.getElementById('signupBtn');
+      errEl.classList.remove('show'); okEl.style.display = 'none';
+
+      if (!name || !email || !pass) {
+        errEl.textContent = 'Please fill in all fields.';
+        errEl.classList.add('show'); return;
+      }
+      if (pass.length < 8) {
+        errEl.textContent = 'Password must be at least 8 characters.';
+        errEl.classList.add('show'); return;
+      }
+
+      btn.disabled = true; btn.textContent = 'Creating...';
+      document.getElementById('statusText').textContent = 'Creating your Post...';
+
+      var { data, error } = await sb.auth.signUp({ email, password: pass });
+      if (error) {
+        errEl.textContent = error.message;
+        errEl.classList.add('show');
+        btn.disabled = false; btn.textContent = 'Create My Post';
+        document.getElementById('statusText').textContent = 'Error.';
+        return;
+      }
+
+      // Save name + handle to profile
+      const userId = data.user?.id;
+      if (userId) {
+        const handle = name.toLowerCase().replace(/\s+/g, '') + '.postmarq';
+        await sb.from('profiles').upsert({ id: userId, full_name: name, handle }, { onConflict: 'id' });
+      }
+
+      if (data.session) {
+        await redirectToPost(data.session.user.id);
+      } else {
+        okEl.style.display = 'block';
+        btn.disabled = false; btn.textContent = 'Create My Post';
+        document.getElementById('statusText').textContent = 'Check your email.';
+      }
+    });
 
     document.getElementById('resetForm').addEventListener('submit', async function(e) {
       e.preventDefault();
