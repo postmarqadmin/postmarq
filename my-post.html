@@ -2614,7 +2614,7 @@
     }
 
     async function loadPosts() {
-      let query = sb.from('posts').select('id, user_id, body, media, created_at, stamps(count), profiles:user_id(full_name, avatar_url)');
+      let query = sb.from('posts').select('id, user_id, body, media, created_at, stamps(count)');
 
       if (feedPrefs.audience === 'me') {
         query = query.eq('user_id', currentUser.id);
