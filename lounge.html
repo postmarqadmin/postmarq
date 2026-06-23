@@ -1000,6 +1000,16 @@
         } else {
           c.unread = (c.unread || 0) + 1;
           renderSidebar();
+          // Browser notification for message in background room
+          if ('Notification' in window && Notification.permission === 'granted') {
+            const sender = msg.profiles?.full_name || 'Someone';
+            const n = new Notification(`${sender} in ${c.name}`, {
+              body: msg.body || '🖼 GIF',
+              icon: '/favicon.ico',
+              tag: 'lounge-room-' + roomId,
+            });
+            n.onclick = () => { window.focus(); openConvo(roomId); n.close(); };
+          }
         }
       })
       .subscribe();
