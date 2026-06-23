@@ -456,9 +456,10 @@
   }
 
   async function init() {
+    const RESERVED = new Set(['login','signup','home','office','playground','lounge','admin','api','static','favicon.ico']);
     const segments = window.location.pathname.replace(/^\//, '').split('/');
     username = segments[0];
-    if (!username) { window.location.replace('/'); return; }
+    if (!username || RESERVED.has(username.toLowerCase())) { window.location.replace('/'); return; }
     document.title = username + ' — Postmarq';
 
     // Check auth in parallel with profile load
