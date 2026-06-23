@@ -596,6 +596,41 @@
     .candids-empty i { font-size: 2rem; opacity: 0.3; }
 
 
+    /* ── My Sites ── */
+    .sites-card {
+      border-radius: 14px; overflow: hidden;
+      background: linear-gradient(135deg, rgba(232,153,42,0.18) 0%, rgba(155,143,212,0.20) 100%);
+      backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.55);
+      box-shadow: 0 4px 24px rgba(80,60,140,0.10);
+      padding: 1.25rem;
+    }
+    .sites-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.9rem; }
+    .sites-title { font-size: 1.2rem; font-weight: 900; letter-spacing: -0.4px; color: #3d2a0a; }
+    .sites-add-btn {
+      background: rgba(232,153,42,0.18); border: 1px solid rgba(232,153,42,0.4);
+      color: #a06010; border-radius: 8px; padding: 0.3rem 0.7rem;
+      font-size: 0.68rem; font-weight: 800; cursor: pointer; font-family: var(--font);
+      transition: background 0.15s;
+    }
+    .sites-add-btn:hover { background: rgba(232,153,42,0.32); }
+    .sites-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .site-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.55rem 0.75rem; border-radius: 10px;
+      background: rgba(255,255,255,0.45); border: 1px solid rgba(255,255,255,0.7);
+      transition: background 0.15s;
+    }
+    .site-row:hover { background: rgba(255,255,255,0.65); }
+    .site-row-name { font-size: 0.82rem; font-weight: 700; color: var(--ink); }
+    .site-row-url { font-size: 0.68rem; color: var(--ink-3); }
+    .site-row-edit {
+      font-size: 0.7rem; font-weight: 800; color: var(--lavender);
+      background: none; border: 1px solid rgba(155,143,212,0.35); border-radius: 6px;
+      padding: 0.2rem 0.55rem; cursor: pointer; font-family: var(--font);
+    }
+    .site-row-edit:hover { background: rgba(155,143,212,0.15); }
+    .sites-empty { font-size: 0.78rem; color: var(--ink-4); text-align: center; padding: 1rem 0; font-style: italic; }
+
     /* ── Biz Card Modal ── */
     .bizcard-overlay { display:none; position:fixed; inset:0; z-index:600; background:rgba(20,10,40,0.55); backdrop-filter:blur(6px); align-items:center; justify-content:center; }
     .bizcard-overlay.open { display:flex; }
@@ -1032,6 +1067,17 @@
         </div>
 
 
+        <!-- My Sites -->
+        <div class="sites-card">
+          <div class="sites-header">
+            <div class="sites-title">My Sites</div>
+            <button class="sites-add-btn" onclick="createNewSite()">+ New Site</button>
+          </div>
+          <div class="sites-list" id="sitesList">
+            <div class="sites-empty" id="sitesEmpty">No sites yet. Create one to get started.</div>
+          </div>
+        </div>
+
       </div><!-- /right-col -->
 
     </div><!-- /main-grid -->
@@ -1216,6 +1262,7 @@
     );
 
     let currentUser = null;
+    let currentHandle = null;
     let localKey = null;
     let cachedPosts = null;
     let cachedMyStamps = new Set();
@@ -1284,8 +1331,44 @@
       await renderMyQ();
       renderFeed();
       loadInbox();
+      await loadSites();
     }
 
+
+    // ── My Sites ──
+    async function loadSites() {
+      if (!currentHandle) return;
+      const { data: rooms } = await sb.from('rooms').select('room_name, updated_at').eq('username', currentHandle).order('created_at', { ascending: false });
+      const list = document.getElementById('sitesList');
+      const empty = document.getElementById('sitesEmpty');
+      if (!rooms || rooms.length === 0) { empty.style.display = ''; return; }
+      empty.style.display = 'none';
+      const existing = list.querySelectorAll('.site-row');
+      existing.forEach(el => el.remove());
+      rooms.forEach(r => {
+        const url = `postmarq.org/${currentHandle}/${r.room_name}`;
+        const row = document.createElement('div');
+        row.className = 'site-row';
+        row.innerHTML = `
+          <div>
+            <div class="site-row-name">${r.room_name}</div>
+            <div class="site-row-url">${url}</div>
+          </div>
+          <button class="site-row-edit" onclick="window.location.href='/${currentHandle}/${r.room_name}'">Edit →</button>`;
+        list.appendChild(row);
+      });
+    }
+
+    async function createNewSite() {
+      const raw = prompt('Site name (e.g. portfolio, blog, music):');
+      if (!raw) return;
+      const slug = raw.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      if (!slug) return;
+      if (!currentHandle) { alert('Profile not loaded yet — try again in a moment.'); return; }
+      const { error } = await sb.from('rooms').insert({ user_id: currentUser.id, username: currentHandle, room_name: slug, html: '', css: '', js: '' });
+      if (error) { alert('Could not create site: ' + error.message); return; }
+      window.location.href = `/${currentHandle}/${slug}`;
+    }
 
     function setDate() {
       const now = new Date();
@@ -1302,6 +1385,7 @@
         .select('full_name, handle, bio, avatar_url, city, hood, relationship_status, last_update, stamp, candids_label, custom_fields')
         .eq('id', currentUser.id).single();
 
+      currentHandle = (profile?.handle || '').replace('.postmarq', '');
       const fallback = currentUser.user_metadata?.full_name || currentUser.email.split('@')[0];
       const name = profile?.full_name || fallback;
 
