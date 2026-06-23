@@ -3,87 +3,118 @@
 ## What was built this session
 
 ### My Sites — Builder-tier custom websites
-Users can create up to **10 custom sites** hosted at `postmarq.org/:username/:site-name`. Each site is a full raw HTML canvas with a split-pane editor + live preview.
+Users can create up to **10 custom sites** hosted at `postmarq.org/:username/:site-name`.
 
-- **viewer.html** — upgraded with a full-screen split-pane editor (left: single HTML textarea, right: live iframe preview, draggable divider). Replaces the old bottom-panel tabbed editor.
-- **rooms table** (new Supabase table) — stores each site: `id, user_id, username, room_name, html, css, js, published, created_at, updated_at`
-- **My Sites card** — sapphire dark card with animated conic-gradient glowing border, lives at top of right column in my-post.html. Shows each site as a glowing button, with `● Live / ○ Private` toggle and `edit` link.
-- **Public/private toggle** — `published` boolean on rooms table. Unpublished sites show a "This site is private" message to visitors.
-- **Back to profile pill** — on any `/:username/:room_name` page, a `← username` pill appears bottom-left linking back to the main profile.
+- **viewer.html** — full-screen split-pane editor (left: HTML textarea, right: live iframe preview)
+- **rooms table** — stores each site: `id, user_id, username, room_name, html, css, js, published, created_at, updated_at`
+- **My Sites card** — sapphire dark (#080d1e) with animated conic-gradient glowing border. Top of right column in my-post.html. Shows site name as clickable link, `● Live / ○ Private` toggle, `Open Editor →` button.
+- **Public/private toggle** — `published` boolean on rooms. Unpublished = private placeholder for visitors.
+- **Back to profile pill** — on any `/:username/:room` page, `← username` pill bottom-left links back to profile.
 - **10 site limit** — enforced in `createNewSite()` before insert.
+- **Edit My Post button** — restyled to match sapphire aesthetic (dark bg, blue glow border).
 
-### Widget System — architecture + Movie Shelf
-A reusable widget framework for the profile and office pages. Users add widgets from a library; each widget instance stores its data as JSON in Supabase.
+### Widget System
+Reusable component framework for profile and office pages.
 
-**New Supabase tables:**
-- `widget_types` — Postmarq-defined widget catalog: `id (text slug), name, description, icon, schema (jsonb)`. No RLS (public read, manual insert only).
-- `widgets` — user widget instances: `id, user_id, widget_type, label, page ('profile'|'office'), position, data (jsonb), created_at, updated_at`
+**Supabase tables:**
+- `widget_types` — Postmarq-defined catalog (no RLS): `id, name, description, icon, schema (jsonb)`
+- `widgets` — user instances: `id, user_id, widget_type, label, page, position, data (jsonb)`
 
-**Seeded widget type:** `movie-shelf` — Movie & Show Shelf 🎬
+**Seeded:** `movie-shelf` — Movie & Show Shelf 🎬
 
 **Built in my-post.html:**
-- Widget Manager card (right column, below My Sites) with `+ Add Widget` button
-- Widget Library modal — shows all widget types from Supabase
-- Movie Shelf renderer — horizontal scrollable shelf of poster tiles with status badges (Seen / Want / Watching)
-- Movie Shelf add modal — title, year, type, status, optional poster URL
-- Full CRUD: add widget, add items to widget, remove widget
+- Widget Manager card (right column, below My Sites)
+- Widget Library modal — fetches all widget_types from Supabase
+- Movie Shelf renderer — horizontal scrollable poster tiles with Seen/Want/Watching badges
+- Movie add modal — title, year, type, status, poster URL
+- Full CRUD: add widget instance, add items, remove widget
 
-**How to add a new widget type later:**
+**To add a new widget type:**
 1. `INSERT INTO widget_types (id, name, description, icon, schema) VALUES (...)`
-2. Add a `renderXxx(el, widget)` function in my-post.html
-3. Add a case for it in `renderWidgetContent()`
-Done — it appears in the library for all users automatically.
+2. Add `renderXxx(el, widget)` function in my-post.html
+3. Add case in `renderWidgetContent()`
 
-### UX / Design
-- **Edit My Post button** — restyled to match sapphire/My Sites aesthetic (dark background, blue glow border, no emoji). Scales correctly on mobile.
-- **Single-column order** (mobile, <700px): Profile → My Sites → Feed → My Q → Friends → Candids
-- **My Sites** moved to top of right column (above My Friends)
+**7 widget concepts designed (not yet built):**
+Now Playing (violet), Mood Ring (coral), Guestbook (parchment), Pinboard (pastel), Countdown (electric green), Currently Into (b&w editorial), Visitor Stamp Wall (amber)
+
+### Feed Controls (edit feature, not a widget)
+Single-line glass card above the feed composer in the feed column.
+
+- **Audience:** Everyone / Friends / Just Me (`<select>` dropdown)
+- **Frequency:** Hour / 12h / Day / Week — controls cache TTL before re-fetch
+- **↻ icon** refresh button forces immediate re-fetch
+- Prefs saved to `localStorage` keyed to user ID
+- "Everyone" fetches all posts joined with profiles; "Friends" filters via friend_requests table
+- "Updated X ago" label ticks every 60s
+
+### Backdrop Editor
+Owner-only background customization for the profile page.
+
+- **🎨 Backdrop** floating button (fixed bottom-right, owner-only)
+- Slide-up panel with: image URL input, Cover/Tile fit toggle, Frost blur slider (0–20px)
+- Live preview as you type/adjust
+- Frost = blur + proportional white rgba overlay so cards stay readable
+- Saves to `profiles`: `bg_image_url`, `bg_blur`, `bg_repeat`
+- Loads and applies on every page visit
+
+**New SQL columns added to profiles:**
+```sql
+alter table public.profiles 
+  add column bg_image_url text,
+  add column bg_blur integer default 8,
+  add column bg_repeat boolean default false;
+```
+
+### Mobile / Layout
+- Single-column order (< 700px): Profile → My Sites → Feed → My Q → Friends → Candids
+- My Sites moved to top of right column
 
 ## Current routing (vercel.json)
 
 ```
 postmarq.org        → redirects to /login
-/login              → login.html (XP-style Windows login UI)
-/home               → my-post.html (authenticated profile page)
+/login              → login.html
+/home               → my-post.html
 /signup             → signup.html
 /:username          → viewer.html (public profile)
-/:username/:room    → viewer.html (custom site — rooms table)
+/:username/:room    → viewer.html (custom site)
 ```
 
 ## Auth flow — DO NOT BREAK THIS
 
-- `login.html` signs in and redirects to `/home`
-- `my-post.html` uses `onAuthStateChange` with `INITIAL_SESSION` event
-- If no session: shows XP-style overlay login (embedded in my-post.html, no redirect)
-- Overlay login calls `overlayLogin()` → `signInWithPassword` → `startApp(session)` directly
-- `my-post.html` does NOT redirect to `/login` — doing so causes redirect loops
+- `login.html` signs in → redirects to `/home`
+- `my-post.html` uses `onAuthStateChange` INITIAL_SESSION event
+- No session → shows embedded XP-style overlay login (no redirect)
+- Overlay: `overlayLogin()` → `signInWithPassword` → `startApp(session)` directly
+- Never redirect my-post.html to /login — causes loops
 
 ## Supabase tables (full list)
 
 | Table | Purpose |
 |---|---|
-| `profiles` | User profile: full_name, handle, bio, avatar_url, city, hood, relationship_status, stamp, candids_label, custom_fields |
+| `profiles` | User profile + bg_image_url, bg_blur, bg_repeat |
 | `posts` | Feed posts: user_id, body, media (JSONB) |
-| `stamps` | Post stamps (likes): post_id, user_id — unique constraint |
+| `stamps` | Post stamps: post_id, user_id — unique constraint |
 | `pick_six` | Friends grid: user_id, slot_index, name, photo_url |
 | `candids` | Candid photos: user_id, photo_url |
-| `myq` | Loop schedule items: user_id, type, label, when_text |
+| `myq` | Loop schedule: user_id, type, label, when_text |
 | `messages` | DMs: to_user_id, from_user_id, body |
-| `friend_requests` | Connection requests: from_user_id, to_user_id, status |
-| `pages` | Public post pages (viewer.html main page): username, user_id, html, css, js, display_name |
+| `friend_requests` | Connections: from_user_id, to_user_id, status |
+| `pages` | Public post pages: username, user_id, html, css, js, display_name |
 | `rooms` | Custom sites: username, user_id, room_name, html, css, js, published |
-| `widget_types` | Widget catalog (Postmarq-defined, no RLS) |
+| `widget_types` | Widget catalog (no RLS, Postmarq-defined) |
 | `widgets` | User widget instances: user_id, widget_type, page, position, data (jsonb) |
 
-## What's next (priority order)
+## Next steps (priority order)
 
-1. **Widget: Office page** — build office.html with widget slots (same widget engine, `page: 'office'`)
-2. **Widget types to build next** — Music Player, Photo Grid, Link Board, Book Log
-3. **Public profiles (viewer.html)** — /:username should render real profile data from Supabase
-4. **Connections** — friends table + invite flow ("Loop someone in")
-5. **Playground** — code sandbox for Builder users; output feeds into custom sites
-6. **Widget marketplace phase 2** — community submissions with review flow
-7. **Supabase Storage migration** — move avatar/candids from localStorage to Supabase Storage
+1. **Verify Backdrop editor** on live site
+2. **Office page** — office.html with widget slots (same widget engine, `page: 'office'`)
+3. **Widget types** — Now Playing, Mood Ring, Guestbook, Pinboard, Countdown, Currently Into, Visitor Stamp Wall
+4. **Public profiles** — viewer.html `/:username` renders real Supabase profile data
+5. **Connections** — "Loop someone in" invite flow
+6. **Profile editor** — background themes, color/font customization
+7. **Playground** — code sandbox for Builder users
+8. **Supabase Storage** — migrate avatar/candids from localStorage
 
 ## Supabase credentials
 - URL: `https://udlbdccvspxqlzizpkda.supabase.co`
@@ -92,5 +123,5 @@ postmarq.org        → redirects to /login
 ## Git / deployment
 - GitHub repo: `postmarqadmin/postmarq` (main branch)
 - Deployed on Vercel (auto-deploys on push to main)
-- **git push via terminal is broken** (SSH not configured) — use GitHub Desktop to push
+- **git push via terminal is broken** (SSH not configured) — use GitHub Desktop
 - After pushing, Vercel deploys in ~30 seconds
