@@ -629,6 +629,18 @@
       padding: 0.2rem 0.55rem; cursor: pointer; font-family: var(--font);
     }
     .site-row-edit:hover { background: rgba(155,143,212,0.15); }
+    .site-row-name { font-size: 0.82rem; font-weight: 700; color: var(--ink); text-decoration: none; }
+    .site-row-name:hover { text-decoration: underline; color: var(--lavender); }
+    .site-row-toggle {
+      font-size: 0.68rem; font-weight: 800; border-radius: 6px;
+      padding: 0.2rem 0.55rem; cursor: pointer; font-family: var(--font);
+      background: none; border: 1px solid rgba(160,125,96,0.35); color: var(--ink-3);
+      transition: all 0.15s;
+    }
+    .site-row-toggle.published {
+      border-color: rgba(74,181,170,0.5); color: #2e8a82;
+      background: rgba(74,181,170,0.1);
+    }
     .sites-empty { font-size: 0.78rem; color: var(--ink-4); text-align: center; padding: 1rem 0; font-style: italic; }
 
     /* ── Biz Card Modal ── */
@@ -1338,25 +1350,37 @@
     // ── My Sites ──
     async function loadSites() {
       if (!currentHandle) return;
-      const { data: rooms } = await sb.from('rooms').select('room_name, updated_at').eq('username', currentHandle).order('created_at', { ascending: false });
+      const { data: rooms } = await sb.from('rooms').select('room_name, published, updated_at').eq('username', currentHandle).order('created_at', { ascending: false });
       const list = document.getElementById('sitesList');
       const empty = document.getElementById('sitesEmpty');
       if (!rooms || rooms.length === 0) { empty.style.display = ''; return; }
       empty.style.display = 'none';
-      const existing = list.querySelectorAll('.site-row');
-      existing.forEach(el => el.remove());
+      list.querySelectorAll('.site-row').forEach(el => el.remove());
       rooms.forEach(r => {
         const url = `postmarq.org/${currentHandle}/${r.room_name}`;
         const row = document.createElement('div');
         row.className = 'site-row';
+        row.dataset.room = r.room_name;
         row.innerHTML = `
           <div>
-            <div class="site-row-name">${r.room_name}</div>
+            <a class="site-row-name" href="/${currentHandle}/${r.room_name}" target="_blank">${r.room_name} ↗</a>
             <div class="site-row-url">${url}</div>
           </div>
-          <button class="site-row-edit" onclick="window.location.href='/${currentHandle}/${r.room_name}'">Edit →</button>`;
+          <div style="display:flex;gap:6px;align-items:center;">
+            <button class="site-row-toggle ${r.published ? 'published' : ''}" onclick="togglePublished('${r.room_name}', this)">${r.published ? '● Live' : '○ Private'}</button>
+            <button class="site-row-edit" onclick="window.location.href='/${currentHandle}/${r.room_name}'">Edit →</button>
+          </div>`;
         list.appendChild(row);
       });
+    }
+
+    async function togglePublished(roomName, btn) {
+      const isPublished = btn.classList.contains('published');
+      const newVal = !isPublished;
+      const { error } = await sb.from('rooms').update({ published: newVal }).eq('username', currentHandle).eq('room_name', roomName);
+      if (error) { alert('Could not update: ' + error.message); return; }
+      btn.classList.toggle('published', newVal);
+      btn.textContent = newVal ? '● Live' : '○ Private';
     }
 
     async function createNewSite() {

@@ -295,6 +295,14 @@
     if (currentRoom) {
       const room = roomsData.find(r => r.room_name === currentRoom);
       if (!room) { showRoomNotFound(); return; }
+
+      // Block visitors from unpublished sites (owner can still see it)
+      if (!room.published) {
+        const { data: { session } } = await sb.auth.getSession();
+        const isOwner = session?.user?.id === post.user_id;
+        if (!isOwner) { showPrivate(); return; }
+      }
+
       currentContent = { html: room.html || DEFAULT_ROOM_HTML(currentRoom), css: room.css || '', js: room.js || '' };
     } else {
       currentContent = { html: post.html || DEFAULT_POST_HTML, css: post.css || '', js: post.js || '' };
@@ -488,6 +496,15 @@
     });
     if (error) { alert('Could not create room: ' + error.message); return; }
     window.location.href = '/' + username + '/' + slug;
+  }
+
+  function showPrivate() {
+    document.getElementById('post-root').innerHTML = `
+      <div class="state">
+        <div class="state-title">This site is private.</div>
+        <p><strong>postmarq.org/${username}/${currentRoom}</strong> is still being built.</p>
+        <a href="/${username}"><button class="xp-btn">← Back to ${username}'s Post</button></a>
+      </div>`;
   }
 
   function showNotFound() {
