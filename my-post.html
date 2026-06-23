@@ -467,6 +467,34 @@
     .post-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(232,153,42,0.42); }
     .file-input { display: none; }
 
+    /* ── Feed Controls ── */
+    .feed-controls {
+      border-radius: var(--radius-lg); padding: 0.85rem 1.1rem;
+      display: flex; flex-direction: column; gap: 0.65rem;
+    }
+    .feed-controls-row { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+    .fc-label { font-size: 0.65rem; font-weight: 900; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); min-width: 60px; }
+    .fc-toggle { display: flex; gap: 3px; background: rgba(0,0,0,0.06); border-radius: 8px; padding: 3px; }
+    .fc-btn {
+      padding: 0.28rem 0.7rem; border-radius: 6px; font-family: var(--font);
+      font-size: 0.7rem; font-weight: 700; cursor: pointer; border: none;
+      background: none; color: var(--ink-3); transition: all 0.15s;
+    }
+    .fc-btn.active {
+      background: #fff; color: var(--ink);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.12); font-weight: 800;
+    }
+    .fc-divider { width: 1px; height: 18px; background: rgba(0,0,0,0.1); margin: 0 2px; }
+    .fc-meta { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.1rem; }
+    .fc-last-updated { font-size: 0.65rem; color: var(--ink-4); font-style: italic; }
+    .fc-refresh-btn {
+      background: none; border: 1px solid rgba(155,143,212,0.3); border-radius: 6px;
+      padding: 0.18rem 0.55rem; font-size: 0.65rem; font-weight: 800;
+      color: var(--lavender); cursor: pointer; font-family: var(--font);
+      transition: background 0.15s;
+    }
+    .fc-refresh-btn:hover { background: rgba(155,143,212,0.15); }
+
     /* ── Feed Tabs ── */
     .feed-tabs {
       display: flex; gap: 0;
@@ -1220,6 +1248,31 @@
           <input type="file" id="videoInput" class="file-input" accept="video/*" onchange="addMedia(this,'video')" />
         </div>
 
+        <!-- Feed Controls -->
+        <div class="feed-controls glass">
+          <div class="feed-controls-row">
+            <span class="fc-label">Showing</span>
+            <div class="fc-toggle">
+              <button class="fc-btn active" onclick="setFeedAudience('everyone', this)">Everyone</button>
+              <button class="fc-btn" onclick="setFeedAudience('friends', this)">Friends</button>
+              <button class="fc-btn" onclick="setFeedAudience('me', this)">Just Me</button>
+            </div>
+          </div>
+          <div class="feed-controls-row">
+            <span class="fc-label">Refresh</span>
+            <div class="fc-toggle">
+              <button class="fc-btn" onclick="setFeedFrequency('1h', this)">1h</button>
+              <button class="fc-btn" onclick="setFeedFrequency('12h', this)">12h</button>
+              <button class="fc-btn active" onclick="setFeedFrequency('day', this)">Daily</button>
+              <button class="fc-btn" onclick="setFeedFrequency('week', this)">Weekly</button>
+            </div>
+          </div>
+          <div class="fc-meta">
+            <span class="fc-last-updated" id="fcLastUpdated">Loading…</span>
+            <button class="fc-refresh-btn" onclick="forceRefreshFeed()">↻ Refresh now</button>
+          </div>
+        </div>
+
         <!-- Feed Tabs -->
         <div class="feed-tabs">
           <button class="feed-tab active" onclick="switchTab('daily')">Daily</button>
@@ -1569,6 +1622,8 @@
     let localKey = null;
     let cachedPosts = null;
     let cachedMyStamps = new Set();
+    let feedPrefs = { audience: 'everyone', frequency: 'day' };
+    const FREQ_MS = { '1h': 3600000, '12h': 43200000, 'day': 86400000, 'week': 604800000 };
     let weeklyRendered = false;
 
     // ── Stamps palette ──
@@ -1632,7 +1687,9 @@
       await renderPickSix();
       await renderCandids();
       await renderMyQ();
-      renderFeed();
+      initFeedControls();
+      await renderFeed();
+      setInterval(updateLastUpdatedLabel, 60000);
       loadInbox();
       await loadSites();
       await loadWidgets();
@@ -2385,14 +2442,79 @@
       if (countEl) countEl.textContent = (count || 0) + ' stamp' + (count !== 1 ? 's' : '');
     }
 
-    async function loadPosts() {
-      const { data: posts } = await sb
-        .from('posts')
-        .select('id, body, media, created_at, stamps(count)')
-        .eq('user_id', currentUser.id)
-        .order('created_at', { ascending: false });
+    function initFeedControls() {
+      const saved = localStorage.getItem(`${localKey}_feedPrefs`);
+      if (saved) feedPrefs = JSON.parse(saved);
 
+      document.querySelectorAll('[onclick^="setFeedAudience"]').forEach(btn => {
+        const val = btn.getAttribute('onclick').match(/'(\w+)'/)[1];
+        btn.classList.toggle('active', val === feedPrefs.audience);
+      });
+      document.querySelectorAll('[onclick^="setFeedFrequency"]').forEach(btn => {
+        const val = btn.getAttribute('onclick').match(/'(\w+)'/)[1];
+        btn.classList.toggle('active', val === feedPrefs.frequency);
+      });
+      updateLastUpdatedLabel();
+    }
+
+    function setFeedAudience(val, btn) {
+      feedPrefs.audience = val;
+      saveFeedPrefs();
+      btn.closest('.fc-toggle').querySelectorAll('.fc-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      forceRefreshFeed();
+    }
+
+    function setFeedFrequency(val, btn) {
+      feedPrefs.frequency = val;
+      saveFeedPrefs();
+      btn.closest('.fc-toggle').querySelectorAll('.fc-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function saveFeedPrefs() {
+      localStorage.setItem(`${localKey}_feedPrefs`, JSON.stringify(feedPrefs));
+    }
+
+    function updateLastUpdatedLabel() {
+      const el = document.getElementById('fcLastUpdated');
+      if (!el) return;
+      const ts = parseInt(localStorage.getItem(`${localKey}_feedFetchedAt`) || '0');
+      if (!ts) { el.textContent = 'Not yet loaded'; return; }
+      el.textContent = 'Updated ' + timeAgo(ts);
+    }
+
+    function shouldRefreshFeed() {
+      const ts = parseInt(localStorage.getItem(`${localKey}_feedFetchedAt`) || '0');
+      return !ts || (Date.now() - ts) > FREQ_MS[feedPrefs.frequency];
+    }
+
+    async function forceRefreshFeed() {
+      localStorage.removeItem(`${localKey}_feedFetchedAt`);
+      await renderFeed();
+    }
+
+    async function loadPosts() {
+      let query = sb.from('posts').select('id, user_id, body, media, created_at, stamps(count), profiles:user_id(full_name, avatar_url)');
+
+      if (feedPrefs.audience === 'me') {
+        query = query.eq('user_id', currentUser.id);
+      } else if (feedPrefs.audience === 'friends') {
+        const { data: conns } = await sb.from('friend_requests')
+          .select('from_user_id, to_user_id')
+          .or(`from_user_id.eq.${currentUser.id},to_user_id.eq.${currentUser.id}`)
+          .eq('status', 'accepted');
+        const friendIds = (conns || []).map(c => c.from_user_id === currentUser.id ? c.to_user_id : c.from_user_id);
+        friendIds.push(currentUser.id);
+        query = query.in('user_id', friendIds);
+      }
+
+      const { data: posts } = await query.order('created_at', { ascending: false }).limit(50);
       cachedPosts = posts || [];
+
+      const key = `${localKey}_feedFetchedAt`;
+      localStorage.setItem(key, Date.now().toString());
+      updateLastUpdatedLabel();
 
       const postIds = cachedPosts.map(p => p.id);
       if (postIds.length) {
@@ -2457,7 +2579,11 @@
       const avatarImg = document.getElementById('avatarImg');
       const avatarUrl = avatarImg.dataset.url || '';
 
-      feed.innerHTML = cachedPosts.map(p => buildPostCard(p, name, avatarUrl)).join('');
+      feed.innerHTML = cachedPosts.map(p => {
+        const pName = p.profiles?.full_name || name;
+        const pAvatar = p.profiles?.avatar_url || (p.user_id === currentUser.id ? avatarUrl : '');
+        return buildPostCard(p, pName, pAvatar);
+      }).join('');
     }
 
     function renderWeekly() {
