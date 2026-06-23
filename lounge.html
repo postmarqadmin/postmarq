@@ -778,160 +778,184 @@
   const { createClient } = supabase;
   const sb = createClient(
     'https://udlbdccvspxqlzizpkda.supabase.co',
-    'sb_publishable_co1yq79BF8oR9Mg651DG5w_ESuACdqn'
+    'sb_publishable_co1yq79BF8oR9Mg651DG5w_ESuACdqn',
+    { realtime: { params: { eventsPerSecond: 10 } } }
   );
 
   const ME = {
-    id: null,
-    name: '',
-    initials: '?',
-    status: 'online',
-    awayMsg: 'Here to make real connections ✌️',
-    bubbleColor: '#6b4fbb',
-    font: 'Nunito',
+    id: null, name: '', initials: '?',
+    status: 'online', awayMsg: 'Here to make real connections ✌️',
+    bubbleColor: '#6b4fbb', font: 'Nunito',
   };
 
   let convos = [];
-
   let activeConvoId = null;
   let pendingGif = null;
+  let realtimeChannel = null;
 
   /* ═══════════════════════════════════════════
-     RENDER
+     SIDEBAR
   ═══════════════════════════════════════════ */
 
   function renderSidebar() {
     const query = document.querySelector('.search-input')?.value.toLowerCase() || '';
     const quorums = convos.filter(c => c.type === 'group' && c.name.toLowerCase().includes(query));
     const dms     = convos.filter(c => c.type === 'dm'    && c.name.toLowerCase().includes(query));
-
     document.getElementById('quorumList').innerHTML = quorums.map(convItem).join('');
     document.getElementById('dmList').innerHTML     = dms.map(convItem).join('');
   }
 
   function convItem(c) {
     const lastMsg = c.messages[c.messages.length - 1];
-    const preview = lastMsg
-      ? (lastMsg.gif ? '🖼 GIF' : lastMsg.link ? '🔗 Link' : lastMsg.text || '')
-      : '';
+    const preview = lastMsg ? (lastMsg.gif_url ? '🖼 GIF' : lastMsg.body || '') : '';
     const isGroup = c.type === 'group';
-    const statusClass = isGroup ? '' : (c.status || 'offline');
+    const safeId = escHtml(c.id);
     const avatarHtml = isGroup
-      ? `<div class="conv-avatar group" style="background:${c.color}20">${c.avatar}</div>`
+      ? `<div class="conv-avatar group">💬</div>`
       : `<div class="conv-avatar" style="background:${c.color}">
-           ${c.initials || c.name.split(' ').map(w=>w[0]).join('').slice(0,2)}
-           ${statusClass ? `<div class="conv-status ${statusClass}"></div>` : ''}
+           ${c.avatarImg
+             ? `<img src="${escHtml(c.avatarImg)}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`
+             : escHtml(c.initials || '?')}
          </div>`;
-
-    return `<li class="conv-item${activeConvoId === c.id ? ' active' : ''}" onclick="openConvo('${c.id}')">
+    return `<li class="conv-item${activeConvoId === c.id ? ' active' : ''}" onclick="openConvo('${safeId}')">
       ${avatarHtml}
       <div class="conv-info">
-        <div class="conv-name">${c.name}</div>
+        <div class="conv-name">${escHtml(c.name)}</div>
         <div class="conv-preview">${escHtml(preview)}</div>
       </div>
       <div class="conv-meta">
-        <div class="conv-time">${lastMsg ? lastMsg.ts.split(' ').slice(-2).join(' ') : ''}</div>
+        <div class="conv-time">${lastMsg ? fmtTime(lastMsg.created_at) : ''}</div>
         ${c.unread ? `<div class="conv-badge">${c.unread}</div>` : ''}
       </div>
     </li>`;
   }
 
-  function openConvo(id) {
+  /* ═══════════════════════════════════════════
+     OPEN CONVERSATION
+  ═══════════════════════════════════════════ */
+
+  async function openConvo(id) {
+    // Friend shortcut — create or find DM room first
+    if (id.startsWith('friend:')) {
+      await startDM(id.slice(7));
+      return;
+    }
+
     activeConvoId = id;
     const c = convos.find(x => x.id === id);
     if (!c) return;
     c.unread = 0;
 
-    // Header
     const isGroup = c.type === 'group';
     const hdrAvatar = document.getElementById('chatHeaderAvatar');
-    hdrAvatar.textContent = isGroup ? c.avatar : (c.initials || c.name.split(' ').map(w=>w[0]).join('').slice(0,2));
+    if (c.avatarImg && !isGroup) {
+      hdrAvatar.innerHTML = `<img src="${escHtml(c.avatarImg)}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+    } else {
+      hdrAvatar.textContent = isGroup ? '💬' : escHtml(c.initials || '?');
+    }
     hdrAvatar.className = 'chat-header-avatar' + (isGroup ? ' group' : '');
-    if (!isGroup) hdrAvatar.style.background = c.color;
+    if (!isGroup && !c.avatarImg) hdrAvatar.style.background = c.color;
     document.getElementById('chatHeaderName').textContent = c.name;
-    document.getElementById('chatHeaderSub').textContent = isGroup
-      ? `${c.members.length} members`
-      : (c.status === 'online' ? 'Active now' : c.status === 'away' ? 'Away' : 'Offline');
+    document.getElementById('chatHeaderSub').textContent = isGroup ? `${c.memberCount || 1} members` : 'Direct Message';
 
-    // Show panels
     document.getElementById('chatEmpty').style.display = 'none';
     document.getElementById('chatHeader').style.display = 'flex';
     document.getElementById('messagesWrap').style.display = 'flex';
     document.getElementById('typingIndicator').style.display = 'flex';
     document.getElementById('composer').style.display = 'block';
 
-    renderMessages(c);
+    await loadMessages(id);
     renderSidebar();
-
-    // Simulate typing after a bit in active convo
-    clearTimeout(window._typingTimer);
-    const typingEl = document.getElementById('typingIndicator');
-    const typingText = document.getElementById('typingText');
-    typingEl.style.opacity = '0';
-
-    if (c.messages.length > 0) {
-      window._typingTimer = setTimeout(() => {
-        const typer = c.type === 'group'
-          ? c.members.filter(m => m !== ME.name)[Math.floor(Math.random() * (c.members.length - 1))]
-          : c.name.split(' ')[0];
-        typingText.textContent = `${typer} is typing…`;
-        typingEl.style.opacity = '1';
-        setTimeout(() => { typingEl.style.opacity = '0'; }, 3000);
-      }, 2500);
-    }
+    subscribeToRoom(id);
   }
+
+  async function loadMessages(roomId) {
+    const { data } = await sb.from('lounge_messages')
+      .select('id, from_user_id, body, gif_url, created_at, profiles:from_user_id(full_name, avatar_url)')
+      .eq('room_id', roomId)
+      .order('created_at', { ascending: true });
+    const c = convos.find(x => x.id === roomId);
+    if (!c) return;
+    c.messages = data || [];
+    renderMessages(c);
+  }
+
+  function subscribeToRoom(roomId) {
+    if (realtimeChannel) sb.removeChannel(realtimeChannel);
+    realtimeChannel = sb.channel('room:' + roomId)
+      .on('postgres_changes', {
+        event: 'INSERT', schema: 'public',
+        table: 'lounge_messages', filter: `room_id=eq.${roomId}`,
+      }, async (payload) => {
+        const msg = payload.new;
+        if (msg.from_user_id === ME.id) return; // already added optimistically
+        const { data: prof } = await sb.from('profiles').select('full_name, avatar_url').eq('id', msg.from_user_id).single();
+        msg.profiles = prof;
+        const c = convos.find(x => x.id === roomId);
+        if (!c) return;
+        c.messages.push(msg);
+        if (activeConvoId === roomId) {
+          renderMessages(c);
+        } else {
+          c.unread = (c.unread || 0) + 1;
+          renderSidebar();
+        }
+      })
+      .subscribe();
+  }
+
+  /* ═══════════════════════════════════════════
+     RENDER MESSAGES
+  ═══════════════════════════════════════════ */
 
   function renderMessages(c) {
     const wrap = document.getElementById('messagesWrap');
-    let html = '';
-    let prevFrom = null;
-    let prevDate = null;
+    if (!c.messages.length) {
+      wrap.innerHTML = `<div class="chat-empty"><i class="ti ti-message-plus"></i><p>No messages yet — say hi!</p></div>`;
+      return;
+    }
+    let html = '', prevFromId = null, prevDate = null, groupOpen = false;
 
     c.messages.forEach((msg, i) => {
-      const isMe = msg.fromId === ME.id;
-      const dateStr = msg.ts.split(' ').slice(0, -2).join(' ') || msg.ts.split(' ')[0];
+      const isMe = msg.from_user_id === ME.id;
+      const senderName = msg.profiles?.full_name || 'Someone';
+      const senderAvatar = msg.profiles?.avatar_url;
+      const dateStr = new Date(msg.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
       if (dateStr !== prevDate) {
-        html += `<div class="msg-day-divider">${dateStr || 'Today'}</div>`;
-        prevDate = dateStr;
-        prevFrom = null;
+        if (groupOpen) { html += '</div></div>'; groupOpen = false; }
+        html += `<div class="msg-day-divider">${dateStr}</div>`;
+        prevDate = dateStr; prevFromId = null;
       }
 
-      const newSender = msg.fromId !== prevFrom;
+      const newSender = msg.from_user_id !== prevFromId;
       if (newSender) {
-        if (prevFrom !== null) html += '</div>'; // close prev group
-        const avatarColor = isMe ? ME.bubbleColor : getColor(msg.fromId);
-        const initials = msg.from.split(' ').map(w=>w[0]).join('').slice(0,2);
+        if (groupOpen) { html += '</div></div>'; groupOpen = false; }
+        const avatarColor = isMe ? ME.bubbleColor : getColor(msg.from_user_id);
+        const initials = senderName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+        const avatarEl = (!isMe && senderAvatar)
+          ? `<img src="${escHtml(senderAvatar)}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
+          : `<div class="msg-group-avatar" style="background:${avatarColor};${isMe ? 'display:none' : ''}">${initials}</div>`;
         html += `<div class="msg-group${isMe ? ' me' : ''}">
-          <div class="msg-group-avatar" style="background:${avatarColor}">${initials}</div>
+          ${avatarEl}
           <div class="msg-bubbles">
-            ${!isMe && newSender ? `<div class="msg-sender-name">${msg.from}</div>` : ''}`;
+            ${!isMe && newSender ? `<div class="msg-sender-name">${escHtml(senderName)}</div>` : ''}`;
+        groupOpen = true;
       }
 
-      if (msg.gif) {
-        html += `<div class="bubble ${isMe ? 'me' : 'them'}"><img class="gif-preview" src="${msg.gif}" alt="GIF" loading="lazy" /></div>`;
-      } else if (msg.link) {
-        html += `<div class="bubble ${isMe ? 'me' : 'them'}">${escHtml(msg.text || '')}
-          <div class="link-preview">
-            <div class="link-preview-title">${escHtml(msg.link.title)}</div>
-            <div class="link-preview-url">${escHtml(msg.link.url)}</div>
-          </div>
-        </div>`;
+      if (msg.gif_url) {
+        html += `<div class="bubble ${isMe ? 'me' : 'them'}"><img class="gif-preview" src="${escHtml(msg.gif_url)}" alt="GIF" loading="lazy"/></div>`;
       } else {
-        html += `<div class="bubble ${isMe ? 'me' : 'them'}">${escHtml(msg.text)}</div>`;
+        html += `<div class="bubble ${isMe ? 'me' : 'them'}">${escHtml(msg.body || '')}</div>`;
       }
 
-      prevFrom = msg.fromId;
-
+      prevFromId = msg.from_user_id;
       if (i === c.messages.length - 1) {
-        html += `<div class="bubble-time">${msg.ts.split(' ').slice(-2).join(' ')}</div>`;
+        html += `<div class="bubble-time">${fmtTime(msg.created_at)}</div>`;
         html += '</div></div>';
+        groupOpen = false;
       }
     });
-
-    if (c.messages.length === 0) {
-      html = `<div class="chat-empty"><i class="ti ti-message-plus"></i><p>No messages yet — say hi!</p></div>`;
-    }
 
     wrap.innerHTML = html;
     wrap.scrollTop = wrap.scrollHeight;
@@ -941,42 +965,44 @@
      SEND MESSAGE
   ═══════════════════════════════════════════ */
 
-  function sendMessage() {
+  async function sendMessage() {
     const input = document.getElementById('composerInput');
     const text = input.value.trim();
     if (!text && !pendingGif) return;
-    const c = convos.find(x => x.id === activeConvoId);
-    if (!c) return;
+    if (!activeConvoId || !ME.id) return;
 
-    const now = new Date();
-    const timeStr = `Today ${now.getHours() % 12 || 12}:${String(now.getMinutes()).padStart(2,'0')} ${now.getHours() >= 12 ? 'PM' : 'AM'}`;
-
-    const msg = {
-      id: Date.now(),
-      from: ME.name,
-      fromId: ME.id,
-      ts: timeStr,
-    };
-    if (pendingGif) {
-      msg.gif = pendingGif;
-      pendingGif = null;
-    } else {
-      msg.text = text;
-    }
-
-    c.messages.push(msg);
+    const body = pendingGif ? null : text;
+    const gif_url = pendingGif || null;
+    pendingGif = null;
     input.value = '';
     input.style.height = '';
-    renderMessages(c);
-    renderSidebar();
     closeGifPicker();
+
+    // Optimistic local add
+    const tempId = 'temp-' + Date.now();
+    const tempMsg = {
+      id: tempId, room_id: activeConvoId,
+      from_user_id: ME.id, body, gif_url,
+      created_at: new Date().toISOString(),
+      profiles: { full_name: ME.name, avatar_url: null },
+    };
+    const c = convos.find(x => x.id === activeConvoId);
+    if (c) { c.messages.push(tempMsg); renderMessages(c); }
+
+    const { data, error } = await sb.from('lounge_messages').insert({
+      room_id: activeConvoId, from_user_id: ME.id, body, gif_url,
+    }).select().single();
+
+    if (!error && data && c) {
+      const idx = c.messages.findIndex(m => m.id === tempId);
+      if (idx !== -1) { c.messages[idx] = { ...data, profiles: { full_name: ME.name } }; }
+      renderMessages(c);
+      renderSidebar();
+    }
   }
 
   function handleComposerKey(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
   }
 
   function autoResize(el) {
@@ -985,11 +1011,89 @@
   }
 
   /* ═══════════════════════════════════════════
+     START DM
+  ═══════════════════════════════════════════ */
+
+  async function startDM(friendId) {
+    // Check for existing DM room
+    const { data: myRooms } = await sb.from('lounge_members').select('room_id').eq('user_id', ME.id);
+    const { data: frRooms } = await sb.from('lounge_members').select('room_id').eq('user_id', friendId);
+    const myIds = (myRooms || []).map(r => r.room_id);
+    const frIds = (frRooms || []).map(r => r.room_id);
+    const shared = myIds.filter(id => frIds.includes(id));
+
+    if (shared.length) {
+      const { data: rooms } = await sb.from('lounge_rooms').select('id').in('id', shared).eq('type', 'dm');
+      if (rooms?.length) {
+        // Make sure it's in our convos list
+        if (!convos.find(c => c.id === rooms[0].id)) {
+          const { data: fp } = await sb.from('profiles').select('full_name, avatar_url').eq('id', friendId).single();
+          const friendName = fp?.full_name || 'Friend';
+          convos.unshift({
+            id: rooms[0].id, type: 'dm', name: friendName,
+            initials: friendName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(),
+            avatarImg: fp?.avatar_url || null, color: getColor(friendId), messages: [], unread: 0,
+          });
+          // Remove friend shortcut entry
+          const idx = convos.findIndex(c => c.id === 'friend:' + friendId);
+          if (idx !== -1) convos.splice(idx, 1);
+        }
+        openConvo(rooms[0].id);
+        return;
+      }
+    }
+
+    // Create DM room
+    const { data: room, error } = await sb.from('lounge_rooms').insert({ name: 'dm', type: 'dm', created_by: ME.id }).select().single();
+    if (error || !room) return;
+    await sb.from('lounge_members').insert([{ room_id: room.id, user_id: ME.id }, { room_id: room.id, user_id: friendId }]);
+
+    const { data: fp } = await sb.from('profiles').select('full_name, avatar_url').eq('id', friendId).single();
+    const friendName = fp?.full_name || 'Friend';
+    // Remove friend shortcut, add real room
+    const idx = convos.findIndex(c => c.id === 'friend:' + friendId);
+    if (idx !== -1) convos.splice(idx, 1);
+    convos.unshift({
+      id: room.id, type: 'dm', name: friendName,
+      initials: friendName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(),
+      avatarImg: fp?.avatar_url || null, color: getColor(friendId), messages: [], unread: 0,
+    });
+    renderSidebar();
+    openConvo(room.id);
+  }
+
+  /* ═══════════════════════════════════════════
+     NEW GROUP LOUNGE
+  ═══════════════════════════════════════════ */
+
+  function openNewLounge() {
+    document.getElementById('newLoungeModal').classList.add('open');
+    document.getElementById('newLoungeName').focus();
+  }
+  function closeNewLounge() { document.getElementById('newLoungeModal').classList.remove('open'); }
+
+  async function createLounge() {
+    const name = document.getElementById('newLoungeName').value.trim();
+    if (!name || !ME.id) return;
+    const { data: room, error } = await sb.from('lounge_rooms').insert({ name, type: 'group', created_by: ME.id }).select().single();
+    if (error || !room) { alert('Could not create lounge.'); return; }
+    await sb.from('lounge_members').insert({ room_id: room.id, user_id: ME.id });
+    closeNewLounge();
+    document.getElementById('newLoungeName').value = '';
+    document.getElementById('newLoungeDesc').value = '';
+    convos.unshift({ id: room.id, type: 'group', name, messages: [], unread: 0, memberCount: 1 });
+    renderSidebar();
+    openConvo(room.id);
+  }
+
+  document.getElementById('newLoungeModal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeNewLounge();
+  });
+
+  /* ═══════════════════════════════════════════
      GIF PICKER
   ═══════════════════════════════════════════ */
 
-  // Trending GIFs — static set for prototype.
-  // When backend is live, call Giphy API with user's key.
   const TRENDING_GIFS = [
     { url: 'https://media.giphy.com/media/l0HlNQ03J5JxX6lva/giphy.gif', title: 'celebration' },
     { url: 'https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif', title: 'nod' },
@@ -1000,15 +1104,13 @@
     { url: 'https://media.giphy.com/media/du3J3cXyzhj75IOgvA/giphy.gif', title: 'cool' },
     { url: 'https://media.giphy.com/media/l0HlvtIPzPdt2usKs/giphy.gif', title: 'wow' },
   ];
-
   let gifResults = [...TRENDING_GIFS];
 
   function renderGifs(list) {
     document.getElementById('gifGrid').innerHTML = list.map(g =>
       `<div class="gif-thumb" onclick="selectGif('${g.url}')">
         <img src="${g.url}" alt="${g.title}" loading="lazy" />
-      </div>`
-    ).join('');
+      </div>`).join('');
   }
 
   function toggleGifPicker(e) {
@@ -1019,26 +1121,18 @@
     if (!isOpen) renderGifs(gifResults);
   }
 
-  function closeGifPicker() {
-    document.getElementById('gifPicker').classList.remove('open');
-  }
+  function closeGifPicker() { document.getElementById('gifPicker').classList.remove('open'); }
 
   function searchGifs(query) {
-    // Prototype: filter static set. Wire to Giphy /search when live.
     const q = query.toLowerCase();
     gifResults = q ? TRENDING_GIFS.filter(g => g.title.includes(q)) : TRENDING_GIFS;
     renderGifs(gifResults);
   }
 
-  function selectGif(url) {
-    pendingGif = url;
-    sendMessage();
-  }
+  function selectGif(url) { pendingGif = url; sendMessage(); }
 
   document.addEventListener('click', e => {
-    if (!e.target.closest('.composer-area') && !e.target.closest('.gif-picker')) {
-      closeGifPicker();
-    }
+    if (!e.target.closest('.composer-area') && !e.target.closest('.gif-picker')) closeGifPicker();
   });
 
   /* ═══════════════════════════════════════════
@@ -1046,14 +1140,10 @@
   ═══════════════════════════════════════════ */
 
   const BUBBLE_COLORS = [
-    { hex: '#6b4fbb', name: 'Lavender' },
-    { hex: '#c85c3a', name: 'Rust' },
-    { hex: '#4ab5aa', name: 'Teal' },
-    { hex: '#e8992a', name: 'Amber' },
-    { hex: '#2563eb', name: 'Blue' },
-    { hex: '#16a34a', name: 'Green' },
-    { hex: '#9333ea', name: 'Purple' },
-    { hex: '#e11d48', name: 'Rose' },
+    { hex: '#6b4fbb', name: 'Lavender' }, { hex: '#c85c3a', name: 'Rust' },
+    { hex: '#4ab5aa', name: 'Teal' },     { hex: '#e8992a', name: 'Amber' },
+    { hex: '#2563eb', name: 'Blue' },     { hex: '#16a34a', name: 'Green' },
+    { hex: '#9333ea', name: 'Purple' },   { hex: '#e11d48', name: 'Rose' },
   ];
 
   const FONTS = [
@@ -1066,21 +1156,16 @@
   function renderPersonality() {
     document.getElementById('bubbleColors').innerHTML = BUBBLE_COLORS.map(c =>
       `<div class="color-swatch${ME.bubbleColor === c.hex ? ' active' : ''}"
-            style="background:${c.hex}"
-            title="${c.name}"
-            onclick="setBubbleColor('${c.hex}', this)"></div>`
-    ).join('');
-
+            style="background:${c.hex}" title="${c.name}"
+            onclick="setBubbleColor('${c.hex}', this)"></div>`).join('');
     document.getElementById('fontOptions').innerHTML = FONTS.map(f =>
       `<div class="font-option${ME.font === f.name ? ' active' : ''}"
             style="font-family:'${f.name}'"
-            onclick="setChatFont('${f.name}', this)">${f.label}</div>`
-    ).join('');
+            onclick="setChatFont('${f.name}', this)">${f.label}</div>`).join('');
   }
 
   function togglePersonality() {
-    const drawer = document.getElementById('personalityDrawer');
-    drawer.classList.toggle('open');
+    document.getElementById('personalityDrawer').classList.toggle('open');
     renderPersonality();
   }
 
@@ -1089,10 +1174,8 @@
     document.documentElement.style.setProperty('--bubble-me', hex);
     document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
     el.classList.add('active');
-    if (activeConvoId) {
-      const c = convos.find(x => x.id === activeConvoId);
-      if (c) renderMessages(c);
-    }
+    const c = convos.find(x => x.id === activeConvoId);
+    if (c) renderMessages(c);
     localStorage.setItem('pm_bubble', hex);
   }
 
@@ -1122,53 +1205,28 @@
   }
 
   /* ═══════════════════════════════════════════
-     NEW LOUNGE MODAL
-  ═══════════════════════════════════════════ */
-
-  function openNewLounge() {
-    document.getElementById('newLoungeModal').classList.add('open');
-    document.getElementById('newLoungeName').focus();
-  }
-  function closeNewLounge() {
-    document.getElementById('newLoungeModal').classList.remove('open');
-  }
-  function createLounge() {
-    const name = document.getElementById('newLoungeName').value.trim();
-    if (!name) return;
-    const id = 'q-' + Date.now();
-    convos.unshift({
-      id, type: 'group', name,
-      avatar: '💬', color: '#4e3aa0',
-      members: [ME.name], unread: 0, messages: [],
-    });
-    closeNewLounge();
-    document.getElementById('newLoungeName').value = '';
-    document.getElementById('newLoungeDesc').value = '';
-    renderSidebar();
-    openConvo(id);
-  }
-  document.getElementById('newLoungeModal').addEventListener('click', e => {
-    if (e.target === e.currentTarget) closeNewLounge();
-  });
-
-  /* ═══════════════════════════════════════════
-     FILTER
+     FILTER / UTILS
   ═══════════════════════════════════════════ */
 
   function filterConvs(q) { renderSidebar(); }
 
-  /* ═══════════════════════════════════════════
-     UTILS
-  ═══════════════════════════════════════════ */
-
   const COLORS = ['#4e3aa0','#326e8e','#c85c3a','#4ab5aa','#9333ea'];
   function getColor(id) {
-    let h = 0; for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
+    let h = 0;
+    for (let i = 0; i < (id||'').length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
     return COLORS[Math.abs(h) % COLORS.length];
   }
 
   function escHtml(str) {
     return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function fmtTime(iso) {
+    if (!iso) return '';
+    const d = new Date(iso), now = new Date();
+    const isToday = d.toDateString() === now.toDateString();
+    if (isToday) { const h = d.getHours(), m = d.getMinutes(); return `${h%12||12}:${String(m).padStart(2,'0')} ${h>=12?'PM':'AM'}`; }
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   }
 
   /* ═══════════════════════════════════════════
@@ -1182,15 +1240,11 @@
     const user = session.user;
     ME.id = user.id;
 
-    // Load profile
     const { data: profile } = await sb.from('profiles').select('full_name, handle, avatar_url').eq('id', user.id).single();
     ME.name = profile?.full_name || user.email.split('@')[0];
     const handle = profile?.handle || ME.name.toLowerCase().replace(/\s+/g,'') + '.postmarq';
 
-    // Update address bar
     document.getElementById('addressHandle').textContent = handle;
-
-    // Update sidebar
     document.getElementById('sidebarName').textContent = ME.name;
     ME.initials = ME.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || '?';
     document.getElementById('sidebarInitials').textContent = ME.initials;
@@ -1198,16 +1252,15 @@
     if (profile?.avatar_url) {
       const img = document.getElementById('sidebarAvatar');
       img.src = profile.avatar_url + '?t=' + Date.now();
-      img.alt = ME.name;
-      img.style.display = 'block';
+      img.alt = ME.name; img.style.display = 'block';
       document.getElementById('sidebarInitials').style.display = 'none';
     }
 
-    // Restore saved personality
+    // Restore personality
     const savedBubble = localStorage.getItem('pm_bubble');
     if (savedBubble) { ME.bubbleColor = savedBubble; document.documentElement.style.setProperty('--bubble-me', savedBubble); }
     const savedFont = localStorage.getItem('pm_font');
-    if (savedFont) { ME.font = savedFont; }
+    if (savedFont) ME.font = savedFont;
     const savedAway = localStorage.getItem('pm_away');
     if (savedAway) { ME.awayMsg = savedAway; document.getElementById('awayMsgInput').value = savedAway; document.getElementById('myAwayMsg').textContent = savedAway; }
     const savedStatus = localStorage.getItem('pm_status');
@@ -1215,6 +1268,55 @@
       const colors = { online: '#4ade80', away: '#facc15', busy: '#f87171', offline: 'rgba(232,224,240,0.18)' };
       document.documentElement.style.setProperty('--status-color', colors[savedStatus] || colors.online);
       document.getElementById('myStatusDot').style.background = colors[savedStatus] || colors.online;
+    }
+
+    // Load rooms this user belongs to
+    const { data: memberRows } = await sb.from('lounge_members').select('room_id').eq('user_id', ME.id);
+    const roomIds = (memberRows || []).map(r => r.room_id);
+
+    if (roomIds.length) {
+      const { data: rooms } = await sb.from('lounge_rooms').select('id, name, type, created_at').in('id', roomIds).order('created_at', { ascending: false });
+
+      for (const room of (rooms || [])) {
+        if (room.type === 'dm') {
+          const { data: members } = await sb.from('lounge_members').select('user_id').eq('room_id', room.id);
+          const otherId = (members || []).map(m => m.user_id).find(id => id !== ME.id);
+          if (otherId) {
+            const { data: fp } = await sb.from('profiles').select('full_name, avatar_url').eq('id', otherId).single();
+            const friendName = fp?.full_name || 'Someone';
+            convos.push({
+              id: room.id, type: 'dm', name: friendName,
+              initials: friendName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(),
+              avatarImg: fp?.avatar_url || null, color: getColor(otherId), messages: [], unread: 0,
+            });
+          }
+        } else {
+          const { data: mems } = await sb.from('lounge_members').select('user_id').eq('room_id', room.id);
+          convos.push({ id: room.id, type: 'group', name: room.name, messages: [], unread: 0, memberCount: (mems||[]).length });
+        }
+      }
+    }
+
+    // Add accepted friends as DM shortcuts (no room yet)
+    const { data: friends } = await sb.from('friend_requests')
+      .select('from_user_id, to_user_id, profiles_from:from_user_id(id, full_name, avatar_url), profiles_to:to_user_id(id, full_name, avatar_url)')
+      .or(`from_user_id.eq.${ME.id},to_user_id.eq.${ME.id}`)
+      .eq('status', 'accepted');
+
+    for (const fr of (friends || [])) {
+      const fp = fr.from_user_id === ME.id ? fr.profiles_to : fr.profiles_from;
+      const friendId = fr.from_user_id === ME.id ? fr.to_user_id : fr.from_user_id;
+      if (!fp) continue;
+      // Skip if we already have a real DM room with them
+      const hasDM = convos.find(c => c.type === 'dm' && c.friendId === friendId);
+      if (!hasDM) {
+        convos.push({
+          id: 'friend:' + friendId, type: 'dm', name: fp.full_name || 'Friend',
+          initials: (fp.full_name||'F').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(),
+          avatarImg: fp.avatar_url || null, color: getColor(friendId),
+          friendId, messages: [], unread: 0,
+        });
+      }
     }
 
     renderSidebar();
