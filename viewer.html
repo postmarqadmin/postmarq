@@ -143,9 +143,23 @@
       width: 5px; background: #1040A0; cursor: col-resize; flex-shrink: 0;
     }
     #ed-divider:hover { background: #4A88E8; }
+
+    /* ── Back to profile pill ── */
+    #back-pill {
+      display: none; position: fixed; bottom: 14px; left: 14px; z-index: 9998;
+      background: #ECE9D8; border: 2px solid;
+      border-color: #fff #808080 #808080 #fff;
+      padding: 4px 12px; font-family: Tahoma, Arial, sans-serif;
+      font-size: 11px; color: #316AC5; text-decoration: none;
+      box-shadow: 2px 2px 4px rgba(0,0,0,0.25);
+    }
+    #back-pill:hover { background: #DDD9C8; }
+    #back-pill.visible { display: block; }
   </style>
 </head>
 <body>
+
+<a id="back-pill" href="#">← back</a>
 
 <div id="logout-pill">
   <span id="pill-username"></span>
@@ -262,6 +276,13 @@
     }
 
     document.title = username + (currentRoom ? '/' + currentRoom : '') + ' — Postmarq';
+
+    if (currentRoom) {
+      const pill = document.getElementById('back-pill');
+      pill.href = '/' + username;
+      pill.textContent = '← ' + username;
+      pill.classList.add('visible');
+    }
 
     // 1. Fetch page data
     const { data: post, error } = await sb.from('pages').select('*').eq('username', username).single();
