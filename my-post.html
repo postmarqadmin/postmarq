@@ -2615,7 +2615,7 @@
     }
 
     async function loadPosts() {
-      let query = sb.from('posts').select('id, user_id, body, media, created_at, stamps(count), profiles:user_id(full_name, avatar_url)');
+      let query = sb.from('posts').select('id, user_id, body, media, created_at');
 
       if (feedPrefs.audience === 'me') {
         query = query.eq('user_id', currentUser.id);
@@ -2629,7 +2629,8 @@
         query = query.in('user_id', friendIds);
       }
 
-      const { data: posts } = await query.order('created_at', { ascending: false }).limit(50);
+      const { data: posts, error: fetchError } = await query.order('created_at', { ascending: false }).limit(50);
+      if (fetchError) console.error('[loadPosts] error:', fetchError.message, fetchError.details, fetchError.hint);
       cachedPosts = posts || [];
 
       const key = `${localKey}_feedFetchedAt`;
@@ -2687,7 +2688,14 @@
       const feed = document.getElementById('dailyFeed');
       feed.innerHTML = `<div class="glass" style="border-radius:var(--radius-lg)"><div class="empty-state"><div class="empty-icon" style="font-size:1.2rem;opacity:0.3">⏳</div><div>Loading…</div></div></div>`;
 
-      await loadPosts();
+      try {
+        await loadPosts();
+      } catch (e) {
+        console.error('[renderFeed] loadPosts threw:', e);
+        feed.innerHTML = `<div class="glass" style="border-radius:var(--radius-lg)"><div class="empty-state"><div class="empty-icon">⚠️</div><div>Feed error: ${e.message}</div></div></div>`;
+        return;
+      }
+      console.log('[renderFeed] cachedPosts count:', cachedPosts.length);
       weeklyRendered = false;
 
       if (!cachedPosts.length) {
