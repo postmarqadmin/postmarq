@@ -959,7 +959,7 @@
       display: flex; align-items: center; justify-content: center; font-size: 1.6rem;
     }
     .np-info { flex: 1; min-width: 0; }
-    .np-status-row { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.3rem; }
+    .np-status-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem; }
     .np-pip {
       width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
       background: #1db954; box-shadow: 0 0 6px #1db95488;
@@ -968,21 +968,62 @@
     .np-pip.looping { background: var(--lavender); box-shadow: 0 0 6px rgba(155,143,212,0.6); animation: np-pulse 1.6s ease-in-out infinite; }
     @keyframes np-pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
     .np-status-label { font-size: 0.6rem; font-weight: 800; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.06em; }
+
+    /* Visualizer bars */
+    .np-viz { display: flex; align-items: flex-end; gap: 2px; height: 14px; }
+    .np-viz-bar {
+      width: 3px; border-radius: 2px;
+      background: linear-gradient(to top, var(--lavender), #9feaff);
+      animation: np-bar var(--dur, 0.8s) ease-in-out infinite alternate;
+      animation-delay: var(--delay, 0s);
+    }
+    @keyframes np-bar { from { height: 3px; opacity:0.5; } to { height: 100%; opacity:1; } }
+    .np-viz.paused .np-viz-bar { animation-play-state: paused; height: 3px; }
+
     .np-track {
       font-size: 0.88rem; font-weight: 900; color: var(--ink);
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;
     }
     .np-artist { font-size: 0.72rem; font-weight: 700; color: var(--ink-2); margin-top: 0.2rem; }
     .np-album { font-size: 0.65rem; color: var(--ink-4); margin-top: 0.1rem; font-style: italic; }
+
+    /* Play button */
+    .np-play-btn {
+      width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+      background: rgba(155,143,212,0.12); border: 1.5px solid rgba(155,143,212,0.4);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background 0.15s, border-color 0.15s;
+      color: var(--lavender); font-size: 0.75rem;
+    }
+    .np-play-btn:hover { background: rgba(155,143,212,0.22); border-color: rgba(155,143,212,0.7); }
+    .np-play-btn.playing { background: var(--lavender); border-color: var(--lavender); color: #fff; }
+
+    .np-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.45rem; flex-shrink: 0; }
     .np-edit-btn {
       background: none; border: 1px solid rgba(155,143,212,0.35);
-      border-radius: 7px; padding: 0.25rem 0.55rem;
-      font-size: 0.65rem; font-weight: 800; color: var(--lavender);
-      cursor: pointer; font-family: var(--font); flex-shrink: 0;
+      border-radius: 7px; padding: 0.22rem 0.5rem;
+      font-size: 0.62rem; font-weight: 800; color: var(--lavender);
+      cursor: pointer; font-family: var(--font);
       transition: background 0.15s;
     }
     .np-edit-btn:hover { background: rgba(155,143,212,0.12); }
     .np-empty { font-size: 0.75rem; color: var(--ink-4); font-style: italic; }
+
+    /* Upload row in modal */
+    .np-upload-row {
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .np-upload-btn {
+      padding: 0.45rem 0.9rem; border-radius: 8px; font-family: var(--font);
+      border: 1px solid rgba(155,143,212,0.4); background: rgba(155,143,212,0.08);
+      font-size: 0.78rem; font-weight: 700; color: var(--lavender);
+      cursor: pointer; white-space: nowrap; transition: background 0.15s;
+    }
+    .np-upload-btn:hover { background: rgba(155,143,212,0.18); }
+    .np-upload-name {
+      font-size: 0.7rem; color: var(--ink-3); overflow: hidden;
+      text-overflow: ellipsis; white-space: nowrap; flex: 1;
+    }
 
     /* Now Playing modal */
     .np-modal-overlay {
@@ -1525,6 +1566,8 @@
   </div>
 
   <!-- ── Now Playing Modal ── -->
+  <input type="file" id="npCoverInput" class="file-input" accept="image/*" onchange="npHandleCoverUpload(this)" />
+  <input type="file" id="npAudioInput" class="file-input" accept="audio/*" onchange="npHandleAudioUpload(this)" />
   <div class="np-modal-overlay" id="npModalOverlay">
     <div class="np-modal">
       <h3>Now Playing</h3>
@@ -1549,16 +1592,22 @@
         </select>
       </div>
       <div class="mshelf-field">
-        <label>Album art URL <span style="font-weight:400;opacity:0.6">(optional)</span></label>
-        <input id="npCover" type="url" placeholder="Paste an image URL" />
+        <label>Album Art <span style="font-weight:400;opacity:0.6">(optional)</span></label>
+        <div class="np-upload-row">
+          <button class="np-upload-btn" onclick="document.getElementById('npCoverInput').click()">Choose Image</button>
+          <span class="np-upload-name" id="npCoverName">No file chosen</span>
+        </div>
       </div>
       <div class="mshelf-field">
-        <label>Link <span style="font-weight:400;opacity:0.6">(optional — Spotify, Apple Music, etc.)</span></label>
-        <input id="npLink" type="url" placeholder="https://open.spotify.com/..." />
+        <label>Audio File <span style="font-weight:400;opacity:0.6">(optional — MP3, M4A, etc.)</span></label>
+        <div class="np-upload-row">
+          <button class="np-upload-btn" onclick="document.getElementById('npAudioInput').click()">Choose Audio</button>
+          <span class="np-upload-name" id="npAudioName">No file chosen</span>
+        </div>
       </div>
       <div class="mshelf-modal-actions">
         <button class="mshelf-modal-cancel" onclick="closeNpModal()">Cancel</button>
-        <button class="mshelf-modal-save" onclick="saveNpWidget()">Save</button>
+        <button class="mshelf-modal-save" id="npSaveBtn" onclick="saveNpWidget()">Save</button>
       </div>
     </div>
   </div>
@@ -2337,18 +2386,25 @@
     }
     // ── Now Playing widget ──
     let editingNpWidgetId = null;
+    let _npPendingCoverUrl = null;
+    let _npPendingAudioUrl = null;
+
+    function _npVizBars() {
+      const durs = [0.6, 0.9, 0.5, 1.1, 0.7, 0.85, 0.55, 0.95];
+      return durs.map((d, i) =>
+        `<div class="np-viz-bar" style="--dur:${d}s;--delay:${i * 0.07}s"></div>`
+      ).join('');
+    }
 
     function renderNowPlaying(el, widget) {
       const d = widget.data || {};
-      const statusLabel = { playing: 'Now Playing', looping: 'On Repeat', paused: 'Paused' }[d.status] || 'Now Playing';
       const pipClass = d.status === 'paused' ? 'paused' : d.status === 'looping' ? 'looping' : '';
+      const statusLabel = { playing: 'Now Playing', looping: 'On Repeat', paused: 'Paused' }[d.status] || 'Now Playing';
 
       if (!d.track) {
         el.innerHTML = `<div class="np-card">
           <div class="np-cover-empty"><i class="ti ti-music"></i></div>
-          <div class="np-info">
-            <span class="np-empty">Nothing playing yet.</span>
-          </div>
+          <div class="np-info"><span class="np-empty">Nothing playing yet.</span></div>
           <button class="np-edit-btn" onclick="openNpModal('${widget.id}')">Edit</button>
         </div>`;
         return;
@@ -2362,49 +2418,118 @@
         ? `<a class="np-track" href="${d.link}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;">${d.track}</a>`
         : `<div class="np-track">${d.track}</div>`;
 
-      el.innerHTML = `<div class="np-card">
-        ${coverHtml}
-        <div class="np-info">
-          <div class="np-status-row">
-            <span class="np-pip ${pipClass}"></span>
-            <span class="np-status-label">${statusLabel}</span>
+      el.innerHTML = `
+        ${d.audio_url ? `<audio id="np-audio-${widget.id}" src="${d.audio_url}" loop="${d.status === 'looping'}" preload="none"></audio>` : ''}
+        <div class="np-card">
+          ${coverHtml}
+          <div class="np-info">
+            <div class="np-status-row">
+              <span class="np-pip ${pipClass}"></span>
+              <span class="np-status-label">${statusLabel}</span>
+              <div class="np-viz ${d.status === 'paused' ? 'paused' : ''}">${_npVizBars()}</div>
+            </div>
+            ${trackHtml}
+            ${d.artist ? `<div class="np-artist">${d.artist}</div>` : ''}
+            ${d.album  ? `<div class="np-album">${d.album}</div>`   : ''}
           </div>
-          ${trackHtml}
-          ${d.artist ? `<div class="np-artist">${d.artist}</div>` : ''}
-          ${d.album ? `<div class="np-album">${d.album}</div>` : ''}
-        </div>
-        <button class="np-edit-btn" onclick="openNpModal('${widget.id}')">Edit</button>
-      </div>`;
+          <div class="np-right">
+            ${d.audio_url ? `<button class="np-play-btn" id="np-playbtn-${widget.id}" onclick="npTogglePlay('${widget.id}')"><i class="ti ti-player-play-filled"></i></button>` : ''}
+            <button class="np-edit-btn" onclick="openNpModal('${widget.id}')">Edit</button>
+          </div>
+        </div>`;
+    }
+
+    function npTogglePlay(widgetId) {
+      const audio = document.getElementById(`np-audio-${widgetId}`);
+      const btn   = document.getElementById(`np-playbtn-${widgetId}`);
+      const viz   = btn?.closest('.np-card')?.querySelector('.np-viz');
+      if (!audio) return;
+      if (audio.paused) {
+        audio.play();
+        btn.classList.add('playing');
+        btn.innerHTML = '<i class="ti ti-player-pause-filled"></i>';
+        viz?.classList.remove('paused');
+      } else {
+        audio.pause();
+        btn.classList.remove('playing');
+        btn.innerHTML = '<i class="ti ti-player-play-filled"></i>';
+        viz?.classList.add('paused');
+      }
     }
 
     function openNpModal(widgetId) {
       editingNpWidgetId = widgetId;
+      _npPendingCoverUrl = null;
+      _npPendingAudioUrl = null;
       const widget = userWidgets.find(w => w.id === widgetId);
       const d = widget?.data || {};
-      document.getElementById('npTrack').value = d.track || '';
+      document.getElementById('npTrack').value  = d.track  || '';
       document.getElementById('npArtist').value = d.artist || '';
-      document.getElementById('npAlbum').value = d.album || '';
+      document.getElementById('npAlbum').value  = d.album  || '';
       document.getElementById('npStatus').value = d.status || 'playing';
-      document.getElementById('npCover').value = d.cover_url || '';
-      document.getElementById('npLink').value = d.link || '';
+      document.getElementById('npCoverName').textContent = d.cover_url ? 'Current image saved' : 'No file chosen';
+      document.getElementById('npAudioName').textContent = d.audio_url ? 'Current audio saved' : 'No file chosen';
+      document.getElementById('npCoverInput').value = '';
+      document.getElementById('npAudioInput').value = '';
       document.getElementById('npModalOverlay').classList.add('open');
     }
 
     function closeNpModal() {
       document.getElementById('npModalOverlay').classList.remove('open');
       editingNpWidgetId = null;
+      _npPendingCoverUrl = null;
+      _npPendingAudioUrl = null;
+    }
+
+    async function npUploadFile(file, folder) {
+      const ext  = file.name.split('.').pop();
+      const path = `${currentUser.id}/${folder}/${Date.now()}.${ext}`;
+      const { error } = await sb.storage.from('media').upload(path, file, { upsert: true });
+      if (error) throw error;
+      const { data } = sb.storage.from('media').getPublicUrl(path);
+      return data.publicUrl;
+    }
+
+    async function npHandleCoverUpload(input) {
+      const file = input.files[0];
+      if (!file) return;
+      document.getElementById('npCoverName').textContent = 'Uploading...';
+      try {
+        _npPendingCoverUrl = await npUploadFile(file, 'covers');
+        document.getElementById('npCoverName').textContent = file.name;
+      } catch (e) {
+        document.getElementById('npCoverName').textContent = 'Upload failed';
+        alert('Cover upload failed: ' + e.message);
+      }
+    }
+
+    async function npHandleAudioUpload(input) {
+      const file = input.files[0];
+      if (!file) return;
+      document.getElementById('npAudioName').textContent = 'Uploading...';
+      document.getElementById('npSaveBtn').disabled = true;
+      try {
+        _npPendingAudioUrl = await npUploadFile(file, 'audio');
+        document.getElementById('npAudioName').textContent = file.name;
+      } catch (e) {
+        document.getElementById('npAudioName').textContent = 'Upload failed';
+        alert('Audio upload failed: ' + e.message);
+      } finally {
+        document.getElementById('npSaveBtn').disabled = false;
+      }
     }
 
     async function saveNpWidget() {
       const widget = userWidgets.find(w => w.id === editingNpWidgetId);
       if (!widget) return;
+      const prev = widget.data || {};
       const data = {
-        track: document.getElementById('npTrack').value.trim(),
-        artist: document.getElementById('npArtist').value.trim(),
-        album: document.getElementById('npAlbum').value.trim(),
-        status: document.getElementById('npStatus').value,
-        cover_url: document.getElementById('npCover').value.trim(),
-        link: document.getElementById('npLink').value.trim(),
+        track:     document.getElementById('npTrack').value.trim(),
+        artist:    document.getElementById('npArtist').value.trim(),
+        album:     document.getElementById('npAlbum').value.trim(),
+        status:    document.getElementById('npStatus').value,
+        cover_url: _npPendingCoverUrl ?? prev.cover_url ?? '',
+        audio_url: _npPendingAudioUrl ?? prev.audio_url ?? '',
       };
       const { error } = await sb.from('widgets').update({ data, updated_at: new Date().toISOString() }).eq('id', widget.id);
       if (error) { alert('Could not save: ' + error.message); return; }
