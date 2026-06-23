@@ -475,34 +475,32 @@
       to { --feed-angle: 360deg; }
     }
     .feed-controls-wrap {
-      border-radius: 15px; padding: 1.5px; width: 100%;
-      background: conic-gradient(from var(--feed-angle), #00c896, #00ff9d, #a3ff6e, #00bfa8, #00c896);
-      animation: feed-angle 4s linear infinite;
-      box-shadow: 0 0 28px rgba(0,200,150,0.32), 0 0 56px rgba(0,255,157,0.15);
+      border-radius: var(--radius-lg); width: 100%;
     }
     .feed-controls {
-      border-radius: 14px; padding: 0.65rem 1rem;
-      background: #060f0c;
+      border-radius: var(--radius-lg); padding: 0.65rem 1rem;
+      background: var(--glass-white); backdrop-filter: blur(18px) saturate(1.6);
+      -webkit-backdrop-filter: blur(18px) saturate(1.6);
+      border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);
       display: flex; align-items: center; gap: 0.5rem;
     }
-    .fc-label { font-size: 0.62rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; color: #3a9e7a; }
+    .fc-label { font-size: 0.62rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; color: #1a9e74; }
     .fc-select {
       background: none; border: none; font-family: var(--font);
-      font-size: 0.75rem; font-weight: 800; color: #fff; cursor: pointer;
+      font-size: 0.75rem; font-weight: 800; color: var(--ink); cursor: pointer;
       padding: 0.2rem 0.3rem; border-radius: 6px; transition: background 0.15s;
       -webkit-appearance: none; appearance: none;
     }
-    .fc-select:focus { outline: none; background: rgba(0,200,150,0.1); }
-    .fc-select option { background: #0d1f19; color: #fff; }
-    .fc-divider { width: 1px; height: 14px; background: rgba(255,255,255,0.1); margin: 0 4px; }
+    .fc-select:focus { outline: none; background: rgba(0,180,120,0.08); }
+    .fc-divider { width: 1px; height: 14px; background: rgba(0,0,0,0.1); margin: 0 4px; }
     .fc-spacer { flex: 1; }
     .fc-refresh-btn {
-      background: none; border: 1px solid rgba(0,200,150,0.3); border-radius: 6px;
+      background: none; border: 1px solid rgba(0,180,120,0.35); border-radius: 6px;
       width: 26px; height: 26px; display: flex; align-items: center; justify-content: center;
-      color: #00c896; cursor: pointer; font-size: 0.85rem; transition: background 0.15s;
+      color: #1a9e74; cursor: pointer; font-size: 0.85rem; transition: background 0.15s;
       line-height: 1;
     }
-    .fc-refresh-btn:hover { background: rgba(0,200,150,0.15); }
+    .fc-refresh-btn:hover { background: rgba(0,180,120,0.1); }
 
     /* ── Feed Tabs ── */
     .feed-tabs {
