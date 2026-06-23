@@ -587,10 +587,13 @@
 
     if (p.stamp) {
       const stampEl = document.getElementById('stampDisplay');
-      if (p.stamp.startsWith('data:') || p.stamp.startsWith('http')) {
-        stampEl.innerHTML = `<img src="${p.stamp}" />`;
+      const s = p.stamp;
+      if (s.startsWith('img:')) {
+        stampEl.innerHTML = `<img src="${s.slice(4)}" alt="stamp" />`;
+      } else if (s.startsWith('data:') || s.startsWith('http')) {
+        stampEl.innerHTML = `<img src="${s}" alt="stamp" />`;
       } else {
-        stampEl.textContent = p.stamp;
+        stampEl.textContent = s;
       }
       document.getElementById('stampRow').style.display = '';
       document.getElementById('stampDivider').style.display = '';
