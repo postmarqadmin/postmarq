@@ -1457,11 +1457,13 @@
     }
 
     async function createNewSite() {
+      if (!currentHandle) { alert('Profile not loaded yet — try again in a moment.'); return; }
+      const { count } = await sb.from('rooms').select('*', { count: 'exact', head: true }).eq('username', currentHandle);
+      if (count >= 10) { alert('You\'ve reached the 10 site limit. Remove a site to create a new one.'); return; }
       const raw = prompt('Site name (e.g. portfolio, blog, music):');
       if (!raw) return;
       const slug = raw.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
       if (!slug) return;
-      if (!currentHandle) { alert('Profile not loaded yet — try again in a moment.'); return; }
       const { error } = await sb.from('rooms').insert({ user_id: currentUser.id, username: currentHandle, room_name: slug, html: '', css: '', js: '' });
       if (error) { alert('Could not create site: ' + error.message); return; }
       window.location.href = `/${currentHandle}/${slug}`;
