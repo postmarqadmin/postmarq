@@ -644,7 +644,7 @@
         <div class="sidebar-section">
           <div class="section-label">
             Direct Messages
-            <button class="btn-add" title="New DM"><i class="ti ti-plus"></i></button>
+            <button class="btn-add" title="New DM" onclick="openNewDM()"><i class="ti ti-plus"></i></button>
           </div>
         </div>
         <ul class="conv-list" id="dmList"></ul>
@@ -756,6 +756,17 @@
       </div>
     </aside>
 
+  </div>
+
+  <!-- New DM Modal -->
+  <div class="modal-overlay" id="newDMModal">
+    <div class="modal">
+      <div class="modal-title">Message a Friend</div>
+      <ul class="conv-list" id="dmFriendList" style="max-height:260px;overflow-y:auto;margin-bottom:0.75rem;"></ul>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeNewDM()">Cancel</button>
+      </div>
+    </div>
   </div>
 
   <!-- New Lounge/Quorum Modal -->
@@ -1063,6 +1074,31 @@
   }
 
   /* ═══════════════════════════════════════════
+     NEW DM MODAL
+  ═══════════════════════════════════════════ */
+
+  let allFriends = []; // { id, name, avatarImg }
+
+  async function openNewDM() {
+    document.getElementById('newDMModal').classList.add('open');
+    // Render current friends list
+    if (!allFriends.length) {
+      document.getElementById('dmFriendList').innerHTML = '<li style="padding:0.5rem 0.6rem;color:var(--ink-3);font-size:0.78rem;">No friends yet — Loop someone in first!</li>';
+      return;
+    }
+    document.getElementById('dmFriendList').innerHTML = allFriends.map(f => `
+      <li class="conv-item" onclick="closeNewDM(); startDM('${f.id}')">
+        <div class="conv-avatar" style="background:${getColor(f.id)}">
+          ${f.avatarImg ? `<img src="${escHtml(f.avatarImg)}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : escHtml(f.initials)}
+        </div>
+        <div class="conv-info"><div class="conv-name">${escHtml(f.name)}</div></div>
+      </li>`).join('');
+  }
+
+  function closeNewDM() { document.getElementById('newDMModal').classList.remove('open'); }
+  document.getElementById('newDMModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeNewDM(); });
+
+  /* ═══════════════════════════════════════════
      NEW GROUP LOUNGE
   ═══════════════════════════════════════════ */
 
@@ -1297,24 +1333,27 @@
       }
     }
 
-    // Add accepted friends as DM shortcuts (no room yet)
-    const { data: friends } = await sb.from('friend_requests')
-      .select('from_user_id, to_user_id, profiles_from:from_user_id(id, full_name, avatar_url), profiles_to:to_user_id(id, full_name, avatar_url)')
+    // Load accepted friends for DM shortcuts and picker
+    const { data: frRows } = await sb.from('friend_requests')
+      .select('from_user_id, to_user_id')
       .or(`from_user_id.eq.${ME.id},to_user_id.eq.${ME.id}`)
       .eq('status', 'accepted');
 
-    for (const fr of (friends || [])) {
-      const fp = fr.from_user_id === ME.id ? fr.profiles_to : fr.profiles_from;
+    for (const fr of (frRows || [])) {
       const friendId = fr.from_user_id === ME.id ? fr.to_user_id : fr.from_user_id;
+      const { data: fp } = await sb.from('profiles').select('full_name, avatar_url').eq('id', friendId).single();
       if (!fp) continue;
-      // Skip if we already have a real DM room with them
-      const hasDM = convos.find(c => c.type === 'dm' && c.friendId === friendId);
+      const friendName = fp.full_name || 'Friend';
+      const initials = friendName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      // Store in allFriends for the DM picker
+      allFriends.push({ id: friendId, name: friendName, initials, avatarImg: fp.avatar_url || null });
+      // Add to sidebar if no existing DM room with them
+      const hasDM = convos.find(c => c.type === 'dm' && (c.friendId === friendId || c.otherId === friendId));
       if (!hasDM) {
         convos.push({
-          id: 'friend:' + friendId, type: 'dm', name: fp.full_name || 'Friend',
-          initials: (fp.full_name||'F').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(),
-          avatarImg: fp.avatar_url || null, color: getColor(friendId),
-          friendId, messages: [], unread: 0,
+          id: 'friend:' + friendId, type: 'dm', name: friendName,
+          initials, avatarImg: fp.avatar_url || null,
+          color: getColor(friendId), friendId, messages: [], unread: 0,
         });
       }
     }
