@@ -715,6 +715,164 @@
       border-top: 0.5px solid rgba(255,255,255,0.06);
     }
 
+    /* ── Widget Manager ── */
+    .widget-section {
+      border-radius: 14px; overflow: hidden;
+      background: var(--glass-white); backdrop-filter: blur(18px);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow), var(--glass-inset);
+    }
+    .widget-section-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.1rem 1.25rem 0.85rem;
+      border-bottom: 1px solid rgba(255,255,255,0.4);
+    }
+    .widget-section-title { font-size: 0.95rem; font-weight: 900; color: var(--ink); letter-spacing: -0.2px; }
+    .widget-add-btn {
+      background: rgba(155,143,212,0.14); border: 1px solid rgba(155,143,212,0.35);
+      color: var(--lavender); border-radius: 8px; padding: 0.28rem 0.75rem;
+      font-size: 0.7rem; font-weight: 800; cursor: pointer; font-family: var(--font);
+      transition: background 0.15s;
+    }
+    .widget-add-btn:hover { background: rgba(155,143,212,0.28); }
+    .widget-list { display: flex; flex-direction: column; }
+    .widget-empty {
+      padding: 1.5rem 1.25rem; font-size: 0.75rem; color: var(--ink-4);
+      font-style: italic; text-align: center; line-height: 1.6;
+    }
+
+    /* Widget Library overlay */
+    .widget-library-overlay {
+      display: none; position: fixed; inset: 0; z-index: 800;
+      background: rgba(20,10,40,0.6); backdrop-filter: blur(6px);
+      align-items: center; justify-content: center;
+    }
+    .widget-library-overlay.open { display: flex; }
+    .widget-library-modal {
+      background: #fef3d8; border-radius: 18px; width: 100%; max-width: 480px;
+      max-height: 80vh; overflow-y: auto;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.35);
+      padding: 1.5rem;
+    }
+    .widget-library-title {
+      font-size: 1.1rem; font-weight: 900; color: var(--ink);
+      margin-bottom: 0.4rem; letter-spacing: -0.3px;
+    }
+    .widget-library-sub { font-size: 0.75rem; color: var(--ink-3); margin-bottom: 1.2rem; }
+    .widget-type-grid { display: flex; flex-direction: column; gap: 0.6rem; }
+    .widget-type-card {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 0.9rem 1rem; border-radius: 12px;
+      background: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.8);
+      cursor: pointer; transition: background 0.15s, transform 0.15s;
+    }
+    .widget-type-card:hover { background: rgba(255,255,255,0.9); transform: translateY(-1px); }
+    .widget-type-icon { font-size: 1.8rem; line-height: 1; }
+    .widget-type-info { flex: 1; }
+    .widget-type-name { font-size: 0.9rem; font-weight: 800; color: var(--ink); margin-bottom: 0.2rem; }
+    .widget-type-desc { font-size: 0.72rem; color: var(--ink-3); line-height: 1.4; }
+    .widget-library-close {
+      margin-top: 1.2rem; width: 100%; padding: 0.6rem;
+      background: none; border: 1px solid rgba(160,125,96,0.3);
+      border-radius: 10px; cursor: pointer; font-family: var(--font);
+      font-size: 0.78rem; color: var(--ink-3);
+    }
+
+    /* Rendered widget rows */
+    .widget-row {
+      border-bottom: 1px solid rgba(255,255,255,0.4); padding: 1rem 1.25rem;
+    }
+    .widget-row:last-child { border-bottom: none; }
+    .widget-row-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+    .widget-row-name { font-size: 0.8rem; font-weight: 800; color: var(--ink); }
+    .widget-row-remove {
+      background: none; border: none; cursor: pointer;
+      font-size: 0.7rem; color: var(--ink-4); padding: 0;
+      transition: color 0.15s;
+    }
+    .widget-row-remove:hover { color: #c83030; }
+
+    /* Movie Shelf widget */
+    .mshelf-grid {
+      display: flex; gap: 0.6rem; overflow-x: auto; padding-bottom: 0.5rem;
+      scrollbar-width: thin; scrollbar-color: rgba(180,140,100,0.3) transparent;
+    }
+    .mshelf-grid::-webkit-scrollbar { height: 3px; }
+    .mshelf-grid::-webkit-scrollbar-thumb { background: rgba(180,140,100,0.3); border-radius: 2px; }
+    .mshelf-tile {
+      flex-shrink: 0; width: 72px; cursor: pointer; position: relative;
+    }
+    .mshelf-poster {
+      width: 72px; height: 108px; border-radius: 8px; object-fit: cover;
+      background: rgba(155,143,212,0.18); display: block;
+      border: 1px solid rgba(255,255,255,0.5);
+    }
+    .mshelf-poster-empty {
+      width: 72px; height: 108px; border-radius: 8px;
+      background: rgba(155,143,212,0.12); border: 1.5px dashed rgba(155,143,212,0.4);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+    }
+    .mshelf-title {
+      font-size: 0.6rem; font-weight: 700; color: var(--ink-2);
+      margin-top: 0.3rem; text-align: center; line-height: 1.3;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .mshelf-status {
+      position: absolute; top: 4px; right: 4px;
+      font-size: 0.5rem; font-weight: 900; padding: 1px 4px; border-radius: 4px;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .mshelf-status.seen { background: rgba(74,181,170,0.85); color: #fff; }
+    .mshelf-status.want { background: rgba(232,153,42,0.85); color: #fff; }
+    .mshelf-status.watching { background: rgba(155,143,212,0.85); color: #fff; }
+    .mshelf-add-tile {
+      flex-shrink: 0; width: 72px; cursor: pointer;
+    }
+    .mshelf-add-btn {
+      width: 72px; height: 108px; border-radius: 8px;
+      background: none; border: 1.5px dashed rgba(155,143,212,0.35);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; color: rgba(155,143,212,0.5); cursor: pointer;
+      transition: border-color 0.15s, color 0.15s; font-family: var(--font);
+    }
+    .mshelf-add-btn:hover { border-color: rgba(155,143,212,0.7); color: rgba(155,143,212,0.9); }
+
+    /* Movie add modal */
+    .mshelf-modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 900;
+      background: rgba(20,10,40,0.6); backdrop-filter: blur(6px);
+      align-items: center; justify-content: center;
+    }
+    .mshelf-modal-overlay.open { display: flex; }
+    .mshelf-modal {
+      background: #fef3d8; border-radius: 18px; width: 100%; max-width: 360px;
+      padding: 1.5rem; box-shadow: 0 24px 64px rgba(0,0,0,0.35);
+    }
+    .mshelf-modal h3 { font-size: 1rem; font-weight: 900; color: var(--ink); margin-bottom: 1rem; }
+    .mshelf-field { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.75rem; }
+    .mshelf-field label { font-size: 0.7rem; font-weight: 800; color: var(--ink-2); text-transform: uppercase; letter-spacing: 0.05em; }
+    .mshelf-field input, .mshelf-field select {
+      padding: 0.5rem 0.75rem; border-radius: 8px; font-family: var(--font);
+      border: 1px solid rgba(160,125,96,0.3); background: rgba(255,255,255,0.7);
+      font-size: 0.82rem; color: var(--ink); outline: none;
+    }
+    .mshelf-field input:focus, .mshelf-field select:focus { border-color: var(--lavender); }
+    .mshelf-modal-actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
+    .mshelf-modal-save {
+      flex: 1; padding: 0.55rem; border-radius: 10px; font-family: var(--font);
+      font-size: 0.82rem; font-weight: 800; cursor: pointer;
+      background: var(--lavender); color: #fff; border: none;
+    }
+    .mshelf-modal-cancel {
+      padding: 0.55rem 1rem; border-radius: 10px; font-family: var(--font);
+      font-size: 0.82rem; cursor: pointer; background: none;
+      border: 1px solid rgba(160,125,96,0.3); color: var(--ink-3);
+    }
+
     /* ── Biz Card Modal ── */
     .bizcard-overlay { display:none; position:fixed; inset:0; z-index:600; background:rgba(20,10,40,0.55); backdrop-filter:blur(6px); align-items:center; justify-content:center; }
     .bizcard-overlay.open { display:flex; }
@@ -1130,6 +1288,17 @@
           </div>
         </div>
 
+        <!-- Widgets -->
+        <div class="widget-section">
+          <div class="widget-section-header">
+            <div class="widget-section-title">Widgets</div>
+            <button class="widget-add-btn" onclick="openWidgetLibrary()">+ Add Widget</button>
+          </div>
+          <div class="widget-list" id="widgetList">
+            <div class="widget-empty" id="widgetEmpty">No widgets yet. Add one to personalize your profile.</div>
+          </div>
+        </div>
+
         <!-- My Pick Six -->
         <div class="pick-six-card">
           <div class="pick-six-header">
@@ -1169,6 +1338,54 @@
     </div><!-- /main-grid -->
   </div><!-- /zone-feed -->
 
+
+  <!-- ── Widget Library ── -->
+  <div class="widget-library-overlay" id="widgetLibraryOverlay">
+    <div class="widget-library-modal">
+      <div class="widget-library-title">Widget Library</div>
+      <div class="widget-library-sub">Pick a widget to add to your profile.</div>
+      <div class="widget-type-grid" id="widgetTypeGrid"></div>
+      <button class="widget-library-close" onclick="closeWidgetLibrary()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ── Movie Shelf Add Modal ── -->
+  <div class="mshelf-modal-overlay" id="mshelfModalOverlay">
+    <div class="mshelf-modal">
+      <h3>Add to Shelf</h3>
+      <div class="mshelf-field">
+        <label>Title</label>
+        <input id="mshelfTitle" type="text" placeholder="e.g. Interstellar" />
+      </div>
+      <div class="mshelf-field">
+        <label>Year</label>
+        <input id="mshelfYear" type="number" placeholder="e.g. 2014" min="1900" max="2099" />
+      </div>
+      <div class="mshelf-field">
+        <label>Type</label>
+        <select id="mshelfType">
+          <option value="movie">Movie</option>
+          <option value="show">Show</option>
+        </select>
+      </div>
+      <div class="mshelf-field">
+        <label>Status</label>
+        <select id="mshelfStatus">
+          <option value="seen">Seen it</option>
+          <option value="want">Want to watch</option>
+          <option value="watching">Currently watching</option>
+        </select>
+      </div>
+      <div class="mshelf-field">
+        <label>Poster URL <span style="font-weight:400;opacity:0.6">(optional)</span></label>
+        <input id="mshelfPoster" type="url" placeholder="Paste an image URL" />
+      </div>
+      <div class="mshelf-modal-actions">
+        <button class="mshelf-modal-cancel" onclick="closeMshelfModal()">Cancel</button>
+        <button class="mshelf-modal-save" onclick="saveMshelfItem()">Add to Shelf</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ── Biz Card Modal ── -->
   <div class="bizcard-overlay" id="bizcardOverlay">
@@ -1418,6 +1635,7 @@
       renderFeed();
       loadInbox();
       await loadSites();
+      await loadWidgets();
     }
 
 
@@ -1468,6 +1686,154 @@
       if (error) { alert('Could not create site: ' + error.message); return; }
       window.location.href = `/${currentHandle}/${slug}`;
     }
+
+    // ── Widget Engine ──────────────────────────────────────────
+    let widgetTypes = [];
+    let userWidgets = [];
+    let pendingWidgetType = null;
+    let editingMshelfWidgetId = null;
+
+    async function loadWidgets() {
+      const [{ data: types }, { data: instances }] = await Promise.all([
+        sb.from('widget_types').select('*').order('name'),
+        sb.from('widgets').select('*').eq('user_id', currentUser.id).eq('page', 'profile').order('position')
+      ]);
+      widgetTypes = types || [];
+      userWidgets = instances || [];
+      renderWidgetList();
+    }
+
+    function renderWidgetList() {
+      const list = document.getElementById('widgetList');
+      const empty = document.getElementById('widgetEmpty');
+      list.querySelectorAll('.widget-row').forEach(el => el.remove());
+      if (!userWidgets.length) { empty.style.display = ''; return; }
+      empty.style.display = 'none';
+      userWidgets.forEach(w => {
+        const row = document.createElement('div');
+        row.className = 'widget-row';
+        row.dataset.id = w.id;
+        const type = widgetTypes.find(t => t.id === w.widget_type);
+        row.innerHTML = `
+          <div class="widget-row-header">
+            <span class="widget-row-name">${type?.icon || '▪'} ${w.label || type?.name || w.widget_type}</span>
+            <button class="widget-row-remove" onclick="removeWidget('${w.id}')">✕ Remove</button>
+          </div>
+          <div id="widget-render-${w.id}"></div>`;
+        list.appendChild(row);
+        renderWidgetContent(w);
+      });
+    }
+
+    function renderWidgetContent(w) {
+      const el = document.getElementById('widget-render-' + w.id);
+      if (!el) return;
+      if (w.widget_type === 'movie-shelf') renderMovieShelf(el, w);
+    }
+
+    // ── Widget Library ──
+    function openWidgetLibrary() {
+      const grid = document.getElementById('widgetTypeGrid');
+      grid.innerHTML = '';
+      widgetTypes.forEach(t => {
+        const card = document.createElement('div');
+        card.className = 'widget-type-card';
+        card.innerHTML = `
+          <div class="widget-type-icon">${t.icon}</div>
+          <div class="widget-type-info">
+            <div class="widget-type-name">${t.name}</div>
+            <div class="widget-type-desc">${t.description}</div>
+          </div>`;
+        card.onclick = () => addWidget(t.id);
+        grid.appendChild(card);
+      });
+      document.getElementById('widgetLibraryOverlay').classList.add('open');
+    }
+
+    function closeWidgetLibrary() {
+      document.getElementById('widgetLibraryOverlay').classList.remove('open');
+    }
+
+    async function addWidget(typeId) {
+      closeWidgetLibrary();
+      const type = widgetTypes.find(t => t.id === typeId);
+      const { data, error } = await sb.from('widgets').insert({
+        user_id: currentUser.id,
+        widget_type: typeId,
+        label: type?.name,
+        page: 'profile',
+        position: userWidgets.length,
+        data: typeId === 'movie-shelf' ? { items: [] } : {}
+      }).select().single();
+      if (error) { alert('Could not add widget: ' + error.message); return; }
+      userWidgets.push(data);
+      renderWidgetList();
+    }
+
+    async function removeWidget(id) {
+      if (!confirm('Remove this widget?')) return;
+      await sb.from('widgets').delete().eq('id', id);
+      userWidgets = userWidgets.filter(w => w.id !== id);
+      renderWidgetList();
+    }
+
+    // ── Movie Shelf renderer ──
+    function renderMovieShelf(el, widget) {
+      const items = widget.data?.items || [];
+      let html = '<div class="mshelf-grid">';
+      items.forEach((item, idx) => {
+        const statusLabel = { seen: 'Seen', want: 'Want', watching: '▶' }[item.status] || '';
+        html += `<div class="mshelf-tile" title="${item.title} (${item.year || ''})">
+          ${item.poster_url
+            ? `<img class="mshelf-poster" src="${item.poster_url}" alt="${item.title}" />`
+            : `<div class="mshelf-poster-empty">🎬</div>`}
+          ${item.status ? `<span class="mshelf-status ${item.status}">${statusLabel}</span>` : ''}
+          <div class="mshelf-title">${item.title}</div>
+        </div>`;
+      });
+      html += `<div class="mshelf-add-tile">
+        <button class="mshelf-add-btn" onclick="openMshelfModal('${widget.id}')">+</button>
+      </div></div>`;
+      el.innerHTML = html;
+    }
+
+    // ── Movie Shelf modal ──
+    function openMshelfModal(widgetId) {
+      editingMshelfWidgetId = widgetId;
+      document.getElementById('mshelfTitle').value = '';
+      document.getElementById('mshelfYear').value = '';
+      document.getElementById('mshelfType').value = 'movie';
+      document.getElementById('mshelfStatus').value = 'seen';
+      document.getElementById('mshelfPoster').value = '';
+      document.getElementById('mshelfModalOverlay').classList.add('open');
+    }
+
+    function closeMshelfModal() {
+      document.getElementById('mshelfModalOverlay').classList.remove('open');
+      editingMshelfWidgetId = null;
+    }
+
+    async function saveMshelfItem() {
+      const title = document.getElementById('mshelfTitle').value.trim();
+      if (!title) { alert('Title is required.'); return; }
+      const widget = userWidgets.find(w => w.id === editingMshelfWidgetId);
+      if (!widget) return;
+      const newItem = {
+        title,
+        year: parseInt(document.getElementById('mshelfYear').value) || null,
+        type: document.getElementById('mshelfType').value,
+        status: document.getElementById('mshelfStatus').value,
+        poster_url: document.getElementById('mshelfPoster').value.trim() || null
+      };
+      const items = [...(widget.data?.items || []), newItem];
+      const { error } = await sb.from('widgets').update({ data: { items }, updated_at: new Date().toISOString() }).eq('id', widget.id);
+      if (error) { alert('Could not save: ' + error.message); return; }
+      widget.data = { items };
+      closeMshelfModal();
+      const el = document.getElementById('widget-render-' + widget.id);
+      if (el) renderMovieShelf(el, widget);
+    }
+    // ── End Widget Engine ───────────────────────────────────────
 
     function setDate() {
       const now = new Date();
