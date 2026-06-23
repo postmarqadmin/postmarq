@@ -1715,17 +1715,16 @@
 
   <!-- ── Pick Six Name Modal ── -->
   <div class="modal-overlay" id="pickSixModal">
-    <div class="modal-box">
-      <h3 id="pickSixModalTitle">Add to Pick Six</h3>
-      <label class="modal-label" for="pickSixName">Name</label>
-      <input class="modal-input" type="text" id="pickSixNameInput" maxlength="30" placeholder="Their name" />
-      <div class="modal-actions">
-        <button class="btn-cancel" onclick="closeModal('pickSixModal')">Cancel</button>
-        <button class="btn-save" onclick="savePickSixSlot()">Save</button>
+    <div class="modal-box" style="max-width:480px">
+      <h3 id="pickSixModalTitle">Pick a Friend</h3>
+      <div id="pickSixFriendList" style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.75rem;max-height:320px;overflow-y:auto"></div>
+      <div id="pickSixEmpty" style="display:none;font-size:0.8rem;color:var(--ink-4);font-style:italic;padding:1rem 0">No accepted friends yet. Loop someone in first.</div>
+      <div style="display:flex;gap:0.5rem;margin-top:1rem">
+        <button class="btn-cancel" style="flex:1" onclick="closeModal('pickSixModal')">Cancel</button>
+        <button class="btn-cancel" style="flex:1;color:#c83030" id="pickSixClearBtn" onclick="clearPickSixSlot()" style="display:none">Remove</button>
       </div>
     </div>
   </div>
-  <input type="file" id="pickSixImgInput" class="file-input" accept="image/*" />
 
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -2298,7 +2297,7 @@
     async function renderPickSix() {
       const { data } = await sb.from('pick_six').select('*').eq('user_id', currentUser.id);
       pickSixSlots = Array(6).fill(null);
-      (data || []).forEach(row => { pickSixSlots[row.slot_index] = { name: row.name, img: row.photo_url, dbId: row.id }; });
+      (data || []).forEach(row => { pickSixSlots[row.slot_index] = { name: row.name, img: row.photo_url, dbId: row.id, profileId: row.profile_id }; });
       _drawPickSix();
     }
 
@@ -2318,39 +2317,74 @@
     }
 
     let pendingPickSixIdx = -1;
-    function pickSixClick(i) {
+    let friendsCache = [];
+
+    async function pickSixClick(i) {
       pendingPickSixIdx = i;
       const slot = pickSixSlots[i];
-      document.getElementById('pickSixModalTitle').textContent = slot ? 'Edit slot ' + (i+1) : 'Add to Pick Six';
-      document.getElementById('pickSixNameInput').value = slot?.name || '';
+      document.getElementById('pickSixModalTitle').textContent = slot ? 'Change friend in slot ' + (i+1) : 'Pick a friend for slot ' + (i+1);
+      const clearBtn = document.getElementById('pickSixClearBtn');
+      clearBtn.style.display = slot ? '' : 'none';
+
+      // Load accepted friends
+      const { data: conns } = await sb.from('friend_requests')
+        .select('from_user_id, to_user_id')
+        .or(`from_user_id.eq.${currentUser.id},to_user_id.eq.${currentUser.id}`)
+        .eq('status', 'accepted');
+
+      const friendIds = (conns || []).map(c => c.from_user_id === currentUser.id ? c.to_user_id : c.from_user_id);
+
+      const list = document.getElementById('pickSixFriendList');
+      const empty = document.getElementById('pickSixEmpty');
+
+      if (!friendIds.length) {
+        list.style.display = 'none'; empty.style.display = '';
+        openModal('pickSixModal'); return;
+      }
+
+      const { data: friends } = await sb.from('profiles').select('id, full_name, avatar_url, handle').in('id', friendIds);
+      friendsCache = friends || [];
+
+      // Mark already-slotted friends
+      const slottedIds = pickSixSlots.filter(Boolean).map(s => s.profileId).filter(Boolean);
+
+      list.style.display = ''; empty.style.display = 'none';
+      list.innerHTML = friendsCache.map(f => {
+        const inUse = slottedIds.includes(f.id) && pickSixSlots[i]?.profileId !== f.id;
+        const initial = (f.full_name || f.handle || '?').charAt(0).toUpperCase();
+        const av = f.avatar_url
+          ? `<img src="${f.avatar_url}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0" />`
+          : `<div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#f5c462,#e8992a);display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;flex-shrink:0">${initial}</div>`;
+        return `<button onclick="selectPickSixFriend('${f.id}')" ${inUse ? 'disabled style="opacity:0.4"' : ''}
+          style="display:flex;align-items:center;gap:0.75rem;padding:0.6rem 0.75rem;border-radius:10px;border:1.5px solid rgba(155,143,212,0.25);background:rgba(255,255,255,0.5);cursor:pointer;font-family:var(--font);text-align:left;transition:background 0.15s">
+          ${av}
+          <div>
+            <div style="font-size:0.85rem;font-weight:800;color:var(--ink)">${f.full_name || f.handle}</div>
+            <div style="font-size:0.68rem;color:var(--ink-4)">${f.handle || ''}</div>
+          </div>
+          ${pickSixSlots[i]?.profileId === f.id ? '<span style="margin-left:auto;font-size:0.7rem;color:var(--teal);font-weight:800">current</span>' : ''}
+        </button>`;
+      }).join('');
+
       openModal('pickSixModal');
     }
 
-    async function savePickSixSlot() {
-      const name = document.getElementById('pickSixNameInput').value.trim();
-      if (!name) { closeModal('pickSixModal'); return; }
+    async function selectPickSixFriend(profileId) {
+      const friend = friendsCache.find(f => f.id === profileId);
+      if (!friend) return;
       closeModal('pickSixModal');
+      await sb.from('pick_six').upsert(
+        { user_id: currentUser.id, slot_index: pendingPickSixIdx, name: friend.full_name || friend.handle, photo_url: friend.avatar_url || '', profile_id: friend.id },
+        { onConflict: 'user_id,slot_index' }
+      );
+      await renderPickSix();
+    }
 
-      const imgInput = document.getElementById('pickSixImgInput');
-      imgInput.onchange = async function() {
-        const file = imgInput.files[0];
-        let photo_url = pickSixSlots[pendingPickSixIdx]?.img || '';
-
-        if (file) {
-          const ext  = file.name.split('.').pop();
-          const path = `${currentUser.id}/slot${pendingPickSixIdx}.${ext}`;
-          await sb.storage.from('my-friends').upload(path, file, { upsert: true });
-          const { data } = sb.storage.from('my-friends').getPublicUrl(path);
-          photo_url = data.publicUrl + '?t=' + Date.now();
-        }
-
-        await sb.from('pick_six').upsert(
-          { user_id: currentUser.id, slot_index: pendingPickSixIdx, name, photo_url },
-          { onConflict: 'user_id,slot_index' }
-        );
-        await renderPickSix();
-      };
-      imgInput.click();
+    async function clearPickSixSlot() {
+      closeModal('pickSixModal');
+      const slot = pickSixSlots[pendingPickSixIdx];
+      if (slot?.dbId) await sb.from('pick_six').delete().eq('id', slot.dbId);
+      await renderPickSix();
     }
 
     // ── Candids title ──
