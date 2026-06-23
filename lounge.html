@@ -693,8 +693,9 @@
     <!-- Chat Panel -->
     <div class="chat-panel" id="chatPanel">
       <div class="chat-empty" id="chatEmpty">
-        <i class="ti ti-messages-off"></i>
-        <p>Select a conversation to start chatting</p>
+        <i class="ti ti-messages"></i>
+        <p>Pick a friend from the left to start chatting</p>
+        <button class="btn-primary" style="margin-top:0.5rem;font-size:0.8rem;" onclick="openNewDM()">+ New Message</button>
       </div>
 
       <!-- Chat header (hidden until convo selected) -->
@@ -796,11 +797,14 @@
 
   </div>
 
+  <!-- Toast -->
+  <div id="toast" style="position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);background:#1e1e2a;border:1px solid rgba(255,255,255,0.15);color:#e8e0f0;padding:0.6rem 1.2rem;border-radius:10px;font-size:0.8rem;font-family:'Nunito',sans-serif;z-index:999;transition:transform 0.25s;pointer-events:none;"></div>
+
   <!-- New DM Modal -->
   <div class="modal-overlay" id="newDMModal">
     <div class="modal">
-      <div class="modal-title">Message a Friend</div>
-      <ul class="conv-list" id="dmFriendList" style="max-height:260px;overflow-y:auto;margin-bottom:0.75rem;"></ul>
+      <div class="modal-title">New Message</div>
+      <div id="dmFriendList" style="max-height:280px;overflow-y:auto;margin-bottom:0.75rem;"></div>
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeNewDM()">Cancel</button>
       </div>
@@ -905,11 +909,26 @@
     </li>`;
   }
 
-  // Called from Top Friends strip — opens existing DM or creates one
+  function showToast(msg, color) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.background = color === 'err' ? '#7f1d1d' : '#1e1e2a';
+    t.style.transform = 'translateX(-50%) translateY(0)';
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(() => { t.style.transform = 'translateX(-50%) translateY(80px)'; }, 3000);
+  }
+
+  // Called from Top Friends strip
   async function dmFriend(friendId) {
-    const existing = convos.find(c => c.type === 'dm' && c.otherId === friendId);
-    if (existing) { await openConvo(existing.id); return; }
-    await startDM(friendId);
+    showToast('Opening chat…');
+    try {
+      const existing = convos.find(c => c.type === 'dm' && c.otherId === friendId);
+      if (existing) { await openConvo(existing.id); return; }
+      await startDM(friendId);
+    } catch(e) {
+      console.error('dmFriend error', e);
+      showToast('Error: ' + e.message, 'err');
+    }
   }
 
   /* ═══════════════════════════════════════════
@@ -1101,22 +1120,19 @@
     const friendName = fp.name || 'Friend';
     const initials = friendName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
 
-    // RLS-safe: get MY room ids, then check if friend is in any of those DM rooms
-    // (RLS allows reading member rows for rooms I belong to)
-    const { data: myRows } = await sb.from('lounge_members').select('room_id').eq('user_id', ME.id);
+    // Step 1: get my room IDs
+    const { data: myRows, error: e1 } = await sb.from('lounge_members').select('room_id').eq('user_id', ME.id);
+    if (e1) throw new Error('Fetch rooms: ' + e1.message);
     const myRoomIds = (myRows || []).map(r => r.room_id);
 
+    // Step 2: among those, find DM rooms where friend is also a member
     if (myRoomIds.length) {
-      const { data: myDMRooms } = await sb.from('lounge_rooms')
-        .select('id').in('id', myRoomIds).eq('type', 'dm');
+      const { data: myDMRooms } = await sb.from('lounge_rooms').select('id').in('id', myRoomIds).eq('type', 'dm');
       const myDMIds = (myDMRooms || []).map(r => r.id);
-
       if (myDMIds.length) {
-        // Can read these rows because room_id is in my rooms (RLS allows it)
-        const { data: friendInRoom } = await sb.from('lounge_members')
-          .select('room_id').eq('user_id', friendId).in('room_id', myDMIds);
-        if (friendInRoom?.length) {
-          const roomId = friendInRoom[0].room_id;
+        const { data: hit } = await sb.from('lounge_members').select('room_id').eq('user_id', friendId).in('room_id', myDMIds);
+        if (hit?.length) {
+          const roomId = hit[0].room_id;
           if (!convos.find(c => c.id === roomId)) {
             convos.unshift({ id: roomId, type: 'dm', name: friendName, initials, otherId: friendId,
               avatarImg: fp.avatarImg || null, color: getColor(friendId), messages: [], unread: 0 });
@@ -1128,41 +1144,52 @@
       }
     }
 
-    // No existing room — create one
-    const { data: room, error } = await sb.from('lounge_rooms')
+    // Step 3: create room
+    showToast('Creating conversation…');
+    const { data: room, error: e2 } = await sb.from('lounge_rooms')
       .insert({ name: 'dm', type: 'dm', created_by: ME.id }).select().single();
-    if (error || !room) { console.error('DM room create error', error); return; }
-    const { error: memErr } = await sb.from('lounge_members').insert([
+    if (e2 || !room) throw new Error('Create room: ' + (e2?.message || 'no data'));
+
+    // Step 4: add members
+    const { error: e3 } = await sb.from('lounge_members').insert([
       { room_id: room.id, user_id: ME.id },
       { room_id: room.id, user_id: friendId },
     ]);
-    if (memErr) { console.error('Member insert error', memErr); return; }
-    convos.unshift({ id: room.id, type: 'dm', name: friendName, initials, otherId: friendId,
-      avatarImg: fp.avatarImg || null, color: getColor(friendId), messages: [], unread: 0 });
+    if (e3) throw new Error('Add members: ' + e3.message);
+
+    // Step 5: open it
+    const convo = { id: room.id, type: 'dm', name: friendName, initials, otherId: friendId,
+      avatarImg: fp.avatarImg || null, color: getColor(friendId), messages: [], unread: 0 };
+    convos.unshift(convo);
     renderSidebar();
     await openConvo(room.id);
+    showToast('Conversation started!');
   }
 
   /* ═══════════════════════════════════════════
      NEW DM MODAL
   ═══════════════════════════════════════════ */
 
-  let allFriends = []; // { id, name, avatarImg }
+  let allFriends = [];
 
-  async function openNewDM() {
-    document.getElementById('newDMModal').classList.add('open');
-    // Render current friends list
+  function openNewDM() {
+    const modal = document.getElementById('newDMModal');
+    const list = document.getElementById('dmFriendList');
     if (!allFriends.length) {
-      document.getElementById('dmFriendList').innerHTML = '<li style="padding:0.5rem 0.6rem;color:var(--ink-3);font-size:0.78rem;">No friends yet — Loop someone in first!</li>';
-      return;
+      list.innerHTML = '<p style="padding:0.5rem 0.6rem;color:var(--ink-3);font-size:0.78rem;">No friends yet — Loop someone in first!</p>';
+    } else {
+      list.innerHTML = allFriends.map(f => `
+        <div style="display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0.6rem;border-radius:8px;cursor:pointer;transition:background 0.12s;"
+             onmouseover="this.style.background='rgba(255,255,255,0.06)'"
+             onmouseout="this.style.background=''"
+             onclick="closeNewDM(); dmFriend('${f.id}')">
+          <div style="width:36px;height:36px;border-radius:50%;background:${getColor(f.id)};display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:800;color:#fff;flex-shrink:0;overflow:hidden;">
+            ${f.avatarImg ? `<img src="${escHtml(f.avatarImg)}" style="width:100%;height:100%;object-fit:cover;">` : escHtml(f.initials)}
+          </div>
+          <div style="font-size:0.85rem;font-weight:700;color:var(--ink);">${escHtml(f.name)}</div>
+        </div>`).join('');
     }
-    document.getElementById('dmFriendList').innerHTML = allFriends.map(f => `
-      <li class="conv-item" onclick="closeNewDM(); startDM('${f.id}')">
-        <div class="conv-avatar" style="background:${getColor(f.id)}">
-          ${f.avatarImg ? `<img src="${escHtml(f.avatarImg)}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : escHtml(f.initials)}
-        </div>
-        <div class="conv-info"><div class="conv-name">${escHtml(f.name)}</div></div>
-      </li>`).join('');
+    modal.classList.add('open');
   }
 
   function closeNewDM() { document.getElementById('newDMModal').classList.remove('open'); }
