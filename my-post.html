@@ -481,31 +481,26 @@
       box-shadow: 0 0 28px rgba(0,200,150,0.32), 0 0 56px rgba(0,255,157,0.15);
     }
     .feed-controls {
-      border-radius: 14px; padding: 0.85rem 1.1rem;
+      border-radius: 14px; padding: 0.65rem 1rem;
       background: #060f0c;
-      display: flex; flex-direction: column; gap: 0.65rem;
+      display: flex; align-items: center; gap: 0.5rem;
     }
-    .feed-controls-row { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
-    .fc-label { font-size: 0.65rem; font-weight: 900; letter-spacing: 0.07em; text-transform: uppercase; color: #4dbb99; min-width: 60px; }
-    .fc-toggle { display: flex; gap: 3px; background: rgba(0,0,0,0.25); border-radius: 8px; padding: 3px; }
-    .fc-btn {
-      padding: 0.28rem 0.7rem; border-radius: 6px; font-family: var(--font);
-      font-size: 0.7rem; font-weight: 700; cursor: pointer; border: none;
-      background: none; color: rgba(255,255,255,0.4); transition: all 0.15s;
+    .fc-label { font-size: 0.62rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; color: #3a9e7a; }
+    .fc-select {
+      background: none; border: none; font-family: var(--font);
+      font-size: 0.75rem; font-weight: 800; color: #fff; cursor: pointer;
+      padding: 0.2rem 0.3rem; border-radius: 6px; transition: background 0.15s;
+      -webkit-appearance: none; appearance: none;
     }
-    .fc-btn.active {
-      background: rgba(0,200,150,0.2); color: #00ffaa;
-      box-shadow: 0 0 8px rgba(0,200,150,0.3); font-weight: 800;
-      border: 1px solid rgba(0,200,150,0.4);
-    }
-    .fc-divider { width: 1px; height: 18px; background: rgba(255,255,255,0.08); margin: 0 2px; }
-    .fc-meta { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.1rem; }
-    .fc-last-updated { font-size: 0.65rem; color: rgba(255,255,255,0.3); font-style: italic; }
+    .fc-select:focus { outline: none; background: rgba(0,200,150,0.1); }
+    .fc-select option { background: #0d1f19; color: #fff; }
+    .fc-divider { width: 1px; height: 14px; background: rgba(255,255,255,0.1); margin: 0 4px; }
+    .fc-spacer { flex: 1; }
     .fc-refresh-btn {
       background: none; border: 1px solid rgba(0,200,150,0.3); border-radius: 6px;
-      padding: 0.18rem 0.55rem; font-size: 0.65rem; font-weight: 800;
-      color: #00c896; cursor: pointer; font-family: var(--font);
-      transition: background 0.15s;
+      width: 26px; height: 26px; display: flex; align-items: center; justify-content: center;
+      color: #00c896; cursor: pointer; font-size: 0.85rem; transition: background 0.15s;
+      line-height: 1;
     }
     .fc-refresh-btn:hover { background: rgba(0,200,150,0.15); }
 
@@ -1265,27 +1260,22 @@
         <!-- Feed Controls -->
         <div class="feed-controls-wrap">
         <div class="feed-controls">
-          <div class="feed-controls-row">
-            <span class="fc-label">Showing</span>
-            <div class="fc-toggle">
-              <button class="fc-btn active" onclick="setFeedAudience('everyone', this)">Everyone</button>
-              <button class="fc-btn" onclick="setFeedAudience('friends', this)">Friends</button>
-              <button class="fc-btn" onclick="setFeedAudience('me', this)">Just Me</button>
-            </div>
-          </div>
-          <div class="feed-controls-row">
-            <span class="fc-label">Refresh</span>
-            <div class="fc-toggle">
-              <button class="fc-btn" onclick="setFeedFrequency('1h', this)">1h</button>
-              <button class="fc-btn" onclick="setFeedFrequency('12h', this)">12h</button>
-              <button class="fc-btn active" onclick="setFeedFrequency('day', this)">Daily</button>
-              <button class="fc-btn" onclick="setFeedFrequency('week', this)">Weekly</button>
-            </div>
-          </div>
-          <div class="fc-meta">
-            <span class="fc-last-updated" id="fcLastUpdated">Loading…</span>
-            <button class="fc-refresh-btn" onclick="forceRefreshFeed()">↻ Refresh now</button>
-          </div>
+          <span class="fc-label">Showing</span>
+          <select class="fc-select" id="fcAudience" onchange="setFeedAudience(this.value)">
+            <option value="everyone">Everyone</option>
+            <option value="friends">Friends</option>
+            <option value="me">Just Me</option>
+          </select>
+          <div class="fc-divider"></div>
+          <span class="fc-label">Every</span>
+          <select class="fc-select" id="fcFrequency" onchange="setFeedFrequency(this.value)">
+            <option value="1h">Hour</option>
+            <option value="12h">12 Hours</option>
+            <option value="day">Day</option>
+            <option value="week">Week</option>
+          </select>
+          <div class="fc-spacer"></div>
+          <button class="fc-refresh-btn" onclick="forceRefreshFeed()" title="Refresh feed">↻</button>
         </div>
         </div>
 
@@ -2461,31 +2451,22 @@
     function initFeedControls() {
       const saved = localStorage.getItem(`${localKey}_feedPrefs`);
       if (saved) feedPrefs = JSON.parse(saved);
-
-      document.querySelectorAll('[onclick^="setFeedAudience"]').forEach(btn => {
-        const val = btn.getAttribute('onclick').match(/'(\w+)'/)[1];
-        btn.classList.toggle('active', val === feedPrefs.audience);
-      });
-      document.querySelectorAll('[onclick^="setFeedFrequency"]').forEach(btn => {
-        const val = btn.getAttribute('onclick').match(/'(\w+)'/)[1];
-        btn.classList.toggle('active', val === feedPrefs.frequency);
-      });
+      const aud = document.getElementById('fcAudience');
+      const freq = document.getElementById('fcFrequency');
+      if (aud) aud.value = feedPrefs.audience;
+      if (freq) freq.value = feedPrefs.frequency;
       updateLastUpdatedLabel();
     }
 
-    function setFeedAudience(val, btn) {
+    function setFeedAudience(val) {
       feedPrefs.audience = val;
       saveFeedPrefs();
-      btn.closest('.fc-toggle').querySelectorAll('.fc-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
       forceRefreshFeed();
     }
 
-    function setFeedFrequency(val, btn) {
+    function setFeedFrequency(val) {
       feedPrefs.frequency = val;
       saveFeedPrefs();
-      btn.closest('.fc-toggle').querySelectorAll('.fc-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
     }
 
     function saveFeedPrefs() {
