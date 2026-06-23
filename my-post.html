@@ -919,6 +919,60 @@
       border: 1px solid rgba(160,125,96,0.3); color: var(--ink-3);
     }
 
+    /* Now Playing widget */
+    .np-card {
+      display: flex; align-items: center; gap: 0.9rem;
+      padding: 0.1rem 0;
+    }
+    .np-cover {
+      width: 64px; height: 64px; border-radius: 10px; object-fit: cover; flex-shrink: 0;
+      border: 1px solid rgba(255,255,255,0.5);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .np-cover-empty {
+      width: 64px; height: 64px; border-radius: 10px; flex-shrink: 0;
+      background: rgba(155,143,212,0.12); border: 1.5px dashed rgba(155,143,212,0.4);
+      display: flex; align-items: center; justify-content: center; font-size: 1.6rem;
+    }
+    .np-info { flex: 1; min-width: 0; }
+    .np-status-row { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.3rem; }
+    .np-pip {
+      width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+      background: #1db954; box-shadow: 0 0 6px #1db95488;
+    }
+    .np-pip.paused { background: rgba(180,140,100,0.5); box-shadow: none; }
+    .np-pip.looping { background: var(--lavender); box-shadow: 0 0 6px rgba(155,143,212,0.6); animation: np-pulse 1.6s ease-in-out infinite; }
+    @keyframes np-pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+    .np-status-label { font-size: 0.6rem; font-weight: 800; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.06em; }
+    .np-track {
+      font-size: 0.88rem; font-weight: 900; color: var(--ink);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;
+    }
+    .np-artist { font-size: 0.72rem; font-weight: 700; color: var(--ink-2); margin-top: 0.2rem; }
+    .np-album { font-size: 0.65rem; color: var(--ink-4); margin-top: 0.1rem; font-style: italic; }
+    .np-edit-btn {
+      background: none; border: 1px solid rgba(155,143,212,0.35);
+      border-radius: 7px; padding: 0.25rem 0.55rem;
+      font-size: 0.65rem; font-weight: 800; color: var(--lavender);
+      cursor: pointer; font-family: var(--font); flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .np-edit-btn:hover { background: rgba(155,143,212,0.12); }
+    .np-empty { font-size: 0.75rem; color: var(--ink-4); font-style: italic; }
+
+    /* Now Playing modal */
+    .np-modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 900;
+      background: rgba(20,10,40,0.6); backdrop-filter: blur(6px);
+      align-items: center; justify-content: center;
+    }
+    .np-modal-overlay.open { display: flex; }
+    .np-modal {
+      background: #fef3d8; border-radius: 18px; width: 100%; max-width: 360px;
+      padding: 1.5rem; box-shadow: 0 24px 64px rgba(0,0,0,0.35);
+    }
+    .np-modal h3 { font-size: 1rem; font-weight: 900; color: var(--ink); margin-bottom: 1rem; }
+
     /* ── Backdrop Editor ── */
     #backdrop-layer {
       display: none; position: fixed; inset: 0; z-index: 0;
@@ -1501,6 +1555,45 @@
     </div>
   </div>
 
+  <!-- ── Now Playing Modal ── -->
+  <div class="np-modal-overlay" id="npModalOverlay">
+    <div class="np-modal">
+      <h3>Now Playing</h3>
+      <div class="mshelf-field">
+        <label>Track / Song</label>
+        <input id="npTrack" type="text" placeholder="e.g. Motion Picture Soundtrack" />
+      </div>
+      <div class="mshelf-field">
+        <label>Artist</label>
+        <input id="npArtist" type="text" placeholder="e.g. Radiohead" />
+      </div>
+      <div class="mshelf-field">
+        <label>Album <span style="font-weight:400;opacity:0.6">(optional)</span></label>
+        <input id="npAlbum" type="text" placeholder="e.g. Kid A" />
+      </div>
+      <div class="mshelf-field">
+        <label>Status</label>
+        <select id="npStatus">
+          <option value="playing">Playing now</option>
+          <option value="looping">On repeat</option>
+          <option value="paused">Paused</option>
+        </select>
+      </div>
+      <div class="mshelf-field">
+        <label>Album art URL <span style="font-weight:400;opacity:0.6">(optional)</span></label>
+        <input id="npCover" type="url" placeholder="Paste an image URL" />
+      </div>
+      <div class="mshelf-field">
+        <label>Link <span style="font-weight:400;opacity:0.6">(optional — Spotify, Apple Music, etc.)</span></label>
+        <input id="npLink" type="url" placeholder="https://open.spotify.com/..." />
+      </div>
+      <div class="mshelf-modal-actions">
+        <button class="mshelf-modal-cancel" onclick="closeNpModal()">Cancel</button>
+        <button class="mshelf-modal-save" onclick="saveNpWidget()">Save</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ── Movie Shelf Add Modal ── -->
   <div class="mshelf-modal-overlay" id="mshelfModalOverlay">
     <div class="mshelf-modal">
@@ -1994,6 +2087,7 @@
       const el = document.getElementById('widget-render-' + w.id);
       if (!el) return;
       if (w.widget_type === 'movie-shelf') renderMovieShelf(el, w);
+      if (w.widget_type === 'now-playing') renderNowPlaying(el, w);
     }
 
     // ── Widget Library ──
@@ -2028,7 +2122,7 @@
         label: type?.name,
         page: 'profile',
         position: userWidgets.length,
-        data: typeId === 'movie-shelf' ? { items: [] } : {}
+        data: typeId === 'movie-shelf' ? { items: [] } : typeId === 'now-playing' ? { track: '', artist: '', album: '', status: 'playing', cover_url: '', link: '' } : {}
       }).select().single();
       if (error) { alert('Could not add widget: ' + error.message); return; }
       userWidgets.push(data);
@@ -2098,6 +2192,86 @@
       const el = document.getElementById('widget-render-' + widget.id);
       if (el) renderMovieShelf(el, widget);
     }
+    // ── Now Playing widget ──
+    let editingNpWidgetId = null;
+
+    function renderNowPlaying(el, widget) {
+      const d = widget.data || {};
+      const isOwner = currentUser && profileData?.id === currentUser.id;
+      const statusLabel = { playing: 'Now Playing', looping: 'On Repeat', paused: 'Paused' }[d.status] || 'Now Playing';
+      const pipClass = d.status === 'paused' ? 'paused' : d.status === 'looping' ? 'looping' : '';
+
+      if (!d.track) {
+        el.innerHTML = `<div class="np-card">
+          <div class="np-cover-empty">🎵</div>
+          <div class="np-info">
+            <span class="np-empty">Nothing playing yet.</span>
+          </div>
+          ${isOwner ? `<button class="np-edit-btn" onclick="openNpModal('${widget.id}')">Edit</button>` : ''}
+        </div>`;
+        return;
+      }
+
+      const coverHtml = d.cover_url
+        ? `<img class="np-cover" src="${d.cover_url}" alt="album art" />`
+        : `<div class="np-cover-empty">🎵</div>`;
+
+      const trackHtml = d.link
+        ? `<a class="np-track" href="${d.link}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;">${d.track}</a>`
+        : `<div class="np-track">${d.track}</div>`;
+
+      el.innerHTML = `<div class="np-card">
+        ${coverHtml}
+        <div class="np-info">
+          <div class="np-status-row">
+            <span class="np-pip ${pipClass}"></span>
+            <span class="np-status-label">${statusLabel}</span>
+          </div>
+          ${trackHtml}
+          ${d.artist ? `<div class="np-artist">${d.artist}</div>` : ''}
+          ${d.album ? `<div class="np-album">${d.album}</div>` : ''}
+        </div>
+        ${isOwner ? `<button class="np-edit-btn" onclick="openNpModal('${widget.id}')">Edit</button>` : ''}
+      </div>`;
+    }
+
+    function openNpModal(widgetId) {
+      editingNpWidgetId = widgetId;
+      const widget = userWidgets.find(w => w.id === widgetId);
+      const d = widget?.data || {};
+      document.getElementById('npTrack').value = d.track || '';
+      document.getElementById('npArtist').value = d.artist || '';
+      document.getElementById('npAlbum').value = d.album || '';
+      document.getElementById('npStatus').value = d.status || 'playing';
+      document.getElementById('npCover').value = d.cover_url || '';
+      document.getElementById('npLink').value = d.link || '';
+      document.getElementById('npModalOverlay').classList.add('open');
+    }
+
+    function closeNpModal() {
+      document.getElementById('npModalOverlay').classList.remove('open');
+      editingNpWidgetId = null;
+    }
+
+    async function saveNpWidget() {
+      const widget = userWidgets.find(w => w.id === editingNpWidgetId);
+      if (!widget) return;
+      const data = {
+        track: document.getElementById('npTrack').value.trim(),
+        artist: document.getElementById('npArtist').value.trim(),
+        album: document.getElementById('npAlbum').value.trim(),
+        status: document.getElementById('npStatus').value,
+        cover_url: document.getElementById('npCover').value.trim(),
+        link: document.getElementById('npLink').value.trim(),
+      };
+      const { error } = await sb.from('widgets').update({ data, updated_at: new Date().toISOString() }).eq('id', widget.id);
+      if (error) { alert('Could not save: ' + error.message); return; }
+      widget.data = data;
+      closeNpModal();
+      const el = document.getElementById('widget-render-' + widget.id);
+      if (el) renderNowPlaying(el, widget);
+    }
+
     // ── End Widget Engine ───────────────────────────────────────
 
     function setDate() {
