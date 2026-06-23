@@ -598,49 +598,53 @@
 
     /* ── My Sites ── */
     .sites-card {
-      border-radius: 14px; overflow: hidden;
-      background: linear-gradient(135deg, rgba(232,153,42,0.18) 0%, rgba(155,143,212,0.20) 100%);
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(232,153,42,0.15) 0%, rgba(155,143,212,0.18) 100%);
       backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.55);
       box-shadow: 0 4px 24px rgba(80,60,140,0.10);
-      padding: 1.25rem;
+      padding: 1.4rem 1.4rem 1rem;
     }
-    .sites-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.9rem; }
+    .sites-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; }
     .sites-title { font-size: 1.2rem; font-weight: 900; letter-spacing: -0.4px; color: #3d2a0a; }
     .sites-add-btn {
-      background: rgba(232,153,42,0.18); border: 1px solid rgba(232,153,42,0.4);
-      color: #a06010; border-radius: 8px; padding: 0.3rem 0.7rem;
-      font-size: 0.68rem; font-weight: 800; cursor: pointer; font-family: var(--font);
+      background: rgba(232,153,42,0.22); border: 1px solid rgba(232,153,42,0.5);
+      color: #8a5000; border-radius: 20px; padding: 0.35rem 0.9rem;
+      font-size: 0.72rem; font-weight: 800; cursor: pointer; font-family: var(--font);
       transition: background 0.15s;
     }
-    .sites-add-btn:hover { background: rgba(232,153,42,0.32); }
-    .sites-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .sites-add-btn:hover { background: rgba(232,153,42,0.38); }
+    .sites-list { display: flex; flex-direction: column; gap: 0.75rem; }
     .site-row {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0.55rem 0.75rem; border-radius: 10px;
-      background: rgba(255,255,255,0.45); border: 1px solid rgba(255,255,255,0.7);
-      transition: background 0.15s;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.85);
+      box-shadow: 0 2px 8px rgba(120,80,40,0.06);
+      padding: 0.9rem 1rem;
     }
-    .site-row:hover { background: rgba(255,255,255,0.65); }
-    .site-row-name { font-size: 0.82rem; font-weight: 700; color: var(--ink); }
-    .site-row-url { font-size: 0.68rem; color: var(--ink-3); }
-    .site-row-edit {
-      font-size: 0.7rem; font-weight: 800; color: var(--lavender);
-      background: none; border: 1px solid rgba(155,143,212,0.35); border-radius: 6px;
-      padding: 0.2rem 0.55rem; cursor: pointer; font-family: var(--font);
+    .site-row-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.45rem; }
+    .site-row-name {
+      font-size: 1rem; font-weight: 800; color: var(--ink);
+      text-decoration: none; letter-spacing: -0.2px;
     }
-    .site-row-edit:hover { background: rgba(155,143,212,0.15); }
-    .site-row-name { font-size: 0.82rem; font-weight: 700; color: var(--ink); text-decoration: none; }
-    .site-row-name:hover { text-decoration: underline; color: var(--lavender); }
+    .site-row-name:hover { color: var(--lavender); }
+    .site-row-url { font-size: 0.72rem; color: var(--ink-3); margin-bottom: 0.75rem; }
+    .site-row-actions { display: flex; gap: 0.5rem; }
     .site-row-toggle {
-      font-size: 0.68rem; font-weight: 800; border-radius: 6px;
-      padding: 0.2rem 0.55rem; cursor: pointer; font-family: var(--font);
-      background: none; border: 1px solid rgba(160,125,96,0.35); color: var(--ink-3);
-      transition: all 0.15s;
+      flex: 1; font-size: 0.72rem; font-weight: 800; border-radius: 8px;
+      padding: 0.35rem 0.6rem; cursor: pointer; font-family: var(--font);
+      background: rgba(160,125,96,0.1); border: 1.5px solid rgba(160,125,96,0.3);
+      color: var(--ink-3); transition: all 0.15s; text-align: center;
     }
     .site-row-toggle.published {
-      border-color: rgba(74,181,170,0.5); color: #2e8a82;
-      background: rgba(74,181,170,0.1);
+      background: rgba(74,181,170,0.14); border-color: rgba(74,181,170,0.55);
+      color: #1e7a72; font-weight: 900;
     }
+    .site-row-edit {
+      flex: 1; font-size: 0.72rem; font-weight: 800; color: #5040a8;
+      background: rgba(155,143,212,0.14); border: 1.5px solid rgba(155,143,212,0.4);
+      border-radius: 8px; padding: 0.35rem 0.6rem; cursor: pointer;
+      font-family: var(--font); text-align: center; transition: background 0.15s;
+    }
+    .site-row-edit:hover { background: rgba(155,143,212,0.28); }
     .sites-empty { font-size: 0.78rem; color: var(--ink-4); text-align: center; padding: 1rem 0; font-style: italic; }
 
     /* ── Biz Card Modal ── */
@@ -1362,13 +1366,13 @@
         row.className = 'site-row';
         row.dataset.room = r.room_name;
         row.innerHTML = `
-          <div>
+          <div class="site-row-top">
             <a class="site-row-name" href="/${currentHandle}/${r.room_name}" target="_blank">${r.room_name} ↗</a>
-            <div class="site-row-url">${url}</div>
           </div>
-          <div style="display:flex;gap:6px;align-items:center;">
+          <div class="site-row-url">${url}</div>
+          <div class="site-row-actions">
             <button class="site-row-toggle ${r.published ? 'published' : ''}" onclick="togglePublished('${r.room_name}', this)">${r.published ? '● Live' : '○ Private'}</button>
-            <button class="site-row-edit" onclick="window.location.href='/${currentHandle}/${r.room_name}'">Edit →</button>
+            <button class="site-row-edit" onclick="window.location.href='/${currentHandle}/${r.room_name}'">Open Editor →</button>
           </div>`;
         list.appendChild(row);
       });
