@@ -97,30 +97,52 @@
       background: none; border: 1px dashed #808080;
     }
 
-    /* ── Code editor ── */
+    /* ── Split-pane editor ── */
     #editor-panel {
-      display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 9997;
-      height: 320px; background: #1E1E1E; border-top: 3px solid #1040A0;
-      flex-direction: column;
+      display: none; position: fixed; inset: 0; z-index: 9997;
+      flex-direction: column; background: #1E1E1E;
     }
     #editor-panel.visible { display: flex; }
-    .editor-tabs {
-      display: flex; background: #2D2D2D; border-bottom: 1px solid #1040A0;
+    #editor-topbar {
+      display: flex; align-items: center; gap: 8px;
+      background: #2D2D2D; border-bottom: 2px solid #1040A0;
+      padding: 5px 12px; flex-shrink: 0;
+      font-family: Tahoma, Arial, sans-serif; font-size: 11px; color: #CCC;
     }
-    .editor-tab {
-      padding: 5px 16px; font-size: 11px; font-family: Tahoma, Arial, sans-serif;
-      color: #CCC; cursor: pointer; border-right: 1px solid #444;
+    #editor-topbar span { font-weight: bold; color: #fff; }
+    .ed-btn {
+      padding: 3px 12px; font-family: Tahoma, Arial, sans-serif; font-size: 11px;
+      font-weight: bold; cursor: pointer; color: white;
+      background: linear-gradient(180deg, #6AAAF8 0%, #2A68D0 50%, #3A78DC 100%);
+      border: 2px solid; border-color: #8ABCFA #1040A0 #1040A0 #8ABCFA;
+      text-shadow: 0 1px 1px rgba(0,0,60,0.5);
     }
-    .editor-tab.active { background: #1E1E1E; color: white; border-bottom: 2px solid #4A88E8; }
-    .editor-panes { flex: 1; position: relative; }
-    .editor-pane { display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
-    .editor-pane.active { display: block; }
-    .editor-pane textarea {
-      width: 100%; height: 100%; padding: 10px;
-      background: #1E1E1E; color: #D4D4D4;
+    .ed-btn.danger {
+      background: linear-gradient(180deg, #F87070 0%, #C83030 50%, #D84040 100%);
+      border-color: #FA8888 #A02020 #A02020 #FA8888;
+    }
+    #ed-status { font-size: 10px; opacity: 0.8; font-style: italic; margin-left: 4px; }
+    #editor-split {
+      display: flex; flex: 1; overflow: hidden;
+    }
+    #editor-code {
+      width: 50%; display: flex; flex-direction: column; border-right: 3px solid #1040A0;
+    }
+    #editor-code textarea {
+      flex: 1; padding: 12px; background: #1E1E1E; color: #D4D4D4;
       font-family: 'Courier New', monospace; font-size: 12px;
-      border: none; outline: none; resize: none; line-height: 1.6;
+      border: none; outline: none; resize: none; line-height: 1.6; tab-size: 2;
     }
+    #editor-preview {
+      flex: 1; background: #fff; position: relative;
+    }
+    #editor-preview iframe {
+      width: 100%; height: 100%; border: none; display: block;
+    }
+    #ed-divider {
+      width: 5px; background: #1040A0; cursor: col-resize; flex-shrink: 0;
+    }
+    #ed-divider:hover { background: #4A88E8; }
   </style>
 </head>
 <body>
@@ -140,28 +162,31 @@
 
 <div id="edit-toolbar">
   <span>✏️ Edit Mode</span>
-  <button class="tb-btn" onclick="toggleEditor()">Code Editor</button>
-  <button class="tb-btn" onclick="saveContent()">Save</button>
+  <button class="tb-btn" onclick="toggleEditor()">Open Editor</button>
   <button class="tb-btn" onclick="addRoom()">+ New Room</button>
   <button class="tb-btn danger" onclick="exitEditMode()">Exit Edit</button>
   <button class="tb-btn danger" onclick="signOut()">Sign Out</button>
   <div class="tb-spacer"></div>
-  <span class="tb-status" id="saveStatus"></span>
 </div>
 
 <div id="room-nav"></div>
 <div id="post-root"></div>
 
 <div id="editor-panel">
-  <div class="editor-tabs">
-    <div class="editor-tab active" onclick="switchTab('html', this)">HTML</div>
-    <div class="editor-tab" onclick="switchTab('css', this)">CSS</div>
-    <div class="editor-tab" onclick="switchTab('js', this)">JS</div>
+  <div id="editor-topbar">
+    <span>✏️ Builder Editor</span>
+    <button class="ed-btn" onclick="saveContent()">Save</button>
+    <button class="ed-btn danger" onclick="closeEditor()">✕ Close</button>
+    <span id="ed-status"></span>
   </div>
-  <div class="editor-panes">
-    <div class="editor-pane active" id="pane-html"><textarea id="code-html" placeholder="<!-- Paste your HTML here -->"></textarea></div>
-    <div class="editor-pane" id="pane-css"><textarea id="code-css" placeholder="/* CSS here */"></textarea></div>
-    <div class="editor-pane" id="pane-js"><textarea id="code-js" placeholder="// JS here"></textarea></div>
+  <div id="editor-split">
+    <div id="editor-code">
+      <textarea id="code-html" placeholder="<!-- Write your full HTML here. Include <style> and <script> tags inline. -->"></textarea>
+    </div>
+    <div id="ed-divider"></div>
+    <div id="editor-preview">
+      <iframe id="preview-frame" sandbox="allow-scripts"></iframe>
+    </div>
   </div>
 </div>
 
@@ -319,27 +344,34 @@
     if (nameEl) nameEl.textContent = displayName;
   }
 
+  function buildCombinedDoc(content) {
+    let doc = '';
+    if (content.css) doc += `<style>\n${content.css}\n</style>\n`;
+    doc += content.html || '';
+    if (content.js) doc += `\n<script>\n${content.js}\n<\/script>`;
+    return doc;
+  }
+
+  let previewDebounce = null;
+  function updatePreview() {
+    clearTimeout(previewDebounce);
+    previewDebounce = setTimeout(() => {
+      const frame = document.getElementById('preview-frame');
+      if (frame) frame.srcdoc = document.getElementById('code-html').value;
+    }, 300);
+  }
+
   function showEditUI() {
-    const toolbar = document.getElementById('edit-toolbar');
-    toolbar.classList.add('visible');
-
-    // Build room nav
-    const nav = document.getElementById('room-nav');
-    nav.classList.add('visible');
+    document.getElementById('edit-toolbar').classList.add('visible');
+    document.getElementById('room-nav').classList.add('visible');
     buildRoomNav();
-
-    // Load editor with current content
-    document.getElementById('code-html').value = currentContent.html;
-    document.getElementById('code-css').value  = currentContent.css;
-    document.getElementById('code-js').value   = currentContent.js;
-
     document.body.style.paddingTop = '60px';
   }
 
   function buildRoomNav() {
     const nav = document.getElementById('room-nav');
-    const base = '';
-    let html = `<a class="room-tab ${!currentRoom ? 'active' : ''}" href="${base}">Home</a>`;
+    const base = '/' + username;
+    let html = `<a class="room-tab ${!currentRoom ? 'active' : ''}" href="/${username}">Home</a>`;
     roomsData.forEach(r => {
       html += `<a class="room-tab ${currentRoom === r.room_name ? 'active' : ''}" href="${base}/${r.room_name}">${r.room_name}</a>`;
     });
@@ -350,38 +382,65 @@
   function exitEditMode() {
     document.getElementById('edit-toolbar').classList.remove('visible');
     document.getElementById('room-nav').classList.remove('visible');
-    document.getElementById('editor-panel').classList.remove('visible');
+    closeEditor();
     document.body.style.paddingTop = '';
-    document.body.style.paddingBottom = '';
   }
 
   function toggleEditor() {
     const panel = document.getElementById('editor-panel');
-    panel.classList.toggle('visible');
-    document.body.style.paddingBottom = panel.classList.contains('visible') ? '320px' : '';
+    if (panel.classList.contains('visible')) {
+      closeEditor();
+    } else {
+      openEditor();
+    }
   }
 
-  function switchTab(lang, el) {
-    document.querySelectorAll('.editor-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.editor-pane').forEach(p => p.classList.remove('active'));
-    el.classList.add('active');
-    document.getElementById('pane-' + lang).classList.add('active');
+  function openEditor() {
+    const combined = buildCombinedDoc(currentContent);
+    const ta = document.getElementById('code-html');
+    ta.value = combined;
+    ta.addEventListener('input', updatePreview);
+    document.getElementById('editor-panel').classList.add('visible');
+    updatePreview();
+    initDividerDrag();
+  }
+
+  function closeEditor() {
+    const ta = document.getElementById('code-html');
+    ta.removeEventListener('input', updatePreview);
+    document.getElementById('editor-panel').classList.remove('visible');
+  }
+
+  function initDividerDrag() {
+    const divider = document.getElementById('ed-divider');
+    const split = document.getElementById('editor-split');
+    const codePane = document.getElementById('editor-code');
+    let dragging = false;
+    divider.onmousedown = (e) => {
+      dragging = true;
+      e.preventDefault();
+    };
+    document.onmousemove = (e) => {
+      if (!dragging) return;
+      const rect = split.getBoundingClientRect();
+      const pct = ((e.clientX - rect.left) / rect.width) * 100;
+      codePane.style.width = Math.min(Math.max(pct, 20), 80) + '%';
+    };
+    document.onmouseup = () => { dragging = false; };
   }
 
   async function saveContent() {
-    const status = document.getElementById('saveStatus');
+    const status = document.getElementById('ed-status');
     status.textContent = 'Saving…';
     const html = document.getElementById('code-html').value;
-    const css  = document.getElementById('code-css').value;
-    const js   = document.getElementById('code-js').value;
 
     let error;
     if (currentRoom) {
-      const res = await sb.from('rooms').update({ html, css, js, updated_at: new Date().toISOString() })
+      const res = await sb.from('rooms').update({ html, css: '', js: '', updated_at: new Date().toISOString() })
         .eq('username', username).eq('room_name', currentRoom);
       error = res.error;
     } else {
-      const res = await sb.from('posts').update({ html, css, js, updated_at: new Date().toISOString() })
+      const res = await sb.from('pages').update({ html, css: '', js: '', updated_at: new Date().toISOString() })
         .eq('username', username);
       error = res.error;
     }
@@ -389,7 +448,7 @@
     if (error) {
       status.textContent = 'Error saving.';
     } else {
-      currentContent = { html, css, js };
+      currentContent = { html, css: '', js: '' };
       renderContent(currentContent, postData.display_name || username);
       status.textContent = 'Saved ✓';
       setTimeout(() => status.textContent = '', 3000);
