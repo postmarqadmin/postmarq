@@ -501,6 +501,41 @@
     .status-option.active { background: rgba(255,255,255,0.07); color: var(--ink); }
     .status-pip { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
 
+    /* ── Top Friends Strip ── */
+    .top-friends-strip {
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.4rem 0.75rem 0.6rem;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .top-friends-strip::-webkit-scrollbar { display: none; }
+    .top-friend {
+      display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+      cursor: pointer; flex-shrink: 0;
+      transition: transform 0.12s;
+    }
+    .top-friend:hover { transform: translateY(-2px); }
+    .top-friend-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 800; color: #fff;
+      border: 2px solid transparent;
+      transition: border-color 0.15s;
+      overflow: hidden; flex-shrink: 0;
+    }
+    .top-friend:hover .top-friend-avatar { border-color: var(--accent); }
+    .top-friend-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .top-friend-name {
+      font-size: 0.6rem; font-weight: 700; color: var(--ink-3);
+      max-width: 48px; text-align: center;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .top-friends-empty {
+      font-size: 0.72rem; color: var(--ink-4);
+      padding: 0.2rem 0.75rem 0.6rem;
+    }
+
     /* ── Empty state ── */
     .chat-empty {
       flex: 1;
@@ -625,29 +660,32 @@
 
       <!-- Search -->
       <div class="sidebar-search">
-        <input type="text" class="search-input" placeholder="Search conversations..." oninput="filterConvs(this.value)" />
+        <input type="text" class="search-input" placeholder="Search friends & conversations…" oninput="filterConvs(this.value)" />
       </div>
 
       <!-- Scroll area -->
       <div class="sidebar-scroll">
 
-        <!-- Quorums (Groups) -->
+        <!-- Top Friends -->
         <div class="sidebar-section">
-          <div class="section-label">
-            Quorums
-            <button class="btn-add" title="New Quorum" onclick="openNewLounge()"><i class="ti ti-plus"></i></button>
-          </div>
+          <div class="section-label">Top Friends</div>
         </div>
-        <ul class="conv-list" id="quorumList"></ul>
+        <div class="top-friends-strip" id="topFriendsStrip"></div>
 
-        <!-- DMs -->
-        <div class="sidebar-section">
+        <!-- Lounges -->
+        <div class="sidebar-section" style="margin-top:0.5rem;">
           <div class="section-label">
-            Direct Messages
-            <button class="btn-add" title="New DM" onclick="openNewDM()"><i class="ti ti-plus"></i></button>
+            Lounges
+            <button class="btn-add" title="New Lounge" onclick="openNewLounge()"><i class="ti ti-plus"></i></button>
           </div>
         </div>
-        <ul class="conv-list" id="dmList"></ul>
+        <ul class="conv-list" id="loungeList"></ul>
+
+        <!-- Recent Conversations -->
+        <div class="sidebar-section" style="margin-top:0.5rem;">
+          <div class="section-label">Recent</div>
+        </div>
+        <ul class="conv-list" id="recentList"></ul>
 
       </div>
     </aside>
@@ -810,25 +848,51 @@
 
   function renderSidebar() {
     const query = document.querySelector('.search-input')?.value.toLowerCase() || '';
-    const quorums = convos.filter(c => c.type === 'group' && c.name.toLowerCase().includes(query));
-    const dms     = convos.filter(c => c.type === 'dm'    && c.name.toLowerCase().includes(query));
-    document.getElementById('quorumList').innerHTML = quorums.map(convItem).join('');
-    document.getElementById('dmList').innerHTML     = dms.map(convItem).join('');
+
+    // Top Friends strip
+    const friendsEl = document.getElementById('topFriendsStrip');
+    const visibleFriends = allFriends.filter(f => !query || f.name.toLowerCase().includes(query));
+    if (visibleFriends.length) {
+      friendsEl.innerHTML = visibleFriends.map(f => `
+        <div class="top-friend" onclick="dmFriend('${f.id}')">
+          <div class="top-friend-avatar" style="background:${getColor(f.id)}">
+            ${f.avatarImg ? `<img src="${escHtml(f.avatarImg)}" alt="">` : escHtml(f.initials)}
+          </div>
+          <div class="top-friend-name">${escHtml(f.name.split(' ')[0])}</div>
+        </div>`).join('');
+    } else {
+      friendsEl.innerHTML = `<div class="top-friends-empty">${query ? 'No matches' : 'Loop in friends to chat'}</div>`;
+    }
+
+    // Lounges (group rooms)
+    const lounges = convos.filter(c => c.type === 'group' && (!query || c.name.toLowerCase().includes(query)));
+    document.getElementById('loungeList').innerHTML = lounges.map(convItem).join('') ||
+      `<li style="padding:0.35rem 0.75rem;font-size:0.72rem;color:var(--ink-4);">No lounges yet</li>`;
+
+    // Recent conversations — DM rooms that have a real room id (UUID), sorted newest first
+    const recent = convos
+      .filter(c => c.type === 'dm' && !c.id.startsWith('friend:') && (!query || c.name.toLowerCase().includes(query)))
+      .sort((a, b) => {
+        const aT = a.messages[a.messages.length - 1]?.created_at || '';
+        const bT = b.messages[b.messages.length - 1]?.created_at || '';
+        return bT.localeCompare(aT);
+      });
+    document.getElementById('recentList').innerHTML = recent.map(convItem).join('') ||
+      (!query ? `<li style="padding:0.35rem 0.75rem;font-size:0.72rem;color:var(--ink-4);">No conversations yet</li>` : '');
   }
 
   function convItem(c) {
     const lastMsg = c.messages[c.messages.length - 1];
     const preview = lastMsg ? (lastMsg.gif_url ? '🖼 GIF' : lastMsg.body || '') : '';
     const isGroup = c.type === 'group';
-    const safeId = escHtml(c.id);
     const avatarHtml = isGroup
-      ? `<div class="conv-avatar group">💬</div>`
+      ? `<div class="conv-avatar group">🛋️</div>`
       : `<div class="conv-avatar" style="background:${c.color}">
            ${c.avatarImg
              ? `<img src="${escHtml(c.avatarImg)}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`
              : escHtml(c.initials || '?')}
          </div>`;
-    return `<li class="conv-item${activeConvoId === c.id ? ' active' : ''}" onclick="openConvo('${safeId}')">
+    return `<li class="conv-item${activeConvoId === c.id ? ' active' : ''}" onclick="openConvo('${c.id}')">
       ${avatarHtml}
       <div class="conv-info">
         <div class="conv-name">${escHtml(c.name)}</div>
@@ -839,6 +903,14 @@
         ${c.unread ? `<div class="conv-badge">${c.unread}</div>` : ''}
       </div>
     </li>`;
+  }
+
+  // Called from Top Friends strip — opens existing DM or creates one
+  async function dmFriend(friendId) {
+    // If already in convos as a real room, open it
+    const existing = convos.find(c => c.type === 'dm' && c.otherId === friendId && !c.id.startsWith('friend:'));
+    if (existing) { openConvo(existing.id); return; }
+    await startDM(friendId);
   }
 
   /* ═══════════════════════════════════════════
@@ -1026,6 +1098,10 @@
   ═══════════════════════════════════════════ */
 
   async function startDM(friendId) {
+    const fp = allFriends.find(f => f.id === friendId) || {};
+    const friendName = fp.name || 'Friend';
+    const initials = friendName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+
     // Check for existing DM room
     const { data: myRooms } = await sb.from('lounge_members').select('room_id').eq('user_id', ME.id);
     const { data: frRooms } = await sb.from('lounge_members').select('room_id').eq('user_id', friendId);
@@ -1036,41 +1112,28 @@
     if (shared.length) {
       const { data: rooms } = await sb.from('lounge_rooms').select('id').in('id', shared).eq('type', 'dm');
       if (rooms?.length) {
-        // Make sure it's in our convos list
-        if (!convos.find(c => c.id === rooms[0].id)) {
-          const { data: fp } = await sb.from('profiles').select('full_name, avatar_url').eq('id', friendId).single();
-          const friendName = fp?.full_name || 'Friend';
-          convos.unshift({
-            id: rooms[0].id, type: 'dm', name: friendName,
-            initials: friendName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(),
-            avatarImg: fp?.avatar_url || null, color: getColor(friendId), messages: [], unread: 0,
-          });
-          // Remove friend shortcut entry
-          const idx = convos.findIndex(c => c.id === 'friend:' + friendId);
-          if (idx !== -1) convos.splice(idx, 1);
+        const roomId = rooms[0].id;
+        if (!convos.find(c => c.id === roomId)) {
+          convos.unshift({ id: roomId, type: 'dm', name: friendName, initials, otherId: friendId,
+            avatarImg: fp.avatarImg || null, color: getColor(friendId), messages: [], unread: 0 });
         }
-        openConvo(rooms[0].id);
+        await openConvo(roomId);
         return;
       }
     }
 
-    // Create DM room
-    const { data: room, error } = await sb.from('lounge_rooms').insert({ name: 'dm', type: 'dm', created_by: ME.id }).select().single();
-    if (error || !room) return;
-    await sb.from('lounge_members').insert([{ room_id: room.id, user_id: ME.id }, { room_id: room.id, user_id: friendId }]);
-
-    const { data: fp } = await sb.from('profiles').select('full_name, avatar_url').eq('id', friendId).single();
-    const friendName = fp?.full_name || 'Friend';
-    // Remove friend shortcut, add real room
-    const idx = convos.findIndex(c => c.id === 'friend:' + friendId);
-    if (idx !== -1) convos.splice(idx, 1);
-    convos.unshift({
-      id: room.id, type: 'dm', name: friendName,
-      initials: friendName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(),
-      avatarImg: fp?.avatar_url || null, color: getColor(friendId), messages: [], unread: 0,
-    });
+    // Create new DM room
+    const { data: room, error } = await sb.from('lounge_rooms')
+      .insert({ name: 'dm', type: 'dm', created_by: ME.id }).select().single();
+    if (error || !room) { console.error('DM room create error', error); return; }
+    await sb.from('lounge_members').insert([
+      { room_id: room.id, user_id: ME.id },
+      { room_id: room.id, user_id: friendId },
+    ]);
+    convos.unshift({ id: room.id, type: 'dm', name: friendName, initials, otherId: friendId,
+      avatarImg: fp.avatarImg || null, color: getColor(friendId), messages: [], unread: 0 });
     renderSidebar();
-    openConvo(room.id);
+    await openConvo(room.id);
   }
 
   /* ═══════════════════════════════════════════
@@ -1333,7 +1396,7 @@
       }
     }
 
-    // Load accepted friends for DM shortcuts and picker
+    // Load accepted friends into allFriends (for Top Friends strip)
     const { data: frRows } = await sb.from('friend_requests')
       .select('from_user_id, to_user_id')
       .or(`from_user_id.eq.${ME.id},to_user_id.eq.${ME.id}`)
@@ -1345,17 +1408,10 @@
       if (!fp) continue;
       const friendName = fp.full_name || 'Friend';
       const initials = friendName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-      // Store in allFriends for the DM picker
       allFriends.push({ id: friendId, name: friendName, initials, avatarImg: fp.avatar_url || null });
-      // Add to sidebar if no existing DM room with them
-      const hasDM = convos.find(c => c.type === 'dm' && (c.friendId === friendId || c.otherId === friendId));
-      if (!hasDM) {
-        convos.push({
-          id: 'friend:' + friendId, type: 'dm', name: friendName,
-          initials, avatarImg: fp.avatar_url || null,
-          color: getColor(friendId), friendId, messages: [], unread: 0,
-        });
-      }
+      // Tag existing DM convo with otherId so dmFriend() can find it
+      const existing = convos.find(c => c.type === 'dm');
+      // (otherId gets set when room is loaded above via the members query)
     }
 
     renderSidebar();
