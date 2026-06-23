@@ -2517,7 +2517,10 @@
 
     async function submitPost() {
       const text = document.getElementById('composerText').value.trim();
+      console.log('[submitPost] called, text:', text, 'currentUser:', currentUser?.id);
       if (!text && !mediaFiles.length) return;
+
+      if (!currentUser) { alert('Not logged in — please refresh.'); return; }
 
       const btn = document.querySelector('.post-btn');
       btn.disabled = true; btn.textContent = 'Posting…';
@@ -2538,7 +2541,10 @@
       });
 
       btn.disabled = false; btn.textContent = 'Post';
-      if (!error) {
+      if (error) {
+        console.error('Post insert error:', error.message, error.details, error.hint);
+        alert('Could not save post: ' + error.message);
+      } else {
         document.getElementById('composerText').value = '';
         document.getElementById('composerText').style.height = 'auto';
         document.getElementById('mediaPreviews').innerHTML = '';
