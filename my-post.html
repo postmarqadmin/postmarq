@@ -468,32 +468,46 @@
     .file-input { display: none; }
 
     /* ── Feed Controls ── */
+    @property --feed-angle {
+      syntax: '<angle>'; initial-value: 0deg; inherits: false;
+    }
+    @keyframes feed-angle {
+      to { --feed-angle: 360deg; }
+    }
+    .feed-controls-wrap {
+      border-radius: 15px; padding: 1.5px; width: 100%;
+      background: conic-gradient(from var(--feed-angle), #00c896, #00ff9d, #a3ff6e, #00bfa8, #00c896);
+      animation: feed-angle 4s linear infinite;
+      box-shadow: 0 0 28px rgba(0,200,150,0.32), 0 0 56px rgba(0,255,157,0.15);
+    }
     .feed-controls {
-      border-radius: var(--radius-lg); padding: 0.85rem 1.1rem;
+      border-radius: 14px; padding: 0.85rem 1.1rem;
+      background: #060f0c;
       display: flex; flex-direction: column; gap: 0.65rem;
     }
     .feed-controls-row { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
-    .fc-label { font-size: 0.65rem; font-weight: 900; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); min-width: 60px; }
-    .fc-toggle { display: flex; gap: 3px; background: rgba(0,0,0,0.06); border-radius: 8px; padding: 3px; }
+    .fc-label { font-size: 0.65rem; font-weight: 900; letter-spacing: 0.07em; text-transform: uppercase; color: #4dbb99; min-width: 60px; }
+    .fc-toggle { display: flex; gap: 3px; background: rgba(0,0,0,0.25); border-radius: 8px; padding: 3px; }
     .fc-btn {
       padding: 0.28rem 0.7rem; border-radius: 6px; font-family: var(--font);
       font-size: 0.7rem; font-weight: 700; cursor: pointer; border: none;
-      background: none; color: var(--ink-3); transition: all 0.15s;
+      background: none; color: rgba(255,255,255,0.4); transition: all 0.15s;
     }
     .fc-btn.active {
-      background: #fff; color: var(--ink);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.12); font-weight: 800;
+      background: rgba(0,200,150,0.2); color: #00ffaa;
+      box-shadow: 0 0 8px rgba(0,200,150,0.3); font-weight: 800;
+      border: 1px solid rgba(0,200,150,0.4);
     }
-    .fc-divider { width: 1px; height: 18px; background: rgba(0,0,0,0.1); margin: 0 2px; }
+    .fc-divider { width: 1px; height: 18px; background: rgba(255,255,255,0.08); margin: 0 2px; }
     .fc-meta { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.1rem; }
-    .fc-last-updated { font-size: 0.65rem; color: var(--ink-4); font-style: italic; }
+    .fc-last-updated { font-size: 0.65rem; color: rgba(255,255,255,0.3); font-style: italic; }
     .fc-refresh-btn {
-      background: none; border: 1px solid rgba(155,143,212,0.3); border-radius: 6px;
+      background: none; border: 1px solid rgba(0,200,150,0.3); border-radius: 6px;
       padding: 0.18rem 0.55rem; font-size: 0.65rem; font-weight: 800;
-      color: var(--lavender); cursor: pointer; font-family: var(--font);
+      color: #00c896; cursor: pointer; font-family: var(--font);
       transition: background 0.15s;
     }
-    .fc-refresh-btn:hover { background: rgba(155,143,212,0.15); }
+    .fc-refresh-btn:hover { background: rgba(0,200,150,0.15); }
 
     /* ── Feed Tabs ── */
     .feed-tabs {
@@ -1249,7 +1263,8 @@
         </div>
 
         <!-- Feed Controls -->
-        <div class="feed-controls glass">
+        <div class="feed-controls-wrap">
+        <div class="feed-controls">
           <div class="feed-controls-row">
             <span class="fc-label">Showing</span>
             <div class="fc-toggle">
@@ -1271,6 +1286,7 @@
             <span class="fc-last-updated" id="fcLastUpdated">Loading…</span>
             <button class="fc-refresh-btn" onclick="forceRefreshFeed()">↻ Refresh now</button>
           </div>
+        </div>
         </div>
 
         <!-- Feed Tabs -->
