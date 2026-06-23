@@ -1714,14 +1714,20 @@
   </div>
 
   <!-- ── Pick Six Name Modal ── -->
-  <div class="modal-overlay" id="pickSixModal">
-    <div class="modal-box" style="max-width:480px">
-      <h3 id="pickSixModalTitle">Pick a Friend</h3>
-      <div id="pickSixFriendList" style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.75rem;max-height:320px;overflow-y:auto"></div>
-      <div id="pickSixEmpty" style="display:none;font-size:0.8rem;color:var(--ink-4);font-style:italic;padding:1rem 0">No accepted friends yet. Loop someone in first.</div>
-      <div style="display:flex;gap:0.5rem;margin-top:1rem">
-        <button class="btn-cancel" style="flex:1" onclick="closeModal('pickSixModal')">Cancel</button>
-        <button class="btn-cancel" style="flex:1;color:#c83030" id="pickSixClearBtn" onclick="clearPickSixSlot()" style="display:none">Remove</button>
+  <div class="modal-overlay" id="pickSixModal" style="backdrop-filter:blur(8px)">
+    <div style="background:linear-gradient(145deg,#1e1828,#0f1620);border:1px solid rgba(155,143,212,0.25);border-radius:24px;width:100%;max-width:420px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,0.55)">
+      <!-- Header -->
+      <div style="padding:1.4rem 1.5rem 1rem;border-bottom:1px solid rgba(255,255,255,0.06)">
+        <div style="font-size:0.58rem;font-weight:900;letter-spacing:0.12em;text-transform:uppercase;color:var(--lavender);margin-bottom:0.3rem">My Friends</div>
+        <div id="pickSixModalTitle" style="font-size:1.1rem;font-weight:900;color:#fff;letter-spacing:-0.3px">Pick a friend</div>
+      </div>
+      <!-- Friend list -->
+      <div id="pickSixFriendList" style="display:flex;flex-direction:column;gap:0;max-height:340px;overflow-y:auto;padding:0.5rem 0"></div>
+      <div id="pickSixEmpty" style="display:none;font-size:0.8rem;color:rgba(255,255,255,0.25);font-style:italic;padding:2rem 1.5rem;text-align:center">No accepted friends yet.<br>Loop someone in first.</div>
+      <!-- Footer -->
+      <div style="display:flex;gap:0.6rem;padding:1rem 1.5rem;border-top:1px solid rgba(255,255,255,0.06)">
+        <button onclick="closeModal('pickSixModal')" style="flex:1;padding:0.6rem;border-radius:12px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.5);font-family:var(--font);font-size:0.82rem;font-weight:700;cursor:pointer">Cancel</button>
+        <button id="pickSixClearBtn" onclick="clearPickSixSlot()" style="display:none;flex:1;padding:0.6rem;border-radius:12px;border:1px solid rgba(200,60,60,0.3);background:rgba(200,60,60,0.1);color:#e07070;font-family:var(--font);font-size:0.82rem;font-weight:700;cursor:pointer">Remove</button>
       </div>
     </div>
   </div>
@@ -2355,14 +2361,17 @@
         const av = f.avatar_url
           ? `<img src="${f.avatar_url}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0" />`
           : `<div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#f5c462,#e8992a);display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;flex-shrink:0">${initial}</div>`;
-        return `<button onclick="selectPickSixFriend('${f.id}')" ${inUse ? 'disabled style="opacity:0.4"' : ''}
-          style="display:flex;align-items:center;gap:0.75rem;padding:0.6rem 0.75rem;border-radius:10px;border:1.5px solid rgba(155,143,212,0.25);background:rgba(255,255,255,0.5);cursor:pointer;font-family:var(--font);text-align:left;transition:background 0.15s">
+        const isCurrent = pickSixSlots[i]?.profileId === f.id;
+        return `<button onclick="selectPickSixFriend('${f.id}')" ${inUse ? 'disabled' : ''}
+          style="display:flex;align-items:center;gap:0.85rem;padding:0.75rem 1.5rem;border:none;border-bottom:1px solid rgba(255,255,255,0.05);background:${isCurrent ? 'rgba(127,119,221,0.12)' : 'transparent'};cursor:${inUse ? 'default' : 'pointer'};font-family:var(--font);text-align:left;width:100%;opacity:${inUse ? '0.35' : '1'};transition:background 0.15s"
+          onmouseover="if(!this.disabled)this.style.background='rgba(127,119,221,0.1)'"
+          onmouseout="this.style.background='${isCurrent ? 'rgba(127,119,221,0.12)' : 'transparent'}'">
           ${av}
-          <div>
-            <div style="font-size:0.85rem;font-weight:800;color:var(--ink)">${f.full_name || f.handle}</div>
-            <div style="font-size:0.68rem;color:var(--ink-4)">${f.handle || ''}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:0.88rem;font-weight:800;color:#fff">${f.full_name || f.handle}</div>
+            <div style="font-size:0.68rem;color:rgba(255,255,255,0.3);margin-top:1px">${f.handle || ''}</div>
           </div>
-          ${pickSixSlots[i]?.profileId === f.id ? '<span style="margin-left:auto;font-size:0.7rem;color:var(--teal);font-weight:800">current</span>' : ''}
+          ${isCurrent ? '<span style="font-size:0.62rem;font-weight:800;color:var(--teal);letter-spacing:0.04em;text-transform:uppercase">✓ current</span>' : ''}
         </button>`;
       }).join('');
 
