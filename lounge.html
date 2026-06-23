@@ -907,9 +907,8 @@
 
   // Called from Top Friends strip — opens existing DM or creates one
   async function dmFriend(friendId) {
-    // If already in convos as a real room, open it
-    const existing = convos.find(c => c.type === 'dm' && c.otherId === friendId && !c.id.startsWith('friend:'));
-    if (existing) { openConvo(existing.id); return; }
+    const existing = convos.find(c => c.type === 'dm' && c.otherId === friendId);
+    if (existing) { await openConvo(existing.id); return; }
     await startDM(friendId);
   }
 
@@ -1102,34 +1101,42 @@
     const friendName = fp.name || 'Friend';
     const initials = friendName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
 
-    // Check for existing DM room
-    const { data: myRooms } = await sb.from('lounge_members').select('room_id').eq('user_id', ME.id);
-    const { data: frRooms } = await sb.from('lounge_members').select('room_id').eq('user_id', friendId);
-    const myIds = (myRooms || []).map(r => r.room_id);
-    const frIds = (frRooms || []).map(r => r.room_id);
-    const shared = myIds.filter(id => frIds.includes(id));
+    // RLS-safe: get MY room ids, then check if friend is in any of those DM rooms
+    // (RLS allows reading member rows for rooms I belong to)
+    const { data: myRows } = await sb.from('lounge_members').select('room_id').eq('user_id', ME.id);
+    const myRoomIds = (myRows || []).map(r => r.room_id);
 
-    if (shared.length) {
-      const { data: rooms } = await sb.from('lounge_rooms').select('id').in('id', shared).eq('type', 'dm');
-      if (rooms?.length) {
-        const roomId = rooms[0].id;
-        if (!convos.find(c => c.id === roomId)) {
-          convos.unshift({ id: roomId, type: 'dm', name: friendName, initials, otherId: friendId,
-            avatarImg: fp.avatarImg || null, color: getColor(friendId), messages: [], unread: 0 });
+    if (myRoomIds.length) {
+      const { data: myDMRooms } = await sb.from('lounge_rooms')
+        .select('id').in('id', myRoomIds).eq('type', 'dm');
+      const myDMIds = (myDMRooms || []).map(r => r.id);
+
+      if (myDMIds.length) {
+        // Can read these rows because room_id is in my rooms (RLS allows it)
+        const { data: friendInRoom } = await sb.from('lounge_members')
+          .select('room_id').eq('user_id', friendId).in('room_id', myDMIds);
+        if (friendInRoom?.length) {
+          const roomId = friendInRoom[0].room_id;
+          if (!convos.find(c => c.id === roomId)) {
+            convos.unshift({ id: roomId, type: 'dm', name: friendName, initials, otherId: friendId,
+              avatarImg: fp.avatarImg || null, color: getColor(friendId), messages: [], unread: 0 });
+          }
+          renderSidebar();
+          await openConvo(roomId);
+          return;
         }
-        await openConvo(roomId);
-        return;
       }
     }
 
-    // Create new DM room
+    // No existing room — create one
     const { data: room, error } = await sb.from('lounge_rooms')
       .insert({ name: 'dm', type: 'dm', created_by: ME.id }).select().single();
     if (error || !room) { console.error('DM room create error', error); return; }
-    await sb.from('lounge_members').insert([
+    const { error: memErr } = await sb.from('lounge_members').insert([
       { room_id: room.id, user_id: ME.id },
       { room_id: room.id, user_id: friendId },
     ]);
+    if (memErr) { console.error('Member insert error', memErr); return; }
     convos.unshift({ id: room.id, type: 'dm', name: friendName, initials, otherId: friendId,
       avatarImg: fp.avatarImg || null, color: getColor(friendId), messages: [], unread: 0 });
     renderSidebar();
