@@ -4,206 +4,418 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Postmarq</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Tahoma, Arial, sans-serif; background: #ECE9D8; min-height: 100vh; }
-
-    .state {
-      display: flex; flex-direction: column; align-items: center;
-      justify-content: center; min-height: 100vh; gap: 1rem;
-      font-size: 13px; color: #444;
+    :root {
+      --glass-white:  rgba(255,255,255,0.52);
+      --glass-border: rgba(255,255,255,0.75);
+      --glass-shadow: 0 8px 32px rgba(120,80,40,0.10), 0 2px 8px rgba(120,80,40,0.07);
+      --glass-inset:  0 1px 0 rgba(255,255,255,0.9) inset;
+      --amber:        #e8992a;
+      --amber-light:  #f5c462;
+      --amber-pale:   #fef3d8;
+      --teal:         #4ab5aa;
+      --lavender:     #9b8fd4;
+      --ink:   #26180e;
+      --ink-2: #5a3e28;
+      --ink-3: #a07d60;
+      --ink-4: #c9aa90;
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 22px;
+      --font: 'Nunito', system-ui, sans-serif;
     }
-    .state-title { font-size: 16px; font-weight: bold; color: #0A246A; }
-    .xp-btn {
-      padding: 4px 16px; font-family: Tahoma, Arial, sans-serif; font-size: 11px;
-      background: linear-gradient(180deg, #F8F6F2 0%, #ECE9D8 50%, #DDD9C8 100%);
-      border: 2px solid; cursor: pointer;
-      border-color: #fff #808080 #808080 #fff;
+    body {
+      font-family: var(--font); color: var(--ink);
+      min-height: 100vh; padding: 0 0 5rem;
+      background:
+        radial-gradient(ellipse at 80% 10%, rgba(195,160,255,0.30) 0%, transparent 52%),
+        radial-gradient(ellipse at 10% 90%, rgba(255,180,90,0.38) 0%, transparent 52%),
+        radial-gradient(ellipse at 55% 55%, rgba(255,210,150,0.18) 0%, transparent 65%),
+        radial-gradient(ellipse at 30% 20%, rgba(160,210,255,0.20) 0%, transparent 45%),
+        linear-gradient(158deg, #ede5f8 0%, #f8ead8 38%, #fdf4e8 62%, #f3e2cc 100%);
+      background-attachment: fixed;
     }
-
-    #post-root { min-height: 100vh; }
-
-    /* ── Always-visible logout pill ── */
-    #logout-pill {
-      display: none;
-      position: fixed; bottom: 12px; right: 12px; z-index: 99999;
-      background: #ECE9D8; border: 2px solid;
-      border-color: #fff #808080 #808080 #fff;
-      padding: 4px 10px; font-family: Tahoma, Arial, sans-serif;
-      font-size: 11px; color: #333; gap: 8px; align-items: center;
-      box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-    }
-    #logout-pill.visible { display: flex; }
-    #logout-pill button {
-      background: none; border: none; color: #316AC5;
-      text-decoration: underline; cursor: pointer;
-      font-size: 11px; font-family: Tahoma, Arial, sans-serif; padding: 0;
-    }
-
-    /* ── Edit toolbar ── */
-    #edit-toolbar {
-      display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
-      background: linear-gradient(180deg, #5896E8 0%, #1A54B2 50%, #2870D0 100%);
-      border-bottom: 2px solid #1040A0;
-      padding: 4px 10px; gap: 8px; align-items: center;
-      font-family: Tahoma, Arial, sans-serif; font-size: 11px; color: white;
-    }
-    #edit-toolbar.visible { display: flex; }
-    #edit-toolbar span { font-weight: bold; text-shadow: 0 1px 1px rgba(0,0,60,0.5); }
-
-    /* ── Visitor bar (logged in, not owner) ── */
-    #visitor-bar {
-      display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
-      background: #DDD9C8; border-bottom: 2px solid #808080;
-      padding: 3px 10px; gap: 8px; align-items: center;
-      font-family: Tahoma, Arial, sans-serif; font-size: 11px; color: #333;
-    }
-    #visitor-bar.visible { display: flex; }
-    .vb-link { color: #316AC5; text-decoration: underline; cursor: pointer; background: none; border: none; font-size: 11px; font-family: Tahoma, Arial, sans-serif; }
-    .tb-btn {
-      padding: 3px 10px; font-family: Tahoma, Arial, sans-serif; font-size: 11px;
-      font-weight: bold; cursor: pointer;
-      background: linear-gradient(180deg, #6AAAF8 0%, #2A68D0 50%, #3A78DC 100%);
-      border: 2px solid; color: white;
-      border-color: #8ABCFA #1040A0 #1040A0 #8ABCFA;
-      text-shadow: 0 1px 1px rgba(0,0,60,0.5);
-    }
-    .tb-btn.danger {
-      background: linear-gradient(180deg, #F87070 0%, #C83030 50%, #D84040 100%);
-      border-color: #FA8888 #A02020 #A02020 #FA8888;
-    }
-    .tb-spacer { flex: 1; }
-    .tb-status { font-size: 10px; opacity: 0.8; font-style: italic; }
-
-    /* ── Room nav (owner only) ── */
-    #room-nav {
-      display: none; position: fixed; top: 36px; left: 0; right: 0; z-index: 9998;
-      background: #DDD9C8; border-bottom: 1px solid #808080;
-      padding: 3px 10px; gap: 4px; align-items: center; flex-wrap: wrap;
-      font-family: Tahoma, Arial, sans-serif; font-size: 11px;
-    }
-    #room-nav.visible { display: flex; }
-    .room-tab {
-      padding: 2px 10px; cursor: pointer; font-size: 11px;
-      background: #ECE9D8; border: 2px solid;
-      border-color: #fff #808080 #808080 #fff;
-    }
-    .room-tab.active {
-      background: white; border-color: #808080 #fff #fff #808080;
-      font-weight: bold; color: #0A246A;
-    }
-    .room-tab-add {
-      padding: 2px 8px; cursor: pointer; font-size: 11px; color: #316AC5;
-      background: none; border: 1px dashed #808080;
+    .glass {
+      background: var(--glass-white); backdrop-filter: blur(18px) saturate(1.6);
+      -webkit-backdrop-filter: blur(18px) saturate(1.6);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow), var(--glass-inset);
     }
 
-    /* ── Split-pane editor ── */
-    #editor-panel {
-      display: none; position: fixed; inset: 0; z-index: 10000;
-      flex-direction: column; background: #1E1E1E;
+    /* ── Banner ── */
+    .site-banner {
+      position: sticky; top: 0; z-index: 200;
+      background: linear-gradient(90deg, rgba(78,58,160,0.97) 0%, rgba(50,150,142,0.97) 100%);
+      backdrop-filter: blur(12px);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 1.5rem; height: 44px;
+      box-shadow: 0 2px 12px rgba(60,40,120,0.25);
     }
-    #editor-panel.visible { display: flex; }
-    #editor-topbar {
-      display: flex; align-items: center; gap: 8px;
-      background: #2D2D2D; border-bottom: 2px solid #1040A0;
-      padding: 5px 12px; flex-shrink: 0;
-      font-family: Tahoma, Arial, sans-serif; font-size: 11px; color: #CCC;
+    .site-banner-logo { font-size: 1.25rem; font-weight: 900; color: rgba(255,255,255,0.97); letter-spacing: -0.5px; text-decoration: none; }
+    .site-banner-nav { display: flex; align-items: center; gap: 1rem; }
+    .site-banner-nav a {
+      font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.82);
+      text-decoration: none; letter-spacing: 0.04em; text-transform: lowercase; transition: color 0.14s;
     }
-    #editor-topbar span { font-weight: bold; color: #fff; }
-    .ed-btn {
-      padding: 3px 12px; font-family: Tahoma, Arial, sans-serif; font-size: 11px;
-      font-weight: bold; cursor: pointer; color: white;
-      background: linear-gradient(180deg, #6AAAF8 0%, #2A68D0 50%, #3A78DC 100%);
-      border: 2px solid; border-color: #8ABCFA #1040A0 #1040A0 #8ABCFA;
-      text-shadow: 0 1px 1px rgba(0,0,60,0.5);
+    .site-banner-nav a:hover { color: #fff; }
+    .loop-in-btn {
+      background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.5);
+      color: #fff; border-radius: 20px; padding: 0.28rem 0.85rem;
+      font-family: var(--font); font-size: 0.72rem; font-weight: 800;
+      cursor: pointer; transition: background 0.15s; display: none;
     }
-    .ed-btn.danger {
-      background: linear-gradient(180deg, #F87070 0%, #C83030 50%, #D84040 100%);
-      border-color: #FA8888 #A02020 #A02020 #FA8888;
-    }
-    #ed-status { font-size: 10px; opacity: 0.8; font-style: italic; margin-left: 4px; }
-    #editor-split {
-      display: flex; flex: 1; overflow: hidden;
-    }
-    #editor-code {
-      width: 50%; display: flex; flex-direction: column; border-right: 3px solid #1040A0;
-    }
-    #editor-code textarea {
-      flex: 1; padding: 12px; background: #1E1E1E; color: #D4D4D4;
-      font-family: 'Courier New', monospace; font-size: 12px;
-      border: none; outline: none; resize: none; line-height: 1.6; tab-size: 2;
-    }
-    #editor-preview {
-      flex: 1; background: #fff; position: relative;
-    }
-    #editor-preview iframe {
-      width: 100%; height: 100%; border: none; display: block;
-    }
-    #ed-divider {
-      width: 5px; background: #1040A0; cursor: col-resize; flex-shrink: 0;
-    }
-    #ed-divider:hover { background: #4A88E8; }
+    .loop-in-btn:hover { background: rgba(255,255,255,0.25); }
+    .loop-in-btn.sent { opacity: 0.6; cursor: default; }
 
-    /* ── Back to profile pill ── */
-    #back-pill {
-      display: none; position: fixed; bottom: 14px; left: 14px; z-index: 9998;
-      background: #ECE9D8; border: 2px solid;
-      border-color: #fff #808080 #808080 #fff;
-      padding: 4px 12px; font-family: Tahoma, Arial, sans-serif;
-      font-size: 11px; color: #316AC5; text-decoration: none;
-      box-shadow: 2px 2px 4px rgba(0,0,0,0.25);
+    /* ── Backdrop ── */
+    #backdrop-layer { display:none; position:fixed; inset:0; z-index:0; background-size:cover; background-position:center; background-attachment:fixed; }
+    #backdrop-layer.visible { display:block; }
+    #backdrop-frost { position:fixed; inset:0; z-index:1; backdrop-filter:blur(0px); -webkit-backdrop-filter:blur(0px); background:rgba(255,255,255,0); pointer-events:none; }
+    body.has-backdrop { background: transparent !important; }
+    body.has-backdrop .zone-feed { position:relative; z-index:2; }
+    body.has-backdrop .site-banner { z-index:202; }
+
+    /* ── Layout ── */
+    .zone-feed { max-width: 1400px; margin: 1.25rem auto 0; padding: 0 1.25rem; }
+    .main-grid { display: grid; grid-template-columns: 320px 1fr 280px; gap: 1.25rem; align-items: start; }
+    .left-col  { display: flex; flex-direction: column; gap: 1rem; }
+    .feed-col  { display: flex; flex-direction: column; gap: 1rem; }
+    .right-col { display: flex; flex-direction: column; gap: 1rem; }
+    @media (max-width: 1299px) {
+      .main-grid { grid-template-columns: 280px 1fr; }
+      .right-col { grid-column: 1; grid-row: 2; }
+      .feed-col  { grid-column: 2; grid-row: 1 / 3; }
     }
-    #back-pill:hover { background: #DDD9C8; }
-    #back-pill.visible { display: block; }
+    @media (max-width: 699px) {
+      .main-grid { grid-template-columns: 1fr; display: flex; flex-direction: column; }
+    }
+
+    /* ── Profile Card ── */
+    .myspace-card {
+      border-radius: 14px; overflow: hidden;
+      background: linear-gradient(135deg, rgba(155,143,212,0.28) 0%, rgba(74,181,170,0.16) 100%);
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.55);
+      box-shadow: 0 4px 24px rgba(80,60,140,0.10);
+    }
+    .ms-profile { display: grid; grid-template-columns: 120px 1fr; }
+    .ms-avatar-wrap { position: relative; width: 120px; height: 120px; flex-shrink: 0; background: linear-gradient(135deg, var(--amber-light), var(--amber)); }
+    .ms-avatar-wrap img { width: 120px; height: 120px; object-fit: cover; object-position: center top; display: block; }
+    .ms-avatar-initials { width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; font-size: 2.8rem; font-weight: 900; color: white; }
+    .ms-info { padding: 0.85rem 1rem; display: flex; flex-direction: column; justify-content: center; gap: 0.18rem; }
+    .ms-name { font-size: 1.15rem; font-weight: 900; color: var(--ink); letter-spacing: -0.3px; line-height: 1.1; }
+    .ms-meta { font-size: 0.68rem; font-weight: 600; color: var(--ink-3); }
+    .ms-meta .meta-field { display: grid; grid-template-columns: max-content 1fr; gap: 0.35rem; align-items: baseline; line-height: 1.75; }
+    .ms-meta .meta-label { color: var(--ink-3); white-space: nowrap; }
+    .ms-meta .meta-value { color: var(--ink-2); font-weight: 700; }
+    .ms-divider { height: 1px; background: rgba(255,255,255,0.45); margin: 0 0.85rem; }
+    .ms-marq-row { padding: 0.55rem 1rem 0.65rem; display: flex; flex-direction: column; align-items: flex-start; gap: 0.15rem; }
+    .ms-marq-label { font-size: 0.6rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; color: var(--lavender); }
+    .ms-marq-text { font-size: 0.72rem; font-weight: 500; color: var(--ink-2); line-height: 1.45; }
+    .ms-marq-text.empty { color: var(--ink-4); font-style: italic; }
+    .ms-stamp-row { padding: 0.55rem 1rem 0.65rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.68rem; font-weight: 700; color: var(--ink-3); }
+    .ms-stamp-emoji { font-size: 1.4rem; display: inline-flex; align-items: center; }
+    .ms-stamp-emoji img { width: 1.6rem; height: 1.6rem; object-fit: cover; border-radius: 4px; }
+    .ms-contact-header {
+      background: linear-gradient(90deg, rgba(100,80,180,0.82) 0%, rgba(74,181,170,0.72) 100%);
+      padding: 0.4rem 0.9rem;
+      font-size: 0.68rem; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase;
+      color: rgba(255,255,255,0.96);
+    }
+    .ms-contact-grid { display: grid; grid-template-columns: 1fr 1fr; }
+    .ms-contact-item {
+      display: flex; align-items: center; gap: 0.45rem; padding: 0.48rem 0.9rem;
+      font-size: 0.68rem; font-weight: 700; color: var(--ink-2);
+      cursor: pointer; transition: background 0.14s; text-decoration: none;
+      border-bottom: 1px solid rgba(155,143,212,0.18);
+    }
+    .ms-contact-item:nth-child(odd)  { background: rgba(155,143,212,0.08); }
+    .ms-contact-item:nth-child(even) { background: rgba(74,181,170,0.07); }
+    .ms-contact-item:hover           { background: rgba(155,143,212,0.22); color: var(--ink); }
+    .ms-contact-item i { font-size: 0.95rem; color: var(--lavender); flex-shrink: 0; }
+    .ms-contact-item:nth-last-child(-n+2) { border-bottom: none; }
+
+    /* ── My Q ── */
+    .myq-wrap {
+      border-radius: 14px; overflow: hidden;
+      background: rgba(26,26,31,0.90); border: 0.5px solid rgba(255,255,255,0.08);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.28);
+    }
+    .myq-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 1.1rem 1.2rem 0.85rem; border-bottom: 0.5px solid rgba(255,255,255,0.07); }
+    .myq-date-block { display: flex; flex-direction: column; line-height: 1; gap: 2px; }
+    .myq-day-num { font-size: 42px; font-weight: 900; color: #fff; line-height: 1; }
+    .myq-day-name { font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; background: linear-gradient(90deg, #7F77DD, #5aafc2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .myq-month { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.35); margin-top: 2px; }
+    .myq-title-block { text-align: right; }
+    .myq-title { font-size: 36px; font-weight: 900; line-height: 1; background: linear-gradient(90deg, #7F77DD, #EF9F27); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .myq-subtitle { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-top: 3px; }
+    .myq-list { display: flex; flex-direction: column; padding: 0.5rem 0; }
+    .myq-item { display: flex; align-items: flex-start; gap: 0; padding: 0.55rem 1.2rem; }
+    .myq-accent { width: 3px; border-radius: 999px; flex-shrink: 0; align-self: stretch; margin-right: 10px; min-height: 28px; }
+    .myq-accent.loop   { background: #7F77DD; }
+    .myq-accent.invite { background: #EF9F27; }
+    .myq-body { flex: 1; min-width: 0; }
+    .myq-item-title { font-size: 0.82rem; font-weight: 700; color: rgba(255,255,255,0.88); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .myq-item-when { font-size: 0.7rem; font-weight: 500; color: rgba(255,255,255,0.38); margin-top: 1px; }
+    .myq-empty-state { padding: 1rem 1.2rem; font-size: 0.72rem; font-weight: 500; color: rgba(255,255,255,0.25); font-style: italic; text-align: center; line-height: 1.5; }
+
+    /* ── Feed Tabs ── */
+    .feed-tabs {
+      display: flex; gap: 0;
+      background: linear-gradient(90deg, rgba(78,58,160,0.88) 0%, rgba(50,150,142,0.88) 100%);
+      border-radius: 12px; padding: 5px;
+      box-shadow: 0 2px 10px rgba(60,40,120,0.18);
+    }
+    .feed-tab { flex: 1; padding: 0.52rem 0.6rem; font-family: inherit; font-size: 0.72rem; font-weight: 700; border: none; cursor: pointer; border-radius: 8px; background: transparent; color: rgba(255,255,255,0.65); transition: all 0.16s ease; }
+    .feed-tab:hover { color: rgba(255,255,255,0.9); background: rgba(255,255,255,0.12); }
+    .feed-tab.active { background: linear-gradient(135deg, var(--amber-light), var(--amber)); color: #fff; box-shadow: 0 2px 8px rgba(232,153,42,0.45); font-weight: 800; }
+    .tab-panel { display: none; flex-direction: column; gap: 1rem; }
+    .tab-panel.active { display: flex; }
+
+    /* ── Post Cards ── */
+    .post-card { border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; }
+    .post-meta { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.6rem; }
+    .post-av { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--amber-light), var(--amber)); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 800; color: white; flex-shrink: 0; overflow: hidden; }
+    .post-av img { width: 100%; height: 100%; object-fit: cover; }
+    .post-author { font-size: 0.82rem; font-weight: 800; color: var(--ink); }
+    .post-time { font-size: 0.72rem; color: rgba(90,62,40,0.5); margin-left: auto; }
+    .post-body { font-size: 0.9rem; color: var(--ink); line-height: 1.6; }
+    .post-media-grid { display: grid; gap: 3px; margin-top: 0.85rem; border-radius: var(--radius-md); overflow: hidden; }
+    .post-media-grid.count-1 { grid-template-columns: 1fr; }
+    .post-media-grid.count-2 { grid-template-columns: 1fr 1fr; }
+    .media-item { position: relative; overflow: hidden; background: rgba(0,0,0,0.03); }
+    .media-item img { display: block; width: 100%; height: auto; }
+    .media-item video { width: 100%; display: block; max-height: 340px; object-fit: contain; background: #000; }
+    .post-footer { display: flex; align-items: center; gap: 1rem; margin-top: 1rem; }
+    .stamp-btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.9rem; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.7); background: rgba(255,255,255,0.5); font-family: var(--font); font-size: 0.75rem; font-weight: 700; color: var(--ink-2); cursor: pointer; transition: all 0.18s cubic-bezier(0.34,1.56,0.64,1); }
+    .stamp-btn:hover { background: rgba(255,255,255,0.75); transform: scale(1.04); }
+    .stamp-btn.stamped { background: linear-gradient(135deg, rgba(232,153,42,0.18), rgba(245,196,98,0.22)); border-color: rgba(232,153,42,0.5); color: var(--amber); }
+    .stamp-count { font-size: 0.72rem; font-weight: 600; color: var(--ink-4); }
+
+    /* ── Empty states ── */
+    .empty-state { text-align: center; padding: 2.5rem 1.5rem; color: var(--ink-4); font-size: 0.82rem; font-weight: 500; line-height: 1.6; }
+    .empty-state .empty-icon { font-size: 2rem; margin-bottom: 0.75rem; opacity: 0.4; }
+
+    /* ── Pick Six ── */
+    .pick-six-card { border-radius: 14px; overflow: hidden; background: linear-gradient(135deg, rgba(155,143,212,0.28) 0%, rgba(74,181,170,0.16) 100%); backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.55); box-shadow: 0 4px 24px rgba(80,60,140,0.10); }
+    .pick-six-header { padding: 1.1rem 1.25rem 0.75rem; display: flex; justify-content: center; }
+    .pick-six-title { font-size: 1.2rem; font-weight: 900; letter-spacing: -0.4px; color: #3d2a0a; }
+    .pick-six-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 1rem 1.1rem; }
+    .pick-six-tile { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+    .pick-six-slot { width: 100%; aspect-ratio: 3/4; border-radius: 10px; border: 2px dashed rgba(155,143,212,0.4); background: rgba(155,143,212,0.07); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    .pick-six-slot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 2.5px solid rgba(232,153,42,0.55); box-shadow: 0 2px 10px rgba(232,153,42,0.22); }
+    .pick-six-slot .slot-plus { font-size: 1.5rem; color: rgba(155,143,212,0.3); font-weight: 300; }
+    .pick-six-name { font-size: 0.72rem; font-weight: 700; color: #3d2a0a; text-align: center; line-height: 1.2; text-shadow: 0 1px 2px rgba(255,255,255,0.6); }
+    .pick-six-name.empty { color: var(--ink-4); font-weight: 400; font-style: italic; }
+
+    /* ── Candids Wall ── */
+    .candids-card { border-radius: 14px; overflow: hidden; background: linear-gradient(135deg, rgba(74,181,170,0.22) 0%, rgba(155,143,212,0.22) 100%); backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.55); box-shadow: 0 4px 24px rgba(80,60,140,0.10); }
+    .candids-header { padding: 1.25rem 1.25rem 0.8rem; display: flex; justify-content: center; align-items: center; }
+    .candids-title { font-size: 1.45rem; font-weight: 900; letter-spacing: -0.5px; color: #2d3a4a; }
+    .candids-scroll-wrap { height: 320px; overflow-y: scroll; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: rgba(180,140,100,0.35) transparent; }
+    .candids-scroll-wrap::-webkit-scrollbar { width: 4px; }
+    .candids-scroll-wrap::-webkit-scrollbar-thumb { background: rgba(180,140,100,0.35); border-radius: 2px; }
+    .candids-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
+    .candid-tile { aspect-ratio: 4/5; overflow: hidden; cursor: pointer; background: rgba(0,0,0,0.08); }
+    .candid-tile img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.28s ease; }
+    .candid-tile:hover img { transform: scale(1.05); }
+    .candids-empty { height: 320px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem; color: var(--ink-4); font-size: 0.78rem; font-weight: 500; text-align: center; padding: 1rem; }
+    .candids-empty i { font-size: 2rem; opacity: 0.3; }
+
+    /* ── My Sites ── */
+    @property --angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+    @keyframes sites-angle { to { --angle: 360deg; } }
+    .sites-card-wrap { border-radius: 15px; padding: 1.5px; position: relative; width: 100%; background: conic-gradient(from var(--angle, 0deg), #1a3aff, #00c2ff, #a259ff, #ff6b35, #1a3aff); animation: sites-angle 4s linear infinite; box-shadow: 0 0 28px rgba(26,58,255,0.35), 0 0 56px rgba(0,194,255,0.18); }
+    .sites-card { border-radius: 14px; overflow: hidden; background: #080d1e; position: relative; }
+    .sites-header { display: flex; justify-content: space-between; align-items: center; padding: 1.1rem 1.2rem 0.9rem; border-bottom: 0.5px solid rgba(255,255,255,0.07); }
+    .sites-title { font-size: 1rem; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase; background: linear-gradient(90deg, #a599f5, #EF9F27); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .sites-list { display: flex; flex-direction: column; padding: 0.75rem 0.9rem; gap: 0.6rem; }
+    .site-btn { display: block; width: 100%; text-decoration: none; text-align: left; position: relative; border-radius: 12px; padding: 1rem 1.1rem; background: linear-gradient(135deg, rgba(127,119,221,0.18) 0%, rgba(239,159,39,0.12) 100%); border: 1px solid rgba(127,119,221,0.28); box-shadow: 0 0 18px rgba(127,119,221,0.12); transition: all 0.2s; }
+    .site-btn:hover { border-color: rgba(165,153,245,0.55); box-shadow: 0 0 32px rgba(127,119,221,0.28); transform: translateY(-1px); }
+    .site-btn-name { font-size: 1.05rem; font-weight: 900; background: linear-gradient(90deg, #e8e0ff, #f5c87a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.2rem; }
+    .site-btn-url { font-size: 0.68rem; color: rgba(255,255,255,0.28); }
+    .sites-empty { padding: 1.2rem; font-size: 0.75rem; font-weight: 500; color: rgba(255,255,255,0.22); font-style: italic; text-align: center; line-height: 1.6; }
+
+    /* ── Lightbox ── */
+    .lightbox { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.22s ease; }
+    .lightbox.open { opacity: 1; pointer-events: all; }
+    .lb-backdrop { position: absolute; inset: 0; background: rgba(20,12,5,0.92); backdrop-filter: blur(10px); cursor: zoom-out; }
+    .lb-wrap { position: relative; z-index: 1; max-width: 92vw; max-height: 88vh; transform: scale(0.94); transition: transform 0.22s cubic-bezier(0.34,1.3,0.64,1); }
+    .lightbox.open .lb-wrap { transform: scale(1); }
+    .lb-wrap img { max-width: 92vw; max-height: 82vh; border-radius: var(--radius-lg); box-shadow: 0 24px 80px rgba(0,0,0,0.55); }
+    .lb-close { position: absolute; top: -14px; right: -14px; width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); color: white; font-size: 0.85rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+    /* ── Not found ── */
+    .not-found { min-height: 60vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; color: var(--ink-3); }
+    .not-found h2 { font-size: 1.4rem; font-weight: 900; color: var(--ink-2); }
   </style>
 </head>
 <body>
 
-<a id="back-pill" href="#">← back</a>
+  <!-- Backdrop layers -->
+  <div id="backdrop-layer"></div>
+  <div id="backdrop-frost"></div>
 
-<div id="logout-pill">
-  <span id="pill-username"></span>
-  <button onclick="signOut()">Sign out</button>
-</div>
-
-<div id="visitor-bar">
-  <span>You're signed in as <strong id="visitorUsername"></strong></span>
-  <div class="tb-spacer"></div>
-  <button class="tb-btn" id="loopInBtn" onclick="loopIn()" style="display:none">+ Loop in</button>
-  <button class="vb-link" id="myPostLink">Go to my Post</button>
-  &nbsp;·&nbsp;
-  <button class="vb-link" onclick="signOut()">Sign out</button>
-</div>
-
-<div id="edit-toolbar">
-  <span>✏️ Edit Mode</span>
-  <button class="tb-btn" onclick="toggleEditor()">Open Editor</button>
-  <button class="tb-btn" onclick="addRoom()">+ New Room</button>
-  <button class="tb-btn danger" onclick="exitEditMode()">Exit Edit</button>
-  <button class="tb-btn danger" onclick="signOut()">Sign Out</button>
-  <div class="tb-spacer"></div>
-</div>
-
-<div id="room-nav"></div>
-<div id="post-root"></div>
-
-<div id="editor-panel">
-  <div id="editor-topbar">
-    <span>✏️ Builder Editor</span>
-    <button class="ed-btn" onclick="saveContent()">Save</button>
-    <button class="ed-btn danger" onclick="closeEditor()">✕ Close</button>
-    <span id="ed-status"></span>
-  </div>
-  <div id="editor-split">
-    <div id="editor-code">
-      <textarea id="code-html" placeholder="<!-- Write your full HTML here. Include <style> and <script> tags inline. -->"></textarea>
-    </div>
-    <div id="ed-divider"></div>
-    <div id="editor-preview">
-      <iframe id="preview-frame" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox">
+    <div class="lb-backdrop" onclick="lbClose()"></div>
+    <div class="lb-wrap">
+      <img id="lbImg" src="" alt="" />
+      <button class="lb-close" onclick="lbClose()">✕</button>
     </div>
   </div>
-</div>
+
+  <!-- Banner -->
+  <div class="site-banner">
+    <a class="site-banner-logo" href="/home">Postmarq</a>
+    <nav class="site-banner-nav">
+      <button class="loop-in-btn" id="loopInBtn" onclick="loopIn()">+ Loop in</button>
+      <a href="/home" id="myHomeLink" style="display:none">My Post</a>
+      <a href="#" id="signOutLink" style="display:none" onclick="signOut();return false;">Sign out</a>
+    </nav>
+  </div>
+
+  <div class="zone-feed" id="mainContent" style="display:none">
+    <div class="main-grid">
+
+      <!-- LEFT COLUMN -->
+      <div class="left-col">
+        <div class="myspace-card" id="profileCard">
+          <div class="ms-profile">
+            <div class="ms-avatar-wrap">
+              <img id="avatarImg" src="" alt="" style="display:none" />
+              <div class="ms-avatar-initials" id="avatarInitials">?</div>
+            </div>
+            <div class="ms-info">
+              <div class="ms-name" id="profileName">—</div>
+              <div class="ms-meta">
+                <div class="meta-field" id="metaCityRow" style="display:none">
+                  <span class="meta-label">My Townsquare:&nbsp;</span>
+                  <span class="meta-value" id="metaCity"></span>
+                </div>
+                <div class="meta-field" id="metaHoodRow" style="display:none">
+                  <span class="meta-label">My Hood:&nbsp;</span>
+                  <span class="meta-value" id="metaHood"></span>
+                </div>
+                <div class="meta-field" id="metaRelRow" style="display:none">
+                  <span class="meta-label">Relationship:&nbsp;</span>
+                  <span class="meta-value" id="metaRelationship"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ms-divider"></div>
+
+          <div class="ms-marq-row">
+            <span class="ms-marq-label">My Marq</span>
+            <span class="ms-marq-text empty" id="marqText">—</span>
+          </div>
+
+          <div class="ms-divider"></div>
+
+          <div class="ms-stamp-row" id="stampRow" style="display:none">
+            <span style="color:var(--ink-3)">Current Stamp:</span>
+            <span class="ms-stamp-emoji" id="stampDisplay"></span>
+          </div>
+          <div id="stampDivider" class="ms-divider" style="display:none"></div>
+
+          <div class="ms-contact-header" id="contactHeader">Contacting —</div>
+          <div class="ms-contact-grid">
+            <a class="ms-contact-item" href="#" onclick="sendDM();return false;"><i class="ti ti-message-2"></i> Send DM</a>
+            <a class="ms-contact-item" href="#" id="contactLoopIn" onclick="loopIn();return false;"><i class="ti ti-user-plus"></i> Loop in</a>
+          </div>
+        </div>
+
+        <!-- My Q -->
+        <div class="myq-wrap">
+          <div class="myq-header">
+            <div class="myq-date-block">
+              <div class="myq-day-num" id="myqDayNum"></div>
+              <div class="myq-day-name" id="myqDayName"></div>
+              <div class="myq-month" id="myqMonth"></div>
+            </div>
+            <div class="myq-title-block">
+              <div class="myq-title">My Q</div>
+              <div class="myq-subtitle">loop schedule</div>
+            </div>
+          </div>
+          <div class="myq-list" id="myqList">
+            <div class="myq-empty-state">Nothing public on the schedule.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FEED COLUMN -->
+      <div class="feed-col">
+        <div class="feed-tabs">
+          <button class="feed-tab active" onclick="switchTab('daily',this)">Daily</button>
+          <button class="feed-tab" onclick="switchTab('weekly',this)">Weekly</button>
+        </div>
+
+        <div class="tab-panel active" id="panel-daily">
+          <div id="dailyFeed">
+            <div class="glass" style="border-radius:var(--radius-lg)">
+              <div class="empty-state"><div class="empty-icon" style="font-size:1.2rem;opacity:0.3">⏳</div><div>Loading…</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="panel-weekly">
+          <div id="weeklyFeed">
+            <div class="glass" style="border-radius:var(--radius-lg)">
+              <div class="empty-state"><div class="empty-icon">📅</div><div>No posts this week.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="right-col">
+        <!-- My Sites -->
+        <div class="sites-card-wrap">
+          <div class="sites-card">
+            <div class="sites-header"><div class="sites-title">My Sites</div></div>
+            <div class="sites-list" id="sitesList">
+              <div class="sites-empty">No published sites yet.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pick Six -->
+        <div class="pick-six-card">
+          <div class="pick-six-header"><div class="pick-six-title">My Friends</div></div>
+          <div class="pick-six-grid" id="pickSixGrid"></div>
+        </div>
+
+        <!-- Candids Wall -->
+        <div class="candids-card">
+          <div class="candids-header">
+            <div class="candids-title" id="candidsTitle">Candids Wall</div>
+          </div>
+          <div id="candidsWrap">
+            <div class="candids-empty" id="candidsEmpty"><i class="ti ti-polaroid"></i><div>No candids yet.</div></div>
+            <div class="candids-scroll-wrap" id="candidsScrollWrap" style="display:none">
+              <div class="candids-grid" id="candidsGrid"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="zone-feed" id="notFound" style="display:none">
+    <div class="not-found">
+      <h2>This Post doesn't exist yet.</h2>
+      <p>postmarq.org/<span id="nfUsername"></span> hasn't been claimed.</p>
+    </div>
+  </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -211,166 +423,138 @@
   const SUPABASE_KEY = 'sb_publishable_co1yq79BF8oR9Mg651DG5w_ESuACdqn';
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  const DEFAULT_POST_HTML = `
-<style>
-  body { font-family: Tahoma, Arial, sans-serif; background: #ECE9D8; margin: 0; padding: 2rem; }
-  .post-name { font-size: 28px; font-weight: bold; color: #0A246A; max-width: 680px; margin: 0 auto 0.4rem; }
-  .post-bio  { font-size: 13px; color: #555; max-width: 680px; margin: 0 auto 2rem; }
-  .post-card {
-    max-width: 680px; margin: 0 auto; padding: 1.5rem;
-    background: white; border: 2px solid;
-    border-color: #fff #808080 #808080 #fff;
-    font-size: 13px; color: #333; line-height: 1.6;
-  }
-  .post-card h2 { font-size: 14px; color: #0A246A; margin-bottom: 0.75rem; }
-  .stamp-row { display: flex; gap: 0.5rem; margin-top: 1rem; }
-  .stamp { padding: 4px 12px; font-size: 11px; cursor: pointer; background: #ECE9D8; border: 2px solid; border-color: #fff #808080 #808080 #fff; }
-</style>
-<div class="post-name" id="post-username">Your Post</div>
-<div class="post-bio">Welcome to my place on the internet.</div>
-<div class="post-card">
-  <h2>Hello, neighbor.</h2>
-  <p>This is my Post. Edit this page to make it yours — paste in code, write it yourself, or remix it any way you like.</p>
-  <div class="stamp-row">
-    <button class="stamp">📮 Stamp</button>
-    <button class="stamp">🔁 Loop</button>
-  </div>
-</div>`;
-
-  const DEFAULT_ROOM_HTML = (roomName) => `
-<style>
-  body { font-family: Tahoma, Arial, sans-serif; background: #ECE9D8; margin: 0; padding: 2rem; }
-  .room-title { font-size: 22px; font-weight: bold; color: #0A246A; max-width: 680px; margin: 0 auto 1.5rem; text-transform: capitalize; }
-  .room-card { max-width: 680px; margin: 0 auto; padding: 1.5rem; background: white; border: 2px solid; border-color: #fff #808080 #808080 #fff; font-size: 13px; color: #333; line-height: 1.6; }
-</style>
-<div class="room-title">${roomName}</div>
-<div class="room-card">
-  <p>This is your ${roomName}. Make it whatever you want — paste in code from Claude, write it yourself, or start fresh.</p>
-</div>`;
-
+  let profileUserId = null;
+  let viewerUserId  = null;
+  let profileData   = null;
+  let cachedMyStamps = new Set();
   let username = '';
-  let currentRoom = null;
-  let postData = null;
-  let roomsData = [];
-  let isOwner = false;
-  let currentContent = { html: '', css: '', js: '' };
-  let pendingSession = null;
 
-  // Register IMMEDIATELY — before any awaits — so we never miss the token event
-  sb.auth.onAuthStateChange((event, session) => {
-    if (!session) return;
-    if (postData) {
-      showOwnerUI(session, postData);
-    } else {
-      pendingSession = session;
-    }
-  });
+  function lbOpen(src) { document.getElementById('lbImg').src = src; document.getElementById('lightbox').classList.add('open'); }
+  function lbClose() { document.getElementById('lightbox').classList.remove('open'); }
+
+  function timeAgo(ts) {
+    const diff = Date.now() - new Date(ts).getTime();
+    const m = Math.floor(diff / 60000), h = Math.floor(diff / 3600000), d = Math.floor(diff / 86400000);
+    if (diff < 60000) return 'just now';
+    if (m < 60) return m + 'm ago';
+    if (h < 24) return h + 'h ago';
+    if (d < 7)  return d + 'd ago';
+    return new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+
+  function escHtml(s) {
+    return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function setDate() {
+    const now = new Date();
+    const days  = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    document.getElementById('myqDayNum').textContent  = now.getDate();
+    document.getElementById('myqDayName').textContent = days[now.getDay()];
+    document.getElementById('myqMonth').textContent   = months[now.getMonth()] + ' ' + now.getFullYear();
+  }
 
   async function init() {
-    // Read username and room from path: /davemichael or /davemichael/living-room
     const segments = window.location.pathname.replace(/^\//, '').split('/');
     username = segments[0];
-    currentRoom = segments[1] || null;
+    if (!username) { window.location.replace('/'); return; }
+    document.title = username + ' — Postmarq';
 
-    if (!username || username === 'viewer.html' || username === 'index.html') {
-      window.location.replace('/'); return;
-    }
+    // Check auth in parallel with profile load
+    const [{ data: { session } }, profileResult] = await Promise.all([
+      sb.auth.getSession(),
+      sb.from('profiles').select('*').eq('handle', username + '.postmarq').maybeSingle()
+    ]);
 
-    document.title = username + (currentRoom ? '/' + currentRoom : '') + ' — Postmarq';
-
-    if (currentRoom) {
-      const pill = document.getElementById('back-pill');
-      pill.href = '/' + username;
-      pill.textContent = '← ' + username;
-      pill.classList.add('visible');
-    }
-
-    // 1. Fetch page data
-    const { data: post, error } = await sb.from('pages').select('*').eq('username', username).single();
-    if (error || !post) { showNotFound(); return; }
-    postData = post;
-
-    const { data: rooms } = await sb.from('rooms').select('*').eq('username', username);
-    roomsData = rooms || [];
-
-    if (currentRoom) {
-      const room = roomsData.find(r => r.room_name === currentRoom);
-      if (!room) { showRoomNotFound(); return; }
-
-      // Block visitors from unpublished sites (owner can still see it)
-      if (!room.published) {
-        const { data: { session } } = await sb.auth.getSession();
-        const isOwner = session?.user?.id === post.user_id;
-        if (!isOwner) { showPrivate(); return; }
-      }
-
-      currentContent = { html: room.html || DEFAULT_ROOM_HTML(currentRoom), css: room.css || '', js: room.js || '' };
-    } else {
-      currentContent = { html: post.html || DEFAULT_POST_HTML, css: post.css || '', js: post.js || '' };
-    }
-    renderContent(currentContent, post.display_name || username);
-
-    // 2. Apply pending session if auth fired before post loaded
-    if (pendingSession) {
-      showOwnerUI(pendingSession, post);
+    const profile = profileResult.data;
+    if (!profile) {
+      document.getElementById('nfUsername').textContent = username;
+      document.getElementById('notFound').style.display = '';
       return;
     }
 
-    // 3. Try getSession as final fallback
-    const { data: { session } } = await sb.auth.getSession();
-    if (session) showOwnerUI(session, post);
+    profileData   = profile;
+    profileUserId = profile.id;
+
+    // Handle visitor session
+    if (session) {
+      viewerUserId = session.user.id;
+      document.getElementById('myHomeLink').style.display = '';
+      document.getElementById('signOutLink').style.display = '';
+
+      if (viewerUserId !== profileUserId) {
+        await setupLoopIn(session);
+      }
+    }
+
+    // Apply backdrop
+    if (profile.bg_image_url) {
+      const layer = document.getElementById('backdrop-layer');
+      layer.style.backgroundImage = `url('${profile.bg_image_url}')`;
+      layer.style.backgroundSize  = profile.bg_repeat ? 'auto' : 'cover';
+      layer.classList.add('visible');
+      const blur = profile.bg_blur || 0;
+      const frost = document.getElementById('backdrop-frost');
+      frost.style.backdropFilter = `blur(${blur}px)`;
+      frost.style.webkitBackdropFilter = `blur(${blur}px)`;
+      frost.style.background = blur > 0 ? `rgba(255,255,255,${Math.min(blur/20*0.38, 0.38)})` : 'rgba(255,255,255,0)';
+      document.body.classList.add('has-backdrop');
+    }
+
+    setDate();
+    renderProfile(profile);
+
+    document.getElementById('mainContent').style.display = '';
+
+    await Promise.all([
+      loadPosts(),
+      loadPickSix(),
+      loadCandids(),
+      loadMyQ(),
+      loadSites()
+    ]);
   }
 
-  async function showOwnerUI(session, post) {
-    // Always show logout pill
-    document.getElementById('logout-pill').classList.add('visible');
-    document.getElementById('pill-username').textContent = session.user.email;
+  async function setupLoopIn(session) {
+    const { data: existing } = await sb.from('friend_requests')
+      .select('status')
+      .or(`and(from_user_id.eq.${viewerUserId},to_user_id.eq.${profileUserId}),and(from_user_id.eq.${profileUserId},to_user_id.eq.${viewerUserId})`)
+      .maybeSingle();
 
-    if (session.user.id === post.user_id) {
-      document.getElementById('edit-toolbar').classList.add('visible');
-      document.body.style.paddingTop = '36px';
-    } else {
-      const { data: myPost } = await sb.from('pages').select('username').eq('user_id', session.user.id).single();
-      document.getElementById('visitor-bar').classList.add('visible');
-      document.getElementById('visitorUsername').textContent = myPost?.username || session.user.email;
-      const myPostLink = document.getElementById('myPostLink');
-      if (myPost?.username) {
-        myPostLink.onclick = () => window.location.href = '/' + myPost.username;
-      } else {
-        myPostLink.style.display = 'none';
-      }
-      document.body.style.paddingTop = '28px';
+    const btn = document.getElementById('loopInBtn');
+    const contactBtn = document.getElementById('contactLoopIn');
+    btn.style.display = '';
 
-      // Check friend request status
-      viewerUserId = session.user.id;
-      profileUserId = post.user_id;
-      const { data: existing } = await sb.from('friend_requests')
-        .select('status')
-        .or(`and(from_user_id.eq.${viewerUserId},to_user_id.eq.${profileUserId}),and(from_user_id.eq.${profileUserId},to_user_id.eq.${viewerUserId})`)
-        .maybeSingle();
-
-      const btn = document.getElementById('loopInBtn');
-      if (!existing) {
-        btn.style.display = '';
-      } else if (existing.status === 'pending') {
-        btn.style.display = ''; btn.textContent = 'Request sent'; btn.disabled = true;
-      } else if (existing.status === 'accepted') {
-        btn.style.display = ''; btn.textContent = '✓ Friends'; btn.disabled = true;
-      }
+    if (!existing) {
+      // show buttons
+    } else if (existing.status === 'pending') {
+      btn.textContent = 'Request sent'; btn.classList.add('sent'); btn.disabled = true;
+      contactBtn.textContent = '✓ Request sent'; contactBtn.style.pointerEvents = 'none'; contactBtn.style.opacity = '0.5';
+    } else if (existing.status === 'accepted') {
+      btn.textContent = '✓ Friends'; btn.classList.add('sent'); btn.disabled = true;
+      contactBtn.innerHTML = '<i class="ti ti-users"></i> Friends'; contactBtn.style.pointerEvents = 'none'; contactBtn.style.opacity = '0.7';
     }
   }
 
-  let viewerUserId = null, profileUserId = null;
-
   async function loopIn() {
+    if (!viewerUserId) { window.location.href = '/login'; return; }
+    if (viewerUserId === profileUserId) return;
     const btn = document.getElementById('loopInBtn');
     btn.disabled = true; btn.textContent = 'Sending…';
     const { error } = await sb.from('friend_requests').insert({ from_user_id: viewerUserId, to_user_id: profileUserId });
-    if (error?.code === '23505' || !error) {
-      btn.textContent = 'Request sent';
+    if (!error || error.code === '23505') {
+      btn.textContent = 'Request sent'; btn.classList.add('sent');
+      const cb = document.getElementById('contactLoopIn');
+      cb.textContent = '✓ Request sent'; cb.style.pointerEvents = 'none'; cb.style.opacity = '0.5';
     } else {
-      btn.textContent = '+ Loop in'; btn.disabled = false;
+      btn.disabled = false; btn.textContent = '+ Loop in';
     }
+  }
+
+  function sendDM() {
+    if (!viewerUserId) { window.location.href = '/login'; return; }
+    alert('DMs coming soon.');
   }
 
   async function signOut() {
@@ -378,186 +562,188 @@
     window.location.reload();
   }
 
-  function renderContent(content, displayName) {
-    const root = document.getElementById('post-root');
-    root.innerHTML = '';
+  function renderProfile(p) {
+    const name = p.full_name || username;
+    document.getElementById('profileName').textContent = name;
+    document.getElementById('contactHeader').textContent = 'Contacting ' + name;
+    document.title = name + ' — Postmarq';
 
-    if (content.css) {
-      const style = document.createElement('style');
-      style.textContent = content.css;
-      root.appendChild(style);
+    if (p.avatar_url) {
+      const img = document.getElementById('avatarImg');
+      img.src = p.avatar_url; img.style.display = 'block';
+      document.getElementById('avatarInitials').style.display = 'none';
+    } else {
+      document.getElementById('avatarInitials').textContent = name.charAt(0).toUpperCase();
     }
 
-    if (content.html) {
-      const div = document.createElement('div');
-      div.innerHTML = content.html;
-      root.appendChild(div);
+    if (p.city) { document.getElementById('metaCity').textContent = p.city; document.getElementById('metaCityRow').style.display = ''; }
+    if (p.hood) { document.getElementById('metaHood').textContent = p.hood; document.getElementById('metaHoodRow').style.display = ''; }
+    if (p.relationship_status) { document.getElementById('metaRelationship').textContent = p.relationship_status; document.getElementById('metaRelRow').style.display = ''; }
+
+    if (p.bio) {
+      const el = document.getElementById('marqText');
+      el.textContent = p.bio; el.classList.remove('empty');
     }
 
-    if (content.js) {
-      const script = document.createElement('script');
-      script.textContent = content.js;
-      root.appendChild(script);
+    if (p.stamp) {
+      document.getElementById('stampDisplay').textContent = p.stamp;
+      document.getElementById('stampRow').style.display = '';
+      document.getElementById('stampDivider').style.display = '';
     }
 
-    const nameEl = document.getElementById('post-username');
-    if (nameEl) nameEl.textContent = displayName;
+    if (p.candids_label) document.getElementById('candidsTitle').textContent = p.candids_label;
   }
 
-  function buildCombinedDoc(content) {
-    let doc = '';
-    if (content.css) doc += `<style>\n${content.css}\n</style>\n`;
-    doc += content.html || '';
-    if (content.js) doc += `\n<script>\n${content.js}\n<\/script>`;
-    return doc;
+  async function loadPosts() {
+    const { data: posts } = await sb.from('posts')
+      .select('id, user_id, body, media, created_at, stamps(count)')
+      .eq('user_id', profileUserId)
+      .order('created_at', { ascending: false })
+      .limit(50);
+
+    if (viewerUserId && posts?.length) {
+      const { data: myStamps } = await sb.from('stamps').select('post_id').eq('user_id', viewerUserId).in('post_id', posts.map(p => p.id));
+      cachedMyStamps = new Set((myStamps || []).map(s => s.post_id));
+    }
+
+    renderPosts(posts || []);
+    renderWeekly(posts || []);
   }
 
-  let previewDebounce = null;
-  function updatePreview() {
-    clearTimeout(previewDebounce);
-    previewDebounce = setTimeout(() => {
-      const frame = document.getElementById('preview-frame');
-      if (frame) frame.srcdoc = document.getElementById('code-html').value;
-    }, 300);
+  function renderPosts(posts) {
+    const feed = document.getElementById('dailyFeed');
+    if (!posts.length) {
+      feed.innerHTML = `<div class="glass" style="border-radius:var(--radius-lg)"><div class="empty-state"><div class="empty-icon">✉️</div><div>No posts yet.</div></div></div>`;
+      return;
+    }
+    feed.innerHTML = posts.map(p => buildPostCard(p)).join('');
   }
 
-  function showEditUI() {
-    document.getElementById('edit-toolbar').classList.add('visible');
-    document.getElementById('room-nav').classList.add('visible');
-    buildRoomNav();
-    document.body.style.paddingTop = '60px';
+  function buildPostCard(p) {
+    const name      = profileData?.full_name || username;
+    const avatarUrl = profileData?.avatar_url || '';
+    const stampCount = p.stamps?.[0]?.count || 0;
+    const stamped    = cachedMyStamps.has(p.id);
+    const initial    = name.charAt(0).toUpperCase();
+    const avHtml     = avatarUrl
+      ? `<div class="post-av"><img src="${avatarUrl}" alt="" /></div>`
+      : `<div class="post-av">${initial}</div>`;
+    const media = p.media || [];
+    const mediaHtml = media.length
+      ? `<div class="post-media-grid count-${Math.min(media.length, 2)}">${media.map(m =>
+          `<div class="media-item">${m.kind === 'image' ? `<img src="${m.src}" onclick="lbOpen('${m.src}')" style="cursor:zoom-in" />` : `<video src="${m.src}" controls playsinline></video>`}</div>`
+        ).join('')}</div>` : '';
+    const stampDisabled = !viewerUserId || viewerUserId === profileUserId ? 'disabled style="opacity:0.5;cursor:default"' : '';
+    return `
+      <div class="post-card glass" data-id="${p.id}">
+        <div class="post-meta">
+          ${avHtml}
+          <span class="post-author">${escHtml(name)}</span>
+          <span class="post-time">${timeAgo(p.created_at)}</span>
+        </div>
+        ${p.body ? `<div class="post-body">${escHtml(p.body).replace(/\n/g,'<br>')}</div>` : ''}
+        ${mediaHtml}
+        <div class="post-footer">
+          <button class="stamp-btn${stamped ? ' stamped' : ''}" onclick="toggleStamp(this,'${p.id}')" ${stampDisabled}>
+            <span>⬡</span> Stamp
+          </button>
+          <span class="stamp-count">${stampCount} stamp${stampCount !== 1 ? 's' : ''}</span>
+        </div>
+      </div>`;
   }
 
-  function buildRoomNav() {
-    const nav = document.getElementById('room-nav');
-    const base = '/' + username;
-    let html = `<a class="room-tab ${!currentRoom ? 'active' : ''}" href="/${username}">Home</a>`;
-    roomsData.forEach(r => {
-      html += `<a class="room-tab ${currentRoom === r.room_name ? 'active' : ''}" href="${base}/${r.room_name}">${r.room_name}</a>`;
+  function renderWeekly(posts) {
+    const panel = document.getElementById('weeklyFeed');
+    const now = new Date(); now.setHours(0,0,0,0);
+    const weekStart = new Date(now); weekStart.setDate(now.getDate() - now.getDay());
+    const weekPosts = posts.filter(p => new Date(p.created_at) >= weekStart);
+    if (!weekPosts.length) return;
+
+    const byDay = {};
+    const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    weekPosts.forEach(p => {
+      const d = new Date(p.created_at).getDay();
+      if (!byDay[d]) byDay[d] = [];
+      byDay[d].push(p);
     });
-    html += `<button class="room-tab-add" onclick="addRoom()">+ room</button>`;
-    nav.innerHTML = html;
+    panel.innerHTML = Object.keys(byDay).sort((a,b) => b-a).map(d => `
+      <div style="margin-bottom:0.75rem">
+        <div style="font-size:0.68rem;font-weight:900;color:var(--lavender);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.4rem;padding:0 0.25rem">${DAY_NAMES[d]}</div>
+        ${byDay[d].map(p => buildPostCard(p)).join('')}
+      </div>`).join('');
   }
 
-  function exitEditMode() {
-    document.getElementById('edit-toolbar').classList.remove('visible');
-    document.getElementById('room-nav').classList.remove('visible');
-    closeEditor();
-    document.body.style.paddingTop = '';
-  }
-
-  function toggleEditor() {
-    const panel = document.getElementById('editor-panel');
-    if (panel.classList.contains('visible')) {
-      closeEditor();
+  async function toggleStamp(btn, postId) {
+    if (!viewerUserId) { window.location.href = '/login'; return; }
+    const stamped = btn.classList.contains('stamped');
+    btn.classList.toggle('stamped');
+    const countEl = btn.closest('.post-footer').querySelector('.stamp-count');
+    let n = parseInt(countEl.textContent);
+    if (stamped) {
+      await sb.from('stamps').delete().eq('post_id', postId).eq('user_id', viewerUserId);
+      n = Math.max(0, n - 1);
     } else {
-      openEditor();
+      await sb.from('stamps').insert({ post_id: postId, user_id: viewerUserId });
+      n++;
     }
+    countEl.textContent = n + ' stamp' + (n !== 1 ? 's' : '');
   }
 
-  function openEditor() {
-    const combined = buildCombinedDoc(currentContent);
-    const ta = document.getElementById('code-html');
-    ta.value = combined;
-    ta.addEventListener('input', updatePreview);
-    document.getElementById('editor-panel').classList.add('visible');
-    updatePreview();
-    initDividerDrag();
+  async function loadPickSix() {
+    const { data: slots } = await sb.from('pick_six').select('*').eq('user_id', profileUserId).order('slot_index');
+    const grid = document.getElementById('pickSixGrid');
+    const items = Array.from({ length: 6 }, (_, i) => slots?.find(s => s.slot_index === i) || null);
+    grid.innerHTML = items.map(s => `
+      <div class="pick-six-tile">
+        <div class="pick-six-slot">
+          ${s?.photo_url ? `<img src="${s.photo_url}" alt="${escHtml(s.name)}" />` : `<span class="slot-plus">+</span>`}
+        </div>
+        <div class="pick-six-name${s ? '' : ' empty'}">${s ? escHtml(s.name) : 'empty'}</div>
+      </div>`).join('');
   }
 
-  function closeEditor() {
-    const ta = document.getElementById('code-html');
-    ta.removeEventListener('input', updatePreview);
-    document.getElementById('editor-panel').classList.remove('visible');
+  async function loadCandids() {
+    const { data: candids } = await sb.from('candids').select('*').eq('user_id', profileUserId).order('created_at', { ascending: false });
+    if (!candids?.length) return;
+    document.getElementById('candidsEmpty').style.display = 'none';
+    const wrap = document.getElementById('candidsScrollWrap');
+    wrap.style.display = '';
+    document.getElementById('candidsGrid').innerHTML = candids.map(c =>
+      `<div class="candid-tile"><img src="${c.photo_url}" onclick="lbOpen('${c.photo_url}')" alt="" /></div>`
+    ).join('');
   }
 
-  function initDividerDrag() {
-    const divider = document.getElementById('ed-divider');
-    const split = document.getElementById('editor-split');
-    const codePane = document.getElementById('editor-code');
-    let dragging = false;
-    divider.onmousedown = (e) => {
-      dragging = true;
-      e.preventDefault();
-    };
-    document.onmousemove = (e) => {
-      if (!dragging) return;
-      const rect = split.getBoundingClientRect();
-      const pct = ((e.clientX - rect.left) / rect.width) * 100;
-      codePane.style.width = Math.min(Math.max(pct, 20), 80) + '%';
-    };
-    document.onmouseup = () => { dragging = false; };
+  async function loadMyQ() {
+    const { data: items } = await sb.from('myq').select('*').eq('user_id', profileUserId).order('created_at');
+    const list = document.getElementById('myqList');
+    const pub = (items || []).filter(i => i.visibility !== 'private');
+    if (!pub.length) return;
+    list.innerHTML = pub.map(i => `
+      <div class="myq-item">
+        <div class="myq-accent ${i.type || 'loop'}"></div>
+        <div class="myq-body">
+          <div class="myq-item-title">${escHtml(i.label)}</div>
+          ${i.when_text ? `<div class="myq-item-when">${escHtml(i.when_text)}</div>` : ''}
+        </div>
+      </div>`).join('');
   }
 
-  async function saveContent() {
-    const status = document.getElementById('ed-status');
-    status.textContent = 'Saving…';
-    const html = document.getElementById('code-html').value;
-
-    let error;
-    if (currentRoom) {
-      const res = await sb.from('rooms').update({ html, css: '', js: '', updated_at: new Date().toISOString() })
-        .eq('username', username).eq('room_name', currentRoom);
-      error = res.error;
-    } else {
-      const res = await sb.from('pages').update({ html, css: '', js: '', updated_at: new Date().toISOString() })
-        .eq('username', username);
-      error = res.error;
-    }
-
-    if (error) {
-      status.textContent = 'Error saving.';
-    } else {
-      currentContent = { html, css: '', js: '' };
-      renderContent(currentContent, postData.display_name || username);
-      status.textContent = 'Saved ✓';
-      setTimeout(() => status.textContent = '', 3000);
-    }
+  async function loadSites() {
+    const { data: rooms } = await sb.from('rooms').select('room_name').eq('username', username).eq('published', true).order('created_at');
+    const list = document.getElementById('sitesList');
+    if (!rooms?.length) return;
+    list.innerHTML = rooms.map(r => `
+      <a class="site-btn" href="/${username}/${r.room_name}">
+        <div class="site-btn-name">${escHtml(r.room_name)}</div>
+        <div class="site-btn-url">postmarq.org/${username}/${r.room_name}</div>
+      </a>`).join('');
   }
 
-  async function addRoom() {
-    const name = prompt('Room name (e.g. living-room, office, studio):');
-    if (!name) return;
-    const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-    if (!slug) return;
-
-    const { data: { session } } = await sb.auth.getSession();
-    const { error } = await sb.from('rooms').insert({
-      user_id: session.user.id, username, room_name: slug, html: '', css: '', js: ''
-    });
-    if (error) { alert('Could not create room: ' + error.message); return; }
-    window.location.href = '/' + username + '/' + slug;
-  }
-
-  function showPrivate() {
-    document.getElementById('post-root').innerHTML = `
-      <div class="state">
-        <div class="state-title">This site is private.</div>
-        <p><strong>postmarq.org/${username}/${currentRoom}</strong> is still being built.</p>
-        <a href="/${username}"><button class="xp-btn">← Back to ${username}'s Post</button></a>
-      </div>`;
-  }
-
-  function showNotFound() {
-    document.getElementById('post-root').innerHTML = `
-      <div class="state">
-        <div class="state-title">This Post doesn't exist yet.</div>
-        <p><strong>postmarq.org/${username}</strong> hasn't been claimed.</p>
-        <a href="/"><button class="xp-btn">Claim it →</button></a>
-      </div>`;
-  }
-
-  function showRoomNotFound() {
-    document.getElementById('post-root').innerHTML = `
-      <div class="state">
-        <div class="state-title">Room not found.</div>
-        <p><strong>postmarq.org/${username}/${currentRoom}</strong> doesn't exist yet.</p>
-        <a href="/${username}"><button class="xp-btn">← Back to Post</button></a>
-      </div>`;
-  }
-
-  function showError(msg) {
-    document.getElementById('post-root').innerHTML = `<div class="state"><div class="state-title">${msg}</div></div>`;
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.feed-tab').forEach(b => b.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    btn.classList.add('active');
   }
 
   init();
