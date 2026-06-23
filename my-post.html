@@ -1898,7 +1898,9 @@
             n.onclick = () => { openLounge(); window.focus(); n.close(); };
           }
         })
-        .subscribe();
+        .subscribe((status, err) => {
+          console.log('[Lounge notify] channel status:', status, err || '');
+        });
     }
 
 
