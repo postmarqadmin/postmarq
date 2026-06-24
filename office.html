@@ -153,7 +153,16 @@
       position: relative;
       background: rgba(155,143,212,0.15);
       display: flex; align-items: center; justify-content: center;
+      cursor: pointer; overflow: hidden;
     }
+    .bio-avatar-wrap:hover .bio-avatar-overlay { opacity: 1; }
+    .bio-avatar-overlay {
+      position: absolute; inset: 0; background: rgba(0,0,0,0.45);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 0.3rem; opacity: 0; transition: opacity 0.2s; z-index: 2;
+      color: #fff; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.04em;
+    }
+    .bio-avatar-overlay i { font-size: 1.4rem; }
     .bio-avatar {
       position: absolute; inset: 0;
       width: 100%; height: 100%;
@@ -174,27 +183,30 @@
     .bio-text { font-size: 0.85rem; font-weight: 400; color: var(--ink-2); line-height: 1.6; margin-top: 0.85rem; max-width: 520px; }
     .bio-empty-hint { font-size: 0.8rem; color: var(--ink-3); font-style: italic; margin-top: 0.6rem; }
     .bio-actions { display: flex; align-items: center; gap: 0.75rem; margin-top: 1.1rem; flex-wrap: wrap; }
-    .btn-bcard {
+    .btn-secondary {
       display: inline-flex; align-items: center; gap: 0.45rem;
       padding: 0.5rem 1.1rem; border-radius: 999px;
       background: rgba(255,255,255,0.55); border: 1.5px solid rgba(255,255,255,0.8);
       color: var(--ink-2); font-family: var(--font); font-size: 0.78rem; font-weight: 700;
       cursor: pointer; transition: background 0.15s, transform 0.15s;
     }
-    .btn-bcard:hover { background: rgba(255,255,255,0.8); transform: translateY(-1px); }
-    .btn-bcard i { color: var(--lavender); }
+    .btn-secondary:hover { background: rgba(255,255,255,0.8); transform: translateY(-1px); }
+    .btn-secondary i { color: var(--lavender); }
 
     /* Timeline */
     .timeline { display: flex; flex-direction: column; }
     .timeline-item { display: flex; gap: 1rem; padding-bottom: 1.5rem; align-items: flex-start; }
     .timeline-item:last-child { padding-bottom: 0; }
-    .timeline-left { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 18px; }
+    .timeline-left { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 36px; }
     .timeline-dot {
-      width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; margin-top: 3px;
-      background: linear-gradient(135deg, var(--lavender), var(--teal));
-      border: 2px solid rgba(255,255,255,0.7);
-      box-shadow: 0 0 0 3px rgba(155,143,212,0.2);
+      width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0;
+      background: linear-gradient(135deg, rgba(155,143,212,0.3), rgba(74,181,170,0.2));
+      border: 1px solid rgba(255,255,255,0.6);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; position: relative;
     }
+    .timeline-dot img { width: 100%; height: 100%; object-fit: contain; padding: 4px; }
+    .timeline-dot i { font-size: 1rem; color: var(--lavender); }
     .timeline-line { flex: 1; width: 2px; margin-top: 4px; background: linear-gradient(to bottom, rgba(155,143,212,0.4), rgba(74,181,170,0.15)); border-radius: 2px; min-height: 20px; }
     .timeline-role { font-size: 0.92rem; font-weight: 800; color: var(--ink); line-height: 1.2; }
     .timeline-company { font-size: 0.78rem; font-weight: 600; color: var(--lavender); margin-top: 0.1rem; }
@@ -217,30 +229,48 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 1.1rem; color: var(--lavender);
       border: 1px solid rgba(255,255,255,0.6);
+      overflow: hidden;
     }
+    .edu-icon img { width: 100%; height: 100%; object-fit: contain; padding: 5px; }
     .edu-name { font-size: 0.92rem; font-weight: 800; color: var(--ink); }
     .edu-degree { font-size: 0.78rem; font-weight: 600; color: var(--teal); margin-top: 0.1rem; }
     .edu-dates { font-size: 0.7rem; font-weight: 600; color: var(--ink-4); margin-top: 0.1rem; }
 
-    /* Socials */
-    .socials-card { padding: 0 !important; overflow: hidden; }
-    .socials-main-row {
-      display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
-      padding: 0.75rem 1.1rem;
-      background: linear-gradient(90deg, rgba(78,58,160,0.97), rgba(50,150,142,0.97));
-      color: #fff;
+    /* My Links */
+    .links-row {
+      display: flex; flex-wrap: wrap; gap: 0.55rem; align-items: center;
     }
-    .socials-label { font-size: 0.8rem; font-weight: 800; white-space: nowrap; }
-    .socials-icons { display: flex; gap: 0.45rem; align-items: center; }
-    .social-icon-btn {
-      width: 34px; height: 34px; border-radius: 50%;
-      background: rgba(255,255,255,0.92); border: 1.5px solid rgba(255,255,255,1);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    .link-chip {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      padding: 0.38rem 0.8rem 0.38rem 0.5rem;
+      border-radius: 999px; text-decoration: none;
+      font-size: 0.75rem; font-weight: 700; color: #fff;
+      transition: opacity 0.15s, transform 0.15s;
+      border: 1.5px solid rgba(255,255,255,0.25);
+    }
+    .link-chip:hover { opacity: 0.88; transform: translateY(-1px); }
+    .link-letter {
+      width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+      background: rgba(255,255,255,0.22);
       display: flex; align-items: center; justify-content: center;
-      color: var(--ink-2); font-size: 1rem; text-decoration: none;
-      transition: background 0.15s, transform 0.15s;
+      font-size: 0.72rem; font-weight: 900; letter-spacing: 0;
     }
-    .social-icon-btn:hover { background: #fff; transform: translateY(-2px); }
+    .link-chip-rm {
+      background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer;
+      font-size: 0.65rem; padding: 0 0 0 0.1rem; line-height: 1; margin-left: 0.15rem;
+      transition: color 0.15s;
+    }
+    .link-chip-rm:hover { color: #fff; }
+
+    /* Color swatches for link picker */
+    .color-swatches { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+    .color-swatch {
+      width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
+      border: 2.5px solid transparent; transition: border-color 0.15s, transform 0.15s;
+      flex-shrink: 0;
+    }
+    .color-swatch:hover { transform: scale(1.12); }
+    .color-swatch.selected { border-color: #fff; box-shadow: 0 0 0 2px rgba(255,255,255,0.4); }
 
     /* Skills */
     .skills-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; }
@@ -309,6 +339,74 @@
     .resume-toggle::after { content:''; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: white; transition: left 0.2s; }
     .resume-toggle:checked::after { left: 14px; }
 
+    /* My Sites (sapphire card) */
+    @property --angle {
+      syntax: '<angle>'; initial-value: 0deg; inherits: false;
+    }
+    @keyframes sites-angle { to { --angle: 360deg; } }
+    .sites-card-wrap {
+      border-radius: 15px; padding: 1.5px; position: relative;
+      background: conic-gradient(from var(--angle, 0deg), #1a3aff, #00c2ff, #a259ff, #ff6b35, #1a3aff);
+      animation: sites-angle 4s linear infinite;
+      box-shadow: 0 0 28px rgba(26,58,255,0.35), 0 0 56px rgba(0,194,255,0.18);
+      margin-bottom: 1.25rem;
+    }
+    .sites-card { border-radius: 14px; overflow: hidden; background: #080d1e; }
+    .sites-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.1rem 1.2rem 0.9rem;
+      border-bottom: 0.5px solid rgba(255,255,255,0.07);
+    }
+    .sites-title {
+      font-size: 1rem; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase;
+      background: linear-gradient(90deg, #a599f5, #EF9F27);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .sites-list { display: flex; flex-direction: column; padding: 0.75rem 0.9rem; gap: 0.6rem; }
+    .site-btn {
+      display: block; width: 100%; text-decoration: none; text-align: left;
+      position: relative; border-radius: 12px; padding: 0.85rem 1rem;
+      background: linear-gradient(135deg, rgba(127,119,221,0.18) 0%, rgba(239,159,39,0.12) 100%);
+      border: 1px solid rgba(127,119,221,0.28);
+      transition: all 0.2s;
+    }
+    .site-btn:hover { border-color: rgba(165,153,245,0.55); transform: translateY(-1px); }
+    .site-btn-name {
+      font-size: 0.95rem; font-weight: 900;
+      background: linear-gradient(90deg, #e8e0ff, #f5c87a);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .site-btn-url { font-size: 0.65rem; color: rgba(255,255,255,0.28); margin-top: 0.15rem; }
+    .site-status { font-size: 0.6rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 0.35rem; }
+    .site-status.pub { color: #4ed494; }
+    .site-status.priv { color: rgba(255,255,255,0.25); }
+    .sites-empty { padding: 1.2rem; font-size: 0.75rem; color: rgba(255,255,255,0.22); font-style: italic; text-align: center; }
+
+    /* Business card preview */
+    .bcard-preview {
+      border-radius: 16px; overflow: hidden;
+      background: linear-gradient(135deg, #1a0e35, #0d2233);
+      border: 1px solid rgba(155,143,212,0.3);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    }
+    .bcard-top {
+      padding: 1.5rem 1.5rem 1.2rem;
+      background: linear-gradient(135deg, rgba(78,58,160,0.8), rgba(50,150,142,0.6));
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .bcard-avatar {
+      width: 56px; height: 56px; border-radius: 12px; flex-shrink: 0;
+      background: rgba(255,255,255,0.15);
+      border: 2px solid rgba(255,255,255,0.3);
+      overflow: hidden; display: flex; align-items: center; justify-content: center;
+    }
+    .bcard-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .bcard-avatar i { font-size: 1.6rem; color: rgba(255,255,255,0.5); }
+    .bcard-name { font-size: 1.25rem; font-weight: 800; color: #fff; line-height: 1.1; }
+    .bcard-title { font-size: 0.78rem; color: rgba(255,255,255,0.7); margin-top: 0.2rem; }
+    .bcard-location { font-size: 0.7rem; color: rgba(255,255,255,0.5); margin-top: 0.1rem; display: flex; align-items: center; gap: 0.3rem; }
+    .bcard-bottom { padding: 1rem 1.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
     /* Modals */
     .modal-overlay { display: none; position: fixed; inset: 0; z-index: 300; background: rgba(40,30,20,0.55); backdrop-filter: blur(6px); align-items: center; justify-content: center; padding: 1.5rem; }
     .modal-overlay.open { display: flex; }
@@ -330,6 +428,35 @@
     .modal-btn-save { background: linear-gradient(90deg, rgba(78,58,160,0.97), rgba(50,150,142,0.97)); border: none; color: #fff; border-radius: 8px; padding: 0.45rem 1.2rem; font-family: var(--font); font-size: 0.8rem; font-weight: 800; cursor: pointer; transition: opacity 0.15s; }
     .modal-btn-save:hover { opacity: 0.88; }
     .modal-divider { height: 1px; background: rgba(255,255,255,0.08); }
+
+    /* Logo upload area in modal */
+    .logo-upload-area {
+      display: flex; align-items: center; gap: 0.75rem;
+      background: rgba(255,255,255,0.04); border: 1px dashed rgba(255,255,255,0.12);
+      border-radius: 10px; padding: 0.7rem 0.9rem; cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .logo-upload-area:hover { border-color: rgba(155,143,212,0.4); }
+    .logo-preview-thumb {
+      width: 36px; height: 36px; border-radius: 8px; object-fit: contain;
+      border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); padding: 3px;
+    }
+    .logo-upload-text { font-size: 0.72rem; color: rgba(255,255,255,0.4); }
+    .logo-upload-text strong { color: var(--lavender); font-weight: 700; }
+
+    /* Link list in modal */
+    .link-list-item {
+      display: flex; align-items: center; gap: 0.6rem;
+      background: rgba(255,255,255,0.05); border-radius: 8px; padding: 0.5rem 0.7rem;
+    }
+    .link-list-badge {
+      width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 900; color: #fff;
+    }
+    .link-list-label { font-size: 0.8rem; font-weight: 700; color: rgba(255,255,255,0.8); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .link-list-rm { background: none; border: none; color: rgba(162,40,65,0.5); cursor: pointer; font-size: 0.8rem; transition: color 0.15s; flex-shrink: 0; }
+    .link-list-rm:hover { color: rgba(162,40,65,0.9); }
   </style>
 </head>
 
@@ -354,9 +481,14 @@
     <!-- Bio -->
     <div class="office-card">
       <div class="bio-header">
-        <div class="bio-avatar-wrap" id="bioAvatarWrap">
+        <div class="bio-avatar-wrap" id="bioAvatarWrap" onclick="document.getElementById('officeAvatarInput').click()">
           <i class="ti ti-user bio-avatar-icon" id="bioAvatarIcon"></i>
+          <div class="bio-avatar-overlay">
+            <i class="ti ti-camera"></i>
+            <span>Change Photo</span>
+          </div>
         </div>
+        <input type="file" id="officeAvatarInput" accept="image/*" style="display:none" onchange="uploadOfficeAvatar(this)" />
         <div class="bio-divider"></div>
         <div class="bio-info">
           <div class="bio-name" id="bioName">Loading…</div>
@@ -368,7 +500,8 @@
           <div class="bio-text" id="bioText" style="display:none;"></div>
           <p class="bio-empty-hint" id="bioEmptyHint" style="display:none;">Complete your Office by adding your title, location, and bio.</p>
           <div class="bio-actions">
-            <button class="btn-bcard" onclick="openModal('bio')"><i class="ti ti-pencil"></i> Edit Bio</button>
+            <button class="btn-secondary" onclick="openModal('bio')"><i class="ti ti-pencil"></i> Edit Bio</button>
+            <button class="btn-secondary" onclick="openModal('bcard')"><i class="ti ti-id-badge"></i> Business Card</button>
           </div>
         </div>
       </div>
@@ -402,6 +535,20 @@
 
       <!-- Right column -->
       <div>
+
+        <!-- My Sites -->
+        <div class="section-label">My Sites</div>
+        <div class="sites-card-wrap">
+          <div class="sites-card">
+            <div class="sites-header">
+              <div class="sites-title">My Sites</div>
+            </div>
+            <div id="sitesList">
+              <div class="sites-empty">No sites yet — create one from your Home page.</div>
+            </div>
+          </div>
+        </div>
+
         <!-- Resume -->
         <div class="section-label">Resume</div>
         <div class="resume-card">
@@ -428,17 +575,14 @@
           </div>
         </div>
 
-        <!-- Socials -->
+        <!-- My Links -->
         <div class="section-label">
-          Portfolio &amp; Socials
-          <button class="section-edit-btn" onclick="openModal('socials')"><i class="ti ti-pencil"></i> Edit</button>
+          My Links
+          <button class="section-add-btn" onclick="openModal('link-add')"><i class="ti ti-plus"></i> Add</button>
         </div>
-        <div class="office-card-plain socials-card">
-          <div class="socials-main-row">
-            <span class="socials-label">My Links</span>
-            <div class="socials-icons" id="socialsIcons">
-              <span style="font-size:0.72rem;color:rgba(255,255,255,0.4);font-style:italic;">No links yet</span>
-            </div>
+        <div class="office-card-plain">
+          <div class="links-row" id="linksRow">
+            <span class="empty-state"><i class="ti ti-link"></i> No links yet</span>
           </div>
         </div>
 
@@ -488,6 +632,10 @@
       </div>
       <div class="modal-body">
         <div class="modal-field">
+          <div class="modal-label">Display Name</div>
+          <input class="modal-input" id="bioEditName" type="text" placeholder="e.g. Dave Michael" />
+        </div>
+        <div class="modal-field">
           <div class="modal-label">Professional Title</div>
           <input class="modal-input" id="bioEditTitle" type="text" placeholder="e.g. Visual Content Producer · Filmmaker" />
         </div>
@@ -507,6 +655,36 @@
     </div>
   </div>
 
+  <!-- Business Card Modal -->
+  <div class="modal-overlay" id="modalBcard">
+    <div class="modal-box" style="width:min(420px,96vw);">
+      <div class="modal-header">
+        <div class="modal-title"><i class="ti ti-id-badge"></i> Business Card</div>
+        <button class="modal-close" onclick="closeModal('bcard')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="bcard-preview" id="bcardPreview">
+          <div class="bcard-top">
+            <div class="bcard-avatar" id="bcardAvatar"><i class="ti ti-user"></i></div>
+            <div>
+              <div class="bcard-name" id="bcardName">—</div>
+              <div class="bcard-title" id="bcardTitle"></div>
+              <div class="bcard-location" id="bcardLocation"></div>
+            </div>
+          </div>
+          <div class="bcard-bottom" id="bcardLinks"></div>
+        </div>
+        <div style="font-size:0.72rem;color:rgba(255,255,255,0.3);text-align:center;">
+          Share your Office link: <strong id="bcardUrl" style="color:rgba(155,143,212,0.8);"></strong>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn-cancel" onclick="closeModal('bcard')">Close</button>
+        <button class="modal-btn-save" onclick="copyOfficeLink()"><i class="ti ti-copy"></i> Copy Link</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Add Experience Modal -->
   <div class="modal-overlay" id="modalExpAdd">
     <div class="modal-box">
@@ -515,6 +693,15 @@
         <button class="modal-close" onclick="closeModal('exp-add')">✕</button>
       </div>
       <div class="modal-body">
+        <div class="modal-field">
+          <div class="modal-label">Company Logo <span style="color:rgba(255,255,255,0.3);font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></div>
+          <div class="logo-upload-area" onclick="document.getElementById('expLogoInput').click()">
+            <img id="expLogoPreview" class="logo-preview-thumb" style="display:none;" alt="" />
+            <i class="ti ti-building" id="expLogoIcon" style="font-size:1.5rem;color:rgba(155,143,212,0.5);"></i>
+            <div class="logo-upload-text"><strong>Click to upload</strong> company logo</div>
+          </div>
+          <input type="file" id="expLogoInput" accept="image/*" style="display:none" onchange="previewExpLogo(this)" />
+        </div>
         <div class="modal-field">
           <div class="modal-label">Role / Title</div>
           <input class="modal-input" id="expRole" type="text" placeholder="e.g. Creative Director" />
@@ -548,6 +735,15 @@
       </div>
       <div class="modal-body">
         <div class="modal-field">
+          <div class="modal-label">School Logo <span style="color:rgba(255,255,255,0.3);font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></div>
+          <div class="logo-upload-area" onclick="document.getElementById('eduLogoInput').click()">
+            <img id="eduLogoPreview" class="logo-preview-thumb" style="display:none;" alt="" />
+            <i class="ti ti-school" id="eduLogoIcon" style="font-size:1.5rem;color:rgba(155,143,212,0.5);"></i>
+            <div class="logo-upload-text"><strong>Click to upload</strong> school logo</div>
+          </div>
+          <input type="file" id="eduLogoInput" accept="image/*" style="display:none" onchange="previewEduLogo(this)" />
+        </div>
+        <div class="modal-field">
           <div class="modal-label">School / Institution</div>
           <input class="modal-input" id="eduName" type="text" placeholder="e.g. Arizona State University" />
         </div>
@@ -567,34 +763,44 @@
     </div>
   </div>
 
-  <!-- Socials Modal -->
-  <div class="modal-overlay" id="modalSocials">
+  <!-- Add Link Modal -->
+  <div class="modal-overlay" id="modalLinkAdd">
     <div class="modal-box">
       <div class="modal-header">
-        <div class="modal-title"><i class="ti ti-link"></i> Portfolio &amp; Socials</div>
-        <button class="modal-close" onclick="closeModal('socials')">✕</button>
+        <div class="modal-title"><i class="ti ti-link"></i> Add Link</div>
+        <button class="modal-close" onclick="closeModal('link-add')">✕</button>
       </div>
       <div class="modal-body">
-        <div class="modal-field">
-          <div class="modal-label">LinkedIn URL</div>
-          <input class="modal-input" id="socialLinkedin" type="url" placeholder="https://linkedin.com/in/yourname" />
+        <div style="font-size:0.75rem;color:rgba(255,255,255,0.35);line-height:1.5;">
+          Pick a color and letter to make a badge for this link. Examples: <strong style="color:rgba(255,255,255,0.5);">F</strong> blue = Facebook, <strong style="color:rgba(255,255,255,0.5);">X</strong> black = X.com, <strong style="color:rgba(255,255,255,0.5);">LI</strong> blue = LinkedIn
         </div>
         <div class="modal-field">
-          <div class="modal-label">Instagram URL</div>
-          <input class="modal-input" id="socialInstagram" type="url" placeholder="https://instagram.com/yourname" />
+          <div class="modal-label">Badge Color</div>
+          <div class="color-swatches" id="linkColorSwatches"></div>
         </div>
         <div class="modal-field">
-          <div class="modal-label">Facebook URL</div>
-          <input class="modal-input" id="socialFacebook" type="url" placeholder="https://facebook.com/yourname" />
+          <div class="modal-label">Badge Letter(s) <span style="color:rgba(255,255,255,0.3);font-weight:400;text-transform:none;letter-spacing:0;">(1–3 chars)</span></div>
+          <input class="modal-input" id="linkLetter" type="text" maxlength="3" placeholder="e.g. F, X, LI, YT" style="text-transform:uppercase;" />
         </div>
         <div class="modal-field">
-          <div class="modal-label">Portfolio / Website</div>
-          <input class="modal-input" id="socialPortfolio" type="url" placeholder="https://yourportfolio.com" />
+          <div class="modal-label">Label</div>
+          <input class="modal-input" id="linkLabel" type="text" placeholder="e.g. Facebook, My Portfolio" />
+        </div>
+        <div class="modal-field">
+          <div class="modal-label">URL</div>
+          <input class="modal-input" id="linkUrl" type="url" placeholder="https://" />
+        </div>
+        <div id="linkPreviewWrap" style="display:flex;align-items:center;gap:0.5rem;margin-top:0.25rem;">
+          <span style="font-size:0.65rem;color:rgba(255,255,255,0.3);">Preview:</span>
+          <a class="link-chip" id="linkPreviewChip" href="#" onclick="return false;" style="background:#555;">
+            <span class="link-letter" id="linkPreviewLetter">?</span>
+            <span id="linkPreviewLabel">Label</span>
+          </a>
         </div>
       </div>
       <div class="modal-footer">
-        <button class="modal-btn-cancel" onclick="closeModal('socials')">Cancel</button>
-        <button class="modal-btn-save" onclick="saveSocials()">Save</button>
+        <button class="modal-btn-cancel" onclick="closeModal('link-add')">Cancel</button>
+        <button class="modal-btn-save" onclick="addLink()">Add</button>
       </div>
     </div>
   </div>
@@ -659,30 +865,71 @@
     let currentUser = null;
     let officeData = {};
     let currentResumeUrl = null;
+    let currentProfileName = '';
+    let currentProfileHandle = '';
+    let currentOfficeAvatarUrl = '';
+    let pendingExpLogoFile = null;
+    let pendingEduLogoFile = null;
+    let selectedLinkColor = '#1877F2';
+
+    const LINK_COLORS = [
+      { hex: '#1877F2', label: 'Blue' },
+      { hex: '#000000', label: 'Black' },
+      { hex: '#E1306C', label: 'Pink' },
+      { hex: '#FF0000', label: 'Red' },
+      { hex: '#25D366', label: 'Green' },
+      { hex: '#FF6B35', label: 'Orange' },
+      { hex: '#7B2FBE', label: 'Purple' },
+      { hex: '#009688', label: 'Teal' },
+      { hex: '#795548', label: 'Brown' },
+      { hex: '#607D8B', label: 'Slate' },
+    ];
 
     // ── Modal helpers ──────────────────────────────────────────────
-    const MODALS = { bio:'modalBio', 'exp-add':'modalExpAdd', 'edu-add':'modalEduAdd', socials:'modalSocials', skills:'modalSkills', 'client-add':'modalClientAdd' };
+    const MODALS = {
+      bio: 'modalBio', bcard: 'modalBcard',
+      'exp-add': 'modalExpAdd', 'edu-add': 'modalEduAdd',
+      'link-add': 'modalLinkAdd',
+      skills: 'modalSkills', 'client-add': 'modalClientAdd'
+    };
 
     function openModal(key) {
       if (key === 'bio') {
+        document.getElementById('bioEditName').value     = currentProfileName;
         document.getElementById('bioEditTitle').value    = officeData.title    || '';
         document.getElementById('bioEditLocation').value = officeData.location || '';
         document.getElementById('bioEditBio').value      = officeData.bio      || '';
       }
-      if (key === 'socials') {
-        const s = officeData.socials || {};
-        document.getElementById('socialLinkedin').value  = s.linkedin  || '';
-        document.getElementById('socialInstagram').value = s.instagram || '';
-        document.getElementById('socialFacebook').value  = s.facebook  || '';
-        document.getElementById('socialPortfolio').value = s.portfolio || '';
+      if (key === 'bcard') {
+        renderBcard();
       }
       if (key === 'skills') {
         document.getElementById('skillsEdit').value = (officeData.skills || []).join('\n');
         document.getElementById('toolsEdit').value  = (officeData.tools  || []).join('\n');
       }
-      if (key === 'exp-add')    ['expRole','expCompany','expDates','expDesc'].forEach(id => document.getElementById(id).value = '');
-      if (key === 'edu-add')    ['eduName','eduDegree','eduDates'].forEach(id => document.getElementById(id).value = '');
-      if (key === 'client-add') ['clientName','clientLogo'].forEach(id => document.getElementById(id).value = '');
+      if (key === 'exp-add') {
+        ['expRole','expCompany','expDates','expDesc'].forEach(id => document.getElementById(id).value = '');
+        pendingExpLogoFile = null;
+        document.getElementById('expLogoPreview').style.display = 'none';
+        document.getElementById('expLogoIcon').style.display = '';
+      }
+      if (key === 'edu-add') {
+        ['eduName','eduDegree','eduDates'].forEach(id => document.getElementById(id).value = '');
+        pendingEduLogoFile = null;
+        document.getElementById('eduLogoPreview').style.display = 'none';
+        document.getElementById('eduLogoIcon').style.display = '';
+      }
+      if (key === 'link-add') {
+        document.getElementById('linkLetter').value = '';
+        document.getElementById('linkLabel').value = '';
+        document.getElementById('linkUrl').value = '';
+        selectedLinkColor = LINK_COLORS[0].hex;
+        updateLinkSwatches();
+        updateLinkPreview();
+      }
+      if (key === 'client-add') {
+        ['clientName','clientLogo'].forEach(id => document.getElementById(id).value = '');
+      }
       document.getElementById(MODALS[key]).classList.add('open');
     }
 
@@ -701,28 +948,30 @@
 
     // ── Bio ────────────────────────────────────────────────────────
     async function saveBio() {
+      const newName = document.getElementById('bioEditName').value.trim();
       officeData.title    = document.getElementById('bioEditTitle').value.trim();
       officeData.location = document.getElementById('bioEditLocation').value.trim();
       officeData.bio      = document.getElementById('bioEditBio').value.trim();
-      await persist();
+
+      const updates = { id: currentUser.id, office_data: officeData };
+      if (newName) { updates.full_name = newName; currentProfileName = newName; }
+      await sb.from('profiles').upsert(updates, { onConflict: 'id' });
+
       renderBio();
       closeModal('bio');
     }
 
     function renderBio(profile) {
       if (profile) {
-        document.getElementById('bioName').textContent = profile.full_name || currentUser.email.split('@')[0];
-        document.getElementById('addressHandle').textContent = profile.handle || 'me';
+        currentProfileName   = profile.full_name || currentUser.email.split('@')[0];
+        currentProfileHandle = profile.handle || 'me';
+        document.getElementById('addressHandle').textContent = currentProfileHandle;
         if (profile.avatar_url) {
-          document.getElementById('bioAvatarIcon').style.display = 'none';
-          const wrap = document.getElementById('bioAvatarWrap');
-          const img = wrap.querySelector('img') || document.createElement('img');
-          img.className = 'bio-avatar';
-          img.alt = profile.full_name || '';
-          img.src = profile.avatar_url;
-          if (!img.parentNode) wrap.appendChild(img);
+          currentOfficeAvatarUrl = currentOfficeAvatarUrl || profile.avatar_url;
+          setAvatarImg(currentOfficeAvatarUrl);
         }
       }
+      document.getElementById('bioName').textContent = currentProfileName;
       const titleEl    = document.getElementById('bioTitle');
       const locationEl = document.getElementById('bioLocation');
       const textEl     = document.getElementById('bioText');
@@ -736,15 +985,111 @@
       hintEl.style.display = (!officeData.title && !officeData.location && !officeData.bio) ? '' : 'none';
     }
 
+    function setAvatarImg(url) {
+      document.getElementById('bioAvatarIcon').style.display = 'none';
+      const wrap = document.getElementById('bioAvatarWrap');
+      let img = wrap.querySelector('img.bio-avatar');
+      if (!img) { img = document.createElement('img'); img.className = 'bio-avatar'; wrap.appendChild(img); }
+      img.src = url;
+    }
+
+    async function uploadOfficeAvatar(input) {
+      const file = input.files[0]; if (!file) return; input.value = '';
+      const ext  = file.name.split('.').pop();
+      const path = `${currentUser.id}/office/avatar.${ext}`;
+      const { error } = await sb.storage.from('media').upload(path, file, { upsert: true, contentType: file.type });
+      if (error) { alert('Upload failed: ' + error.message); return; }
+      const { data } = sb.storage.from('media').getPublicUrl(path);
+      currentOfficeAvatarUrl = data.publicUrl;
+      officeData.office_avatar_url = data.publicUrl;
+      await persist();
+      setAvatarImg(data.publicUrl);
+    }
+
+    // ── Business Card ──────────────────────────────────────────────
+    function renderBcard() {
+      document.getElementById('bcardName').textContent  = currentProfileName || '—';
+      document.getElementById('bcardTitle').textContent = officeData.title    || '';
+      const loc = document.getElementById('bcardLocation');
+      if (officeData.location) {
+        loc.innerHTML = `<i class="ti ti-map-pin" style="font-size:0.65rem;"></i> ${esc(officeData.location)}`;
+        loc.style.display = '';
+      } else { loc.style.display = 'none'; }
+
+      // Avatar
+      const avWrap = document.getElementById('bcardAvatar');
+      if (currentOfficeAvatarUrl) {
+        avWrap.innerHTML = `<img src="${esc(currentOfficeAvatarUrl)}" alt="" style="width:100%;height:100%;object-fit:cover;" />`;
+      } else {
+        avWrap.innerHTML = `<i class="ti ti-user" style="font-size:1.6rem;color:rgba(255,255,255,0.5);"></i>`;
+      }
+
+      // Links
+      const linksEl = document.getElementById('bcardLinks');
+      linksEl.innerHTML = '';
+      (officeData.links || []).forEach(lnk => {
+        const a = document.createElement('a');
+        a.className = 'link-chip';
+        a.href = lnk.url; a.target = '_blank'; a.rel = 'noopener';
+        a.style.background = lnk.color;
+        a.innerHTML = `<span class="link-letter">${esc(lnk.letter)}</span>${esc(lnk.label)}`;
+        linksEl.appendChild(a);
+      });
+      if (!(officeData.links || []).length) {
+        linksEl.innerHTML = '<span style="font-size:0.7rem;color:rgba(255,255,255,0.25);font-style:italic;">No links added yet</span>';
+      }
+
+      const handle = currentProfileHandle;
+      const url = `${window.location.origin}/${handle}/office`;
+      document.getElementById('bcardUrl').textContent = url;
+    }
+
+    function copyOfficeLink() {
+      const handle = currentProfileHandle;
+      const url = `${window.location.origin}/${handle}/office`;
+      navigator.clipboard.writeText(url).then(() => {
+        const btn = document.querySelector('#modalBcard .modal-btn-save');
+        const orig = btn.innerHTML;
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.innerHTML = orig; }, 1500);
+      });
+    }
+
     // ── Experience ─────────────────────────────────────────────────
+    function previewExpLogo(input) {
+      const file = input.files[0]; if (!file) return;
+      pendingExpLogoFile = file;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const prev = document.getElementById('expLogoPreview');
+        prev.src = e.target.result;
+        prev.style.display = '';
+        document.getElementById('expLogoIcon').style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    }
+
     async function addExperience() {
       const role    = document.getElementById('expRole').value.trim();
       const company = document.getElementById('expCompany').value.trim();
       const dates   = document.getElementById('expDates').value.trim();
       const desc    = document.getElementById('expDesc').value.trim();
       if (!role) { document.getElementById('expRole').focus(); return; }
+
+      const id = Date.now();
+      let logo_url = '';
+      if (pendingExpLogoFile) {
+        const ext  = pendingExpLogoFile.name.split('.').pop();
+        const path = `${currentUser.id}/exp-logos/${id}.${ext}`;
+        const { error } = await sb.storage.from('media').upload(path, pendingExpLogoFile, { upsert: true, contentType: pendingExpLogoFile.type });
+        if (!error) {
+          const { data } = sb.storage.from('media').getPublicUrl(path);
+          logo_url = data.publicUrl;
+        }
+      }
+
       officeData.experience = officeData.experience || [];
-      officeData.experience.unshift({ id: Date.now(), role, company, dates, desc });
+      officeData.experience.unshift({ id, role, company, dates, desc, logo_url });
       await persist();
       renderExperience();
       closeModal('exp-add');
@@ -767,9 +1112,12 @@
       items.forEach((e, i) => {
         const div = document.createElement('div');
         div.className = 'timeline-item';
+        const dotInner = e.logo_url
+          ? `<img src="${esc(e.logo_url)}" alt="${esc(e.company || '')}" />`
+          : `<i class="ti ti-briefcase"></i>`;
         div.innerHTML = `
           <div class="timeline-left">
-            <div class="timeline-dot"></div>
+            <div class="timeline-dot">${dotInner}</div>
             ${i < items.length - 1 ? '<div class="timeline-line"></div>' : ''}
           </div>
           <div style="flex:1;min-width:0;">
@@ -784,13 +1132,39 @@
     }
 
     // ── Education ──────────────────────────────────────────────────
+    function previewEduLogo(input) {
+      const file = input.files[0]; if (!file) return;
+      pendingEduLogoFile = file;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const prev = document.getElementById('eduLogoPreview');
+        prev.src = e.target.result;
+        prev.style.display = '';
+        document.getElementById('eduLogoIcon').style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    }
+
     async function addEducation() {
       const name   = document.getElementById('eduName').value.trim();
       const degree = document.getElementById('eduDegree').value.trim();
       const dates  = document.getElementById('eduDates').value.trim();
       if (!name) { document.getElementById('eduName').focus(); return; }
+
+      const id = Date.now();
+      let logo_url = '';
+      if (pendingEduLogoFile) {
+        const ext  = pendingEduLogoFile.name.split('.').pop();
+        const path = `${currentUser.id}/edu-logos/${id}.${ext}`;
+        const { error } = await sb.storage.from('media').upload(path, pendingEduLogoFile, { upsert: true, contentType: pendingEduLogoFile.type });
+        if (!error) {
+          const { data } = sb.storage.from('media').getPublicUrl(path);
+          logo_url = data.publicUrl;
+        }
+      }
+
       officeData.education = officeData.education || [];
-      officeData.education.push({ id: Date.now(), name, degree, dates });
+      officeData.education.push({ id, name, degree, dates, logo_url });
       await persist();
       renderEducation();
       closeModal('edu-add');
@@ -813,8 +1187,11 @@
       items.forEach(e => {
         const div = document.createElement('div');
         div.className = 'edu-item';
+        const iconInner = e.logo_url
+          ? `<img src="${esc(e.logo_url)}" alt="${esc(e.name)}" />`
+          : `<i class="ti ti-school"></i>`;
         div.innerHTML = `
-          <div class="edu-icon"><i class="ti ti-school"></i></div>
+          <div class="edu-icon">${iconInner}</div>
           <div style="flex:1;min-width:0;">
             <div class="edu-name">${esc(e.name)}</div>
             ${e.degree ? `<div class="edu-degree">${esc(e.degree)}</div>` : ''}
@@ -825,40 +1202,77 @@
       });
     }
 
-    // ── Socials ────────────────────────────────────────────────────
-    async function saveSocials() {
-      officeData.socials = {
-        linkedin:  document.getElementById('socialLinkedin').value.trim(),
-        instagram: document.getElementById('socialInstagram').value.trim(),
-        facebook:  document.getElementById('socialFacebook').value.trim(),
-        portfolio: document.getElementById('socialPortfolio').value.trim(),
-      };
-      await persist();
-      renderSocials();
-      closeModal('socials');
+    // ── My Links ───────────────────────────────────────────────────
+    function updateLinkSwatches() {
+      const wrap = document.getElementById('linkColorSwatches');
+      wrap.innerHTML = '';
+      LINK_COLORS.forEach(c => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'color-swatch' + (c.hex === selectedLinkColor ? ' selected' : '');
+        btn.style.background = c.hex;
+        btn.title = c.label;
+        btn.onclick = () => { selectedLinkColor = c.hex; updateLinkSwatches(); updateLinkPreview(); };
+        wrap.appendChild(btn);
+      });
     }
 
-    function renderSocials() {
-      const s = officeData.socials || {};
-      const icons = document.getElementById('socialsIcons');
-      icons.innerHTML = '';
-      const defs = [
-        { key:'linkedin',  icon:'ti-brand-linkedin',  label:'LinkedIn' },
-        { key:'instagram', icon:'ti-brand-instagram', label:'Instagram' },
-        { key:'facebook',  icon:'ti-brand-facebook',  label:'Facebook' },
-        { key:'portfolio', icon:'ti-briefcase',       label:'Portfolio' },
-      ];
-      const active = defs.filter(d => s[d.key]);
-      if (!active.length) {
-        icons.innerHTML = '<span style="font-size:0.72rem;color:rgba(255,255,255,0.4);font-style:italic;">No links yet</span>';
+    function updateLinkPreview() {
+      const letter = (document.getElementById('linkLetter').value || '?').toUpperCase();
+      const label  = document.getElementById('linkLabel').value || 'Label';
+      const chip   = document.getElementById('linkPreviewChip');
+      chip.style.background = selectedLinkColor;
+      document.getElementById('linkPreviewLetter').textContent = letter;
+      document.getElementById('linkPreviewLabel').textContent  = label;
+    }
+
+    async function addLink() {
+      const letter = document.getElementById('linkLetter').value.trim().toUpperCase();
+      const label  = document.getElementById('linkLabel').value.trim();
+      const url    = document.getElementById('linkUrl').value.trim();
+      if (!label || !url) { document.getElementById(!label ? 'linkLabel' : 'linkUrl').focus(); return; }
+      officeData.links = officeData.links || [];
+      officeData.links.push({ id: Date.now(), letter: letter || label[0].toUpperCase(), label, url, color: selectedLinkColor });
+      await persist();
+      renderLinks();
+      closeModal('link-add');
+    }
+
+    async function removeLink(id) {
+      officeData.links = (officeData.links || []).filter(l => l.id !== id);
+      await persist();
+      renderLinks();
+    }
+
+    function renderLinks() {
+      const row = document.getElementById('linksRow');
+      const items = officeData.links || [];
+      row.innerHTML = '';
+      if (!items.length) {
+        row.innerHTML = '<span class="empty-state"><i class="ti ti-link"></i> No links yet</span>';
         return;
       }
-      active.forEach(d => {
+      items.forEach(lnk => {
+        const wrap = document.createElement('span');
+        wrap.style.display = 'inline-flex';
+        wrap.style.alignItems = 'center';
+        wrap.style.gap = '0.15rem';
+
         const a = document.createElement('a');
-        a.className = 'social-icon-btn';
-        a.href = s[d.key]; a.target = '_blank'; a.rel = 'noopener'; a.title = d.label;
-        a.innerHTML = `<i class="ti ${d.icon}"></i>`;
-        icons.appendChild(a);
+        a.className = 'link-chip';
+        a.href = lnk.url; a.target = '_blank'; a.rel = 'noopener';
+        a.style.background = lnk.color;
+        a.innerHTML = `<span class="link-letter">${esc(lnk.letter)}</span>${esc(lnk.label)}`;
+
+        const rm = document.createElement('button');
+        rm.className = 'link-chip-rm';
+        rm.innerHTML = '<i class="ti ti-x"></i>';
+        rm.title = 'Remove';
+        rm.onclick = () => removeLink(lnk.id);
+
+        wrap.appendChild(a);
+        wrap.appendChild(rm);
+        row.appendChild(wrap);
       });
     }
 
@@ -976,6 +1390,38 @@
       renderResumeUI(null, true);
     }
 
+    // ── My Sites ───────────────────────────────────────────────────
+    async function loadMySites(handle) {
+      const { data: rooms } = await sb.from('rooms')
+        .select('room_name, published')
+        .eq('username', handle)
+        .order('created_at', { ascending: false });
+      const el = document.getElementById('sitesList');
+      if (!rooms || !rooms.length) {
+        el.innerHTML = '<div class="sites-empty">No sites yet — create one from your Home page.</div>';
+        return;
+      }
+      el.innerHTML = '';
+      const list = document.createElement('div');
+      list.className = 'sites-list';
+      rooms.forEach(r => {
+        const url = `${window.location.origin}/${handle}/${r.room_name}`;
+        const item = document.createElement('div');
+        item.innerHTML = `
+          <a class="site-btn" href="${esc(url)}" target="_blank">
+            <div class="site-btn-name">${esc(r.room_name)}</div>
+            <div class="site-btn-url">${esc(url)}</div>
+            <div class="site-status ${r.published ? 'pub' : 'priv'}">${r.published ? 'Published' : 'Private'}</div>
+          </a>`;
+        list.appendChild(item);
+      });
+      el.appendChild(list);
+    }
+
+    // ── Live preview wiring for link modal ─────────────────────────
+    document.getElementById('linkLetter').addEventListener('input', updateLinkPreview);
+    document.getElementById('linkLabel').addEventListener('input', updateLinkPreview);
+
     // ── Util ───────────────────────────────────────────────────────
     function esc(str) {
       return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -987,30 +1433,40 @@
       if (!session) { window.location.href = 'login.html'; return; }
       currentUser = session.user;
 
-      // Set name immediately so "Loading…" is never stuck
       document.getElementById('bioName').textContent = currentUser.email.split('@')[0];
 
-      // Fetch base profile (columns that are guaranteed to exist)
       const { data: profile } = await sb.from('profiles')
-        .select('full_name, avatar_url, handle, resume_url, resume_downloadable')
+        .select('full_name, avatar_url, handle, resume_url, resume_downloadable, office_data')
         .eq('id', currentUser.id)
         .single();
 
-      // Fetch office_data separately — column may not exist yet if SQL hasn't been run
-      const { data: officeRow } = await sb.from('profiles')
-        .select('office_data')
-        .eq('id', currentUser.id)
-        .single();
+      officeData = profile?.office_data || {};
+      // office_avatar_url lives inside office_data; fall back to home avatar
+      const officeAvatar = officeData.office_avatar_url || profile?.avatar_url || null;
+      if (officeAvatar) {
+        currentOfficeAvatarUrl = officeAvatar;
+        setAvatarImg(officeAvatar);
+      } else if (profile?.avatar_url) {
+        currentOfficeAvatarUrl = profile.avatar_url;
+        setAvatarImg(profile.avatar_url);
+      }
 
-      officeData = officeRow?.office_data || {};
+      currentProfileName   = profile?.full_name || currentUser.email.split('@')[0];
+      currentProfileHandle = profile?.handle || '';
 
       renderBio(profile);
       renderExperience();
       renderEducation();
-      renderSocials();
+      renderLinks();
       renderSkills();
       renderClients();
       renderResumeUI(profile?.resume_url || null, profile?.resume_downloadable !== false);
+
+      if (currentProfileHandle) {
+        loadMySites(currentProfileHandle);
+      }
+
+      updateLinkSwatches();
     }
 
     init();
