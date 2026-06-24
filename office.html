@@ -15,15 +15,15 @@
     :root {
       --glass-white:  rgba(255, 255, 255, 0.52);
       --glass-border: rgba(255, 255, 255, 0.75);
-      --glass-shadow: 0 8px 32px rgba(120, 80, 40, 0.10), 0 2px 8px rgba(120,80,40,0.07);
+      --glass-shadow: 0 8px 32px rgba(40, 60, 120, 0.10), 0 2px 8px rgba(40,60,120,0.07);
       --glass-inset:  0 1px 0 rgba(255,255,255,0.9) inset;
-      --amber:        #e8992a;
-      --teal:         #4ab5aa;
-      --lavender:     #9b8fd4;
-      --ink:          #26180e;
-      --ink-2:        #5a3e28;
-      --ink-3:        #a07d60;
-      --ink-4:        #c9aa90;
+      --amber:        #4a72c4;
+      --teal:         #6b9de8;
+      --lavender:     #4a72c4;
+      --ink:          #0e1826;
+      --ink-2:        #283e5a;
+      --ink-3:        #607898;
+      --ink-4:        #90aac8;
       --radius-md:    16px;
       --radius-lg:    22px;
       --radius-xl:    28px;
@@ -38,11 +38,11 @@
       min-height: 100vh;
       padding: 0 0 5rem;
       background:
-        radial-gradient(ellipse at 80% 10%, rgba(195,160,255,0.30) 0%, transparent 52%),
-        radial-gradient(ellipse at 10% 90%, rgba(255,180,90,0.38) 0%, transparent 52%),
-        radial-gradient(ellipse at 55% 55%, rgba(255,210,150,0.18) 0%, transparent 65%),
-        radial-gradient(ellipse at 30% 20%, rgba(160,210,255,0.20) 0%, transparent 45%),
-        linear-gradient(158deg, #ede5f8 0%, #f8ead8 38%, #fdf4e8 62%, #f3e2cc 100%);
+        radial-gradient(ellipse at 80% 10%, rgba(100,140,255,0.28) 0%, transparent 52%),
+        radial-gradient(ellipse at 10% 90%, rgba(74,114,196,0.22) 0%, transparent 52%),
+        radial-gradient(ellipse at 55% 55%, rgba(160,190,255,0.14) 0%, transparent 65%),
+        radial-gradient(ellipse at 30% 20%, rgba(200,220,255,0.22) 0%, transparent 45%),
+        linear-gradient(158deg, #e8edf8 0%, #eef2fc 38%, #f4f7ff 62%, #e5eaf8 100%);
       background-attachment: fixed;
     }
 
@@ -64,7 +64,7 @@
       border-radius: 999px;
       padding: 0.3rem 1rem 0.3rem 0.75rem;
     }
-    .address-dot { width: 8px; height: 8px; border-radius: 50%; background: linear-gradient(135deg, #f5c462, #e8992a); }
+    .address-dot { width: 8px; height: 8px; border-radius: 50%; background: linear-gradient(135deg, #7098e0, #4a72c4); }
     .address-text { font-size: 0.78rem; font-weight: 500; color: var(--ink-3); letter-spacing: 0.02em; }
     .address-text strong { color: var(--ink-2); font-weight: 700; }
 
@@ -92,7 +92,7 @@
     .room-tab:last-child { border-right: none; }
     .room-tab i { font-size: 1.2rem; }
     .room-tab:hover { background: rgba(255,255,255,0.45); color: var(--ink); }
-    .room-tab.active { background: linear-gradient(160deg, rgba(155,143,212,0.25), rgba(74,181,170,0.18)); color: var(--ink); }
+    .room-tab.active { background: linear-gradient(160deg, rgba(74,114,196,0.22), rgba(107,157,232,0.14)); color: var(--ink); }
     .room-tab.active i { color: var(--lavender); }
 
     /* Section Label */
