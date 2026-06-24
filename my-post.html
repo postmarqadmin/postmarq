@@ -3544,7 +3544,7 @@
       feed.innerHTML = cachedPosts.map(p => {
         const pName   = p.profiles?.full_name || name;
         const pAvatar = p.profiles?.avatar_url || (p.user_id === currentUser.id ? avatarUrl : '');
-        const pHandle = p.profiles?.handle || (p.user_id === currentUser.id ? currentHandle : '');
+        const pHandle = (p.profiles?.handle || '').replace('.postmarq', '') || (p.user_id === currentUser.id ? currentHandle : '');
         return buildPostCard(p, pName, pAvatar, pHandle);
       }).join('');
     }
