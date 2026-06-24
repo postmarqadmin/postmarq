@@ -590,6 +590,8 @@
       overflow: hidden;
     }
     .post-av img { width: 100%; height: 100%; object-fit: cover; }
+    a.post-av { text-decoration: none; cursor: pointer; transition: opacity 0.15s, transform 0.15s; }
+    a.post-av:hover { opacity: 0.85; transform: scale(1.06); }
     .post-author { font-size: 0.82rem; font-weight: 800; color: var(--ink); }
     .post-time { font-size: 0.72rem; color: rgba(90,62,40,0.5); margin-left: auto; }
     .post-delete { background: none; border: none; font-size: 0.75rem; color: rgba(90,62,40,0.4); cursor: pointer; padding: 0 0.25rem; }
@@ -3442,7 +3444,7 @@
     }
 
     async function loadPosts() {
-      let query = sb.from('posts').select('id, user_id, body, media, created_at, stamps(count), profiles:user_id(full_name, avatar_url)');
+      let query = sb.from('posts').select('id, user_id, body, media, created_at, stamps(count), profiles:user_id(full_name, avatar_url, handle)');
 
       if (feedPrefs.audience === 'me') {
         query = query.eq('user_id', currentUser.id);
@@ -3482,13 +3484,16 @@
       if (ybStamps) ybStamps.textContent = stampsSent || 0;
     }
 
-    function buildPostCard(p, name, avatarUrl) {
+    function buildPostCard(p, name, avatarUrl, handle) {
       const stampCount = p.stamps?.[0]?.count || 0;
       const stamped    = cachedMyStamps.has(p.id);
       const initial    = name.charAt(0).toUpperCase();
-      const avHtml     = avatarUrl
-        ? `<div class="post-av"><img src="${avatarUrl}" alt="" /></div>`
-        : `<div class="post-av">${initial}</div>`;
+      const avInner    = avatarUrl
+        ? `<img src="${avatarUrl}" alt="" />`
+        : initial;
+      const avHtml     = handle
+        ? `<a class="post-av" href="/${handle}" title="${escHtml(name)}">${avInner}</a>`
+        : `<div class="post-av">${avInner}</div>`;
       const media = p.media || [];
       const mediaHtml = media.length
         ? `<div class="post-media-grid count-${Math.min(media.length, 2)}">${media.map(m =>
@@ -3537,9 +3542,10 @@
       const avatarUrl = avatarImg.dataset.url || '';
 
       feed.innerHTML = cachedPosts.map(p => {
-        const pName = p.profiles?.full_name || name;
+        const pName   = p.profiles?.full_name || name;
         const pAvatar = p.profiles?.avatar_url || (p.user_id === currentUser.id ? avatarUrl : '');
-        return buildPostCard(p, pName, pAvatar);
+        const pHandle = p.profiles?.handle || (p.user_id === currentUser.id ? currentHandle : '');
+        return buildPostCard(p, pName, pAvatar, pHandle);
       }).join('');
     }
 
@@ -3605,7 +3611,7 @@
           html += `<div class="glass" style="border-radius:var(--radius-md);padding:0.65rem 1rem;font-size:0.78rem;color:var(--ink-4);font-style:italic;">Quiet day.</div>`;
         } else {
           thisWeekHasPost = true;
-          html += posts.map(p => buildPostCard(p, name, avatarUrl)).join('');
+          html += posts.map(p => buildPostCard(p, name, avatarUrl, currentHandle)).join('');
         }
 
         html += `</div></div>`;
@@ -3624,7 +3630,7 @@
           const posts = byDay[key];
           html += `<div style="margin-bottom:0.75rem;">
             <div style="font-size:0.72rem;font-weight:700;color:var(--ink-3);margin-bottom:0.4rem;">${DAY_NAMES[d.getDay()]}, ${MONTH_NAMES[d.getMonth()]} ${d.getDate()}</div>
-            ${posts.map(p => buildPostCard(p, name, avatarUrl)).join('')}
+            ${posts.map(p => buildPostCard(p, name, avatarUrl, currentHandle)).join('')}
           </div>`;
         });
       }
