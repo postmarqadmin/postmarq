@@ -10,7 +10,6 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
 
   <style>
-    /* ─── Reset & Base ─── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
@@ -19,7 +18,6 @@
       --glass-shadow: 0 8px 32px rgba(120, 80, 40, 0.10), 0 2px 8px rgba(120,80,40,0.07);
       --glass-inset:  0 1px 0 rgba(255,255,255,0.9) inset;
       --amber:        #e8992a;
-      --amber-light:  #f5c462;
       --teal:         #4ab5aa;
       --lavender:     #9b8fd4;
       --ink:          #26180e;
@@ -48,7 +46,7 @@
       background-attachment: fixed;
     }
 
-    /* ─── Address Bar ─── */
+    /* Address Bar */
     .address-bar {
       position: sticky; top: 0; z-index: 100;
       display: flex; align-items: center; justify-content: center;
@@ -70,10 +68,10 @@
     .address-text { font-size: 0.78rem; font-weight: 500; color: var(--ink-3); letter-spacing: 0.02em; }
     .address-text strong { color: var(--ink-2); font-weight: 700; }
 
-    /* ─── Page Wrap ─── */
+    /* Page Wrap */
     .page-wrap { max-width: 900px; margin: 0 auto; padding: 2rem 1.25rem 0; }
 
-    /* ─── Room Nav ─── */
+    /* Room Nav */
     .room-nav {
       display: flex; border-radius: var(--radius-lg); overflow: hidden;
       background: var(--glass-white);
@@ -97,7 +95,7 @@
     .room-tab.active { background: linear-gradient(160deg, rgba(155,143,212,0.25), rgba(74,181,170,0.18)); color: var(--ink); }
     .room-tab.active i { color: var(--lavender); }
 
-    /* ─── Section Label ─── */
+    /* Section Label */
     .section-label {
       font-size: 0.65rem; font-weight: 900; letter-spacing: 0.12em;
       text-transform: uppercase; color: var(--ink-4);
@@ -105,8 +103,24 @@
       margin-bottom: 0.75rem;
     }
     .section-label::after { content:''; flex:1; height:1px; background:rgba(255,255,255,0.55); }
+    .section-edit-btn {
+      background: none; border: 1px solid rgba(155,143,212,0.3); border-radius: 999px;
+      padding: 0.18rem 0.65rem; font-size: 0.6rem; font-weight: 700;
+      color: var(--lavender); font-family: var(--font); cursor: pointer;
+      display: inline-flex; align-items: center; gap: 0.3rem; transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .section-edit-btn:hover { background: rgba(155,143,212,0.12); }
+    .section-add-btn {
+      background: none; border: 1px solid rgba(74,181,170,0.35); border-radius: 999px;
+      padding: 0.18rem 0.65rem; font-size: 0.6rem; font-weight: 700;
+      color: var(--teal); font-family: var(--font); cursor: pointer;
+      display: inline-flex; align-items: center; gap: 0.3rem; transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .section-add-btn:hover { background: rgba(74,181,170,0.1); }
 
-    /* ─── Cards ─── */
+    /* Cards */
     .office-card {
       border-radius: var(--radius-xl);
       background: linear-gradient(135deg, rgba(155,143,212,0.28) 0%, rgba(74,181,170,0.16) 100%);
@@ -128,25 +142,27 @@
       margin-bottom: 1.25rem;
     }
 
-    /* ─── Bio Header ─── */
+    /* Bio */
     .bio-header {
       display: flex; align-items: stretch;
       margin: -1.75rem -2rem;
       border-radius: calc(var(--radius-xl) - 1px); overflow: hidden;
     }
     .bio-avatar-wrap {
-      flex-shrink: 0; width: 200px; position: relative;
+      flex-shrink: 0; width: 180px; min-height: 220px;
+      position: relative;
+      background: rgba(155,143,212,0.15);
+      display: flex; align-items: center; justify-content: center;
     }
     .bio-avatar {
-      width: 100%; height: 100%; min-height: 240px;
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
       object-fit: cover; object-position: center top;
       display: block;
     }
-    .bio-divider {
-      width: 3px; flex-shrink: 0;
-      background: rgba(255,255,255,0.72);
-    }
-    .bio-info { flex: 1; min-width: 0; padding: 1.75rem 1.75rem; }
+    .bio-avatar-icon { font-size: 3.5rem; color: rgba(155,143,212,0.45); position: relative; z-index: 1; }
+    .bio-divider { width: 3px; flex-shrink: 0; background: rgba(255,255,255,0.72); }
+    .bio-info { flex: 1; min-width: 0; padding: 1.75rem; }
     .bio-name { font-size: 1.9rem; font-weight: 800; color: var(--ink); letter-spacing: -0.02em; line-height: 1; }
     .bio-title {
       font-size: 0.9rem; font-weight: 600; margin-top: 0.3rem;
@@ -156,11 +172,59 @@
     .bio-location { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.75rem; font-weight: 600; color: var(--ink-3); margin-top: 0.4rem; }
     .bio-location i { font-size: 0.8rem; color: var(--teal); }
     .bio-text { font-size: 0.85rem; font-weight: 400; color: var(--ink-2); line-height: 1.6; margin-top: 0.85rem; max-width: 520px; }
+    .bio-empty-hint { font-size: 0.8rem; color: var(--ink-3); font-style: italic; margin-top: 0.6rem; }
     .bio-actions { display: flex; align-items: center; gap: 0.75rem; margin-top: 1.1rem; flex-wrap: wrap; }
+    .btn-bcard {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      padding: 0.5rem 1.1rem; border-radius: 999px;
+      background: rgba(255,255,255,0.55); border: 1.5px solid rgba(255,255,255,0.8);
+      color: var(--ink-2); font-family: var(--font); font-size: 0.78rem; font-weight: 700;
+      cursor: pointer; transition: background 0.15s, transform 0.15s;
+    }
+    .btn-bcard:hover { background: rgba(255,255,255,0.8); transform: translateY(-1px); }
+    .btn-bcard i { color: var(--lavender); }
 
-    /* ─── Portfolio & Socials card ─── */
+    /* Timeline */
+    .timeline { display: flex; flex-direction: column; }
+    .timeline-item { display: flex; gap: 1rem; padding-bottom: 1.5rem; align-items: flex-start; }
+    .timeline-item:last-child { padding-bottom: 0; }
+    .timeline-left { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 18px; }
+    .timeline-dot {
+      width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; margin-top: 3px;
+      background: linear-gradient(135deg, var(--lavender), var(--teal));
+      border: 2px solid rgba(255,255,255,0.7);
+      box-shadow: 0 0 0 3px rgba(155,143,212,0.2);
+    }
+    .timeline-line { flex: 1; width: 2px; margin-top: 4px; background: linear-gradient(to bottom, rgba(155,143,212,0.4), rgba(74,181,170,0.15)); border-radius: 2px; min-height: 20px; }
+    .timeline-role { font-size: 0.92rem; font-weight: 800; color: var(--ink); line-height: 1.2; }
+    .timeline-company { font-size: 0.78rem; font-weight: 600; color: var(--lavender); margin-top: 0.1rem; }
+    .timeline-dates { font-size: 0.7rem; font-weight: 600; color: var(--ink-4); margin-top: 0.15rem; }
+    .timeline-desc { font-size: 0.8rem; color: var(--ink-2); line-height: 1.55; margin-top: 0.4rem; }
+    .item-remove {
+      background: none; border: none; cursor: pointer;
+      color: rgba(162,40,65,0.4); font-size: 0.85rem; padding: 0.15rem;
+      transition: color 0.15s; flex-shrink: 0; margin-top: 2px;
+      line-height: 1;
+    }
+    .item-remove:hover { color: rgba(162,40,65,0.85); }
+
+    /* Education */
+    .edu-item { display: flex; align-items: flex-start; gap: 0.9rem; padding-bottom: 1rem; }
+    .edu-item:last-child { padding-bottom: 0; }
+    .edu-icon {
+      width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+      background: linear-gradient(135deg, rgba(155,143,212,0.3), rgba(74,181,170,0.2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; color: var(--lavender);
+      border: 1px solid rgba(255,255,255,0.6);
+    }
+    .edu-name { font-size: 0.92rem; font-weight: 800; color: var(--ink); }
+    .edu-degree { font-size: 0.78rem; font-weight: 600; color: var(--teal); margin-top: 0.1rem; }
+    .edu-dates { font-size: 0.7rem; font-weight: 600; color: var(--ink-4); margin-top: 0.1rem; }
+
+    /* Socials */
     .socials-card { padding: 0 !important; overflow: hidden; }
-    .socials-main-btn {
+    .socials-main-row {
       display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
       padding: 0.75rem 1.1rem;
       background: linear-gradient(90deg, rgba(78,58,160,0.97), rgba(50,150,142,0.97));
@@ -177,329 +241,52 @@
       transition: background 0.15s, transform 0.15s;
     }
     .social-icon-btn:hover { background: #fff; transform: translateY(-2px); }
-    .social-icon-btn svg { display: block; }
 
-    .btn-bcard {
-      display: inline-flex; align-items: center; gap: 0.45rem;
-      padding: 0.58rem 1.2rem; border-radius: 999px;
-      background: rgba(255,255,255,0.55); border: 1.5px solid rgba(255,255,255,0.8);
-      color: var(--ink-2); font-family: var(--font); font-size: 0.82rem; font-weight: 700;
-      cursor: pointer; transition: background 0.15s, transform 0.15s;
-    }
-    .btn-bcard:hover { background: rgba(255,255,255,0.8); transform: translateY(-1px); }
-    .btn-bcard i { color: var(--lavender); }
-
-    /* ─── Biz Card tile (avatar corner) ─── */
-    .biz-card-tile {
-      position: absolute; bottom: 0.65rem; right: 0.65rem;
-      width: 36px; height: 36px; border-radius: 10px;
-      background: linear-gradient(135deg, rgba(78,58,160,0.92), rgba(50,150,142,0.92));
-      border: 2px solid rgba(255,255,255,0.75);
-      box-shadow: 0 3px 12px rgba(0,0,0,0.25);
-      display: flex; align-items: center; justify-content: center;
-      color: #fff; font-size: 1.05rem; cursor: pointer;
-      transition: transform 0.15s, box-shadow 0.15s;
-    }
-    .biz-card-tile:hover { transform: scale(1.1); box-shadow: 0 5px 18px rgba(0,0,0,0.32); }
-    .biz-card-tile-tooltip {
-      position: absolute; bottom: calc(100% + 8px); right: 0;
-      background: rgba(26,20,14,0.92); color: #fff;
-      font-size: 0.68rem; font-weight: 700; white-space: nowrap;
-      padding: 0.3rem 0.6rem; border-radius: 6px;
-      pointer-events: none; opacity: 0; transition: opacity 0.15s;
-    }
-    .biz-card-tile:hover .biz-card-tile-tooltip { opacity: 1; }
-
-    /* ─── Biz Card spotlight modal ─── */
-    .bizcard-overlay {
-      display: none; position: fixed; inset: 0; z-index: 400;
-      background: rgba(30,20,10,0.65); backdrop-filter: blur(8px);
-      align-items: center; justify-content: center; padding: 1.5rem;
-    }
-    .bizcard-overlay.open { display: flex; }
-    .bizcard-modal {
-      width: min(560px, 96vw);
-      border-radius: var(--radius-xl);
-      background: rgba(26,26,31,0.97);
-      border: 0.5px solid rgba(255,255,255,0.1);
-      box-shadow: 0 28px 72px rgba(0,0,0,0.5);
-      overflow: hidden;
-    }
-    .bizcard-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0.85rem 1.25rem;
-      background: linear-gradient(90deg, rgba(78,58,160,0.97), rgba(50,150,142,0.97));
-    }
-    .bizcard-header-title { font-size: 0.88rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 0.45rem; }
-    .bizcard-close { background: none; border: none; color: rgba(255,255,255,0.7); font-size: 1.1rem; cursor: pointer; line-height: 1; }
-    .bizcard-close:hover { color: #fff; }
-    .bizcard-img-wrap { padding: 1.25rem 1.25rem 0.75rem; }
-    .bizcard-img-wrap img { width: 100%; border-radius: var(--radius-lg); display: block; box-shadow: 0 8px 32px rgba(0,0,0,0.35); }
-    .bizcard-actions {
-      display: flex; gap: 0.75rem; padding: 0.75rem 1.25rem 1.25rem;
-      border-top: 1px solid rgba(255,255,255,0.07); margin-top: 0.25rem;
-    }
-    .bizcard-btn {
-      flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
-      padding: 0.55rem 1rem; border-radius: 999px;
-      font-family: var(--font); font-size: 0.78rem; font-weight: 800;
-      border: 1px solid rgba(255,255,255,0.15); cursor: pointer;
-      transition: opacity 0.15s, transform 0.15s;
-    }
-    .bizcard-btn:hover { opacity: 0.88; transform: translateY(-1px); }
-    .bizcard-btn-rolodex {
-      background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.75);
-    }
-    .bizcard-btn-rolodex.saved { background: rgba(74,181,170,0.2); color: var(--teal); border-color: rgba(74,181,170,0.4); }
-    .bizcard-btn-connect {
-      background: linear-gradient(90deg, rgba(78,58,160,0.92), rgba(50,150,142,0.92));
-      color: #fff; border-color: transparent;
-      box-shadow: 0 3px 12px rgba(78,58,160,0.3);
-    }
-    .bizcard-btn-connect.requested { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.4); cursor: default; }
-    .bizcard-btn-connect.requested:hover { opacity: 1; transform: none; }
-
-    /* ─── Send Card corner button ─── */
-    .btn-send-card-corner {
-      display: inline-flex; align-items: center; gap: 0.4rem; flex-shrink: 0;
-      padding: 0.42rem 1rem; border-radius: 999px;
-      background: linear-gradient(135deg, rgba(162,40,65,0.93), rgba(195,65,50,0.93));
-      color: #fff; font-family: var(--font); font-size: 0.75rem; font-weight: 800;
-      border: 1px solid rgba(255,200,200,0.22);
-      box-shadow: 0 3px 14px rgba(162,40,65,0.38);
-      cursor: pointer; transition: opacity 0.15s, transform 0.15s;
-    }
-    .btn-send-card-corner:hover { opacity: 0.9; transform: translateY(-1px); }
-
-    /* ─── Incoming Cards (owner) ─── */
-    .incoming-wrap { margin-bottom: 1.25rem; }
-    .incoming-list { display: flex; flex-direction: column; gap: 0.75rem; }
-    .incoming-card {
-      display: flex; align-items: flex-start; gap: 0.85rem;
-      padding: 0.9rem 1rem;
-      background: rgba(255,255,255,0.45); border: 1px solid rgba(255,255,255,0.7);
-      border-radius: var(--radius-md);
-    }
-    .incoming-avatar {
-      width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
-      background: linear-gradient(135deg, rgba(162,40,65,0.7), rgba(195,65,50,0.7));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.8rem; font-weight: 800; color: #fff;
-    }
-    .incoming-info { flex: 1; min-width: 0; }
-    .incoming-name { font-size: 0.88rem; font-weight: 800; color: var(--ink); }
-    .incoming-meta { font-size: 0.72rem; font-weight: 600; color: var(--teal); margin-top: 0.1rem; }
-    .incoming-msg { font-size: 0.78rem; color: var(--ink-2); font-style: italic; margin-top: 0.4rem; line-height: 1.5;
-      padding: 0.4rem 0.7rem; background: rgba(255,255,255,0.4); border-radius: 8px;
-      border-left: 3px solid rgba(162,40,65,0.35); }
-    .incoming-actions { display: flex; gap: 0.5rem; margin-top: 0.6rem; }
-    .btn-accept {
-      display: inline-flex; align-items: center; gap: 0.3rem;
-      padding: 0.28rem 0.8rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700;
-      font-family: var(--font); cursor: pointer; border: 1px solid rgba(74,181,170,0.5);
-      background: linear-gradient(90deg, rgba(74,181,170,0.15), rgba(74,181,170,0.08));
-      color: var(--teal); transition: background 0.15s;
-    }
-    .btn-accept:hover { background: linear-gradient(90deg, rgba(74,181,170,0.28), rgba(74,181,170,0.18)); }
-    .btn-deny {
-      display: inline-flex; align-items: center; gap: 0.3rem;
-      padding: 0.28rem 0.8rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700;
-      font-family: var(--font); cursor: pointer; border: 1px solid rgba(162,40,65,0.35);
-      background: rgba(255,255,255,0.45); color: rgba(162,40,65,0.85); transition: background 0.15s;
-    }
-    .btn-deny:hover { background: rgba(162,40,65,0.08); }
-
-    /* ─── Rolodex (owner) ─── */
-    .rolodex-list { display: flex; flex-direction: column; gap: 0.6rem; }
-    .rolodex-entry {
-      display: flex; align-items: center; gap: 0.85rem;
-      padding: 0.7rem 0.9rem; border-radius: var(--radius-md);
-      background: rgba(255,255,255,0.45); border: 1px solid rgba(255,255,255,0.7);
-    }
-    .rolodex-avatar {
-      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
-      background: linear-gradient(135deg, var(--lavender), var(--teal));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.78rem; font-weight: 800; color: #fff;
-    }
-    .rolodex-name { font-size: 0.85rem; font-weight: 800; color: var(--ink); }
-    .rolodex-meta { font-size: 0.72rem; font-weight: 500; color: var(--ink-3); margin-top: 0.1rem; }
-    .rolodex-empty { font-size: 0.82rem; color: var(--ink-4); font-style: italic; padding: 0.4rem 0; }
-
-    /* ─── bcard confirm preview ─── */
-    .bcard-preview-box {
-      margin: 0.5rem 0 0.25rem;
-      padding: 0.85rem 1rem; border-radius: var(--radius-md);
-      background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.15);
-    }
-    .bcard-preview-name { font-size: 1rem; font-weight: 800; color: #fff; }
-    .bcard-preview-role { font-size: 0.78rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-top: 0.15rem; }
-    .bcard-preview-msg  { font-size: 0.75rem; color: rgba(255,255,255,0.55); margin-top: 0.5rem; font-style: italic; }
-    .bcard-quick-label  { font-size: 0.8rem; font-weight: 700; color: rgba(255,255,255,0.6); margin-bottom: 0.1rem; }
-    .bcard-edit-link {
-      display: inline-flex; align-items: center; gap: 0.3rem;
-      background: none; border: none; cursor: pointer; font-family: var(--font);
-      font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.4);
-      margin-top: 0.5rem; padding: 0; transition: color 0.15s;
-    }
-    .bcard-edit-link:hover { color: rgba(255,255,255,0.75); }
-    .bcard-save-row {
-      display: flex; align-items: center; gap: 0.5rem; margin-top: 0.75rem;
-      font-size: 0.75rem; font-weight: 600; color: rgba(255,255,255,0.5); cursor: pointer;
-    }
-    .bcard-save-row input { accent-color: var(--teal); cursor: pointer; }
-    .bcard-send-red {
-      background: linear-gradient(135deg, rgba(162,40,65,0.93), rgba(195,65,50,0.93)) !important;
-      box-shadow: 0 4px 14px rgba(162,40,65,0.35) !important;
-    }
-
-    /* ─── Message Row ─── */
-    .msg-row {
-      display: flex; align-items: center; gap: 0.6rem;
-      margin-top: 1rem;
-    }
-    .msg-avatar {
-      width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
-      object-fit: cover; object-position: center top;
-      border: 2px solid rgba(255,255,255,0.8);
-      box-shadow: 0 2px 6px rgba(80,60,140,0.12);
-    }
-    .msg-input {
-      flex: 1; min-width: 0;
-      padding: 0.45rem 0.9rem; border-radius: 999px;
-      background: rgba(255,255,255,0.55); border: 1px solid rgba(255,255,255,0.8);
-      font-family: var(--font); font-size: 0.8rem; font-weight: 500; color: var(--ink);
-      outline: none; transition: background 0.15s, border-color 0.15s;
-    }
-    .msg-input::placeholder { color: var(--ink-4); }
-    .msg-input:focus { background: rgba(255,255,255,0.8); border-color: rgba(155,143,212,0.5); }
-    .msg-send-btn {
-      width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
-      background: linear-gradient(135deg, rgba(78,58,160,0.97), rgba(50,150,142,0.97));
-      border: none; cursor: pointer; color: #fff; font-size: 0.9rem;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 2px 8px rgba(78,58,160,0.3);
-      transition: opacity 0.15s, transform 0.15s;
-    }
-    .msg-send-btn:hover { opacity: 0.88; transform: translateY(-1px); }
-
-    /* ─── Experience Timeline ─── */
-    .timeline { display: flex; flex-direction: column; }
-    .timeline-item { display: flex; gap: 1rem; padding-bottom: 1.5rem; }
-    .timeline-item:last-child { padding-bottom: 0; }
-    .timeline-left { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 18px; }
-    .timeline-dot {
-      width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; margin-top: 3px;
-      background: linear-gradient(135deg, var(--lavender), var(--teal));
-      border: 2px solid rgba(255,255,255,0.7);
-      box-shadow: 0 0 0 3px rgba(155,143,212,0.2);
-    }
-    .timeline-line { flex: 1; width: 2px; margin-top: 4px; background: linear-gradient(to bottom, rgba(155,143,212,0.4), rgba(74,181,170,0.15)); border-radius: 2px; }
-    .timeline-item:last-child .timeline-line { display: none; }
-    .timeline-role { font-size: 0.92rem; font-weight: 800; color: var(--ink); line-height: 1.2; }
-    .timeline-company { font-size: 0.78rem; font-weight: 600; color: var(--lavender); margin-top: 0.1rem; }
-    .timeline-dates { font-size: 0.7rem; font-weight: 600; color: var(--ink-4); margin-top: 0.15rem; }
-    .timeline-desc { font-size: 0.8rem; color: var(--ink-2); line-height: 1.55; margin-top: 0.4rem; }
-
-    /* ─── Education ─── */
-    .edu-item { display: flex; align-items: flex-start; gap: 0.9rem; }
-    .edu-icon {
-      width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
-      background: linear-gradient(135deg, rgba(155,143,212,0.3), rgba(74,181,170,0.2));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.1rem; color: var(--lavender);
-      border: 1px solid rgba(255,255,255,0.6);
-      overflow: hidden;
-    }
-    .edu-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .company-logo {
-      width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
-      background: rgba(255,255,255,0.55);
-      border: 1px solid rgba(255,255,255,0.7);
-      display: flex; align-items: center; justify-content: center;
-      overflow: hidden; margin-top: 2px;
-    }
-    .company-logo img { width: 100%; height: 100%; object-fit: contain; padding: 4px; }
-    .company-logo-initials {
-      font-size: 0.72rem; font-weight: 900; color: var(--lavender); letter-spacing: -0.02em;
-    }
-
-    /* ─── Collapsible sections ─── */
-    .collapse-wrap .collapse-hidden { display: none; }
-    .collapse-wrap.expanded .collapse-hidden { display: flex; }
-    .view-more-btn {
-      background: none; border: none; cursor: pointer; font-family: var(--font);
-      font-size: 0.72rem; font-weight: 700; color: var(--lavender);
-      padding: 0.5rem 0 0; display: inline-flex; align-items: center; gap: 0.3rem;
-      transition: color 0.15s;
-    }
-    .view-more-btn:hover { color: var(--teal); }
-
-    /* ─── Client tiles ─── */
-    .client-grid {
-      display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
-    }
-    .client-tile {
-      aspect-ratio: 1; border-radius: 10px; overflow: hidden;
-      background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.7);
-      cursor: default; transition: transform 0.18s, box-shadow 0.18s;
-      position: relative;
-    }
-    .client-tile:hover { transform: scale(1.06); box-shadow: 0 6px 18px rgba(80,60,140,0.15); }
-    .client-tile img { width: 100%; height: 100%; object-fit: contain; padding: 6px; display: block; }
-    .edu-name { font-size: 0.92rem; font-weight: 800; color: var(--ink); }
-    .edu-degree { font-size: 0.78rem; font-weight: 600; color: var(--teal); margin-top: 0.1rem; }
-    .edu-dates { font-size: 0.7rem; font-weight: 600; color: var(--ink-4); margin-top: 0.1rem; }
-
-    /* ─── Skills ─── */
+    /* Skills */
     .skills-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; }
     .skill-pill {
       padding: 0.32rem 0.9rem; border-radius: 999px;
       font-size: 0.78rem; font-weight: 700;
       background: rgba(255,255,255,0.55); border: 1px solid rgba(255,255,255,0.75);
-      color: var(--ink-2); transition: transform 0.14s, box-shadow 0.14s;
+      color: var(--ink-2);
     }
-    .skill-pill:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(80,60,140,0.12); }
-
-    /* ─── Two-column grid ─── */
-    .office-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; align-items: start; }
-    @media (max-width: 640px) { .office-grid { grid-template-columns: 1fr; } }
-
-    /* ─── Skills & Tools tabs ─── */
     .st-tabs { display: flex; gap: 0.4rem; margin-bottom: 0.9rem; border-bottom: 1px solid rgba(155,143,212,0.2); padding-bottom: 0.6rem; }
     .st-tab { background: none; border: 1px solid rgba(155,143,212,0.25); border-radius: 999px; padding: 0.28rem 0.85rem; font-size: 0.72rem; font-weight: 700; font-family: var(--font); color: var(--ink-3); cursor: pointer; transition: all 0.15s; }
     .st-tab:hover { background: rgba(155,143,212,0.12); color: var(--lavender); }
     .st-tab.active { background: linear-gradient(90deg, rgba(78,58,160,0.15), rgba(50,150,142,0.12)); border-color: rgba(155,143,212,0.5); color: var(--lavender); }
 
-    /* ─── Owner Badge ─── */
-    .owner-badge { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; background: rgba(232,153,42,0.15); border: 1px solid rgba(232,153,42,0.3); color: var(--amber); padding: 0.2rem 0.6rem; border-radius: 999px; }
+    /* Clients */
+    .client-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+    .client-tile {
+      aspect-ratio: 1; border-radius: 10px; overflow: hidden;
+      background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.7);
+      position: relative; transition: transform 0.18s, box-shadow 0.18s;
+    }
+    .client-tile:hover { transform: scale(1.04); box-shadow: 0 6px 18px rgba(80,60,140,0.15); }
+    .client-tile img { width: 100%; height: 100%; object-fit: contain; padding: 6px; display: block; }
+    .client-tile-initials {
+      width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 900; color: var(--lavender);
+    }
+    .client-tile-rm {
+      position: absolute; top: 2px; right: 2px;
+      background: rgba(162,40,65,0.75); border: none; border-radius: 50%;
+      width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 0.55rem; cursor: pointer; opacity: 0; transition: opacity 0.15s;
+    }
+    .client-tile:hover .client-tile-rm { opacity: 1; }
 
-    /* ─── Modals ─── */
-    .modal-overlay { display: none; position: fixed; inset: 0; z-index: 300; background: rgba(40,30,20,0.55); backdrop-filter: blur(6px); align-items: center; justify-content: center; padding: 1.5rem; }
-    .modal-overlay.open { display: flex; }
-    .modal-box { width: min(440px, 96vw); border-radius: var(--radius-xl); background: rgba(26,26,31,0.93); border: 0.5px solid rgba(255,255,255,0.1); box-shadow: 0 24px 64px rgba(0,0,0,0.4); overflow: hidden; }
-    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem 0.85rem; background: linear-gradient(90deg, rgba(78,58,160,0.97), rgba(50,150,142,0.97)); }
-    .modal-title { font-size: 0.95rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 0.5rem; }
-    .modal-close { background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.7); font-size: 1.1rem; line-height: 1; }
-    .modal-close:hover { color: #fff; }
-    .modal-body { padding: 1.25rem; display: flex; flex-direction: column; gap: 0.85rem; }
-    .modal-field { display: flex; flex-direction: column; gap: 0.3rem; }
-    .modal-label { font-size: 0.65rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.45); }
-    .modal-input { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.5rem 0.75rem; font-family: var(--font); font-size: 0.85rem; color: #fff; outline: none; transition: border-color 0.15s; }
-    .modal-input:focus { border-color: rgba(155,143,212,0.6); }
-    .modal-input::placeholder { color: rgba(255,255,255,0.25); }
-    .modal-textarea { resize: vertical; min-height: 80px; }
-    .modal-footer { padding: 0 1.25rem 1.25rem; display: flex; gap: 0.6rem; justify-content: flex-end; }
-    .modal-btn-cancel { background: none; border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.4); border-radius: 8px; padding: 0.45rem 1rem; font-family: var(--font); font-size: 0.8rem; font-weight: 700; cursor: pointer; }
-    .modal-btn-cancel:hover { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.7); }
-    .modal-btn-send { background: linear-gradient(90deg, rgba(78,58,160,0.97), rgba(50,150,142,0.97)); border: none; color: #fff; border-radius: 8px; padding: 0.45rem 1.2rem; font-family: var(--font); font-size: 0.8rem; font-weight: 800; cursor: pointer; transition: opacity 0.15s; }
-    .modal-btn-send:hover { opacity: 0.88; }
-    .modal-confirm { display: none; flex-direction: column; align-items: center; justify-content: center; padding: 2.5rem 1.5rem; gap: 0.6rem; text-align: center; }
-    .modal-confirm.show { display: flex; }
-    .modal-confirm-icon { font-size: 2.2rem; color: var(--teal); }
-    .modal-confirm-text { font-size: 0.95rem; font-weight: 700; color: rgba(255,255,255,0.85); }
-    .modal-confirm-sub { font-size: 0.78rem; color: rgba(255,255,255,0.4); }
-    /* ── Resume Card ── */
+    /* Two-column */
+    .office-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; align-items: start; }
+    @media (max-width: 640px) { .office-grid { grid-template-columns: 1fr; } }
+
+    /* Empty state */
+    .empty-state {
+      font-size: 0.8rem; color: var(--ink-4); font-style: italic;
+      padding: 0.25rem 0; display: flex; align-items: center; gap: 0.4rem;
+    }
+
+    /* Resume */
     .resume-card { border-radius: 12px; border: 1px solid rgba(255,255,255,0.55); background: linear-gradient(135deg, rgba(155,143,212,0.18) 0%, rgba(74,181,170,0.10) 100%); padding: 0.9rem 1rem; margin-bottom: 1rem; }
     .resume-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem; }
     .resume-card-title { font-size: 0.6rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; color: var(--lavender); }
@@ -509,7 +296,7 @@
     .resume-file-row { display: flex; align-items: center; gap: 0.6rem; background: rgba(255,255,255,0.45); border-radius: 8px; padding: 0.55rem 0.7rem; }
     .resume-file-icon { font-size: 1.4rem; flex-shrink: 0; }
     .resume-file-info { flex: 1; min-width: 0; }
-    .resume-file-name { font-size: 0.72rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .resume-file-name { font-size: 0.72rem; font-weight: 700; }
     .resume-file-actions { display: flex; gap: 0.4rem; margin-top: 0.45rem; flex-wrap: wrap; }
     .resume-btn { font-size: 0.65rem; font-weight: 700; padding: 0.22rem 0.55rem; border-radius: 6px; cursor: pointer; font-family: var(--font); border: none; transition: opacity 0.15s; }
     .resume-btn:hover { opacity: 0.8; }
@@ -521,12 +308,33 @@
     .resume-toggle:checked { background: var(--teal); }
     .resume-toggle::after { content:''; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: white; transition: left 0.2s; }
     .resume-toggle:checked::after { left: 14px; }
+
+    /* Modals */
+    .modal-overlay { display: none; position: fixed; inset: 0; z-index: 300; background: rgba(40,30,20,0.55); backdrop-filter: blur(6px); align-items: center; justify-content: center; padding: 1.5rem; }
+    .modal-overlay.open { display: flex; }
+    .modal-box { width: min(480px, 96vw); border-radius: var(--radius-xl); background: rgba(26,26,31,0.97); border: 0.5px solid rgba(255,255,255,0.1); box-shadow: 0 24px 64px rgba(0,0,0,0.4); overflow: hidden; max-height: 90vh; display: flex; flex-direction: column; }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; background: linear-gradient(90deg, rgba(78,58,160,0.97), rgba(50,150,142,0.97)); flex-shrink: 0; }
+    .modal-title { font-size: 0.95rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 0.5rem; }
+    .modal-close { background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.7); font-size: 1.1rem; line-height: 1; }
+    .modal-close:hover { color: #fff; }
+    .modal-body { padding: 1.25rem; display: flex; flex-direction: column; gap: 0.85rem; overflow-y: auto; }
+    .modal-field { display: flex; flex-direction: column; gap: 0.3rem; }
+    .modal-label { font-size: 0.65rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.45); }
+    .modal-input { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.5rem 0.75rem; font-family: var(--font); font-size: 0.85rem; color: #fff; outline: none; transition: border-color 0.15s; width: 100%; }
+    .modal-input:focus { border-color: rgba(155,143,212,0.6); }
+    .modal-input::placeholder { color: rgba(255,255,255,0.25); }
+    .modal-textarea { resize: vertical; min-height: 80px; }
+    .modal-footer { padding: 0 1.25rem 1.25rem; display: flex; gap: 0.6rem; justify-content: flex-end; flex-shrink: 0; }
+    .modal-btn-cancel { background: none; border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.4); border-radius: 8px; padding: 0.45rem 1rem; font-family: var(--font); font-size: 0.8rem; font-weight: 700; cursor: pointer; }
+    .modal-btn-cancel:hover { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.7); }
+    .modal-btn-save { background: linear-gradient(90deg, rgba(78,58,160,0.97), rgba(50,150,142,0.97)); border: none; color: #fff; border-radius: 8px; padding: 0.45rem 1.2rem; font-family: var(--font); font-size: 0.8rem; font-weight: 800; cursor: pointer; transition: opacity 0.15s; }
+    .modal-btn-save:hover { opacity: 0.88; }
+    .modal-divider { height: 1px; background: rgba(255,255,255,0.08); }
   </style>
 </head>
 
 <body>
 
-  <!-- Address Bar -->
   <div class="address-bar">
     <div class="address-inner">
       <div class="address-dot"></div>
@@ -536,7 +344,6 @@
 
   <div class="page-wrap">
 
-    <!-- Room Nav -->
     <nav class="room-nav">
       <a class="room-tab" href="my-post.html"><i class="ti ti-home-2"></i><span>Home</span></a>
       <a class="room-tab active" href="office.html"><i class="ti ti-briefcase"></i><span>Office</span></a>
@@ -544,107 +351,63 @@
       <a class="room-tab" href="lounge.html"><i class="ti ti-messages"></i><span>Lounge</span></a>
     </nav>
 
-    <!-- Bio Header -->
-    <div class="office-card" style="position:relative;">
+    <!-- Bio -->
+    <div class="office-card">
       <div class="bio-header">
-        <div class="bio-avatar-wrap">
-          <img class="bio-avatar" src="biz page/biz profile.jpg" alt="Dave Contreras" />
-          <button class="biz-card-tile" onclick="viewBizCard()" title="View my business card">
-            <i class="ti ti-id-badge-2"></i>
-            <span class="biz-card-tile-tooltip">View my business card</span>
-          </button>
+        <div class="bio-avatar-wrap" id="bioAvatarWrap">
+          <i class="ti ti-user bio-avatar-icon" id="bioAvatarIcon"></i>
         </div>
         <div class="bio-divider"></div>
         <div class="bio-info">
-          <div class="bio-name">Dave M. Contreras</div>
-          <div class="bio-title">Visual Content Producer · Photographer · Filmmaker · Digital Marketing Specialist</div>
-          <div class="bio-location"><i class="ti ti-map-pin"></i> Phoenix, AZ</div>
-          <div class="bio-text">Founder of Postmarq and a visual storyteller aficionado. I film, I capture, and create ideas that actually mean something. I started working on Postmarq because real connection deserves a real place to live.</div>
-          <div class="bio-actions"></div>
-          <div class="msg-row" id="msgRow" style="display:none;">
-            <img class="msg-avatar" id="msgAvatar" src="" alt="You" />
-            <input class="msg-input" id="msgInput" type="text" placeholder="Write me a message…" />
-            <button class="msg-send-btn" onclick="msgSend()"><i class="ti ti-send"></i></button>
-            <button class="btn-send-card-corner" onclick="bcardOpen()">
-              <i class="ti ti-id-badge"></i> Send Business Card
-            </button>
+          <div class="bio-name" id="bioName">Loading…</div>
+          <div class="bio-title" id="bioTitle" style="display:none;"></div>
+          <div class="bio-location" id="bioLocation" style="display:none;">
+            <i class="ti ti-map-pin"></i>
+            <span id="bioLocationText"></span>
+          </div>
+          <div class="bio-text" id="bioText" style="display:none;"></div>
+          <p class="bio-empty-hint" id="bioEmptyHint" style="display:none;">Complete your Office by adding your title, location, and bio.</p>
+          <div class="bio-actions">
+            <button class="btn-bcard" onclick="openModal('bio')"><i class="ti ti-pencil"></i> Edit Bio</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Incoming Cards (owner only) -->
-    <div id="incomingWrap" class="incoming-wrap" style="display:none;">
-      <div class="section-label">Incoming Business Cards <span class="owner-badge"><i class="ti ti-lock"></i> Owner Only</span></div>
-      <div class="office-card-plain">
-        <div class="incoming-list" id="incomingList"></div>
-      </div>
-    </div>
-
-    <!-- Main two-column layout -->
+    <!-- Two-column layout -->
     <div class="office-grid">
 
-      <!-- Left: Experience + Education + Skills -->
+      <!-- Left: Experience + Education -->
       <div>
-        <div class="section-label">Experience</div>
+        <div class="section-label">
+          Experience
+          <button class="section-add-btn" onclick="openModal('exp-add')"><i class="ti ti-plus"></i> Add</button>
+        </div>
         <div class="office-card-plain">
-          <div class="timeline">
-            <div class="timeline-item">
-              <div class="timeline-left">
-                <div class="timeline-dot"></div>
-                <div class="timeline-line"></div>
-              </div>
-              <div class="company-logo">
-                <img src="biz page/H_Icon_Yellow.png" alt="Heritage" />
-              </div>
-              <div class="timeline-body">
-                <div class="timeline-role">Social Media Coordinator / Visual Content Producer</div>
-                <div class="timeline-company">Heritage — Phoenix, AZ</div>
-                <div class="timeline-dates">May 2024 – Present</div>
-                <div class="timeline-desc">Produced photo, video, and drone content across nationwide job sites and large-scale events. Planned and executed social media strategy across LinkedIn and Facebook. Partnered with marketing, sales, and design teams to ensure brand consistency.</div>
-              </div>
-            </div>
-            <div class="timeline-item">
-              <div class="timeline-left">
-                <div class="timeline-dot"></div>
-                <div class="timeline-line"></div>
-              </div>
-              <div class="company-logo">
-                <img src="biz page/Cactus Shadows.jpg" alt="Cactus Shadows" />
-              </div>
-              <div class="timeline-body">
-                <div class="timeline-role">Digital Media Teacher</div>
-                <div class="timeline-company">Cactus Shadows High School — Cave Creek, AZ</div>
-                <div class="timeline-dates">Sep 2020 – May 2024</div>
-                <div class="timeline-desc">Designed and implemented a digital media curriculum covering photography, video production, graphic design, and business fundamentals. Led a student media club and built partnerships with local industry professionals.</div>
-              </div>
-            </div>
-            <div class="timeline-item">
-              <div class="timeline-left">
-                <div class="timeline-dot"></div>
-                <div class="timeline-line"></div>
-              </div>
-              <div class="company-logo">
-                <img src="biz page/Luxium Creative.jpeg" alt="Luxium Creative" />
-              </div>
-              <div class="timeline-body">
-                <div class="timeline-role">Founder / Freelance Photographer & Filmmaker</div>
-                <div class="timeline-company">Luxium Creative — Phoenix, AZ</div>
-                <div class="timeline-dates">May 2015 – Jul 2020</div>
-                <div class="timeline-desc">Delivered photography, video, and editing services for corporate brands, nonprofits, and live events nationwide. Produced visual content for campaigns reaching 1M+ combined followers.</div>
-              </div>
-            </div>
+          <div class="timeline" id="expList">
+            <div class="empty-state"><i class="ti ti-briefcase"></i> No experience added yet</div>
+          </div>
+        </div>
+
+        <div class="section-label">
+          Education
+          <button class="section-add-btn" onclick="openModal('edu-add')"><i class="ti ti-plus"></i> Add</button>
+        </div>
+        <div class="office-card-plain">
+          <div id="eduList">
+            <div class="empty-state"><i class="ti ti-school"></i> No education added yet</div>
           </div>
         </div>
       </div>
 
-      <!-- Right: Resume + Portfolio/Socials + Education + Skills/Tools + Clients -->
+      <!-- Right column -->
       <div>
+        <!-- Resume -->
         <div class="section-label">Resume</div>
         <div class="resume-card">
           <div class="resume-card-header">
             <span class="resume-card-title">My Resume</span>
-            <button class="resume-upload-btn" id="resumeUploadBtn" style="display:none" onclick="document.getElementById('resumeInput').click()">+ Upload</button>
+            <button class="resume-upload-btn" onclick="document.getElementById('resumeInput').click()">+ Upload</button>
             <input type="file" id="resumeInput" accept=".pdf" style="display:none" onchange="uploadResume(this)" />
           </div>
           <div id="resumeEmpty" class="resume-empty">No resume uploaded yet.</div>
@@ -655,7 +418,7 @@
               <div class="resume-file-actions">
                 <button class="resume-btn resume-btn-view" onclick="viewResume()">View</button>
                 <button class="resume-btn resume-btn-dl" id="resumeDlBtn" onclick="downloadResume()">Download</button>
-                <button class="resume-btn resume-btn-del" id="resumeRemoveBtn" style="display:none" onclick="removeResume()">Remove</button>
+                <button class="resume-btn resume-btn-del" onclick="removeResume()">Remove</button>
               </div>
             </div>
           </div>
@@ -664,225 +427,226 @@
             <label for="resumeDownloadToggle">Allow visitors to download</label>
           </div>
         </div>
-        <div class="section-label">Portfolio & Socials</div>
+
+        <!-- Socials -->
+        <div class="section-label">
+          Portfolio &amp; Socials
+          <button class="section-edit-btn" onclick="openModal('socials')"><i class="ti ti-pencil"></i> Edit</button>
+        </div>
         <div class="office-card-plain socials-card">
-          <div class="socials-main-btn">
-            <span class="socials-label">View My Portfolio &amp; Socials</span>
-            <div class="socials-icons">
-              <a class="social-icon-btn" href="https://www.linkedin.com/in/dave-contreras" target="_blank" rel="noopener" title="LinkedIn">
-                <i class="ti ti-brand-linkedin"></i>
-              </a>
-              <a class="social-icon-btn" href="https://www.instagram.com/davemcontreras" target="_blank" rel="noopener" title="Instagram">
-                <i class="ti ti-brand-instagram"></i>
-              </a>
-              <a class="social-icon-btn" href="https://www.facebook.com/dave.contreras" target="_blank" rel="noopener" title="Facebook">
-                <i class="ti ti-brand-facebook"></i>
-              </a>
-              <a class="social-icon-btn" href="https://example.com/portfolio" target="_blank" rel="noopener" title="My Portfolio">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="2" y="7" width="20" height="14" rx="2"/>
-                  <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
-                  <line x1="12" y1="12" x2="12" y2="17"/>
-                  <line x1="9.5" y1="14.5" x2="14.5" y2="14.5"/>
-                </svg>
-              </a>
+          <div class="socials-main-row">
+            <span class="socials-label">My Links</span>
+            <div class="socials-icons" id="socialsIcons">
+              <span style="font-size:0.72rem;color:rgba(255,255,255,0.4);font-style:italic;">No links yet</span>
             </div>
           </div>
         </div>
 
-        <div class="section-label">Education</div>
-        <div class="office-card-plain">
-          <div class="edu-item">
-            <div class="edu-icon"><img src="biz page/ASU_logo_cube.png" alt="ASU" /></div>
-            <div>
-              <div class="edu-name">Arizona State University</div>
-              <div class="edu-degree">B.S. Business Management · W.P. Carey School of Business</div>
-              <div class="edu-dates">Tempe, AZ</div>
-            </div>
-          </div>
+        <!-- Skills & Tools -->
+        <div class="section-label">
+          Skills &amp; Tools
+          <button class="section-edit-btn" onclick="openModal('skills')"><i class="ti ti-pencil"></i> Edit</button>
         </div>
-
-        <div class="section-label">Skills & Tools</div>
         <div class="office-card-plain">
           <div class="st-tabs">
             <button class="st-tab active" onclick="switchSkillTab('skills')">Skills</button>
-            <button class="st-tab" onclick="switchSkillTab('tools')">Tools & Technology</button>
+            <button class="st-tab" onclick="switchSkillTab('tools')">Tools &amp; Technology</button>
           </div>
           <div id="stSkills">
-            <div class="skills-grid collapse-wrap" id="skillsWrap">
-              <span class="skill-pill">Visual Storytelling</span>
-              <span class="skill-pill">Photography</span>
-              <span class="skill-pill">Video Production</span>
-              <span class="skill-pill collapse-hidden">Content Strategy</span>
-              <span class="skill-pill collapse-hidden">Drone Production</span>
-              <span class="skill-pill collapse-hidden">Social Media Marketing</span>
-              <span class="skill-pill collapse-hidden">Brand Marketing</span>
-              <span class="skill-pill collapse-hidden">Event & Experiential</span>
-              <span class="skill-pill collapse-hidden">Cross-Functional Collaboration</span>
-              <span class="skill-pill collapse-hidden">Asset Management</span>
-              <span class="skill-pill collapse-hidden">Client Communication</span>
-              <span class="skill-pill collapse-hidden">Analytics-Informed Creative</span>
+            <div class="skills-grid" id="skillsList">
+              <div class="empty-state"><i class="ti ti-tag"></i> No skills added yet</div>
             </div>
-            <button class="view-more-btn" onclick="toggleCollapse('skillsWrap', this)">
-              <i class="ti ti-chevron-down"></i> View more
-            </button>
           </div>
           <div id="stTools" style="display:none;">
-            <div class="skills-grid collapse-wrap" id="toolsWrap">
-              <span class="skill-pill">Adobe Premiere Pro ✦ Certified</span>
-              <span class="skill-pill">Adobe Creative Cloud</span>
-              <span class="skill-pill">Final Cut Pro X</span>
-              <span class="skill-pill collapse-hidden">DSLR & Cinema Cameras</span>
-              <span class="skill-pill collapse-hidden">Drone & DJI Systems</span>
-              <span class="skill-pill collapse-hidden">Audio Recording Equipment</span>
-              <span class="skill-pill collapse-hidden">Microsoft Teams</span>
-              <span class="skill-pill collapse-hidden">Google Workspace</span>
-              <span class="skill-pill collapse-hidden">macOS & Windows</span>
+            <div class="skills-grid" id="toolsList">
+              <div class="empty-state"><i class="ti ti-tool"></i> No tools added yet</div>
             </div>
-            <button class="view-more-btn" onclick="toggleCollapse('toolsWrap', this)">
-              <i class="ti ti-chevron-down"></i> View more
-            </button>
           </div>
         </div>
 
-        <div class="section-label">Clients & Projects</div>
+        <!-- Clients -->
+        <div class="section-label">
+          Clients &amp; Projects
+          <button class="section-add-btn" onclick="openModal('client-add')"><i class="ti ti-plus"></i> Add</button>
+        </div>
         <div class="office-card-plain">
-          <div class="client-grid">
-            <div class="client-tile" title="Dude Perfect"><img src="biz page/Clients/Dude Perfect.jpg" alt="Dude Perfect" /></div>
-            <div class="client-tile" title="Hillsong Worship"><img src="biz page/Clients/Hillsong Worship.jpg" alt="Hillsong Worship" /></div>
-            <div class="client-tile" title="Premier Productions"><img src="biz page/Clients/Premier.jpg" alt="Premier Productions" /></div>
-            <div class="client-tile" title="Outcry Tour"><img src="biz page/Clients/Outcry Tour.jpg" alt="Outcry Tour" /></div>
-            <div class="client-tile" title="Arizona State University"><img src="biz page/ASU_logo_cube.png" alt="Arizona State University" /></div>
-            <div class="client-tile" id="clientExtra1" style="display:none;" title="Arizona Christian University"><img src="biz page/Clients/Arizona Christian University.png" alt="Arizona Christian University" /></div>
-            <div class="client-tile" id="clientExtra2" style="display:none;" title="Mesa Community College"><img src="biz page/Clients/Mesa Community College.jpg" alt="Mesa Community College" /></div>
-            <div class="client-tile" id="clientExtra3" style="display:none;" title="Paradise Valley Community College"><img src="biz page/Clients/Paradise Valley Community College.png" alt="Paradise Valley Community College" /></div>
+          <div class="client-grid" id="clientGrid">
+            <div class="empty-state" style="grid-column:1/-1"><i class="ti ti-building"></i> No clients added yet</div>
           </div>
-          <button class="view-more-btn" id="clientsMoreBtn" onclick="showAllClients()">
-            <i class="ti ti-chevron-down"></i> View more (3)
-          </button>
         </div>
       </div>
 
-    </div>
-
-    <!-- Rolodex (owner only) -->
-    <div id="rolodexWrap" style="display:none;">
-      <div class="section-label">Rolodex <span class="owner-badge"><i class="ti ti-lock"></i> Owner Only</span></div>
-      <div class="office-card-plain">
-        <div class="rolodex-list" id="rolodexList">
-          <div class="rolodex-empty" id="rolodexEmpty">No accepted cards yet.</div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /page-wrap -->
-
-
-  <!-- Biz Card Spotlight -->
-  <div class="bizcard-overlay" id="bizcardOverlay">
-    <div class="bizcard-modal">
-      <div class="bizcard-header">
-        <div class="bizcard-header-title"><i class="ti ti-id-badge-2"></i> Dave M. Contreras</div>
-        <button class="bizcard-close" onclick="bizcardClose()">✕</button>
-      </div>
-      <div class="bizcard-img-wrap">
-        <img src="Biz card_v1.png" alt="Dave Contreras Business Card" />
-      </div>
-      <div class="bizcard-actions">
-        <button class="bizcard-btn bizcard-btn-rolodex" id="bizcardRolodexBtn" onclick="bizcardAddRolodex()">
-          <i class="ti ti-address-book"></i> Add to My Rolodex
-        </button>
-        <button class="bizcard-btn bizcard-btn-connect" id="bizcardConnectBtn" onclick="bizcardRequestConnect()">
-          <i class="ti ti-user-plus"></i> Request to Connect
-        </button>
-      </div>
     </div>
   </div>
 
-  <!-- Business Card Modal -->
-  <div class="modal-overlay" id="bcardOverlay">
+  <!-- Bio Modal -->
+  <div class="modal-overlay" id="modalBio">
     <div class="modal-box">
       <div class="modal-header">
-        <div class="modal-title"><i class="ti ti-id-badge"></i> Send Business Card</div>
-        <button class="modal-close" onclick="bcardClose()">✕</button>
+        <div class="modal-title"><i class="ti ti-pencil"></i> Edit Bio</div>
+        <button class="modal-close" onclick="closeModal('bio')">✕</button>
       </div>
-
-      <!-- Path A: Saved card — quick confirm -->
-      <div id="bcardQuick" style="display:none;">
-        <div class="modal-body">
-          <div class="bcard-quick-label">Send your business card to Dave?</div>
-          <div class="bcard-preview-box" id="quickPreviewBox">
-            <div class="bcard-preview-name" id="quickName"></div>
-            <div class="bcard-preview-role" id="quickRole"></div>
-            <div class="bcard-preview-msg"  id="quickMsg"></div>
-          </div>
-          <button class="bcard-edit-link" onclick="bcardEditSaved()"><i class="ti ti-pencil"></i> Edit my card</button>
+      <div class="modal-body">
+        <div class="modal-field">
+          <div class="modal-label">Professional Title</div>
+          <input class="modal-input" id="bioEditTitle" type="text" placeholder="e.g. Visual Content Producer · Filmmaker" />
         </div>
-        <div class="modal-footer">
-          <button class="modal-btn-cancel" onclick="bcardClose()">Cancel</button>
-          <button class="modal-btn-send bcard-send-red" onclick="bcardSendQuick()">
-            Send Business Card <i class="ti ti-send"></i>
-          </button>
+        <div class="modal-field">
+          <div class="modal-label">Location</div>
+          <input class="modal-input" id="bioEditLocation" type="text" placeholder="e.g. Phoenix, AZ" />
+        </div>
+        <div class="modal-field">
+          <div class="modal-label">Bio</div>
+          <textarea class="modal-input modal-textarea" id="bioEditBio" placeholder="Tell people who you are and what you do…" style="min-height:110px;"></textarea>
         </div>
       </div>
-
-      <!-- Path B: No saved card — fill in form -->
-      <div id="bcardForm">
-        <div class="modal-body">
-          <div class="modal-field">
-            <div class="modal-label">Your Name</div>
-            <input class="modal-input" id="bcardName" type="text" placeholder="Full name" />
-          </div>
-          <div class="modal-field">
-            <div class="modal-label">Title / Role</div>
-            <input class="modal-input" id="bcardTitle" type="text" placeholder="e.g. Product Designer" />
-          </div>
-          <div class="modal-field">
-            <div class="modal-label">Company</div>
-            <input class="modal-input" id="bcardCompany" type="text" placeholder="Where you work" />
-          </div>
-          <div class="modal-field">
-            <div class="modal-label">Message <span style="opacity:.4;font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></div>
-            <textarea class="modal-input modal-textarea" id="bcardMessage" placeholder="Say hi or give some context…"></textarea>
-          </div>
-          <label class="bcard-save-row">
-            <input type="checkbox" id="bcardSaveCheck" checked />
-            <span>Save as my card for next time</span>
-          </label>
-        </div>
-        <div class="modal-footer">
-          <button class="modal-btn-cancel" onclick="bcardClose()">Cancel</button>
-          <button class="modal-btn-send" onclick="bcardPreview()">Preview <i class="ti ti-chevron-right"></i></button>
-        </div>
-      </div>
-
-      <!-- Confirm step (form path) -->
-      <div id="bcardConfirmStep" style="display:none;">
-        <div class="modal-body">
-          <div class="bcard-quick-label">Ready to send this card to Dave?</div>
-          <div class="bcard-preview-box">
-            <div class="bcard-preview-name" id="previewName"></div>
-            <div class="bcard-preview-role" id="previewRole"></div>
-            <div class="bcard-preview-msg"  id="previewMsg"></div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="modal-btn-cancel" onclick="bcardBackToForm()"><i class="ti ti-chevron-left"></i> Edit</button>
-          <button class="modal-btn-send bcard-send-red" onclick="bcardSend()">
-            Confirm &amp; Send <i class="ti ti-send"></i>
-          </button>
-        </div>
-      </div>
-
-      <!-- Sent confirmation -->
-      <div class="modal-confirm" id="bcardSent">
-        <div class="modal-confirm-icon"><i class="ti ti-circle-check"></i></div>
-        <div class="modal-confirm-text">Business Card sent!</div>
-        <div class="modal-confirm-sub">Dave will review your card shortly.</div>
+      <div class="modal-footer">
+        <button class="modal-btn-cancel" onclick="closeModal('bio')">Cancel</button>
+        <button class="modal-btn-save" onclick="saveBio()">Save</button>
       </div>
     </div>
   </div>
 
+  <!-- Add Experience Modal -->
+  <div class="modal-overlay" id="modalExpAdd">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title"><i class="ti ti-briefcase"></i> Add Experience</div>
+        <button class="modal-close" onclick="closeModal('exp-add')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-field">
+          <div class="modal-label">Role / Title</div>
+          <input class="modal-input" id="expRole" type="text" placeholder="e.g. Creative Director" />
+        </div>
+        <div class="modal-field">
+          <div class="modal-label">Company &amp; Location</div>
+          <input class="modal-input" id="expCompany" type="text" placeholder="e.g. Acme Studio — Phoenix, AZ" />
+        </div>
+        <div class="modal-field">
+          <div class="modal-label">Dates</div>
+          <input class="modal-input" id="expDates" type="text" placeholder="e.g. Jan 2022 – Present" />
+        </div>
+        <div class="modal-field">
+          <div class="modal-label">Description</div>
+          <textarea class="modal-input modal-textarea" id="expDesc" placeholder="What did you do? What were you proud of?"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn-cancel" onclick="closeModal('exp-add')">Cancel</button>
+        <button class="modal-btn-save" onclick="addExperience()">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Education Modal -->
+  <div class="modal-overlay" id="modalEduAdd">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title"><i class="ti ti-school"></i> Add Education</div>
+        <button class="modal-close" onclick="closeModal('edu-add')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-field">
+          <div class="modal-label">School / Institution</div>
+          <input class="modal-input" id="eduName" type="text" placeholder="e.g. Arizona State University" />
+        </div>
+        <div class="modal-field">
+          <div class="modal-label">Degree &amp; Field</div>
+          <input class="modal-input" id="eduDegree" type="text" placeholder="e.g. B.S. Business Management" />
+        </div>
+        <div class="modal-field">
+          <div class="modal-label">Dates / Location</div>
+          <input class="modal-input" id="eduDates" type="text" placeholder="e.g. Tempe, AZ · 2015–2019" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn-cancel" onclick="closeModal('edu-add')">Cancel</button>
+        <button class="modal-btn-save" onclick="addEducation()">Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Socials Modal -->
+  <div class="modal-overlay" id="modalSocials">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title"><i class="ti ti-link"></i> Portfolio &amp; Socials</div>
+        <button class="modal-close" onclick="closeModal('socials')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-field">
+          <div class="modal-label">LinkedIn URL</div>
+          <input class="modal-input" id="socialLinkedin" type="url" placeholder="https://linkedin.com/in/yourname" />
+        </div>
+        <div class="modal-field">
+          <div class="modal-label">Instagram URL</div>
+          <input class="modal-input" id="socialInstagram" type="url" placeholder="https://instagram.com/yourname" />
+        </div>
+        <div class="modal-field">
+          <div class="modal-label">Facebook URL</div>
+          <input class="modal-input" id="socialFacebook" type="url" placeholder="https://facebook.com/yourname" />
+        </div>
+        <div class="modal-field">
+          <div class="modal-label">Portfolio / Website</div>
+          <input class="modal-input" id="socialPortfolio" type="url" placeholder="https://yourportfolio.com" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn-cancel" onclick="closeModal('socials')">Cancel</button>
+        <button class="modal-btn-save" onclick="saveSocials()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Skills Modal -->
+  <div class="modal-overlay" id="modalSkills">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title"><i class="ti ti-tag"></i> Skills &amp; Tools</div>
+        <button class="modal-close" onclick="closeModal('skills')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-field">
+          <div class="modal-label">Skills <span style="color:rgba(255,255,255,0.3);font-weight:400;text-transform:none;letter-spacing:0;">(one per line)</span></div>
+          <textarea class="modal-input modal-textarea" id="skillsEdit" placeholder="Photography&#10;Video Production&#10;Content Strategy" style="min-height:110px;"></textarea>
+        </div>
+        <div class="modal-divider"></div>
+        <div class="modal-field">
+          <div class="modal-label">Tools &amp; Technology <span style="color:rgba(255,255,255,0.3);font-weight:400;text-transform:none;letter-spacing:0;">(one per line)</span></div>
+          <textarea class="modal-input modal-textarea" id="toolsEdit" placeholder="Adobe Premiere Pro&#10;Final Cut Pro X&#10;DJI Drones" style="min-height:110px;"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn-cancel" onclick="closeModal('skills')">Cancel</button>
+        <button class="modal-btn-save" onclick="saveSkills()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Client Modal -->
+  <div class="modal-overlay" id="modalClientAdd">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title"><i class="ti ti-building"></i> Add Client / Project</div>
+        <button class="modal-close" onclick="closeModal('client-add')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-field">
+          <div class="modal-label">Client or Project Name</div>
+          <input class="modal-input" id="clientName" type="text" placeholder="e.g. Nike, Hillsong, My Own Brand" />
+        </div>
+        <div class="modal-field">
+          <div class="modal-label">Logo URL <span style="color:rgba(255,255,255,0.3);font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></div>
+          <input class="modal-input" id="clientLogo" type="url" placeholder="https://example.com/logo.png" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn-cancel" onclick="closeModal('client-add')">Cancel</button>
+        <button class="modal-btn-save" onclick="addClient()">Add</button>
+      </div>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
@@ -892,322 +656,239 @@
       'sb_publishable_co1yq79BF8oR9Mg651DG5w_ESuACdqn'
     );
 
-    let IS_OWNER = false;
-    let currentUserId = null;
-
-    // ── Resume ──
+    let currentUser = null;
+    let officeData = {};
     let currentResumeUrl = null;
 
-    function renderResume(url, downloadable, isOwner) {
-      currentResumeUrl = url;
-      const empty     = document.getElementById('resumeEmpty');
-      const fileRow   = document.getElementById('resumeFileRow');
-      const toggleRow = document.getElementById('resumeToggleRow');
-      const dlBtn     = document.getElementById('resumeDlBtn');
-      const removeBtn = document.getElementById('resumeRemoveBtn');
-      const uploadBtn = document.getElementById('resumeUploadBtn');
-      if (isOwner) uploadBtn.style.display = '';
-      if (url) {
-        empty.style.display = 'none';
-        fileRow.style.display = 'flex';
-        dlBtn.style.display = downloadable ? '' : 'none';
-        if (isOwner) { toggleRow.style.display = 'flex'; removeBtn.style.display = ''; document.getElementById('resumeDownloadToggle').checked = downloadable; }
-      } else {
-        empty.style.display = '';
-        fileRow.style.display = 'none';
-        toggleRow.style.display = 'none';
+    // ── Modal helpers ──────────────────────────────────────────────
+    const MODALS = { bio:'modalBio', 'exp-add':'modalExpAdd', 'edu-add':'modalEduAdd', socials:'modalSocials', skills:'modalSkills', 'client-add':'modalClientAdd' };
+
+    function openModal(key) {
+      if (key === 'bio') {
+        document.getElementById('bioEditTitle').value    = officeData.title    || '';
+        document.getElementById('bioEditLocation').value = officeData.location || '';
+        document.getElementById('bioEditBio').value      = officeData.bio      || '';
       }
-    }
-
-    async function loadResume(userId) {
-      const { data } = await sb.from('profiles').select('resume_url, resume_downloadable').eq('id', userId).single();
-      renderResume(data?.resume_url || null, data?.resume_downloadable !== false, IS_OWNER);
-    }
-
-    async function uploadResume(input) {
-      const file = input.files[0];
-      if (!file) return;
-      input.value = '';
-      const path = `${currentUserId}/resume.pdf`;
-      const { error: upErr } = await sb.storage.from('resumes').upload(path, file, { upsert: true, contentType: 'application/pdf' });
-      if (upErr) { alert('Upload failed: ' + upErr.message); return; }
-      const { data } = sb.storage.from('resumes').getPublicUrl(path);
-      const url = data.publicUrl;
-      const downloadable = document.getElementById('resumeDownloadToggle').checked;
-      await sb.from('profiles').upsert({ id: currentUserId, resume_url: url, resume_downloadable: downloadable }, { onConflict: 'id' });
-      renderResume(url, downloadable, true);
-    }
-
-    async function saveResumeSettings() {
-      if (!currentResumeUrl) return;
-      const downloadable = document.getElementById('resumeDownloadToggle').checked;
-      document.getElementById('resumeDlBtn').style.display = downloadable ? '' : 'none';
-      await sb.from('profiles').upsert({ id: currentUserId, resume_downloadable: downloadable }, { onConflict: 'id' });
-    }
-
-    function viewResume() { if (currentResumeUrl) window.open(currentResumeUrl, '_blank'); }
-
-    function downloadResume() {
-      if (!currentResumeUrl) return;
-      const a = document.createElement('a'); a.href = currentResumeUrl; a.download = 'resume.pdf'; a.click();
-    }
-
-    async function removeResume() {
-      if (!confirm('Remove your resume?')) return;
-      await sb.storage.from('resumes').remove([`${currentUserId}/resume.pdf`]);
-      await sb.from('profiles').upsert({ id: currentUserId, resume_url: null }, { onConflict: 'id' });
-      renderResume(null, true, true);
-    }
-
-    async function init() {
-      const { data: { session } } = await sb.auth.getSession();
-      if (!session) { window.location.href = 'login.html'; return; }
-
-      currentUserId = session.user.id;
-
-      // Look up the owner of this office by handle — no hardcoded IDs
-      const { data: ownerProfile } = await sb.from('profiles')
-        .select('id')
-        .eq('handle', 'davemichael.postmarq')
-        .single();
-      IS_OWNER = ownerProfile ? (currentUserId === ownerProfile.id) : false;
-
-      // Dynamic address bar
-      const { data: profile } = await sb.from('profiles').select('handle').eq('id', currentUserId).single();
-      const handle = profile?.handle || session.user.email.split('@')[0] + '.postmarq';
-      document.getElementById('addressHandle').textContent = handle;
-
-      // Show visitor message row (hidden for owner)
-      if (!IS_OWNER) {
-        const avatarUrl = profile?.avatar_url;
-        const msgAvatar = document.getElementById('msgAvatar');
-        if (avatarUrl) { msgAvatar.src = avatarUrl; } else { msgAvatar.style.display = 'none'; }
-        document.getElementById('msgRow').style.display = 'flex';
+      if (key === 'socials') {
+        const s = officeData.socials || {};
+        document.getElementById('socialLinkedin').value  = s.linkedin  || '';
+        document.getElementById('socialInstagram').value = s.instagram || '';
+        document.getElementById('socialFacebook').value  = s.facebook  || '';
+        document.getElementById('socialPortfolio').value = s.portfolio || '';
       }
-
-      // Owner-only sections
-      if (IS_OWNER) {
-        document.getElementById('incomingWrap').style.display = '';
-        document.getElementById('rolodexWrap').style.display = '';
-        renderIncoming();
-        renderRolodex();
+      if (key === 'skills') {
+        document.getElementById('skillsEdit').value = (officeData.skills || []).join('\n');
+        document.getElementById('toolsEdit').value  = (officeData.tools  || []).join('\n');
       }
-
-      await loadResume(ownerProfile?.id || currentUserId);
+      if (key === 'exp-add')    ['expRole','expCompany','expDates','expDesc'].forEach(id => document.getElementById(id).value = '');
+      if (key === 'edu-add')    ['eduName','eduDegree','eduDates'].forEach(id => document.getElementById(id).value = '');
+      if (key === 'client-add') ['clientName','clientLogo'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById(MODALS[key]).classList.add('open');
     }
 
-    init();
+    function closeModal(key) { document.getElementById(MODALS[key]).classList.remove('open'); }
 
-    // ── Biz Card Spotlight ────────────────────────────
-    function viewBizCard() {
-      const inRolodex = localStorage.getItem('pm_dave_in_rolodex') === '1';
-      const requested = localStorage.getItem('pm_connect_requested') === '1';
-      const rBtn = document.getElementById('bizcardRolodexBtn');
-      const cBtn = document.getElementById('bizcardConnectBtn');
-      rBtn.classList.toggle('saved', inRolodex);
-      rBtn.innerHTML = inRolodex
-        ? '<i class="ti ti-check"></i> Saved to Rolodex'
-        : '<i class="ti ti-address-book"></i> Add to My Rolodex';
-      if (requested) {
-        cBtn.classList.add('requested');
-        cBtn.innerHTML = '<i class="ti ti-clock"></i> Connection Requested';
-      } else {
-        cBtn.classList.remove('requested');
-        cBtn.innerHTML = '<i class="ti ti-user-plus"></i> Request to Connect';
-      }
-      document.getElementById('bizcardOverlay').classList.add('open');
-    }
-    function bizcardClose() { document.getElementById('bizcardOverlay').classList.remove('open'); }
-    function bizcardAddRolodex() {
-      localStorage.setItem('pm_dave_in_rolodex', '1');
-      const btn = document.getElementById('bizcardRolodexBtn');
-      btn.classList.add('saved');
-      btn.innerHTML = '<i class="ti ti-check"></i> Saved to Rolodex';
-    }
-    function bizcardRequestConnect() {
-      const btn = document.getElementById('bizcardConnectBtn');
-      if (btn.classList.contains('requested')) return;
-      localStorage.setItem('pm_connect_requested', '1');
-      const reqs = JSON.parse(localStorage.getItem('pm_connect_requests') || '[]');
-      reqs.push({ id: Date.now(), from: 'Visitor', ts: new Date().toLocaleDateString() });
-      localStorage.setItem('pm_connect_requests', JSON.stringify(reqs));
-      btn.classList.add('requested');
-      btn.innerHTML = '<i class="ti ti-clock"></i> Connection Requested';
-    }
-    document.getElementById('bizcardOverlay').addEventListener('click', e => {
-      if (e.target === e.currentTarget) bizcardClose();
+    Object.values(MODALS).forEach(id => {
+      document.getElementById(id).addEventListener('click', e => {
+        if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
+      });
     });
 
-    // ── Message Row ───────────────────────────────────
-    function msgSend() {
-      const input = document.getElementById('msgInput');
-      if (!input.value.trim()) return;
-      input.value = '';
-      input.placeholder = 'Message sent!';
-      setTimeout(() => { input.placeholder = 'Write me a message…'; }, 2500);
-    }
-    document.getElementById('msgInput').addEventListener('keydown', e => {
-      if (e.key === 'Enter') msgSend();
-    });
-
-    // ── Business Card Modal ───────────────────────────
-    function bcardShowOnly(id) {
-      ['bcardQuick','bcardForm','bcardConfirmStep','bcardSent'].forEach(s => {
-        const el = document.getElementById(s);
-        if (s === 'bcardSent') el.classList.remove('show');
-        else el.style.display = s === id ? '' : 'none';
-      });
+    // ── Persist ────────────────────────────────────────────────────
+    async function persist() {
+      await sb.from('profiles').upsert({ id: currentUser.id, office_data: officeData }, { onConflict: 'id' });
     }
 
-    function bcardOpen() {
-      const saved = JSON.parse(localStorage.getItem('pm_my_card') || 'null');
-      if (saved) {
-        document.getElementById('quickName').textContent = saved.name;
-        document.getElementById('quickRole').textContent = [saved.title, saved.company].filter(Boolean).join(' · ');
-        const qm = document.getElementById('quickMsg');
-        qm.textContent = saved.msg || '';
-        qm.style.display = saved.msg ? '' : 'none';
-        bcardShowOnly('bcardQuick');
-      } else {
-        ['bcardName','bcardTitle','bcardCompany','bcardMessage'].forEach(id => document.getElementById(id).value = '');
-        document.getElementById('bcardSaveCheck').checked = true;
-        bcardShowOnly('bcardForm');
+    // ── Bio ────────────────────────────────────────────────────────
+    async function saveBio() {
+      officeData.title    = document.getElementById('bioEditTitle').value.trim();
+      officeData.location = document.getElementById('bioEditLocation').value.trim();
+      officeData.bio      = document.getElementById('bioEditBio').value.trim();
+      await persist();
+      renderBio();
+      closeModal('bio');
+    }
+
+    function renderBio(profile) {
+      if (profile) {
+        document.getElementById('bioName').textContent = profile.full_name || currentUser.email.split('@')[0];
+        document.getElementById('addressHandle').textContent = profile.handle || 'me';
+        if (profile.avatar_url) {
+          document.getElementById('bioAvatarIcon').style.display = 'none';
+          const wrap = document.getElementById('bioAvatarWrap');
+          const img = wrap.querySelector('img') || document.createElement('img');
+          img.className = 'bio-avatar';
+          img.alt = profile.full_name || '';
+          img.src = profile.avatar_url;
+          if (!img.parentNode) wrap.appendChild(img);
+        }
       }
-      document.getElementById('bcardOverlay').classList.add('open');
+      const titleEl    = document.getElementById('bioTitle');
+      const locationEl = document.getElementById('bioLocation');
+      const textEl     = document.getElementById('bioText');
+      const hintEl     = document.getElementById('bioEmptyHint');
+      titleEl.textContent = officeData.title || '';
+      titleEl.style.display = officeData.title ? '' : 'none';
+      document.getElementById('bioLocationText').textContent = officeData.location || '';
+      locationEl.style.display = officeData.location ? '' : 'none';
+      textEl.textContent = officeData.bio || '';
+      textEl.style.display = officeData.bio ? '' : 'none';
+      hintEl.style.display = (!officeData.title && !officeData.location && !officeData.bio) ? '' : 'none';
     }
 
-    function bcardClose() { document.getElementById('bcardOverlay').classList.remove('open'); }
-
-    function bcardSendQuick() {
-      const card = JSON.parse(localStorage.getItem('pm_my_card') || 'null');
-      if (!card) return;
-      pushPendingCard(card);
-      bcardShowOnly('bcardSent');
-      document.getElementById('bcardSent').classList.add('show');
-      setTimeout(bcardClose, 2500);
+    // ── Experience ─────────────────────────────────────────────────
+    async function addExperience() {
+      const role    = document.getElementById('expRole').value.trim();
+      const company = document.getElementById('expCompany').value.trim();
+      const dates   = document.getElementById('expDates').value.trim();
+      const desc    = document.getElementById('expDesc').value.trim();
+      if (!role) { document.getElementById('expRole').focus(); return; }
+      officeData.experience = officeData.experience || [];
+      officeData.experience.unshift({ id: Date.now(), role, company, dates, desc });
+      await persist();
+      renderExperience();
+      closeModal('exp-add');
     }
 
-    function bcardEditSaved() {
-      const saved = JSON.parse(localStorage.getItem('pm_my_card') || 'null');
-      if (saved) {
-        document.getElementById('bcardName').value    = saved.name    || '';
-        document.getElementById('bcardTitle').value   = saved.title   || '';
-        document.getElementById('bcardCompany').value = saved.company || '';
-        document.getElementById('bcardMessage').value = saved.msg     || '';
-      }
-      document.getElementById('bcardSaveCheck').checked = true;
-      bcardShowOnly('bcardForm');
+    async function removeExperience(id) {
+      officeData.experience = (officeData.experience || []).filter(e => e.id !== id);
+      await persist();
+      renderExperience();
     }
 
-    function bcardPreview() {
-      const name = document.getElementById('bcardName').value.trim();
-      if (!name) { document.getElementById('bcardName').focus(); return; }
-      const title   = document.getElementById('bcardTitle').value.trim();
-      const company = document.getElementById('bcardCompany').value.trim();
-      const msg     = document.getElementById('bcardMessage').value.trim();
-      document.getElementById('previewName').textContent = name;
-      document.getElementById('previewRole').textContent = [title, company].filter(Boolean).join(' · ');
-      const pm = document.getElementById('previewMsg');
-      pm.textContent = msg; pm.style.display = msg ? '' : 'none';
-      bcardShowOnly('bcardConfirmStep');
-    }
-
-    function bcardBackToForm() { bcardShowOnly('bcardForm'); }
-
-    function bcardSend() {
-      const name    = document.getElementById('bcardName').value.trim();
-      const title   = document.getElementById('bcardTitle').value.trim();
-      const company = document.getElementById('bcardCompany').value.trim();
-      const msg     = document.getElementById('bcardMessage').value.trim();
-      const card    = { name, title, company, msg };
-      if (document.getElementById('bcardSaveCheck').checked) {
-        localStorage.setItem('pm_my_card', JSON.stringify(card));
-      }
-      pushPendingCard(card);
-      bcardShowOnly('bcardSent');
-      document.getElementById('bcardSent').classList.add('show');
-      setTimeout(bcardClose, 2500);
-    }
-
-    function pushPendingCard(card) {
-      const pending = JSON.parse(localStorage.getItem('pm_pending_cards') || '[]');
-      pending.push({ ...card, id: Date.now() });
-      localStorage.setItem('pm_pending_cards', JSON.stringify(pending));
-      if (IS_OWNER) renderIncoming();
-    }
-
-    document.getElementById('bcardOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) bcardClose(); });
-
-    // ── Incoming Cards ────────────────────────────────
-    function renderIncoming() {
-      const pending = JSON.parse(localStorage.getItem('pm_pending_cards') || '[]');
-      const list = document.getElementById('incomingList');
-      list.innerHTML = '';
-      if (!pending.length) {
-        list.innerHTML = '<div class="rolodex-empty">No incoming cards.</div>';
+    function renderExperience() {
+      const list  = document.getElementById('expList');
+      const items = officeData.experience || [];
+      if (!items.length) {
+        list.innerHTML = '<div class="empty-state"><i class="ti ti-briefcase"></i> No experience added yet</div>';
         return;
       }
-      pending.forEach(card => {
-        const initials = card.name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
-        const div = document.createElement('div');
-        div.className = 'incoming-card';
-        div.innerHTML = `
-          <div class="incoming-avatar">${initials}</div>
-          <div class="incoming-info">
-            <div class="incoming-name">${card.name}</div>
-            <div class="incoming-meta">${[card.title, card.company].filter(Boolean).join(' · ')}</div>
-            ${card.msg ? `<div class="incoming-msg">"${card.msg}"</div>` : ''}
-            <div class="incoming-actions">
-              <button class="btn-accept" onclick="cardAccept(${card.id})"><i class="ti ti-check"></i> Accept</button>
-              <button class="btn-deny"   onclick="cardDeny(${card.id})"><i class="ti ti-x"></i> Deny</button>
-            </div>
-          </div>`;
-        list.appendChild(div);
-      });
-    }
-    function cardAccept(id) {
-      let pending = JSON.parse(localStorage.getItem('pm_pending_cards') || '[]');
-      const card  = pending.find(c => c.id === id);
-      pending     = pending.filter(c => c.id !== id);
-      localStorage.setItem('pm_pending_cards', JSON.stringify(pending));
-      if (card) {
-        const rolodex = JSON.parse(localStorage.getItem('pm_rolodex') || '[]');
-        rolodex.push(card);
-        localStorage.setItem('pm_rolodex', JSON.stringify(rolodex));
-      }
-      renderIncoming(); renderRolodex();
-    }
-    function cardDeny(id) {
-      let pending = JSON.parse(localStorage.getItem('pm_pending_cards') || '[]');
-      pending = pending.filter(c => c.id !== id);
-      localStorage.setItem('pm_pending_cards', JSON.stringify(pending));
-      renderIncoming();
-    }
-
-    // ── Rolodex ───────────────────────────────────────
-    function renderRolodex() {
-      const rolodex = JSON.parse(localStorage.getItem('pm_rolodex') || '[]');
-      const list    = document.getElementById('rolodexList');
       list.innerHTML = '';
-      if (!rolodex.length) {
-        list.innerHTML = '<div class="rolodex-empty">No accepted cards yet.</div>';
-        return;
-      }
-      rolodex.forEach(card => {
-        const initials = card.name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+      items.forEach((e, i) => {
         const div = document.createElement('div');
-        div.className = 'rolodex-entry';
+        div.className = 'timeline-item';
         div.innerHTML = `
-          <div class="rolodex-avatar">${initials}</div>
-          <div>
-            <div class="rolodex-name">${card.name}</div>
-            <div class="rolodex-meta">${[card.title, card.company].filter(Boolean).join(' · ')}</div>
-          </div>`;
+          <div class="timeline-left">
+            <div class="timeline-dot"></div>
+            ${i < items.length - 1 ? '<div class="timeline-line"></div>' : ''}
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div class="timeline-role">${esc(e.role)}</div>
+            ${e.company ? `<div class="timeline-company">${esc(e.company)}</div>` : ''}
+            ${e.dates   ? `<div class="timeline-dates">${esc(e.dates)}</div>` : ''}
+            ${e.desc    ? `<div class="timeline-desc">${esc(e.desc)}</div>` : ''}
+          </div>
+          <button class="item-remove" onclick="removeExperience(${e.id})" title="Remove"><i class="ti ti-x"></i></button>`;
         list.appendChild(div);
       });
     }
 
-    // ── Skills & Tools tab switcher ───────────────────
+    // ── Education ──────────────────────────────────────────────────
+    async function addEducation() {
+      const name   = document.getElementById('eduName').value.trim();
+      const degree = document.getElementById('eduDegree').value.trim();
+      const dates  = document.getElementById('eduDates').value.trim();
+      if (!name) { document.getElementById('eduName').focus(); return; }
+      officeData.education = officeData.education || [];
+      officeData.education.push({ id: Date.now(), name, degree, dates });
+      await persist();
+      renderEducation();
+      closeModal('edu-add');
+    }
+
+    async function removeEducation(id) {
+      officeData.education = (officeData.education || []).filter(e => e.id !== id);
+      await persist();
+      renderEducation();
+    }
+
+    function renderEducation() {
+      const list  = document.getElementById('eduList');
+      const items = officeData.education || [];
+      if (!items.length) {
+        list.innerHTML = '<div class="empty-state"><i class="ti ti-school"></i> No education added yet</div>';
+        return;
+      }
+      list.innerHTML = '';
+      items.forEach(e => {
+        const div = document.createElement('div');
+        div.className = 'edu-item';
+        div.innerHTML = `
+          <div class="edu-icon"><i class="ti ti-school"></i></div>
+          <div style="flex:1;min-width:0;">
+            <div class="edu-name">${esc(e.name)}</div>
+            ${e.degree ? `<div class="edu-degree">${esc(e.degree)}</div>` : ''}
+            ${e.dates  ? `<div class="edu-dates">${esc(e.dates)}</div>`  : ''}
+          </div>
+          <button class="item-remove" onclick="removeEducation(${e.id})" title="Remove"><i class="ti ti-x"></i></button>`;
+        list.appendChild(div);
+      });
+    }
+
+    // ── Socials ────────────────────────────────────────────────────
+    async function saveSocials() {
+      officeData.socials = {
+        linkedin:  document.getElementById('socialLinkedin').value.trim(),
+        instagram: document.getElementById('socialInstagram').value.trim(),
+        facebook:  document.getElementById('socialFacebook').value.trim(),
+        portfolio: document.getElementById('socialPortfolio').value.trim(),
+      };
+      await persist();
+      renderSocials();
+      closeModal('socials');
+    }
+
+    function renderSocials() {
+      const s = officeData.socials || {};
+      const icons = document.getElementById('socialsIcons');
+      icons.innerHTML = '';
+      const defs = [
+        { key:'linkedin',  icon:'ti-brand-linkedin',  label:'LinkedIn' },
+        { key:'instagram', icon:'ti-brand-instagram', label:'Instagram' },
+        { key:'facebook',  icon:'ti-brand-facebook',  label:'Facebook' },
+        { key:'portfolio', icon:'ti-briefcase',       label:'Portfolio' },
+      ];
+      const active = defs.filter(d => s[d.key]);
+      if (!active.length) {
+        icons.innerHTML = '<span style="font-size:0.72rem;color:rgba(255,255,255,0.4);font-style:italic;">No links yet</span>';
+        return;
+      }
+      active.forEach(d => {
+        const a = document.createElement('a');
+        a.className = 'social-icon-btn';
+        a.href = s[d.key]; a.target = '_blank'; a.rel = 'noopener'; a.title = d.label;
+        a.innerHTML = `<i class="ti ${d.icon}"></i>`;
+        icons.appendChild(a);
+      });
+    }
+
+    // ── Skills / Tools ─────────────────────────────────────────────
+    async function saveSkills() {
+      const parse = id => document.getElementById(id).value.split('\n').map(s => s.trim()).filter(Boolean);
+      officeData.skills = parse('skillsEdit');
+      officeData.tools  = parse('toolsEdit');
+      await persist();
+      renderSkills();
+      closeModal('skills');
+    }
+
+    function renderSkills() {
+      renderPills('skillsList', officeData.skills || [], 'No skills added yet', 'ti-tag');
+      renderPills('toolsList',  officeData.tools  || [], 'No tools added yet',  'ti-tool');
+    }
+
+    function renderPills(elId, items, empty, icon) {
+      const el = document.getElementById(elId);
+      if (!items.length) { el.innerHTML = `<div class="empty-state"><i class="ti ${icon}"></i> ${empty}</div>`; return; }
+      el.innerHTML = '';
+      items.forEach(s => {
+        const span = document.createElement('span');
+        span.className = 'skill-pill';
+        span.textContent = s;
+        el.appendChild(span);
+      });
+    }
+
     function switchSkillTab(tab) {
       document.getElementById('stSkills').style.display = tab === 'skills' ? '' : 'none';
       document.getElementById('stTools').style.display  = tab === 'tools'  ? '' : 'none';
@@ -1216,22 +897,113 @@
       });
     }
 
-    // ── Collapsible sections ──────────────────────────
-    function toggleCollapse(id, btn) {
-      const wrap = document.getElementById(id);
-      const expanded = wrap.classList.toggle('expanded');
-      btn.innerHTML = expanded
-        ? '<i class="ti ti-chevron-up"></i> View less'
-        : '<i class="ti ti-chevron-down"></i> View more';
+    // ── Clients ────────────────────────────────────────────────────
+    async function addClient() {
+      const name   = document.getElementById('clientName').value.trim();
+      const logo   = document.getElementById('clientLogo').value.trim();
+      if (!name) { document.getElementById('clientName').focus(); return; }
+      officeData.clients = officeData.clients || [];
+      officeData.clients.push({ id: Date.now(), name, logo_url: logo });
+      await persist();
+      renderClients();
+      closeModal('client-add');
     }
 
-    // ── Client tiles ──────────────────────────────────
-    function showAllClients() {
-      ['clientExtra1','clientExtra2','clientExtra3'].forEach(id => {
-        document.getElementById(id).style.display = '';
-      });
-      document.getElementById('clientsMoreBtn').style.display = 'none';
+    async function removeClient(id) {
+      officeData.clients = (officeData.clients || []).filter(c => c.id !== id);
+      await persist();
+      renderClients();
     }
+
+    function renderClients() {
+      const grid  = document.getElementById('clientGrid');
+      const items = officeData.clients || [];
+      if (!items.length) {
+        grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><i class="ti ti-building"></i> No clients added yet</div>';
+        return;
+      }
+      grid.innerHTML = '';
+      items.forEach(c => {
+        const tile = document.createElement('div');
+        tile.className = 'client-tile'; tile.title = c.name;
+        tile.innerHTML = c.logo_url
+          ? `<img src="${esc(c.logo_url)}" alt="${esc(c.name)}" />`
+          : `<div class="client-tile-initials">${c.name.split(' ').map(w=>w[0]).join('').slice(0,3).toUpperCase()}</div>`;
+        const rm = document.createElement('button');
+        rm.className = 'client-tile-rm'; rm.textContent = '✕';
+        rm.onclick = () => removeClient(c.id);
+        tile.appendChild(rm);
+        grid.appendChild(tile);
+      });
+    }
+
+    // ── Resume ─────────────────────────────────────────────────────
+    function renderResumeUI(url, downloadable) {
+      currentResumeUrl = url;
+      document.getElementById('resumeEmpty').style.display     = url ? 'none' : '';
+      document.getElementById('resumeFileRow').style.display   = url ? 'flex' : 'none';
+      document.getElementById('resumeToggleRow').style.display = url ? 'flex' : 'none';
+      if (url) {
+        document.getElementById('resumeDlBtn').style.display = downloadable ? '' : 'none';
+        document.getElementById('resumeDownloadToggle').checked = downloadable;
+      }
+    }
+
+    async function uploadResume(input) {
+      const file = input.files[0]; if (!file) return; input.value = '';
+      const path = `${currentUser.id}/resume/resume.pdf`;
+      const { error } = await sb.storage.from('media').upload(path, file, { upsert: true, contentType: 'application/pdf' });
+      if (error) { alert('Upload failed: ' + error.message); return; }
+      const { data } = sb.storage.from('media').getPublicUrl(path);
+      const downloadable = document.getElementById('resumeDownloadToggle').checked;
+      await sb.from('profiles').upsert({ id: currentUser.id, resume_url: data.publicUrl, resume_downloadable: downloadable }, { onConflict: 'id' });
+      renderResumeUI(data.publicUrl, downloadable);
+    }
+
+    async function saveResumeSettings() {
+      if (!currentResumeUrl) return;
+      const downloadable = document.getElementById('resumeDownloadToggle').checked;
+      document.getElementById('resumeDlBtn').style.display = downloadable ? '' : 'none';
+      await sb.from('profiles').upsert({ id: currentUser.id, resume_downloadable: downloadable }, { onConflict: 'id' });
+    }
+
+    function viewResume()     { if (currentResumeUrl) window.open(currentResumeUrl, '_blank'); }
+    function downloadResume() { if (!currentResumeUrl) return; const a = document.createElement('a'); a.href = currentResumeUrl; a.download = 'resume.pdf'; a.click(); }
+    async function removeResume() {
+      if (!confirm('Remove your resume?')) return;
+      await sb.storage.from('media').remove([`${currentUser.id}/resume/resume.pdf`]);
+      await sb.from('profiles').upsert({ id: currentUser.id, resume_url: null }, { onConflict: 'id' });
+      renderResumeUI(null, true);
+    }
+
+    // ── Util ───────────────────────────────────────────────────────
+    function esc(str) {
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // ── Init ────────────────────────────────────────────────────────
+    async function init() {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { window.location.href = 'login.html'; return; }
+      currentUser = session.user;
+
+      const { data: profile } = await sb.from('profiles')
+        .select('full_name, avatar_url, handle, office_data, resume_url, resume_downloadable')
+        .eq('id', currentUser.id)
+        .single();
+
+      officeData = profile?.office_data || {};
+
+      renderBio(profile);
+      renderExperience();
+      renderEducation();
+      renderSocials();
+      renderSkills();
+      renderClients();
+      renderResumeUI(profile?.resume_url || null, profile?.resume_downloadable !== false);
+    }
+
+    init();
   </script>
 
 </body>
