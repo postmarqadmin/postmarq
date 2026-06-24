@@ -987,12 +987,22 @@
       if (!session) { window.location.href = 'login.html'; return; }
       currentUser = session.user;
 
+      // Set name immediately so "Loading…" is never stuck
+      document.getElementById('bioName').textContent = currentUser.email.split('@')[0];
+
+      // Fetch base profile (columns that are guaranteed to exist)
       const { data: profile } = await sb.from('profiles')
-        .select('full_name, avatar_url, handle, office_data, resume_url, resume_downloadable')
+        .select('full_name, avatar_url, handle, resume_url, resume_downloadable')
         .eq('id', currentUser.id)
         .single();
 
-      officeData = profile?.office_data || {};
+      // Fetch office_data separately — column may not exist yet if SQL hasn't been run
+      const { data: officeRow } = await sb.from('profiles')
+        .select('office_data')
+        .eq('id', currentUser.id)
+        .single();
+
+      officeData = officeRow?.office_data || {};
 
       renderBio(profile);
       renderExperience();
