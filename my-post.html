@@ -69,6 +69,54 @@
     .site-banner-logo { font-size: 1.25rem; font-weight: 900; color: rgba(255,255,255,0.97); letter-spacing: -0.5px; }
     .site-banner-nav { display: flex; align-items: center; gap: 1.5rem; }
 
+    /* Search */
+    .search-wrap { position: relative; }
+    .search-input {
+      background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 20px; padding: 0.28rem 0.85rem 0.28rem 2rem;
+      font-family: var(--font); font-size: 0.72rem; color: #fff;
+      outline: none; width: 180px; transition: background 0.15s, width 0.2s;
+    }
+    .search-input::placeholder { color: rgba(255,255,255,0.45); }
+    .search-input:focus { background: rgba(255,255,255,0.2); width: 220px; }
+    .search-icon {
+      position: absolute; left: 0.6rem; top: 50%; transform: translateY(-50%);
+      color: rgba(255,255,255,0.5); font-size: 0.8rem; pointer-events: none;
+    }
+    .search-results {
+      display: none; position: absolute; top: calc(100% + 6px); left: 0;
+      width: 280px; background: #fef3d8;
+      border: 1px solid rgba(155,143,212,0.3); border-radius: 14px;
+      box-shadow: 0 12px 36px rgba(60,40,120,0.22); z-index: 500;
+      overflow: hidden; max-height: 320px; overflow-y: auto;
+    }
+    .search-results.open { display: block; }
+    .search-result-item {
+      display: flex; align-items: center; gap: 0.7rem;
+      padding: 0.65rem 1rem; border-bottom: 1px solid rgba(155,143,212,0.12);
+      cursor: pointer; transition: background 0.12s;
+    }
+    .search-result-item:last-child { border-bottom: none; }
+    .search-result-item:hover { background: rgba(155,143,212,0.1); }
+    .search-result-avatar {
+      width: 34px; height: 34px; border-radius: 50%; object-fit: cover; flex-shrink: 0;
+      background: rgba(155,143,212,0.2); border: 1px solid rgba(255,255,255,0.6);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 900; color: var(--lavender);
+    }
+    .search-result-info { flex: 1; min-width: 0; }
+    .search-result-name { font-size: 0.78rem; font-weight: 800; color: var(--ink); }
+    .search-result-handle { font-size: 0.62rem; color: var(--ink-4); margin-top: 1px; }
+    .search-loop-btn {
+      font-size: 0.62rem; font-weight: 800; padding: 0.2rem 0.55rem; border-radius: 6px;
+      background: rgba(155,143,212,0.15); border: 1px solid rgba(155,143,212,0.4);
+      color: var(--lavender); cursor: pointer; font-family: var(--font); flex-shrink: 0;
+      transition: background 0.12s;
+    }
+    .search-loop-btn:hover { background: rgba(155,143,212,0.3); }
+    .search-loop-btn.sent { background: rgba(74,181,170,0.15); border-color: rgba(74,181,170,0.4); color: var(--teal); cursor: default; }
+    .search-empty { padding: 1rem; font-size: 0.72rem; color: var(--ink-4); font-style: italic; text-align: center; }
+
     /* Inbox bell */
     .inbox-bell-btn {
       position: relative; background: none; border: none; cursor: pointer;
@@ -1283,6 +1331,15 @@
       <a href="my-post.html">home</a>
       <a href="#" onclick="alert('Coming soon')">townsquare</a>
       <a href="#" onclick="alert('Coming soon')">neighborhood</a>
+
+      <!-- Search -->
+      <div class="search-wrap" id="searchWrap">
+        <i class="ti ti-search search-icon"></i>
+        <input class="search-input" id="searchInput" type="text" placeholder="Find people..." autocomplete="off"
+          oninput="onSearchInput(this.value)" onfocus="onSearchInput(this.value)" />
+        <div class="search-results" id="searchResults"></div>
+      </div>
+
       <a href="edit.html" class="edit-post-btn">Edit My Post</a>
       <button class="inbox-bell-btn" id="inboxBellBtn" style="display:none" onclick="toggleInbox()">
         <i class="ti ti-bell"></i>
@@ -2540,6 +2597,86 @@
     }
 
     // ── End Widget Engine ───────────────────────────────────────
+
+    // ── People Search ──────────────────────────────────────────
+    let _searchTimer = null;
+    let _searchSentTo = new Set(); // track pending loop invites this session
+
+    async function onSearchInput(val) {
+      const results = document.getElementById('searchResults');
+      val = val.trim();
+      if (!val) { results.classList.remove('open'); return; }
+      clearTimeout(_searchTimer);
+      _searchTimer = setTimeout(() => runSearch(val), 220);
+    }
+
+    async function runSearch(q) {
+      const results = document.getElementById('searchResults');
+      results.innerHTML = '<div class="search-empty">Searching...</div>';
+      results.classList.add('open');
+
+      const { data, error } = await sb.from('profiles')
+        .select('id, full_name, handle, avatar_url')
+        .or(`full_name.ilike.%${q}%,handle.ilike.%${q}%`)
+        .neq('id', currentUser.id)
+        .limit(8);
+
+      if (error || !data?.length) {
+        results.innerHTML = '<div class="search-empty">No one found. Try a name or handle.</div>';
+        return;
+      }
+
+      results.innerHTML = '';
+      data.forEach(p => {
+        const handle = p.handle || '';
+        const initials = (p.full_name || '?').split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+        const avatarHtml = p.avatar_url
+          ? `<img class="search-result-avatar" src="${p.avatar_url}" alt="${p.full_name}" />`
+          : `<div class="search-result-avatar">${initials}</div>`;
+        const alreadySent = _searchSentTo.has(p.id);
+        const row = document.createElement('div');
+        row.className = 'search-result-item';
+        row.innerHTML = `
+          ${avatarHtml}
+          <div class="search-result-info">
+            <div class="search-result-name">${p.full_name || handle}</div>
+            <div class="search-result-handle">${handle}</div>
+          </div>
+          <button class="search-loop-btn${alreadySent ? ' sent' : ''}" id="loop-btn-${p.id}"
+            onclick="event.stopPropagation();searchLoopIn('${p.id}')">
+            ${alreadySent ? 'Sent' : 'Loop In'}
+          </button>`;
+        row.onclick = () => {
+          const slug = handle.replace('.postmarq','');
+          if (slug) window.location.href = `/${slug}`;
+        };
+        results.appendChild(row);
+      });
+    }
+
+    async function searchLoopIn(toUserId) {
+      const btn = document.getElementById(`loop-btn-${toUserId}`);
+      if (!btn || btn.classList.contains('sent')) return;
+      btn.disabled = true; btn.textContent = 'Sending...';
+      const { error } = await sb.from('friend_requests').insert({
+        from_user_id: currentUser.id, to_user_id: toUserId, status: 'pending'
+      });
+      if (error && !error.message.includes('duplicate')) {
+        btn.disabled = false; btn.textContent = 'Loop In';
+        return;
+      }
+      _searchSentTo.add(toUserId);
+      btn.classList.add('sent');
+      btn.textContent = 'Sent';
+      btn.disabled = false;
+    }
+
+    // Close search results when clicking outside
+    document.addEventListener('click', e => {
+      if (!document.getElementById('searchWrap')?.contains(e.target)) {
+        document.getElementById('searchResults')?.classList.remove('open');
+      }
+    });
 
     function setDate() {
       const now = new Date();
