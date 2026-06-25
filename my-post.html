@@ -23,10 +23,10 @@
       --amber-pale:   #fef3d8;
       --teal:         #4ab5aa;
       --lavender:     #9b8fd4;
-      --ink:   #26180e;
-      --ink-2: #5a3e28;
-      --ink-3: #a07d60;
-      --ink-4: #c9aa90;
+      --ink:   #ffffff;
+      --ink-2: rgba(255,255,255,0.85);
+      --ink-3: rgba(255,255,255,0.60);
+      --ink-4: rgba(255,255,255,0.40);
       --radius-sm: 10px;
       --radius-md: 16px;
       --radius-lg: 22px;
@@ -37,7 +37,7 @@
     body {
       font-family: var(--font);
       color: var(--ink);
-      text-shadow: 0 1px 2px rgba(255,255,255,0.45);
+      text-shadow: 0 1px 3px rgba(0,0,0,0.25);
       min-height: 100vh;
       padding: 0 0 5rem;
       background:
@@ -225,21 +225,21 @@
     /* ── Room Nav ── */
     .room-nav {
       display: flex; border-radius: var(--radius-lg); overflow: hidden;
-      background: var(--glass-white);
+      background: linear-gradient(135deg, rgba(155,143,212,0.48) 0%, rgba(74,181,170,0.32) 100%);
       backdrop-filter: blur(18px) saturate(1.6);
-      border: 1px solid var(--glass-border);
-      box-shadow: var(--glass-shadow), var(--glass-inset);
+      border: 1px solid rgba(255,255,255,0.65);
+      box-shadow: 0 4px 24px rgba(80,60,140,0.14);
     }
     .room-tab {
       flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
-      padding: 0.65rem 0.25rem 0.55rem; text-decoration: none; color: var(--ink-3);
+      padding: 0.65rem 0.25rem 0.55rem; text-decoration: none; color: rgba(255,255,255,0.65);
       font-size: 0.6rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
-      border-right: 1px solid rgba(255,255,255,0.5); transition: background 0.15s, color 0.15s; cursor: pointer;
+      border-right: 1px solid rgba(255,255,255,0.25); transition: background 0.15s, color 0.15s; cursor: pointer;
     }
     .room-tab:last-child { border-right: none; }
     .room-tab i { font-size: 1.2rem; }
-    .room-tab:hover { background: rgba(255,255,255,0.45); color: var(--ink); }
-    .room-tab.active { background: linear-gradient(160deg, rgba(232,153,42,0.22), rgba(245,196,98,0.14)); color: var(--ink); }
+    .room-tab:hover { background: rgba(255,255,255,0.15); color: #fff; }
+    .room-tab.active { background: linear-gradient(160deg, rgba(232,153,42,0.35), rgba(245,196,98,0.20)); color: #fff; }
     .room-tab.active i { color: var(--amber); }
     .room-tab-wrap { position: relative; flex: 1; display: flex; }
     .room-tab-wrap .room-tab { flex: 1; }
