@@ -305,6 +305,13 @@
       width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
       font-size: 0.7rem; font-weight: 900; color: var(--lavender);
     }
+    .client-tile-name {
+      width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+      font-size: 0.72rem; font-weight: 700; color: var(--lavender);
+      text-align: center; padding: 6px; line-height: 1.2;
+      text-decoration: none;
+    }
+    a.client-tile-name:hover { text-decoration: underline; }
     .client-tile-rm {
       position: absolute; top: 2px; right: 2px;
       background: rgba(162,40,65,0.75); border: none; border-radius: 50%;
@@ -853,8 +860,8 @@
           <input class="modal-input" id="clientName" type="text" placeholder="e.g. Nike, Hillsong, My Own Brand" />
         </div>
         <div class="modal-field">
-          <div class="modal-label">Logo URL <span style="color:rgba(255,255,255,0.3);font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></div>
-          <input class="modal-input" id="clientLogo" type="url" placeholder="https://example.com/logo.png" />
+          <div class="modal-label">Website URL <span style="color:rgba(255,255,255,0.3);font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></div>
+          <input class="modal-input" id="clientLogo" type="url" placeholder="https://example.com" />
         </div>
       </div>
       <div class="modal-footer">
@@ -1398,7 +1405,7 @@
       const logo   = document.getElementById('clientLogo').value.trim();
       if (!name) { document.getElementById('clientName').focus(); return; }
       officeData.clients = officeData.clients || [];
-      officeData.clients.push({ id: Date.now(), name, logo_url: logo });
+      officeData.clients.push({ id: Date.now(), name, url: logo });
       await persist();
       renderClients();
       closeModal('client-add');
@@ -1420,10 +1427,12 @@
       grid.innerHTML = '';
       items.forEach(c => {
         const tile = document.createElement('div');
-        tile.className = 'client-tile'; tile.title = c.name;
-        tile.innerHTML = c.logo_url
-          ? `<img src="${esc(c.logo_url)}" alt="${esc(c.name)}" />`
-          : `<div class="client-tile-initials">${c.name.split(' ').map(w=>w[0]).join('').slice(0,3).toUpperCase()}</div>`;
+        tile.className = 'client-tile';
+        const siteUrl = c.url || c.logo_url || '';
+        const nameEl = siteUrl
+          ? `<a href="${esc(siteUrl)}" target="_blank" rel="noopener" class="client-tile-name">${esc(c.name)}</a>`
+          : `<span class="client-tile-name">${esc(c.name)}</span>`;
+        tile.innerHTML = nameEl;
         const rm = document.createElement('button');
         rm.className = 'client-tile-rm'; rm.textContent = '✕';
         rm.onclick = () => removeClient(c.id);
