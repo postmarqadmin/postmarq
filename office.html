@@ -212,6 +212,13 @@
     .timeline-company { font-size: 0.78rem; font-weight: 600; color: var(--lavender); margin-top: 0.1rem; }
     .timeline-dates { font-size: 0.7rem; font-weight: 600; color: var(--ink-4); margin-top: 0.15rem; }
     .timeline-desc { font-size: 0.8rem; color: var(--ink-2); line-height: 1.55; margin-top: 0.4rem; }
+    .item-edit {
+      background: none; border: none; cursor: pointer;
+      color: rgba(74,114,196,0.4); font-size: 0.85rem; padding: 0.15rem;
+      transition: color 0.15s; flex-shrink: 0; margin-top: 2px;
+      line-height: 1;
+    }
+    .item-edit:hover { color: rgba(74,114,196,0.9); }
     .item-remove {
       background: none; border: none; cursor: pointer;
       color: rgba(162,40,65,0.4); font-size: 0.85rem; padding: 0.15rem;
@@ -693,6 +700,9 @@
         <button class="modal-close" onclick="closeModal('exp-add')">✕</button>
       </div>
       <div class="modal-body">
+        <div style="font-size:0.72rem;color:rgba(255,255,255,0.35);line-height:1.5;background:rgba(255,255,255,0.04);border-radius:8px;padding:0.55rem 0.75rem;">
+          Add your most recent role first — entries appear in the order you add them.
+        </div>
         <div class="modal-field">
           <div class="modal-label">Company Logo <span style="color:rgba(255,255,255,0.3);font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></div>
           <div class="logo-upload-area" onclick="document.getElementById('expLogoInput').click()">
@@ -870,6 +880,8 @@
     let currentOfficeAvatarUrl = '';
     let pendingExpLogoFile = null;
     let pendingEduLogoFile = null;
+    let editingExpId = null;
+    let editingEduId = null;
     let selectedLinkColor = '#1877F2';
 
     const LINK_COLORS = [
@@ -908,12 +920,18 @@
         document.getElementById('toolsEdit').value  = (officeData.tools  || []).join('\n');
       }
       if (key === 'exp-add') {
+        editingExpId = null;
+        document.querySelector('#modalExpAdd .modal-title').innerHTML = '<i class="ti ti-briefcase"></i> Add Experience';
+        document.querySelector('#modalExpAdd .modal-btn-save').textContent = 'Add';
         ['expRole','expCompany','expDates','expDesc'].forEach(id => document.getElementById(id).value = '');
         pendingExpLogoFile = null;
         document.getElementById('expLogoPreview').style.display = 'none';
         document.getElementById('expLogoIcon').style.display = '';
       }
       if (key === 'edu-add') {
+        editingEduId = null;
+        document.querySelector('#modalEduAdd .modal-title').innerHTML = '<i class="ti ti-school"></i> Add Education';
+        document.querySelector('#modalEduAdd .modal-btn-save').textContent = 'Add';
         ['eduName','eduDegree','eduDates'].forEach(id => document.getElementById(id).value = '');
         pendingEduLogoFile = null;
         document.getElementById('eduLogoPreview').style.display = 'none';
@@ -1069,6 +1087,24 @@
       reader.readAsDataURL(file);
     }
 
+    function openEditExp(id) {
+      const item = (officeData.experience || []).find(e => e.id === id);
+      if (!item) return;
+      editingExpId = id;
+      document.querySelector('#modalExpAdd .modal-title').innerHTML = '<i class="ti ti-pencil"></i> Edit Experience';
+      document.querySelector('#modalExpAdd .modal-btn-save').textContent = 'Save';
+      document.getElementById('expRole').value    = item.role    || '';
+      document.getElementById('expCompany').value = item.company || '';
+      document.getElementById('expDates').value   = item.dates   || '';
+      document.getElementById('expDesc').value    = item.desc    || '';
+      pendingExpLogoFile = null;
+      const prev = document.getElementById('expLogoPreview');
+      const icon = document.getElementById('expLogoIcon');
+      if (item.logo_url) { prev.src = item.logo_url; prev.style.display = ''; icon.style.display = 'none'; }
+      else               { prev.style.display = 'none'; icon.style.display = ''; }
+      document.getElementById('modalExpAdd').classList.add('open');
+    }
+
     async function addExperience() {
       const role    = document.getElementById('expRole').value.trim();
       const company = document.getElementById('expCompany').value.trim();
@@ -1076,11 +1112,12 @@
       const desc    = document.getElementById('expDesc').value.trim();
       if (!role) { document.getElementById('expRole').focus(); return; }
 
-      const id = Date.now();
       let logo_url = '';
+      const logoId = editingExpId || Date.now();
+
       if (pendingExpLogoFile) {
         const ext  = pendingExpLogoFile.name.split('.').pop();
-        const path = `${currentUser.id}/exp-logos/${id}.${ext}`;
+        const path = `${currentUser.id}/exp-logos/${logoId}.${ext}`;
         const { error } = await sb.storage.from('media').upload(path, pendingExpLogoFile, { upsert: true, contentType: pendingExpLogoFile.type });
         if (!error) {
           const { data } = sb.storage.from('media').getPublicUrl(path);
@@ -1089,7 +1126,17 @@
       }
 
       officeData.experience = officeData.experience || [];
-      officeData.experience.unshift({ id, role, company, dates, desc, logo_url });
+
+      if (editingExpId) {
+        const idx = officeData.experience.findIndex(e => e.id === editingExpId);
+        if (idx !== -1) {
+          const existing = officeData.experience[idx];
+          officeData.experience[idx] = { ...existing, role, company, dates, desc, ...(logo_url ? { logo_url } : {}) };
+        }
+      } else {
+        officeData.experience.push({ id: logoId, role, company, dates, desc, logo_url });
+      }
+
       await persist();
       renderExperience();
       closeModal('exp-add');
@@ -1126,6 +1173,7 @@
             ${e.dates   ? `<div class="timeline-dates">${esc(e.dates)}</div>` : ''}
             ${e.desc    ? `<div class="timeline-desc">${esc(e.desc)}</div>` : ''}
           </div>
+          <button class="item-edit" onclick="openEditExp(${e.id})" title="Edit"><i class="ti ti-pencil"></i></button>
           <button class="item-remove" onclick="removeExperience(${e.id})" title="Remove"><i class="ti ti-x"></i></button>`;
         list.appendChild(div);
       });
@@ -1145,17 +1193,34 @@
       reader.readAsDataURL(file);
     }
 
+    function openEditEdu(id) {
+      const item = (officeData.education || []).find(e => e.id === id);
+      if (!item) return;
+      editingEduId = id;
+      document.querySelector('#modalEduAdd .modal-title').innerHTML = '<i class="ti ti-pencil"></i> Edit Education';
+      document.querySelector('#modalEduAdd .modal-btn-save').textContent = 'Save';
+      document.getElementById('eduName').value   = item.name   || '';
+      document.getElementById('eduDegree').value = item.degree || '';
+      document.getElementById('eduDates').value  = item.dates  || '';
+      pendingEduLogoFile = null;
+      const prev = document.getElementById('eduLogoPreview');
+      const icon = document.getElementById('eduLogoIcon');
+      if (item.logo_url) { prev.src = item.logo_url; prev.style.display = ''; icon.style.display = 'none'; }
+      else               { prev.style.display = 'none'; icon.style.display = ''; }
+      document.getElementById('modalEduAdd').classList.add('open');
+    }
+
     async function addEducation() {
       const name   = document.getElementById('eduName').value.trim();
       const degree = document.getElementById('eduDegree').value.trim();
       const dates  = document.getElementById('eduDates').value.trim();
       if (!name) { document.getElementById('eduName').focus(); return; }
 
-      const id = Date.now();
+      const logoId = editingEduId || Date.now();
       let logo_url = '';
       if (pendingEduLogoFile) {
         const ext  = pendingEduLogoFile.name.split('.').pop();
-        const path = `${currentUser.id}/edu-logos/${id}.${ext}`;
+        const path = `${currentUser.id}/edu-logos/${logoId}.${ext}`;
         const { error } = await sb.storage.from('media').upload(path, pendingEduLogoFile, { upsert: true, contentType: pendingEduLogoFile.type });
         if (!error) {
           const { data } = sb.storage.from('media').getPublicUrl(path);
@@ -1164,7 +1229,17 @@
       }
 
       officeData.education = officeData.education || [];
-      officeData.education.push({ id, name, degree, dates, logo_url });
+
+      if (editingEduId) {
+        const idx = officeData.education.findIndex(e => e.id === editingEduId);
+        if (idx !== -1) {
+          const existing = officeData.education[idx];
+          officeData.education[idx] = { ...existing, name, degree, dates, ...(logo_url ? { logo_url } : {}) };
+        }
+      } else {
+        officeData.education.push({ id: logoId, name, degree, dates, logo_url });
+      }
+
       await persist();
       renderEducation();
       closeModal('edu-add');
@@ -1197,6 +1272,7 @@
             ${e.degree ? `<div class="edu-degree">${esc(e.degree)}</div>` : ''}
             ${e.dates  ? `<div class="edu-dates">${esc(e.dates)}</div>`  : ''}
           </div>
+          <button class="item-edit" onclick="openEditEdu(${e.id})" title="Edit"><i class="ti ti-pencil"></i></button>
           <button class="item-remove" onclick="removeEducation(${e.id})" title="Remove"><i class="ti ti-x"></i></button>`;
         list.appendChild(div);
       });
