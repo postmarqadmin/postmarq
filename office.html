@@ -961,7 +961,8 @@
 
     // ── Persist ────────────────────────────────────────────────────
     async function persist() {
-      await sb.from('profiles').upsert({ id: currentUser.id, office_data: officeData }, { onConflict: 'id' });
+      const { error } = await sb.from('profiles').upsert({ id: currentUser.id, office_data: officeData }, { onConflict: 'id' });
+      if (error) { alert('Save failed: ' + error.message); throw error; }
     }
 
     // ── Bio ────────────────────────────────────────────────────────
@@ -971,10 +972,14 @@
       officeData.location = document.getElementById('bioEditLocation').value.trim();
       officeData.bio      = document.getElementById('bioEditBio').value.trim();
 
-      const updates = { id: currentUser.id, office_data: officeData };
-      if (newName) { updates.full_name = newName; currentProfileName = newName; }
-      await sb.from('profiles').upsert(updates, { onConflict: 'id' });
+      // Save name to profiles separately so it doesn't interfere with office_data
+      if (newName && newName !== currentProfileName) {
+        const { error } = await sb.from('profiles').upsert({ id: currentUser.id, full_name: newName }, { onConflict: 'id' });
+        if (error) { alert('Could not save name: ' + error.message); return; }
+        currentProfileName = newName;
+      }
 
+      await persist();
       renderBio();
       closeModal('bio');
     }
@@ -1512,11 +1517,17 @@
       document.getElementById('bioName').textContent = currentUser.email.split('@')[0];
 
       const { data: profile } = await sb.from('profiles')
-        .select('full_name, avatar_url, handle, resume_url, resume_downloadable, office_data')
+        .select('full_name, avatar_url, handle, resume_url, resume_downloadable')
         .eq('id', currentUser.id)
         .single();
 
-      officeData = profile?.office_data || {};
+      // Fetch office_data separately so a missing column doesn't wipe the profile load
+      const { data: officeRow } = await sb.from('profiles')
+        .select('office_data')
+        .eq('id', currentUser.id)
+        .single();
+
+      officeData = officeRow?.office_data || {};
       // office_avatar_url lives inside office_data; fall back to home avatar
       const officeAvatar = officeData.office_avatar_url || profile?.avatar_url || null;
       if (officeAvatar) {
