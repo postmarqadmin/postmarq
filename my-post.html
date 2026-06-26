@@ -802,6 +802,48 @@
       padding: 0.22rem 0.4rem; transition: color 0.15s; margin-left: auto;
     }
     .site-edit-btn:hover { color: rgba(165,153,245,1); }
+    .site-rename-btn {
+      font-size: 0.65rem; font-weight: 700; color: rgba(255,255,255,0.3);
+      background: none; border: none; cursor: pointer; font-family: var(--font);
+      padding: 0.22rem 0.4rem; transition: color 0.15s;
+    }
+    .site-rename-btn:hover { color: rgba(255,255,255,0.7); }
+    .site-delete-btn {
+      font-size: 0.65rem; font-weight: 700; color: rgba(240,80,80,0.45);
+      background: none; border: none; cursor: pointer; font-family: var(--font);
+      padding: 0.22rem 0.4rem; transition: color 0.15s;
+    }
+    .site-delete-btn:hover { color: rgba(240,80,80,0.9); }
+
+    /* ── Confirm modal ── */
+    .site-modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 9999;
+      background: rgba(0,0,0,0.6); align-items: center; justify-content: center;
+    }
+    .site-modal-overlay.open { display: flex; }
+    .site-modal {
+      background: #1a1a24; border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px; padding: 1.75rem 1.5rem; width: 300px; text-align: center;
+    }
+    .site-modal h3 { font-size: 1rem; font-weight: 800; color: #fff; margin-bottom: 0.4rem; }
+    .site-modal p { font-size: 0.78rem; color: rgba(255,255,255,0.45); margin-bottom: 1.25rem; line-height: 1.5; }
+    .site-modal input {
+      width: 100%; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px; padding: 0.5rem 0.75rem; color: #fff; font-family: var(--font);
+      font-size: 0.85rem; outline: none; margin-bottom: 1rem;
+    }
+    .site-modal-actions { display: flex; gap: 0.6rem; justify-content: center; }
+    .site-modal-cancel {
+      flex: 1; padding: 0.5rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15);
+      background: none; color: rgba(255,255,255,0.5); font-family: var(--font);
+      font-size: 0.8rem; font-weight: 700; cursor: pointer;
+    }
+    .site-modal-confirm {
+      flex: 1; padding: 0.5rem; border-radius: 8px; border: none;
+      background: #e05050; color: #fff; font-family: var(--font);
+      font-size: 0.8rem; font-weight: 800; cursor: pointer;
+    }
+    .site-modal-confirm.safe { background: linear-gradient(135deg, #9b8fd4, #4ab5aa); }
 
     .sites-empty {
       padding: 1.2rem; font-size: 0.75rem; font-weight: 500;
@@ -1355,6 +1397,30 @@
   </div>
 
   <!-- Lightbox -->
+  <!-- Site delete/rename modals -->
+  <div class="site-modal-overlay" id="deleteModal">
+    <div class="site-modal">
+      <h3>Delete site?</h3>
+      <p id="deleteModalMsg">This will permanently remove the site and all its content. This cannot be undone.</p>
+      <div class="site-modal-actions">
+        <button class="site-modal-cancel" onclick="closeModals()">Cancel</button>
+        <button class="site-modal-confirm" id="deleteConfirmBtn" onclick="confirmDelete()">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="site-modal-overlay" id="renameModal">
+    <div class="site-modal">
+      <h3>Rename site</h3>
+      <p>Choose a new URL-friendly name. The old URL will stop working.</p>
+      <input type="text" id="renameInput" placeholder="new-name" />
+      <div class="site-modal-actions">
+        <button class="site-modal-cancel" onclick="closeModals()">Cancel</button>
+        <button class="site-modal-confirm safe" onclick="confirmRename()">Rename</button>
+      </div>
+    </div>
+  </div>
+
   <div class="lightbox" id="lightbox">
     <div class="lb-backdrop" onclick="lbClose()"></div>
     <div class="lb-wrap">
@@ -2185,7 +2251,9 @@
           </a>
           <div class="site-controls">
             <button class="site-toggle ${r.published ? 'published' : ''}" onclick="togglePublished('${r.room_name}', this)">${r.published ? '● Live' : '○ Private'}</button>
+            <button class="site-rename-btn" onclick="openRename('${r.room_name}')">Rename</button>
             <button class="site-edit-btn" onclick="window.location.href='/edit?site=${r.room_name}'">Edit</button>
+            <button class="site-delete-btn" onclick="openDelete('${r.room_name}')">Delete</button>
           </div>`;
         list.appendChild(row);
       });
@@ -2198,6 +2266,55 @@
       btn.classList.toggle('published', newVal);
       btn.textContent = newVal ? '● Live' : '○ Private';
     }
+
+    let _pendingRoom = '';
+
+    function openDelete(roomName) {
+      _pendingRoom = roomName;
+      document.getElementById('deleteModalMsg').textContent = `"${roomName}" and all its content will be permanently deleted. This cannot be undone.`;
+      document.getElementById('deleteModal').classList.add('open');
+    }
+
+    async function confirmDelete() {
+      if (!_pendingRoom) return;
+      const btn = document.getElementById('deleteConfirmBtn');
+      btn.textContent = 'Deleting…'; btn.disabled = true;
+      const { error } = await sb.from('rooms').delete().eq('username', currentHandle).eq('room_name', _pendingRoom);
+      btn.textContent = 'Delete'; btn.disabled = false;
+      if (error) { alert('Could not delete: ' + error.message); return; }
+      closeModals();
+      loadSites();
+    }
+
+    function openRename(roomName) {
+      _pendingRoom = roomName;
+      document.getElementById('renameInput').value = roomName;
+      document.getElementById('renameModal').classList.add('open');
+      setTimeout(() => document.getElementById('renameInput').select(), 50);
+    }
+
+    async function confirmRename() {
+      const raw = document.getElementById('renameInput').value.trim();
+      const slug = raw.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      if (!slug || slug === _pendingRoom) { closeModals(); return; }
+      const { data: existing } = await sb.from('rooms').select('room_name').eq('username', currentHandle).eq('room_name', slug).maybeSingle();
+      if (existing) { alert(`A site named "${slug}" already exists.`); return; }
+      const { error } = await sb.from('rooms').update({ room_name: slug }).eq('username', currentHandle).eq('room_name', _pendingRoom);
+      if (error) { alert('Could not rename: ' + error.message); return; }
+      closeModals();
+      loadSites();
+    }
+
+    function closeModals() {
+      document.getElementById('deleteModal').classList.remove('open');
+      document.getElementById('renameModal').classList.remove('open');
+      _pendingRoom = '';
+    }
+
+    document.getElementById('renameInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') confirmRename();
+      if (e.key === 'Escape') closeModals();
+    });
 
     async function createNewSite() {
       if (!currentHandle) { alert('Profile not loaded yet — try again in a moment.'); return; }
