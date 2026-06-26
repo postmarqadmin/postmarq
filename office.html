@@ -1521,7 +1521,7 @@
       const handle = currentProfileHandle?.replace('.postmarq','') || '';
       const { error } = await sb.from('rooms').update({ hidden_on_office: true }).eq('username', handle).eq('room_name', roomName);
       if (error) { alert('Could not hide: ' + error.message); btn.textContent = 'Hide'; btn.disabled = false; return; }
-      loadSites(handle);
+      loadMySites(handle);
     }
 
     // ── Live preview wiring for link modal ─────────────────────────
@@ -1575,7 +1575,7 @@
       renderResumeUI(profile?.resume_url || null, profile?.resume_downloadable !== false);
 
       if (currentProfileHandle) {
-        loadMySites(currentProfileHandle);
+        loadMySites(currentProfileHandle.replace('.postmarq', ''));
       }
 
       updateLinkSwatches();
