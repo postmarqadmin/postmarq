@@ -1,5 +1,3 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
-
 const cors = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -12,33 +10,12 @@ Deno.serve(async (req) => {
     const { prompt, html, css, js } = await req.json()
     if (!prompt) return new Response('Missing prompt', { status: 400, headers: cors })
 
-    // Get API key — skip auth check for now, just use Postmarq's key
     const apiKey = Deno.env.get('ANTHROPIC_API_KEY')
     if (!apiKey) return new Response('No API key configured', { status: 500, headers: cors })
 
-    const systemPrompt = `You are a code assistant inside a web site editor. The user describes a change they want to make to their site. You receive their current HTML, CSS, and JS as separate strings.
+    const systemPrompt = `You are a code assistant inside a web site editor. The user describes a change they want to make to their site. You receive their current HTML, CSS, and JS as separate strings. Return ONLY a raw JSON object with exactly these three keys: {"html": "...", "css": "...", "js": "..."}. No markdown, no code fences, no explanation. Always return complete code, never truncate. If everything is in the HTML tab, keep that pattern.`
 
-Return ONLY a raw JSON object — no markdown, no code fences, no explanation — with exactly these three keys:
-{"html": "...", "css": "...", "js": "..."}
-
-Rules:
-- Always return complete code for each tab, never truncate
-- If a tab is empty and the change doesn't affect it, return it unchanged (empty string is fine)
-- If everything is in the HTML tab (inline style and script tags), keep that pattern
-- Preserve all existing functionality unless the user explicitly asks to remove something`
-
-    const userMessage = `Current code:
-
-HTML:
-${html || '(empty)'}
-
-CSS:
-${css || '(empty)'}
-
-JS:
-${js || '(empty)'}
-
-Instruction: ${prompt}`
+    const userMessage = `HTML:\n${html || '(empty)'}\n\nCSS:\n${css || '(empty)'}\n\nJS:\n${js || '(empty)'}\n\nInstruction: ${prompt}`
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -62,8 +39,6 @@ Instruction: ${prompt}`
 
     const data = await response.json()
     const text = data.content?.[0]?.text || ''
-
-    // Strip markdown code fences if Claude wrapped the JSON
     const cleaned = text.replace(/^```(?:json)?\n?/i, '').replace(/\n?```$/i, '').trim()
 
     return new Response(cleaned, {
