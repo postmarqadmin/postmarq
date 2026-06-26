@@ -1549,8 +1549,7 @@
       const { data: officeRow } = await sb.from('profiles')
         .select('office_data')
         .eq('id', currentUser.id)
-        .single()
-        .catch(() => ({ data: null }));
+        .single();
 
 
       officeData = officeRow?.office_data || {};
