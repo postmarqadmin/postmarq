@@ -1696,7 +1696,7 @@
           <span class="fc-label">Showing</span>
           <select class="fc-select" id="fcAudience" onchange="setFeedAudience(this.value)">
             <option value="everyone">Everyone</option>
-            <option value="friends">Friends</option>
+            <option value="friends" selected>Friends</option>
             <option value="me">Just Me</option>
           </select>
           <div class="fc-divider"></div>
@@ -2150,7 +2150,7 @@
     let localKey = null;
     let cachedPosts = null;
     let cachedMyStamps = new Set();
-    let feedPrefs = { audience: 'everyone', frequency: 'day' };
+    let feedPrefs = { audience: 'friends', frequency: 'day' };
     const FREQ_MS = { '1h': 3600000, '12h': 43200000, 'day': 86400000, 'week': 604800000 };
     let weeklyRendered = false;
 
