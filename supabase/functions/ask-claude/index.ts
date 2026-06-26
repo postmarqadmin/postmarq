@@ -1,4 +1,4 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -12,27 +12,8 @@ Deno.serve(async (req) => {
     const { prompt, html, css, js } = await req.json()
     if (!prompt) return new Response('Missing prompt', { status: 400, headers: cors })
 
-    // Auth check
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader) return new Response('Unauthorized', { status: 401, headers: cors })
-
-    const sb = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_ANON_KEY')!,
-      { global: { headers: { Authorization: authHeader } } }
-    )
-
-    const { data: { user }, error: authError } = await sb.auth.getUser()
-    if (authError || !user) return new Response('Unauthorized', { status: 401, headers: cors })
-
-    // Plan A / Plan B: use user's own key if they have one, else fall back to Postmarq's key
-    const { data: profile } = await sb
-      .from('profiles')
-      .select('anthropic_api_key')
-      .eq('id', user.id)
-      .single()
-
-    const apiKey = profile?.anthropic_api_key || Deno.env.get('ANTHROPIC_API_KEY')
+    // Get API key — skip auth check for now, just use Postmarq's key
+    const apiKey = Deno.env.get('ANTHROPIC_API_KEY')
     if (!apiKey) return new Response('No API key configured', { status: 500, headers: cors })
 
     const systemPrompt = `You are a code assistant inside a web site editor. The user describes a change they want to make to their site. You receive their current HTML, CSS, and JS as separate strings.
@@ -43,7 +24,7 @@ Return ONLY a raw JSON object — no markdown, no code fences, no explanation �
 Rules:
 - Always return complete code for each tab, never truncate
 - If a tab is empty and the change doesn't affect it, return it unchanged (empty string is fine)
-- If everything is in the HTML tab (inline style and script tags), keep that pattern — don't split it out
+- If everything is in the HTML tab (inline style and script tags), keep that pattern
 - Preserve all existing functionality unless the user explicitly asks to remove something`
 
     const userMessage = `Current code:
@@ -82,11 +63,8 @@ Instruction: ${prompt}`
     const data = await response.json()
     const text = data.content?.[0]?.text || ''
 
-    // Strip markdown code fences if Claude wrapped the JSON anyway
+    // Strip markdown code fences if Claude wrapped the JSON
     const cleaned = text.replace(/^```(?:json)?\n?/i, '').replace(/\n?```$/i, '').trim()
-
-    // Validate it's parseable JSON before sending back
-    JSON.parse(cleaned)
 
     return new Response(cleaned, {
       headers: { ...cors, 'Content-Type': 'application/json' },
