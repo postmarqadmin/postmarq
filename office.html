@@ -376,24 +376,28 @@
       background: linear-gradient(90deg, #a599f5, #EF9F27);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
-    .sites-list { display: flex; flex-direction: column; padding: 0.75rem 0.9rem; gap: 0.6rem; }
-    .site-btn {
-      display: block; width: 100%; text-decoration: none; text-align: left;
-      position: relative; border-radius: 12px; padding: 0.85rem 1rem;
-      background: linear-gradient(135deg, rgba(127,119,221,0.18) 0%, rgba(239,159,39,0.12) 100%);
-      border: 1px solid rgba(127,119,221,0.28);
-      transition: all 0.2s;
+    .sites-list { display: flex; flex-direction: column; padding: 0.6rem 0.85rem; gap: 0.4rem; }
+    .site-card {
+      display: flex; align-items: center; gap: 0.55rem;
+      border-radius: 9px; padding: 0.42rem 0.6rem 0.42rem 0;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+      overflow: hidden; transition: border-color 0.15s;
     }
-    .site-btn:hover { border-color: rgba(165,153,245,0.55); transform: translateY(-1px); }
-    .site-btn-name {
-      font-size: 0.95rem; font-weight: 900;
-      background: linear-gradient(90deg, #e8e0ff, #f5c87a);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    .site-card:hover { border-color: rgba(255,255,255,0.14); }
+    .site-card-accent { width: 3px; min-width: 3px; align-self: stretch; border-radius: 0 2px 2px 0; background: var(--sc, #9b8fd4); margin-right: 0.3rem; }
+    .site-status-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; background: rgba(255,255,255,0.18); }
+    .site-status-dot.live { background: #4ed494; box-shadow: 0 0 5px rgba(78,212,148,0.7); }
+    .site-card-name {
+      flex: 1; font-size: 0.82rem; font-weight: 700; color: rgba(255,255,255,0.82);
+      text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .site-btn-url { font-size: 0.65rem; color: rgba(255,255,255,0.28); margin-top: 0.15rem; }
-    .site-status { font-size: 0.6rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 0.35rem; }
-    .site-status.pub { color: #4ed494; }
-    .site-status.priv { color: rgba(255,255,255,0.25); }
+    .site-card-name:hover { color: #fff; }
+    .site-hide-btn {
+      background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.2);
+      font-size: 0.68rem; padding: 0 0.45rem; line-height: 1; flex-shrink: 0;
+      font-family: var(--font); font-weight: 700; transition: color 0.15s; white-space: nowrap;
+    }
+    .site-hide-btn:hover { color: rgba(240,80,80,0.8); }
     .sites-empty { padding: 1.2rem; font-size: 0.75rem; color: rgba(255,255,255,0.22); font-style: italic; text-align: center; }
 
     /* Business card preview */
@@ -1483,29 +1487,41 @@
     // ── My Sites ───────────────────────────────────────────────────
     async function loadMySites(handle) {
       const { data: rooms } = await sb.from('rooms')
-        .select('room_name, published')
+        .select('room_name, display_name, published, card_color, hidden_on_office')
         .eq('username', handle)
         .order('created_at', { ascending: false });
       const el = document.getElementById('sitesList');
-      if (!rooms || !rooms.length) {
-        el.innerHTML = '<div class="sites-empty">No sites yet — create one from your Home page.</div>';
+      const visible = (rooms || []).filter(r => !r.hidden_on_office);
+      if (!visible.length) {
+        el.innerHTML = '<div class="sites-empty">No sites shown here. Manage visibility from Home.</div>';
         return;
       }
       el.innerHTML = '';
       const list = document.createElement('div');
       list.className = 'sites-list';
-      rooms.forEach(r => {
-        const url = `${window.location.origin}/${handle}/${r.room_name}`;
-        const item = document.createElement('div');
-        item.innerHTML = `
-          <a class="site-btn" href="${esc(url)}" target="_blank">
-            <div class="site-btn-name">${esc(r.room_name)}</div>
-            <div class="site-btn-url">${esc(url)}</div>
-            <div class="site-status ${r.published ? 'pub' : 'priv'}">${r.published ? 'Published' : 'Private'}</div>
-          </a>`;
-        list.appendChild(item);
+      visible.forEach(r => {
+        const name = r.display_name || r.room_name;
+        const color = r.card_color || '#9b8fd4';
+        const card = document.createElement('div');
+        card.className = 'site-card';
+        card.style.setProperty('--sc', color);
+        card.title = `postmarq.org/${handle}/${r.room_name}`;
+        card.innerHTML = `
+          <div class="site-card-accent"></div>
+          <span class="site-status-dot ${r.published ? 'live' : ''}"></span>
+          <a class="site-card-name" href="/${handle}/${r.room_name}" target="_blank">${esc(name)}</a>
+          <button class="site-hide-btn" onclick="hideFromOffice('${r.room_name}', this)" title="Hide from Office">Hide</button>`;
+        list.appendChild(card);
       });
       el.appendChild(list);
+    }
+
+    async function hideFromOffice(roomName, btn) {
+      btn.textContent = '…'; btn.disabled = true;
+      const handle = currentProfileHandle?.replace('.postmarq','') || '';
+      const { error } = await sb.from('rooms').update({ hidden_on_office: true }).eq('username', handle).eq('room_name', roomName);
+      if (error) { alert('Could not hide: ' + error.message); btn.textContent = 'Hide'; btn.disabled = false; return; }
+      loadSites(handle);
     }
 
     // ── Live preview wiring for link modal ─────────────────────────

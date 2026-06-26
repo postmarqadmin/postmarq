@@ -1456,6 +1456,9 @@
         <button class="site-sheet-btn" onclick="showSheetRename()">
           <span class="site-sheet-btn-icon">✦</span> Rename
         </button>
+        <button class="site-sheet-btn" id="sheetOfficeBtn" onclick="sheetToggleOffice()">
+          <span class="site-sheet-btn-icon">💼</span><span id="sheetOfficeLabel">Hide from Office</span>
+        </button>
         <div class="site-sheet-divider"></div>
         <button class="site-sheet-btn danger" onclick="showSheetDelete()">
           <span class="site-sheet-btn-icon">✕</span> Delete site
@@ -2289,7 +2292,7 @@
 
     // ── My Sites ──
     const SITE_COLORS = ['#9b8fd4','#4ab5aa','#e8992a','#c97ae0','#4a72c4','#2ec48a','#f05a5a','#5a8fa8'];
-    let _sheetRoom = '', _sheetPublished = false, _sheetColor = SITE_COLORS[0], _newSiteColor = SITE_COLORS[0];
+    let _sheetRoom = '', _sheetPublished = false, _sheetColor = SITE_COLORS[0], _newSiteColor = SITE_COLORS[0], _sheetHiddenOffice = false;
 
     function buildSwatches(containerId, currentColor, onPick) {
       const row = document.getElementById(containerId);
@@ -2330,10 +2333,12 @@
 
     async function openSiteMenu(roomName, e) {
       e.stopPropagation();
-      const { data: r } = await sb.from('rooms').select('display_name, published, card_color').eq('username', currentHandle).eq('room_name', roomName).single();
-      _sheetRoom      = roomName;
-      _sheetPublished = r?.published || false;
-      _sheetColor     = r?.card_color || SITE_COLORS[0];
+      const { data: r } = await sb.from('rooms').select('display_name, published, card_color, hidden_on_office').eq('username', currentHandle).eq('room_name', roomName).single();
+      _sheetRoom          = roomName;
+      _sheetPublished     = r?.published || false;
+      _sheetColor         = r?.card_color || SITE_COLORS[0];
+      _sheetHiddenOffice  = r?.hidden_on_office || false;
+      document.getElementById('sheetOfficeLabel').textContent = _sheetHiddenOffice ? 'Show on Office' : 'Hide from Office';
       document.getElementById('sheetTitle').textContent = r?.display_name || roomName;
       document.getElementById('sheetToggleLabel').textContent = _sheetPublished ? 'Make Private' : 'Make Live';
       document.getElementById('sheetToggleBtn').querySelector('.site-sheet-btn-icon').textContent = _sheetPublished ? '●' : '○';
@@ -2398,6 +2403,12 @@
 
     function sheetEdit() {
       window.location.href = `/edit?site=${_sheetRoom}`;
+    }
+
+    async function sheetToggleOffice() {
+      _sheetHiddenOffice = !_sheetHiddenOffice;
+      await sb.from('rooms').update({ hidden_on_office: _sheetHiddenOffice }).eq('username', currentHandle).eq('room_name', _sheetRoom);
+      document.getElementById('sheetOfficeLabel').textContent = _sheetHiddenOffice ? 'Show on Office' : 'Hide from Office';
     }
 
     function createNewSite() {
