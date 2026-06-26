@@ -417,6 +417,17 @@
     </div>
   </div>
 
+  <!-- Room view — full-screen when visiting /:username/:room -->
+  <div id="roomView" style="display:none;position:fixed;inset:0;z-index:200;background:#111;flex-direction:column;">
+    <div id="roomBar" style="flex-shrink:0;height:42px;background:rgba(20,20,26,0.96);border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;padding:0 1rem;gap:0.75rem;font-family:'Nunito',sans-serif;">
+      <a id="roomBackBtn" href="#" style="font-size:0.75rem;font-weight:800;color:rgba(255,255,255,0.45);text-decoration:none;letter-spacing:0.02em;">← Back to Post</a>
+      <span style="color:rgba(255,255,255,0.15);font-size:0.7rem;">postmarq.org/</span><span id="roomUrlLabel" style="color:rgba(255,255,255,0.45);font-size:0.7rem;font-family:monospace;"></span>
+      <div style="flex:1"></div>
+      <a id="roomEditBtn" href="#" style="display:none;font-size:0.72rem;font-weight:800;padding:0.3rem 0.85rem;border-radius:8px;background:linear-gradient(135deg,rgba(155,143,212,0.85),rgba(74,181,170,0.85));color:#fff;text-decoration:none;">Edit</a>
+    </div>
+    <iframe id="roomFrame" style="flex:1;border:none;width:100%;background:#fff;" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+  </div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const SUPABASE_URL = 'https://udlbdccvspxqlzizpkda.supabase.co';
@@ -460,6 +471,46 @@
     const segments = window.location.pathname.replace(/^\//, '').split('/');
     username = segments[0];
     if (!username || RESERVED.has(username.toLowerCase())) { window.location.replace('/'); return; }
+
+    // ── Room mode: /:username/:room ──
+    const roomName = segments[1];
+    if (roomName) {
+      document.title = `${roomName} — ${username} — Postmarq`;
+      const { data: { session } } = await sb.auth.getSession();
+      const viewerId = session?.user?.id || null;
+
+      const { data: profile } = await sb.from('profiles')
+        .select('id, handle')
+        .eq('handle', username + '.postmarq')
+        .maybeSingle();
+
+      if (!profile) { window.location.replace('/' + username); return; }
+      const isOwner = viewerId === profile.id;
+
+      const { data: room } = await sb.from('rooms')
+        .select('html, css, js, published')
+        .eq('username', username)
+        .eq('room_name', roomName)
+        .maybeSingle();
+
+      if (!room || (!room.published && !isOwner)) {
+        document.title = username + ' — Postmarq';
+      } else {
+        const doc = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${room.css || ''}</style></head><body>${room.html || ''}<script>${room.js || ''}<\/script></body></html>`;
+        const rv = document.getElementById('roomView');
+        rv.style.display = 'flex';
+        document.getElementById('roomFrame').srcdoc = doc;
+        document.getElementById('roomUrlLabel').textContent = `${username}/${roomName}`;
+        document.getElementById('roomBackBtn').href = '/' + username;
+        if (isOwner) {
+          const eb = document.getElementById('roomEditBtn');
+          eb.style.display = '';
+          eb.href = `/edit?site=${roomName}`;
+        }
+        return;
+      }
+    }
+
     document.title = username + ' — Postmarq';
 
     // Check auth in parallel with profile load

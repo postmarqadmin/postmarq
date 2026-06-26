@@ -19,6 +19,8 @@
   "rewrites": [
     { "source": "/home", "destination": "/my-post.html" },
     { "source": "/login", "destination": "/login.html" },
+    { "source": "/edit", "destination": "/edit.html" },
+    { "source": "/seed-demos", "destination": "/seed-demos.html" },
     { "source": "/((?!.*\\.).*)", "destination": "/viewer.html" }
   ]
 }

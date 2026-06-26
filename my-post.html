@@ -2185,7 +2185,7 @@
           </a>
           <div class="site-controls">
             <button class="site-toggle ${r.published ? 'published' : ''}" onclick="togglePublished('${r.room_name}', this)">${r.published ? '● Live' : '○ Private'}</button>
-            <button class="site-edit-btn" onclick="window.location.href='/${currentHandle}/${r.room_name}'">Edit</button>
+            <button class="site-edit-btn" onclick="window.location.href='/edit?site=${r.room_name}'">Edit</button>
           </div>`;
         list.appendChild(row);
       });
@@ -2209,7 +2209,7 @@
       if (!slug) return;
       const { error } = await sb.from('rooms').insert({ user_id: currentUser.id, username: currentHandle, room_name: slug, html: '', css: '', js: '' });
       if (error) { alert('Could not create site: ' + error.message); return; }
-      window.location.href = `/${currentHandle}/${slug}`;
+      window.location.href = `/edit?site=${slug}`;
     }
 
     // ── Widget Engine ──────────────────────────────────────────

@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Seed Demo Sites — Postmarq</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Nunito', sans-serif; background: #0f0f14; color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 1.5rem; padding: 2rem; }
+    h1 { font-size: 1.3rem; font-weight: 900; background: linear-gradient(90deg, #9b8fd4, #4ab5aa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    p { color: rgba(255,255,255,0.4); font-size: 0.82rem; text-align: center; max-width: 380px; }
+    .log { width: 100%; max-width: 480px; background: #1a1a22; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1rem 1.25rem; font-size: 0.8rem; line-height: 1.8; color: rgba(255,255,255,0.55); min-height: 120px; font-family: monospace; }
+    .log .ok  { color: #4ab5aa; }
+    .log .err { color: #e05a5a; }
+    .btn { padding: 0.6rem 2rem; border-radius: 10px; border: none; background: linear-gradient(135deg, #9b8fd4, #4ab5aa); color: #fff; font-family: 'Nunito', sans-serif; font-size: 0.9rem; font-weight: 800; cursor: pointer; }
+    .btn:disabled { opacity: 0.4; cursor: default; }
+    a.back { font-size: 0.75rem; color: rgba(255,255,255,0.3); text-decoration: none; margin-top: 0.5rem; }
+    a.back:hover { color: rgba(255,255,255,0.6); }
+  </style>
+</head>
+<body>
+  <h1>Seed Demo Sites</h1>
+  <p>This will create three example sites on your Postmarq account: <strong>biz</strong>, <strong>gridiron</strong>, and <strong>star-catcher</strong>.</p>
+  <div class="log" id="log">Waiting…</div>
+  <button class="btn" id="seedBtn" onclick="seed()">Create Demo Sites</button>
+  <a class="back" href="/home">← Back to My Post</a>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const sb = supabase.createClient(
+      'https://udlbdccvspxqlzizpkda.supabase.co',
+      'sb_publishable_co1yq79BF8oR9Mg651DG5w_ESuACdqn'
+    );
+
+    function log(msg, type = '') {
+      const el = document.getElementById('log');
+      if (el.textContent === 'Waiting…') el.textContent = '';
+      el.innerHTML += `<div class="${type}">${msg}</div>`;
+    }
+
+    const DEMOS = [
+      {
+        slug: 'biz',
+        html: `<div class="hero">
+  <div class="hero-badge">Est. 2024</div>
+  <h1>Contreras<span class="accent">Creative</span></h1>
+  <p class="tagline">Brand strategy, web design, and digital storytelling for the next generation of founders.</p>
+  <div class="cta-row">
+    <a class="btn-primary" href="mailto:dave@example.com">Work With Us</a>
+    <a class="btn-ghost" href="#work">See Our Work</a>
+  </div>
+</div>
+
+<section class="services" id="services">
+  <div class="section-label">What We Do</div>
+  <div class="grid">
+    <div class="card"><div class="icon">✦</div><h3>Brand Identity</h3><p>Logos, color systems, and voice that feel unmistakably yours.</p></div>
+    <div class="card"><div class="icon">◈</div><h3>Web Design</h3><p>Hand-crafted sites that load fast and convert better.</p></div>
+    <div class="card"><div class="icon">◉</div><h3>Content Strategy</h3><p>Story-first content that builds trust before it asks for anything.</p></div>
+    <div class="card"><div class="icon">⬡</div><h3>Growth Consulting</h3><p>Honest advice on where to focus when you can't do everything.</p></div>
+  </div>
+</section>
+
+<section class="work" id="work">
+  <div class="section-label">Recent Work</div>
+  <div class="projects">
+    <div class="project-card" style="background:linear-gradient(135deg,#1a0a2e,#2d1b4e)">
+      <div class="proj-label">Brand Identity</div>
+      <div class="proj-name">Oasis Coffee Co.</div>
+      <div class="proj-desc">Full rebrand for a Phoenix café expanding to three locations.</div>
+    </div>
+    <div class="project-card" style="background:linear-gradient(135deg,#0a1f1a,#0d3326)">
+      <div class="proj-label">Web Design</div>
+      <div class="proj-name">Vela Architecture</div>
+      <div class="proj-desc">Portfolio site with custom project galleries and inquiry flow.</div>
+    </div>
+    <div class="project-card" style="background:linear-gradient(135deg,#1f1208,#3b2010)">
+      <div class="proj-label">Content Strategy</div>
+      <div class="proj-name">Sundial Wellness</div>
+      <div class="proj-desc">6-month editorial calendar + social voice guide.</div>
+    </div>
+  </div>
+</section>
+
+<section class="contact">
+  <div class="contact-inner">
+    <h2>Ready to build something real?</h2>
+    <p>We take on 3–4 projects per quarter. Let's talk before the next one fills up.</p>
+    <a class="btn-primary" href="mailto:dave@example.com">Get In Touch</a>
+  </div>
+</section>
+
+<footer>
+  <div>© 2025 Contreras Creative · Phoenix, AZ</div>
+  <div class="footer-links"><a href="#">Instagram</a> · <a href="#">LinkedIn</a> · <a href="#">Postmarq</a></div>
+</footer>`,
+        css: `*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0d0d14;
+  --surface: #13131d;
+  --border: rgba(255,255,255,0.07);
+  --accent: #c9a84c;
+  --teal: #3ec8b8;
+  --ink: rgba(255,255,255,0.92);
+  --ink2: rgba(255,255,255,0.55);
+  --ink3: rgba(255,255,255,0.28);
+  --font: 'Nunito', system-ui, sans-serif;
+}
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+body { font-family: var(--font); background: var(--bg); color: var(--ink); line-height: 1.6; }
+
+/* Hero */
+.hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 4rem 2rem; background: radial-gradient(ellipse at 60% 40%, rgba(201,168,76,0.08) 0%, transparent 70%), radial-gradient(ellipse at 20% 80%, rgba(62,200,184,0.07) 0%, transparent 60%); }
+.hero-badge { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.25); border-radius: 999px; padding: 0.3rem 0.9rem; margin-bottom: 1.75rem; }
+.hero h1 { font-size: clamp(2.8rem, 8vw, 5.5rem); font-weight: 900; line-height: 1.05; letter-spacing: -0.03em; margin-bottom: 1.25rem; }
+.accent { color: var(--accent); }
+.tagline { font-size: clamp(1rem, 2.5vw, 1.2rem); color: var(--ink2); max-width: 520px; margin-bottom: 2.5rem; line-height: 1.7; }
+.cta-row { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+.btn-primary { background: var(--accent); color: #0d0d14; font-weight: 800; font-size: 0.9rem; padding: 0.7rem 1.75rem; border-radius: 10px; text-decoration: none; transition: opacity 0.15s; }
+.btn-primary:hover { opacity: 0.85; }
+.btn-ghost { border: 1px solid rgba(255,255,255,0.2); color: var(--ink2); font-weight: 700; font-size: 0.9rem; padding: 0.7rem 1.75rem; border-radius: 10px; text-decoration: none; transition: all 0.15s; }
+.btn-ghost:hover { border-color: rgba(255,255,255,0.4); color: var(--ink); }
+
+/* Sections */
+section { padding: 5rem 2rem; max-width: 1100px; margin: 0 auto; }
+.section-label { font-size: 0.65rem; font-weight: 900; letter-spacing: 0.18em; text-transform: uppercase; color: var(--teal); margin-bottom: 2.5rem; }
+
+/* Services Grid */
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.75rem 1.5rem; transition: border-color 0.2s; }
+.card:hover { border-color: rgba(201,168,76,0.3); }
+.icon { font-size: 1.5rem; margin-bottom: 1rem; color: var(--accent); }
+.card h3 { font-size: 1rem; font-weight: 800; margin-bottom: 0.5rem; }
+.card p { font-size: 0.82rem; color: var(--ink2); line-height: 1.6; }
+
+/* Projects */
+.projects { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; }
+.project-card { border-radius: 16px; padding: 2rem 1.75rem; border: 1px solid rgba(255,255,255,0.07); transition: transform 0.2s; }
+.project-card:hover { transform: translateY(-3px); }
+.proj-label { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--teal); margin-bottom: 0.75rem; }
+.proj-name { font-size: 1.25rem; font-weight: 900; margin-bottom: 0.5rem; }
+.proj-desc { font-size: 0.82rem; color: var(--ink2); line-height: 1.6; }
+
+/* Contact */
+.contact { padding: 5rem 2rem; }
+.contact-inner { max-width: 560px; margin: 0 auto; text-align: center; }
+.contact-inner h2 { font-size: clamp(1.5rem, 4vw, 2.2rem); font-weight: 900; margin-bottom: 0.75rem; }
+.contact-inner p { color: var(--ink2); font-size: 0.9rem; margin-bottom: 2rem; }
+
+/* Footer */
+footer { border-top: 1px solid var(--border); padding: 1.5rem 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; max-width: 1100px; margin: 0 auto; font-size: 0.72rem; color: var(--ink3); }
+.footer-links a { color: var(--ink3); text-decoration: none; }
+.footer-links a:hover { color: var(--ink2); }`,
+        js: ``
+      },
+      {
+        slug: 'gridiron',
+        html: `<header>
+  <div class="header-inner">
+    <div class="league-badge">🏈</div>
+    <div>
+      <div class="league-name">Gridiron Glory League</div>
+      <div class="league-sub">Season 7 · 12 Teams · $50 Buy-in</div>
+    </div>
+    <div class="header-spacer"></div>
+    <div class="week-pill">Week 14</div>
+  </div>
+</header>
+
+<main>
+  <!-- Matchup of the Week -->
+  <section class="matchup-banner">
+    <div class="matchup-label">🔥 Matchup of the Week</div>
+    <div class="matchup-teams">
+      <div class="team-side">
+        <div class="team-avatar" style="background:linear-gradient(135deg,#1a3a6b,#2563c4)">DC</div>
+        <div class="team-name">Desert Cobras</div>
+        <div class="team-score">142.6</div>
+        <div class="team-manager">Dave M.</div>
+      </div>
+      <div class="vs">VS</div>
+      <div class="team-side">
+        <div class="team-avatar" style="background:linear-gradient(135deg,#6b1a1a,#c42525)">FH</div>
+        <div class="team-name">Friday Night Hogs</div>
+        <div class="team-score">138.4</div>
+        <div class="team-manager">Carlos R.</div>
+      </div>
+    </div>
+    <div class="matchup-note">Final · Desert Cobras win by 4.2</div>
+  </section>
+
+  <div class="two-col">
+    <!-- Standings -->
+    <section class="standings-card">
+      <div class="card-label">📊 Standings</div>
+      <table class="standings-table">
+        <thead><tr><th>#</th><th>Team</th><th>W</th><th>L</th><th>PF</th></tr></thead>
+        <tbody>
+          <tr class="rank-1"><td>1</td><td>Desert Cobras 🐍</td><td>10</td><td>3</td><td>1,842</td></tr>
+          <tr><td>2</td><td>Phoenix Fireballs</td><td>9</td><td>4</td><td>1,790</td></tr>
+          <tr><td>3</td><td>Friday Night Hogs</td><td>8</td><td>5</td><td>1,755</td></tr>
+          <tr><td>4</td><td>Touchdown Ninjas</td><td>7</td><td>6</td><td>1,698</td></tr>
+          <tr><td>5</td><td>Blitz Brothers</td><td>6</td><td>7</td><td>1,632</td></tr>
+          <tr><td>6</td><td>End Zone Elites</td><td>5</td><td>8</td><td>1,601</td></tr>
+          <tr class="cutline"><td colspan="5" style="text-align:center;font-size:0.68rem;color:var(--red);padding:0.35rem">── Playoff Cutline ──</td></tr>
+          <tr><td>7</td><td>The Benchmarks</td><td>4</td><td>9</td><td>1,558</td></tr>
+          <tr><td>8</td><td>Hail Mary Squad</td><td>3</td><td>10</td><td>1,490</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Right Rail -->
+    <div class="right-rail">
+      <!-- Trash Talk Board -->
+      <section class="trash-card">
+        <div class="card-label">🗣️ Trash Talk Board</div>
+        <div class="trash-feed">
+          <div class="trash-msg">
+            <div class="trash-author">Carlos R.</div>
+            <div class="trash-text">Snake eyes! Lucky win Dave, my RB2 was on a bye 😤</div>
+            <div class="trash-time">2h ago</div>
+          </div>
+          <div class="trash-msg">
+            <div class="trash-author">Dave M.</div>
+            <div class="trash-text">Luck? I've been studying film all week. See you in the playoffs 🐍</div>
+            <div class="trash-time">1h ago</div>
+          </div>
+          <div class="trash-msg">
+            <div class="trash-author">Mike T.</div>
+            <div class="trash-text">Both of you are going down Week 15. Touched by an angel — that WR just got activated 💀</div>
+            <div class="trash-time">45m ago</div>
+          </div>
+        </div>
+        <div class="trash-input-row">
+          <input class="trash-input" placeholder="Talk your talk…" onkeydown="if(event.key==='Enter') postTrash(this)" />
+          <button class="trash-send" onclick="postTrash(document.querySelector('.trash-input'))">Send</button>
+        </div>
+      </section>
+
+      <!-- Top Scorer -->
+      <section class="top-scorer-card">
+        <div class="card-label">⚡ Top Scorer This Week</div>
+        <div class="scorer-row">
+          <div class="scorer-avatar">JS</div>
+          <div>
+            <div class="scorer-name">Justin Sandoval</div>
+            <div class="scorer-team">Touchdown Ninjas</div>
+          </div>
+          <div class="scorer-pts">196.8 pts</div>
+        </div>
+      </section>
+
+      <!-- League Rules CTA -->
+      <section class="rules-card">
+        <div class="card-label">📋 League Info</div>
+        <div class="rules-list">
+          <div class="rule-item">💰 Buy-in: $50 · Pot: $600</div>
+          <div class="rule-item">🏆 Playoffs: Top 6 teams (Weeks 15–17)</div>
+          <div class="rule-item">📅 Waiver: Wednesday midnight</div>
+          <div class="rule-item">🔒 Trades locked: Week 14</div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <span>Gridiron Glory League · Postmarq Internal</span>
+  <span>Commissioner: Dave M. · <a href="#">Message Dave</a></span>
+</footer>`,
+        css: `*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+:root {
+  --bg: #0a0e1a;
+  --surface: #111622;
+  --surface2: #181e2e;
+  --border: rgba(255,255,255,0.07);
+  --green: #22c55e;
+  --red: #ef4444;
+  --amber: #f59e0b;
+  --blue: #3b82f6;
+  --ink: rgba(255,255,255,0.92);
+  --ink2: rgba(255,255,255,0.55);
+  --ink3: rgba(255,255,255,0.28);
+  --font: 'Nunito', system-ui, sans-serif;
+}
+body { font-family: var(--font); background: var(--bg); color: var(--ink); min-height: 100vh; }
+
+/* Header */
+header { background: rgba(10,14,26,0.95); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; backdrop-filter: blur(12px); }
+.header-inner { max-width: 1000px; margin: 0 auto; padding: 0.85rem 1.5rem; display: flex; align-items: center; gap: 0.9rem; }
+.league-badge { font-size: 1.75rem; line-height: 1; }
+.league-name { font-size: 1.05rem; font-weight: 900; }
+.league-sub { font-size: 0.68rem; color: var(--ink3); font-weight: 600; }
+.header-spacer { flex: 1; }
+.week-pill { background: var(--amber); color: #0a0e1a; font-size: 0.72rem; font-weight: 900; padding: 0.3rem 0.85rem; border-radius: 999px; }
+
+/* Main */
+main { max-width: 1000px; margin: 0 auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; }
+
+/* Matchup Banner */
+.matchup-banner { background: linear-gradient(135deg, #0d1a35 0%, #0a1a14 100%); border: 1px solid rgba(255,255,255,0.1); border-radius: 18px; padding: 2rem; text-align: center; }
+.matchup-label { font-size: 0.68rem; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; color: var(--amber); margin-bottom: 1.5rem; }
+.matchup-teams { display: flex; align-items: center; justify-content: center; gap: 2rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.team-side { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
+.team-avatar { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 900; }
+.team-name { font-size: 0.82rem; font-weight: 800; }
+.team-score { font-size: 2rem; font-weight: 900; }
+.team-manager { font-size: 0.68rem; color: var(--ink3); }
+.vs { font-size: 0.9rem; font-weight: 900; color: var(--ink3); }
+.matchup-note { font-size: 0.72rem; color: var(--green); font-weight: 700; }
+
+/* Two-col */
+.two-col { display: grid; grid-template-columns: 1fr 320px; gap: 1.25rem; align-items: start; }
+@media (max-width: 680px) { .two-col { grid-template-columns: 1fr; } }
+
+/* Card base */
+.standings-card, .trash-card, .top-scorer-card, .rules-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.25rem 1.5rem; }
+.right-rail { display: flex; flex-direction: column; gap: 1.25rem; }
+.card-label { font-size: 0.65rem; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink3); margin-bottom: 1rem; }
+
+/* Standings */
+.standings-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+.standings-table th { text-align: left; font-size: 0.62rem; font-weight: 800; color: var(--ink3); letter-spacing: 0.08em; text-transform: uppercase; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border); }
+.standings-table td { padding: 0.55rem 0.25rem; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.standings-table th:not(:first-child), .standings-table td:not(:first-child) { text-align: center; }
+.rank-1 td { color: var(--amber); font-weight: 800; }
+
+/* Trash talk */
+.trash-feed { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; max-height: 200px; overflow-y: auto; }
+.trash-msg { background: var(--surface2); border-radius: 10px; padding: 0.6rem 0.8rem; }
+.trash-author { font-size: 0.68rem; font-weight: 800; color: var(--blue); margin-bottom: 0.2rem; }
+.trash-text { font-size: 0.8rem; line-height: 1.5; }
+.trash-time { font-size: 0.62rem; color: var(--ink3); margin-top: 0.2rem; }
+.trash-input-row { display: flex; gap: 0.5rem; }
+.trash-input { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 0.45rem 0.75rem; color: var(--ink); font-family: var(--font); font-size: 0.78rem; outline: none; }
+.trash-input:focus { border-color: rgba(59,130,246,0.4); }
+.trash-send { background: var(--blue); color: #fff; border: none; border-radius: 8px; padding: 0.45rem 0.9rem; font-family: var(--font); font-size: 0.75rem; font-weight: 800; cursor: pointer; }
+
+/* Top scorer */
+.scorer-row { display: flex; align-items: center; gap: 0.9rem; }
+.scorer-avatar { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #1d4ed8, #7c3aed); display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 900; flex-shrink: 0; }
+.scorer-name { font-size: 0.88rem; font-weight: 800; }
+.scorer-team { font-size: 0.68rem; color: var(--ink3); }
+.scorer-pts { margin-left: auto; font-size: 1.1rem; font-weight: 900; color: var(--green); }
+
+/* Rules */
+.rules-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.rule-item { font-size: 0.8rem; color: var(--ink2); }
+
+/* Footer */
+footer { max-width: 1000px; margin: 0 auto; padding: 1.25rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; font-size: 0.7rem; color: var(--ink3); }
+footer a { color: var(--blue); text-decoration: none; }`,
+        js: `function postTrash(input) {
+  const val = input.value.trim();
+  if (!val) return;
+  const feed = document.querySelector('.trash-feed');
+  const msg = document.createElement('div');
+  msg.className = 'trash-msg';
+  msg.innerHTML = \`<div class="trash-author">You</div><div class="trash-text">\${val}</div><div class="trash-time">just now</div>\`;
+  feed.appendChild(msg);
+  feed.scrollTop = feed.scrollHeight;
+  input.value = '';
+}`
+      },
+      {
+        slug: 'star-catcher',
+        html: `<div id="game-wrap">
+  <div id="hud">
+    <div class="hud-item">⭐ <span id="score">0</span></div>
+    <div class="hud-item hud-title">STAR CATCHER</div>
+    <div class="hud-item">❤️ <span id="lives">3</span></div>
+  </div>
+  <canvas id="canvas"></canvas>
+  <div id="overlay" class="overlay">
+    <div class="overlay-box">
+      <div class="overlay-star">⭐</div>
+      <h1>Star Catcher</h1>
+      <p>Catch the falling stars before they hit the ground!</p>
+      <p class="small">Move your mouse or tap to control the basket</p>
+      <button id="startBtn" onclick="startGame()">Play Now!</button>
+    </div>
+  </div>
+  <div id="gameOverlay" class="overlay" style="display:none">
+    <div class="overlay-box">
+      <div class="overlay-star" id="resultIcon">🎉</div>
+      <h1 id="resultTitle">You Win!</h1>
+      <p id="resultMsg">Amazing catching!</p>
+      <p class="score-display">Score: <span id="finalScore">0</span></p>
+      <button onclick="startGame()">Play Again!</button>
+    </div>
+  </div>
+</div>`,
+        css: `*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap');
+:root { --sky: #0f172a; --font: 'Nunito', system-ui, sans-serif; }
+html, body { height: 100%; overflow: hidden; background: var(--sky); font-family: var(--font); }
+#game-wrap { position: relative; width: 100vw; height: 100vh; display: flex; flex-direction: column; }
+#hud { flex-shrink: 0; height: 52px; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; font-size: 1rem; font-weight: 800; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 10; }
+.hud-title { font-size: 0.85rem; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+#canvas { flex: 1; display: block; cursor: none; touch-action: none; }
+.overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(10,10,30,0.88); backdrop-filter: blur(8px); z-index: 20; }
+.overlay-box { text-align: center; padding: 2.5rem 2rem; border-radius: 24px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); max-width: 340px; }
+.overlay-star { font-size: 3rem; margin-bottom: 0.75rem; animation: bounce 1s ease infinite alternate; }
+@keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-10px); } }
+.overlay-box h1 { font-size: 2rem; font-weight: 900; color: #fff; margin-bottom: 0.75rem; }
+.overlay-box p { font-size: 0.88rem; color: rgba(255,255,255,0.65); margin-bottom: 0.5rem; }
+.overlay-box p.small { font-size: 0.75rem; color: rgba(255,255,255,0.35); margin-bottom: 1.5rem; }
+.score-display { font-size: 1.25rem; font-weight: 900; color: #fbbf24; margin: 0.75rem 0 1.5rem; }
+button { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; border: none; border-radius: 12px; padding: 0.75rem 2rem; font-family: var(--font); font-size: 1rem; font-weight: 900; cursor: pointer; transition: transform 0.15s, opacity 0.15s; box-shadow: 0 0 24px rgba(99,102,241,0.5); }
+button:hover { transform: scale(1.05); opacity: 0.9; }`,
+        js: `const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+let stars = [], particles = [], score = 0, lives = 3, gameRunning = false;
+let basketX = 0, basketW = 100;
+const COLORS = ['#fbbf24','#f472b6','#60a5fa','#34d399','#a78bfa','#fb923c'];
+
+function resize() {
+  canvas.width  = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+  basketX = canvas.width / 2 - basketW / 2;
+}
+window.addEventListener('resize', resize);
+
+canvas.addEventListener('mousemove', e => {
+  const r = canvas.getBoundingClientRect();
+  basketX = e.clientX - r.left - basketW / 2;
+});
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  const r = canvas.getBoundingClientRect();
+  basketX = e.touches[0].clientX - r.left - basketW / 2;
+}, { passive: false });
+
+function spawnStar() {
+  stars.push({
+    x: Math.random() * (canvas.width - 30) + 15,
+    y: -20,
+    r: Math.random() * 12 + 12,
+    speed: Math.random() * (1.5 + score * 0.02) + 1.5,
+    color: COLORS[Math.floor(Math.random() * COLORS.length)],
+    rot: 0,
+    rotSpeed: (Math.random() - 0.5) * 0.1
+  });
+}
+
+function spawnParticles(x, y, color) {
+  for (let i = 0; i < 12; i++) {
+    particles.push({
+      x, y, color,
+      vx: (Math.random() - 0.5) * 6,
+      vy: (Math.random() - 0.5) * 6 - 2,
+      life: 1
+    });
+  }
+}
+
+function drawStar(x, y, r, color, rot) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.beginPath();
+  for (let i = 0; i < 5; i++) {
+    const a = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+    const b = ((i * 4 + 2) * Math.PI) / 5 - Math.PI / 2;
+    i === 0 ? ctx.moveTo(Math.cos(a)*r, Math.sin(a)*r) : ctx.lineTo(Math.cos(a)*r, Math.sin(a)*r);
+    ctx.lineTo(Math.cos(b)*(r*0.4), Math.sin(b)*(r*0.4));
+  }
+  ctx.closePath();
+  ctx.fillStyle = color;
+  ctx.shadowBlur = 18;
+  ctx.shadowColor = color;
+  ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.restore();
+}
+
+function drawBasket(bx) {
+  const bh = 18, br = 14, by = canvas.height - 40;
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(bx, by);
+  ctx.lineTo(bx + basketW, by);
+  ctx.lineTo(bx + basketW - br, by + bh);
+  ctx.lineTo(bx + br, by + bh);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(139,92,246,0.85)';
+  ctx.shadowBlur = 20;
+  ctx.shadowColor = '#8b5cf6';
+  ctx.fill();
+  ctx.restore();
+}
+
+let spawnTimer = 0;
+function loop() {
+  if (!gameRunning) return;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Draw starfield bg
+  ctx.fillStyle = '#0f172a';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const by = canvas.height - 40;
+  const bx = Math.max(0, Math.min(basketX, canvas.width - basketW));
+
+  spawnTimer++;
+  if (spawnTimer > Math.max(30 - score, 10)) { spawnStar(); spawnTimer = 0; }
+
+  // Stars
+  stars = stars.filter(s => {
+    s.y += s.speed;
+    s.rot += s.rotSpeed;
+    // Catch check
+    if (s.y + s.r > by && s.y - s.r < by + 18 && s.x > bx && s.x < bx + basketW) {
+      spawnParticles(s.x, s.y, s.color);
+      score++;
+      document.getElementById('score').textContent = score;
+      if (score >= 30) { endGame(true); return false; }
+      return false;
+    }
+    if (s.y > canvas.height + 20) {
+      lives--;
+      document.getElementById('lives').textContent = '❤️'.repeat(Math.max(lives,0));
+      if (lives <= 0) { endGame(false); return false; }
+      return false;
+    }
+    drawStar(s.x, s.y, s.r, s.color, s.rot);
+    return true;
+  });
+
+  drawBasket(bx);
+
+  // Particles
+  particles = particles.filter(p => {
+    p.x += p.vx; p.y += p.vy; p.vy += 0.15; p.life -= 0.04;
+    ctx.globalAlpha = p.life;
+    ctx.fillStyle = p.color;
+    ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI*2); ctx.fill();
+    ctx.globalAlpha = 1;
+    return p.life > 0;
+  });
+
+  requestAnimationFrame(loop);
+}
+
+function startGame() {
+  stars = []; particles = []; score = 0; lives = 3; spawnTimer = 0; gameRunning = true;
+  document.getElementById('score').textContent = '0';
+  document.getElementById('lives').textContent = '❤️❤️❤️';
+  document.getElementById('overlay').style.display = 'none';
+  document.getElementById('gameOverlay').style.display = 'none';
+  resize();
+  loop();
+}
+
+function endGame(won) {
+  gameRunning = false;
+  const ov = document.getElementById('gameOverlay');
+  document.getElementById('resultIcon').textContent = won ? '🏆' : '💫';
+  document.getElementById('resultTitle').textContent = won ? 'You Win!' : 'Game Over';
+  document.getElementById('resultMsg').textContent = won ? 'You caught all 30 stars!' : 'Better luck next time!';
+  document.getElementById('finalScore').textContent = score;
+  ov.style.display = 'flex';
+}`
+      }
+    ];
+
+    async function seed() {
+      const btn = document.getElementById('seedBtn');
+      btn.disabled = true;
+
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { log('Not logged in — redirecting to login…', 'err'); setTimeout(() => window.location.href = '/login', 1500); return; }
+
+      const { data: profile } = await sb.from('profiles').select('handle').eq('id', session.user.id).single();
+      if (!profile) { log('Could not load your profile.', 'err'); btn.disabled = false; return; }
+
+      const handle = profile.handle.replace('.postmarq', '');
+      log(`Logged in as <strong>${handle}</strong>`);
+
+      for (const demo of DEMOS) {
+        log(`Creating <strong>${demo.slug}</strong>…`);
+        const { error } = await sb.from('rooms').upsert(
+          { user_id: session.user.id, username: handle, room_name: demo.slug, html: demo.html, css: demo.css, js: demo.js, published: true },
+          { onConflict: 'username,room_name' }
+        );
+        if (error) {
+          log(`✗ ${demo.slug}: ${error.message}`, 'err');
+        } else {
+          log(`<span class="ok">✓ ${demo.slug} created → <a href="/${handle}/${demo.slug}" style="color:#4ab5aa" target="_blank">postmarq.org/${handle}/${demo.slug}</a></span>`);
+        }
+      }
+
+      log('');
+      log('<span class="ok">All done! Head to <a href="/home" style="color:#4ab5aa">My Post</a> to see your new sites.</span>');
+    }
+  </script>
+</body>
+</html>

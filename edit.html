@@ -498,6 +498,8 @@
     let postUsername = '';
     let previewTimer = null;
     let isDirty = false;
+    let roomMode = false;   // true when editing a room (?site=slug)
+    let roomSlug = '';
 
     /* ── Tab switching ── */
     function switchTab(tab) {
@@ -541,9 +543,16 @@
       const css  = document.getElementById('code-css').value;
       const js   = document.getElementById('code-js').value;
 
-      const { error } = await sb
-        .from('pages')
-        .upsert({ user_id: currentUser.id, username: postUsername, html, css, js, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
+      let error;
+      if (roomMode) {
+        ({ error } = await sb.from('rooms')
+          .update({ html, css, js })
+          .eq('username', postUsername)
+          .eq('room_name', roomSlug));
+      } else {
+        ({ error } = await sb.from('pages')
+          .upsert({ user_id: currentUser.id, username: postUsername, html, css, js, updated_at: new Date().toISOString() }, { onConflict: 'user_id' }));
+      }
 
       if (error) {
         setStatus('error', 'Save failed');
@@ -614,6 +623,10 @@
       if (!session) { window.location.href = 'login.html'; return; }
       currentUser = session.user;
 
+      const params = new URLSearchParams(window.location.search);
+      roomSlug = params.get('site') || '';
+      roomMode = !!roomSlug;
+
       // Load profile for handle
       const { data: profile } = await sb.from('profiles')
         .select('handle, full_name')
@@ -623,20 +636,43 @@
       const handle = profile?.handle || currentUser.email.split('@')[0] + '.postmarq';
       postUsername  = handle.replace('.postmarq', '');
 
-      document.getElementById('topUrl').innerHTML = `<span style="color:var(--teal)">postmarq.org/</span>${postUsername}`;
-      document.getElementById('previewHandle').textContent = postUsername;
-      document.getElementById('previewLink').href = `https://postmarq.org/${postUsername}`;
+      if (roomMode) {
+        document.title = `Edit ${roomSlug} — Postmarq`;
+        document.querySelector('.top-bar-title').textContent = roomSlug;
+        document.getElementById('topUrl').innerHTML =
+          `<span style="color:var(--teal)">postmarq.org/</span>${postUsername}/<span style="color:var(--amber)">${roomSlug}</span>`;
+        document.getElementById('previewUrlPill').innerHTML =
+          `<span>postmarq.org/</span><span id="previewHandle">${postUsername}/${roomSlug}</span>`;
+        document.getElementById('previewLink').href = `https://postmarq.org/${postUsername}/${roomSlug}`;
+        document.querySelector('.btn-home').href    = `/home`;
+        document.querySelector('.btn-home').textContent = '← My Post';
 
-      // Load existing post content
-      const { data: post } = await sb.from('pages')
-        .select('html, css, js')
-        .eq('user_id', currentUser.id)
-        .single();
+        const { data: room } = await sb.from('rooms')
+          .select('html, css, js')
+          .eq('username', postUsername)
+          .eq('room_name', roomSlug)
+          .single();
 
-      if (post) {
-        document.getElementById('code-html').value = post.html || '';
-        document.getElementById('code-css').value  = post.css  || '';
-        document.getElementById('code-js').value   = post.js   || '';
+        if (room) {
+          document.getElementById('code-html').value = room.html || '';
+          document.getElementById('code-css').value  = room.css  || '';
+          document.getElementById('code-js').value   = room.js   || '';
+        }
+      } else {
+        document.getElementById('topUrl').innerHTML = `<span style="color:var(--teal)">postmarq.org/</span>${postUsername}`;
+        document.getElementById('previewHandle').textContent = postUsername;
+        document.getElementById('previewLink').href = `https://postmarq.org/${postUsername}`;
+
+        const { data: post } = await sb.from('pages')
+          .select('html, css, js')
+          .eq('user_id', currentUser.id)
+          .single();
+
+        if (post) {
+          document.getElementById('code-html').value = post.html || '';
+          document.getElementById('code-css').value  = post.css  || '';
+          document.getElementById('code-js').value   = post.js   || '';
+        }
       }
 
       renderPreview();
