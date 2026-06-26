@@ -756,94 +756,114 @@
       transition: background 0.15s, color 0.15s;
     }
     .sites-add-btn:hover { background: rgba(127,119,221,0.28); color: #fff; }
-    .sites-list { display: flex; flex-direction: column; padding: 0.75rem 0.9rem; gap: 0.6rem; }
+    .sites-list { display: flex; flex-direction: column; padding: 0.6rem 0.85rem; gap: 0.4rem; }
 
-    /* The big site button — the hero element */
-    .site-btn {
-      display: block; width: 100%; text-decoration: none; text-align: left;
-      position: relative; border-radius: 12px; padding: 1rem 1.1rem;
-      background: linear-gradient(135deg, rgba(127,119,221,0.18) 0%, rgba(239,159,39,0.12) 100%);
-      border: 1px solid rgba(127,119,221,0.28);
-      box-shadow: 0 0 18px rgba(127,119,221,0.12), inset 0 1px 0 rgba(255,255,255,0.07);
-      transition: all 0.2s; overflow: hidden; cursor: pointer;
+    /* ── Compact site card ── */
+    .site-card {
+      display: flex; align-items: center; gap: 0.55rem;
+      border-radius: 9px; padding: 0.42rem 0.6rem 0.42rem 0;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+      overflow: hidden; transition: border-color 0.15s; position: relative;
     }
-    .site-btn::before {
-      content: ''; position: absolute; inset: 0; border-radius: 12px;
-      background: radial-gradient(ellipse at 30% 50%, rgba(127,119,221,0.22) 0%, transparent 70%);
-      opacity: 0; transition: opacity 0.25s;
+    .site-card:hover { border-color: rgba(255,255,255,0.14); }
+    .site-card-accent { width: 3px; min-width: 3px; align-self: stretch; border-radius: 0 2px 2px 0; background: var(--sc, #9b8fd4); margin-right: 0.3rem; }
+    .site-status-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; background: rgba(255,255,255,0.18); }
+    .site-status-dot.live { background: #4ed494; box-shadow: 0 0 5px rgba(78,212,148,0.7); }
+    .site-card-name {
+      flex: 1; font-size: 0.82rem; font-weight: 700; color: rgba(255,255,255,0.82);
+      text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      transition: color 0.15s;
     }
-    .site-btn:hover { border-color: rgba(165,153,245,0.55); box-shadow: 0 0 32px rgba(127,119,221,0.28), inset 0 1px 0 rgba(255,255,255,0.1); transform: translateY(-1px); }
-    .site-btn:hover::before { opacity: 1; }
-    .site-btn-name {
-      font-size: 1.05rem; font-weight: 900; letter-spacing: -0.2px;
-      background: linear-gradient(90deg, #e8e0ff, #f5c87a);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      margin-bottom: 0.2rem;
+    .site-card-name:hover { color: #fff; }
+    .site-menu-btn {
+      background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.25);
+      font-size: 0.75rem; padding: 0 0.45rem; line-height: 1; letter-spacing: 1.5px;
+      flex-shrink: 0; transition: color 0.15s; font-family: var(--font);
     }
-    .site-btn-url { font-size: 0.68rem; color: rgba(255,255,255,0.28); letter-spacing: 0.01em; }
+    .site-menu-btn:hover { color: rgba(255,255,255,0.75); }
 
-    /* Owner controls row below the button */
-    .site-controls { display: flex; align-items: center; gap: 0.5rem; padding: 0 0.1rem; margin-top: 0.4rem; }
-    .site-toggle {
-      font-size: 0.65rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase;
-      border-radius: 20px; padding: 0.22rem 0.65rem; cursor: pointer;
-      font-family: var(--font); border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.3);
-      transition: all 0.15s;
+    /* ── Site settings sheet ── */
+    .site-sheet-overlay {
+      display: none; position: fixed; inset: 0; z-index: 9998;
+      background: rgba(0,0,0,0.5); align-items: flex-end; justify-content: center;
     }
-    .site-toggle.published {
-      background: rgba(74,210,149,0.14); border-color: rgba(74,210,149,0.45);
-      color: #4ed494;
-      box-shadow: 0 0 10px rgba(74,210,149,0.18);
+    .site-sheet-overlay.open { display: flex; }
+    .site-sheet {
+      background: #13131c; border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 18px 18px 0 0; padding: 0 1.1rem 2rem; width: 100%; max-width: 360px;
+      transform: translateY(100%); transition: transform 0.22s cubic-bezier(.32,.72,0,1);
     }
-    .site-edit-btn {
-      font-size: 0.65rem; font-weight: 700; color: rgba(165,153,245,0.6);
-      background: none; border: none; cursor: pointer; font-family: var(--font);
-      padding: 0.22rem 0.4rem; transition: color 0.15s; margin-left: auto;
+    .site-sheet-overlay.open .site-sheet { transform: translateY(0); }
+    .site-sheet-handle { width: 32px; height: 3px; border-radius: 2px; background: rgba(255,255,255,0.12); margin: 0.75rem auto 1rem; }
+    .site-sheet-title { font-size: 0.92rem; font-weight: 800; color: #fff; text-align: center; margin-bottom: 0.9rem; }
+    .site-color-row { display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 1rem; flex-wrap: wrap; }
+    .site-color-swatch {
+      width: 24px; height: 24px; border-radius: 50%; cursor: pointer;
+      border: 2px solid transparent; transition: transform 0.12s, border-color 0.12s;
     }
-    .site-edit-btn:hover { color: rgba(165,153,245,1); }
-    .site-rename-btn {
-      font-size: 0.65rem; font-weight: 700; color: rgba(255,255,255,0.3);
-      background: none; border: none; cursor: pointer; font-family: var(--font);
-      padding: 0.22rem 0.4rem; transition: color 0.15s;
+    .site-color-swatch:hover { transform: scale(1.2); }
+    .site-color-swatch.active { border-color: #fff; transform: scale(1.15); }
+    .site-sheet-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 0.6rem 0; }
+    .site-sheet-btn {
+      display: flex; align-items: center; gap: 0.7rem; width: 100%;
+      background: none; border: none; border-radius: 9px; padding: 0.6rem 0.75rem;
+      font-family: var(--font); font-size: 0.82rem; font-weight: 700;
+      color: rgba(255,255,255,0.7); cursor: pointer; text-align: left; transition: background 0.12s;
     }
-    .site-rename-btn:hover { color: rgba(255,255,255,0.7); }
-    .site-delete-btn {
-      font-size: 0.65rem; font-weight: 700; color: rgba(240,80,80,0.45);
-      background: none; border: none; cursor: pointer; font-family: var(--font);
-      padding: 0.22rem 0.4rem; transition: color 0.15s;
+    .site-sheet-btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
+    .site-sheet-btn.danger { color: rgba(240,80,80,0.75); }
+    .site-sheet-btn.danger:hover { background: rgba(240,80,80,0.08); color: #f05050; }
+    .site-sheet-btn-icon { font-size: 0.9rem; width: 18px; text-align: center; opacity: 0.7; }
+    .site-sheet-inline { padding: 0 0.25rem 0.5rem; }
+    .site-sheet-inline input {
+      width: 100%; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 8px; padding: 0.48rem 0.7rem; color: #fff; font-family: var(--font);
+      font-size: 0.83rem; outline: none; margin-bottom: 0.45rem;
     }
-    .site-delete-btn:hover { color: rgba(240,80,80,0.9); }
+    .site-sheet-inline-row { display: flex; gap: 0.4rem; }
+    .site-sheet-save {
+      flex: 1; padding: 0.42rem; border-radius: 7px; border: none;
+      background: linear-gradient(135deg, #9b8fd4, #4ab5aa); color: #fff;
+      font-family: var(--font); font-size: 0.76rem; font-weight: 800; cursor: pointer;
+    }
+    .site-sheet-cancel-sm {
+      padding: 0.42rem 0.65rem; border-radius: 7px; border: 1px solid rgba(255,255,255,0.14);
+      background: none; color: rgba(255,255,255,0.4); font-family: var(--font); font-size: 0.76rem; cursor: pointer;
+    }
+    .site-sheet-confirm-txt { font-size: 0.74rem; color: rgba(255,255,255,0.4); margin-bottom: 0.45rem; line-height: 1.5; padding: 0 0.25rem; }
+    .site-sheet-del-yes {
+      flex: 1; padding: 0.42rem; border-radius: 7px; border: none;
+      background: #c94040; color: #fff; font-family: var(--font); font-size: 0.76rem; font-weight: 800; cursor: pointer;
+    }
 
-    /* ── Confirm modal ── */
-    .site-modal-overlay {
-      display: none; position: fixed; inset: 0; z-index: 9999;
-      background: rgba(0,0,0,0.6); align-items: center; justify-content: center;
+    /* ── New site modal ── */
+    .new-site-overlay {
+      display: none; position: fixed; inset: 0; z-index: 9998;
+      background: rgba(0,0,0,0.55); align-items: center; justify-content: center;
     }
-    .site-modal-overlay.open { display: flex; }
-    .site-modal {
-      background: #1a1a24; border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 16px; padding: 1.75rem 1.5rem; width: 300px; text-align: center;
+    .new-site-overlay.open { display: flex; }
+    .new-site-modal {
+      background: #13131c; border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px; padding: 1.5rem 1.4rem; width: 300px;
     }
-    .site-modal h3 { font-size: 1rem; font-weight: 800; color: #fff; margin-bottom: 0.4rem; }
-    .site-modal p { font-size: 0.78rem; color: rgba(255,255,255,0.45); margin-bottom: 1.25rem; line-height: 1.5; }
-    .site-modal input {
-      width: 100%; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15);
+    .new-site-modal h3 { font-size: 0.95rem; font-weight: 800; color: #fff; margin-bottom: 0.3rem; }
+    .new-site-modal p { font-size: 0.73rem; color: rgba(255,255,255,0.38); margin-bottom: 0.9rem; }
+    .new-site-modal input {
+      width: 100%; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.14);
       border-radius: 8px; padding: 0.5rem 0.75rem; color: #fff; font-family: var(--font);
-      font-size: 0.85rem; outline: none; margin-bottom: 1rem;
+      font-size: 0.85rem; outline: none; margin-bottom: 0.85rem;
     }
-    .site-modal-actions { display: flex; gap: 0.6rem; justify-content: center; }
-    .site-modal-cancel {
-      flex: 1; padding: 0.5rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15);
-      background: none; color: rgba(255,255,255,0.5); font-family: var(--font);
-      font-size: 0.8rem; font-weight: 700; cursor: pointer;
+    .new-site-modal .site-color-row { margin-bottom: 1rem; justify-content: flex-start; }
+    .new-site-modal-actions { display: flex; gap: 0.5rem; }
+    .new-site-cancel {
+      flex: 1; padding: 0.5rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.14);
+      background: none; color: rgba(255,255,255,0.4); font-family: var(--font); font-size: 0.8rem; font-weight: 700; cursor: pointer;
     }
-    .site-modal-confirm {
-      flex: 1; padding: 0.5rem; border-radius: 8px; border: none;
-      background: #e05050; color: #fff; font-family: var(--font);
-      font-size: 0.8rem; font-weight: 800; cursor: pointer;
+    .new-site-create {
+      flex: 2; padding: 0.5rem; border-radius: 8px; border: none;
+      background: linear-gradient(135deg, #9b8fd4, #4ab5aa); color: #fff;
+      font-family: var(--font); font-size: 0.8rem; font-weight: 800; cursor: pointer;
     }
-    .site-modal-confirm.safe { background: linear-gradient(135deg, #9b8fd4, #4ab5aa); }
 
     .sites-empty {
       padding: 1.2rem; font-size: 0.75rem; font-weight: 500;
@@ -1397,26 +1417,63 @@
   </div>
 
   <!-- Lightbox -->
-  <!-- Site delete/rename modals -->
-  <div class="site-modal-overlay" id="deleteModal">
-    <div class="site-modal">
-      <h3>Delete site?</h3>
-      <p id="deleteModalMsg">This will permanently remove the site and all its content. This cannot be undone.</p>
-      <div class="site-modal-actions">
-        <button class="site-modal-cancel" onclick="closeModals()">Cancel</button>
-        <button class="site-modal-confirm" id="deleteConfirmBtn" onclick="confirmDelete()">Delete</button>
+  <!-- Site settings sheet -->
+  <div class="site-sheet-overlay" id="siteSheetOverlay" onclick="closeSiteSheet(event)">
+    <div class="site-sheet" id="siteSheet">
+      <div class="site-sheet-handle"></div>
+      <div class="site-sheet-title" id="sheetTitle"></div>
+
+      <!-- Color swatches -->
+      <div class="site-color-row" id="sheetColorRow"></div>
+      <div class="site-sheet-divider"></div>
+
+      <!-- Rename inline -->
+      <div class="site-sheet-inline" id="sheetRenameInline" style="display:none">
+        <input type="text" id="sheetRenameInput" placeholder="Display name" />
+        <div class="site-sheet-inline-row">
+          <button class="site-sheet-save" onclick="confirmSheetRename()">Save</button>
+          <button class="site-sheet-cancel-sm" onclick="hideSheetInline()">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Delete confirm inline -->
+      <div class="site-sheet-inline" id="sheetDeleteInline" style="display:none">
+        <p class="site-sheet-confirm-txt" id="sheetDeleteMsg"></p>
+        <div class="site-sheet-inline-row">
+          <button class="site-sheet-del-yes" onclick="confirmSheetDelete()">Yes, delete</button>
+          <button class="site-sheet-cancel-sm" onclick="hideSheetInline()">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div id="sheetActions">
+        <button class="site-sheet-btn" id="sheetToggleBtn" onclick="sheetToggleLive()">
+          <span class="site-sheet-btn-icon">○</span><span id="sheetToggleLabel">Make Live</span>
+        </button>
+        <button class="site-sheet-btn" onclick="sheetEdit()">
+          <span class="site-sheet-btn-icon">✏️</span> Edit site
+        </button>
+        <button class="site-sheet-btn" onclick="showSheetRename()">
+          <span class="site-sheet-btn-icon">✦</span> Rename
+        </button>
+        <div class="site-sheet-divider"></div>
+        <button class="site-sheet-btn danger" onclick="showSheetDelete()">
+          <span class="site-sheet-btn-icon">✕</span> Delete site
+        </button>
       </div>
     </div>
   </div>
 
-  <div class="site-modal-overlay" id="renameModal">
-    <div class="site-modal">
-      <h3>Rename site</h3>
-      <p>Choose a new URL-friendly name. The old URL will stop working.</p>
-      <input type="text" id="renameInput" placeholder="new-name" />
-      <div class="site-modal-actions">
-        <button class="site-modal-cancel" onclick="closeModals()">Cancel</button>
-        <button class="site-modal-confirm safe" onclick="confirmRename()">Rename</button>
+  <!-- New site modal -->
+  <div class="new-site-overlay" id="newSiteOverlay" onclick="closeNewSite(event)">
+    <div class="new-site-modal">
+      <h3>New site</h3>
+      <p>Give it a name and pick a color.</p>
+      <input type="text" id="newSiteName" placeholder="e.g. My Portfolio" />
+      <div class="site-color-row" id="newSiteColorRow"></div>
+      <div class="new-site-modal-actions">
+        <button class="new-site-cancel" onclick="closeNewSite()">Cancel</button>
+        <button class="new-site-create" onclick="confirmNewSite()">Create</button>
       </div>
     </div>
   </div>
@@ -2231,103 +2288,152 @@
 
 
     // ── My Sites ──
-    async function loadSites() {
-      if (!currentHandle) return;
-      const { data: rooms } = await sb.from('rooms').select('room_name, published, updated_at').eq('username', currentHandle).order('created_at', { ascending: false });
-      const list = document.getElementById('sitesList');
-      const empty = document.getElementById('sitesEmpty');
-      if (!rooms || rooms.length === 0) { empty.style.display = ''; return; }
-      empty.style.display = 'none';
-      list.querySelectorAll('.site-row').forEach(el => el.remove());
-      rooms.forEach(r => {
-        const url = `postmarq.org/${currentHandle}/${r.room_name}`;
-        const row = document.createElement('div');
-        row.className = 'site-row';
-        row.dataset.room = r.room_name;
-        row.innerHTML = `
-          <a class="site-btn" href="/${currentHandle}/${r.room_name}" target="_blank">
-            <div class="site-btn-name">${r.room_name}</div>
-            <div class="site-btn-url">postmarq.org/${currentHandle}/${r.room_name}</div>
-          </a>
-          <div class="site-controls">
-            <button class="site-toggle ${r.published ? 'published' : ''}" onclick="togglePublished('${r.room_name}', this)">${r.published ? '● Live' : '○ Private'}</button>
-            <button class="site-rename-btn" onclick="openRename('${r.room_name}')">Rename</button>
-            <button class="site-edit-btn" onclick="window.location.href='/edit?site=${r.room_name}'">Edit</button>
-            <button class="site-delete-btn" onclick="openDelete('${r.room_name}')">Delete</button>
-          </div>`;
-        list.appendChild(row);
+    const SITE_COLORS = ['#9b8fd4','#4ab5aa','#e8992a','#c97ae0','#4a72c4','#2ec48a','#f05a5a','#5a8fa8'];
+    let _sheetRoom = '', _sheetPublished = false, _sheetColor = SITE_COLORS[0], _newSiteColor = SITE_COLORS[0];
+
+    function buildSwatches(containerId, currentColor, onPick) {
+      const row = document.getElementById(containerId);
+      row.innerHTML = '';
+      SITE_COLORS.forEach(c => {
+        const s = document.createElement('button');
+        s.className = 'site-color-swatch' + (c === currentColor ? ' active' : '');
+        s.style.background = c;
+        s.onclick = () => { row.querySelectorAll('.site-color-swatch').forEach(x => x.classList.remove('active')); s.classList.add('active'); onPick(c); };
+        row.appendChild(s);
       });
     }
 
-    async function togglePublished(roomName, btn) {
-      const newVal = !btn.classList.contains('published');
-      const { error } = await sb.from('rooms').update({ published: newVal }).eq('username', currentHandle).eq('room_name', roomName);
-      if (error) { alert('Could not update: ' + error.message); return; }
-      btn.classList.toggle('published', newVal);
-      btn.textContent = newVal ? '● Live' : '○ Private';
+    async function loadSites() {
+      if (!currentHandle) return;
+      const { data: rooms } = await sb.from('rooms').select('room_name, display_name, published, card_color').eq('username', currentHandle).order('created_at', { ascending: false });
+      const list = document.getElementById('sitesList');
+      const empty = document.getElementById('sitesEmpty');
+      if (!rooms || rooms.length === 0) { if (empty) empty.style.display = ''; return; }
+      if (empty) empty.style.display = 'none';
+      list.querySelectorAll('.site-card').forEach(el => el.remove());
+      rooms.forEach(r => {
+        const name = r.display_name || r.room_name;
+        const color = r.card_color || SITE_COLORS[0];
+        const card = document.createElement('div');
+        card.className = 'site-card';
+        card.dataset.room = r.room_name;
+        card.style.setProperty('--sc', color);
+        card.title = `postmarq.org/${currentHandle}/${r.room_name}`;
+        card.innerHTML = `
+          <div class="site-card-accent"></div>
+          <span class="site-status-dot ${r.published ? 'live' : ''}"></span>
+          <a class="site-card-name" href="/${currentHandle}/${r.room_name}" target="_blank">${escHtml(name)}</a>
+          <button class="site-menu-btn" onclick="openSiteMenu('${r.room_name}',event)">•••</button>`;
+        list.appendChild(card);
+      });
     }
 
-    let _pendingRoom = '';
-
-    function openDelete(roomName) {
-      _pendingRoom = roomName;
-      document.getElementById('deleteModalMsg').textContent = `"${roomName}" and all its content will be permanently deleted. This cannot be undone.`;
-      document.getElementById('deleteModal').classList.add('open');
+    async function openSiteMenu(roomName, e) {
+      e.stopPropagation();
+      const { data: r } = await sb.from('rooms').select('display_name, published, card_color').eq('username', currentHandle).eq('room_name', roomName).single();
+      _sheetRoom      = roomName;
+      _sheetPublished = r?.published || false;
+      _sheetColor     = r?.card_color || SITE_COLORS[0];
+      document.getElementById('sheetTitle').textContent = r?.display_name || roomName;
+      document.getElementById('sheetToggleLabel').textContent = _sheetPublished ? 'Make Private' : 'Make Live';
+      document.getElementById('sheetToggleBtn').querySelector('.site-sheet-btn-icon').textContent = _sheetPublished ? '●' : '○';
+      hideSheetInline();
+      buildSwatches('sheetColorRow', _sheetColor, async (c) => {
+        _sheetColor = c;
+        await sb.from('rooms').update({ card_color: c }).eq('username', currentHandle).eq('room_name', _sheetRoom);
+        loadSites();
+      });
+      document.getElementById('siteSheetOverlay').classList.add('open');
     }
 
-    async function confirmDelete() {
-      if (!_pendingRoom) return;
-      const btn = document.getElementById('deleteConfirmBtn');
-      btn.textContent = 'Deleting…'; btn.disabled = true;
-      const { error } = await sb.from('rooms').delete().eq('username', currentHandle).eq('room_name', _pendingRoom);
-      btn.textContent = 'Delete'; btn.disabled = false;
-      if (error) { alert('Could not delete: ' + error.message); return; }
-      closeModals();
-      loadSites();
+    function closeSiteSheet(e) {
+      if (e && e.target !== document.getElementById('siteSheetOverlay')) return;
+      document.getElementById('siteSheetOverlay').classList.remove('open');
     }
 
-    function openRename(roomName) {
-      _pendingRoom = roomName;
-      document.getElementById('renameInput').value = roomName;
-      document.getElementById('renameModal').classList.add('open');
-      setTimeout(() => document.getElementById('renameInput').select(), 50);
+    function hideSheetInline() {
+      document.getElementById('sheetRenameInline').style.display = 'none';
+      document.getElementById('sheetDeleteInline').style.display = 'none';
+      document.getElementById('sheetActions').style.display = '';
     }
 
-    async function confirmRename() {
-      const raw = document.getElementById('renameInput').value.trim();
-      const slug = raw.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-      if (!slug || slug === _pendingRoom) { closeModals(); return; }
-      const { data: existing } = await sb.from('rooms').select('room_name').eq('username', currentHandle).eq('room_name', slug).maybeSingle();
-      if (existing) { alert(`A site named "${slug}" already exists.`); return; }
-      const { error } = await sb.from('rooms').update({ room_name: slug }).eq('username', currentHandle).eq('room_name', _pendingRoom);
+    function showSheetRename() {
+      document.getElementById('sheetActions').style.display = 'none';
+      document.getElementById('sheetDeleteInline').style.display = 'none';
+      document.getElementById('sheetRenameInput').value = document.getElementById('sheetTitle').textContent;
+      document.getElementById('sheetRenameInline').style.display = '';
+      setTimeout(() => document.getElementById('sheetRenameInput').select(), 50);
+    }
+
+    async function confirmSheetRename() {
+      const name = document.getElementById('sheetRenameInput').value.trim();
+      if (!name) return;
+      const { error } = await sb.from('rooms').update({ display_name: name }).eq('username', currentHandle).eq('room_name', _sheetRoom);
       if (error) { alert('Could not rename: ' + error.message); return; }
-      closeModals();
+      document.getElementById('siteSheetOverlay').classList.remove('open');
       loadSites();
     }
 
-    function closeModals() {
-      document.getElementById('deleteModal').classList.remove('open');
-      document.getElementById('renameModal').classList.remove('open');
-      _pendingRoom = '';
+    function showSheetDelete() {
+      document.getElementById('sheetActions').style.display = 'none';
+      document.getElementById('sheetRenameInline').style.display = 'none';
+      document.getElementById('sheetDeleteMsg').textContent = `Permanently delete "${document.getElementById('sheetTitle').textContent}"? This cannot be undone.`;
+      document.getElementById('sheetDeleteInline').style.display = '';
     }
 
-    document.getElementById('renameInput').addEventListener('keydown', e => {
-      if (e.key === 'Enter') confirmRename();
-      if (e.key === 'Escape') closeModals();
-    });
+    async function confirmSheetDelete() {
+      const { error } = await sb.from('rooms').delete().eq('username', currentHandle).eq('room_name', _sheetRoom);
+      if (error) { alert('Could not delete: ' + error.message); return; }
+      document.getElementById('siteSheetOverlay').classList.remove('open');
+      loadSites();
+    }
 
-    async function createNewSite() {
-      if (!currentHandle) { alert('Profile not loaded yet — try again in a moment.'); return; }
-      const { count } = await sb.from('rooms').select('*', { count: 'exact', head: true }).eq('username', currentHandle);
-      if (count >= 10) { alert('You\'ve reached the 10 site limit. Remove a site to create a new one.'); return; }
-      const raw = prompt('Site name (e.g. portfolio, blog, music):');
+    async function sheetToggleLive() {
+      _sheetPublished = !_sheetPublished;
+      await sb.from('rooms').update({ published: _sheetPublished }).eq('username', currentHandle).eq('room_name', _sheetRoom);
+      document.getElementById('sheetToggleLabel').textContent = _sheetPublished ? 'Make Private' : 'Make Live';
+      document.getElementById('sheetToggleBtn').querySelector('.site-sheet-btn-icon').textContent = _sheetPublished ? '●' : '○';
+      loadSites();
+    }
+
+    function sheetEdit() {
+      window.location.href = `/edit?site=${_sheetRoom}`;
+    }
+
+    function createNewSite() {
+      if (!currentHandle) { alert('Profile not loaded yet.'); return; }
+      _newSiteColor = SITE_COLORS[0];
+      document.getElementById('newSiteName').value = '';
+      buildSwatches('newSiteColorRow', _newSiteColor, c => { _newSiteColor = c; });
+      document.getElementById('newSiteOverlay').classList.add('open');
+      setTimeout(() => document.getElementById('newSiteName').focus(), 100);
+    }
+
+    function closeNewSite(e) {
+      if (e && e.target !== document.getElementById('newSiteOverlay')) return;
+      document.getElementById('newSiteOverlay').classList.remove('open');
+    }
+
+    async function confirmNewSite() {
+      const raw = document.getElementById('newSiteName').value.trim();
       if (!raw) return;
-      const slug = raw.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-      if (!slug) return;
-      const { error } = await sb.from('rooms').insert({ user_id: currentUser.id, username: currentHandle, room_name: slug, html: '', css: '', js: '' });
-      if (error) { alert('Could not create site: ' + error.message); return; }
-      window.location.href = `/edit?site=${slug}`;
+      const slug = raw.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || 'my-site';
+      const { count } = await sb.from('rooms').select('*', { count: 'exact', head: true }).eq('username', currentHandle);
+      if (count >= 10) { alert('10 site limit reached.'); return; }
+      const { error } = await sb.from('rooms').insert({ user_id: currentUser.id, username: currentHandle, room_name: slug + '-' + Date.now().toString(36), display_name: raw, card_color: _newSiteColor, html: '', css: '', js: '' });
+      if (error) { alert('Could not create: ' + error.message); return; }
+      document.getElementById('newSiteOverlay').classList.remove('open');
+      loadSites();
     }
+
+    document.getElementById('newSiteName').addEventListener('keydown', e => {
+      if (e.key === 'Enter') confirmNewSite();
+      if (e.key === 'Escape') closeNewSite();
+    });
+    document.getElementById('sheetRenameInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') confirmSheetRename();
+      if (e.key === 'Escape') hideSheetInline();
+    });
 
     // ── Widget Engine ──────────────────────────────────────────
     let widgetTypes = [];
