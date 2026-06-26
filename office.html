@@ -1485,10 +1485,10 @@
     }
 
     // ── My Sites ───────────────────────────────────────────────────
-    async function loadMySites(handle) {
+    async function loadMySites(userId) {
       const { data: rooms } = await sb.from('rooms')
-        .select('room_name, display_name, published, card_color, hidden_on_office')
-        .eq('username', handle)
+        .select('room_name, display_name, published, card_color, hidden_on_office, username')
+        .eq('user_id', userId)
         .order('created_at', { ascending: false });
       const el = document.getElementById('sitesList');
       const visible = (rooms || []).filter(r => !r.hidden_on_office);
@@ -1505,11 +1505,11 @@
         const card = document.createElement('div');
         card.className = 'site-card';
         card.style.setProperty('--sc', color);
-        card.title = `postmarq.org/${handle}/${r.room_name}`;
+        card.title = `postmarq.org/${r.username}/${r.room_name}`;
         card.innerHTML = `
           <div class="site-card-accent"></div>
           <span class="site-status-dot ${r.published ? 'live' : ''}"></span>
-          <a class="site-card-name" href="/${handle}/${r.room_name}" target="_blank">${esc(name)}</a>
+          <a class="site-card-name" href="/${r.username}/${r.room_name}" target="_blank">${esc(name)}</a>
           <button class="site-hide-btn" onclick="hideFromOffice('${r.room_name}', this)" title="Hide from Office">Hide</button>`;
         list.appendChild(card);
       });
@@ -1518,10 +1518,9 @@
 
     async function hideFromOffice(roomName, btn) {
       btn.textContent = '…'; btn.disabled = true;
-      const handle = currentProfileHandle?.replace('.postmarq','') || '';
-      const { error } = await sb.from('rooms').update({ hidden_on_office: true }).eq('username', handle).eq('room_name', roomName);
+      const { error } = await sb.from('rooms').update({ hidden_on_office: true }).eq('user_id', currentUser.id).eq('room_name', roomName);
       if (error) { alert('Could not hide: ' + error.message); btn.textContent = 'Hide'; btn.disabled = false; return; }
-      loadMySites(handle);
+      loadMySites(currentUser.id);
     }
 
     // ── Live preview wiring for link modal ─────────────────────────
@@ -1550,7 +1549,9 @@
       const { data: officeRow } = await sb.from('profiles')
         .select('office_data')
         .eq('id', currentUser.id)
-        .single();
+        .single()
+        .catch(() => ({ data: null }));
+
 
       officeData = officeRow?.office_data || {};
       // office_avatar_url lives inside office_data; fall back to home avatar
@@ -1574,9 +1575,7 @@
       renderClients();
       renderResumeUI(profile?.resume_url || null, profile?.resume_downloadable !== false);
 
-      if (currentProfileHandle) {
-        loadMySites(currentProfileHandle.replace('.postmarq', ''));
-      }
+      loadMySites(currentUser.id);
 
       updateLinkSwatches();
     }
