@@ -785,15 +785,15 @@
     /* ── Site settings sheet ── */
     .site-sheet-overlay {
       display: none; position: fixed; inset: 0; z-index: 9998;
-      background: rgba(0,0,0,0.5); align-items: flex-end; justify-content: center;
+      background: rgba(0,0,0,0.5); align-items: center; justify-content: center;
     }
     .site-sheet-overlay.open { display: flex; }
     .site-sheet {
       background: #13131c; border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 18px 18px 0 0; padding: 0 1.1rem 2rem; width: 100%; max-width: 360px;
-      transform: translateY(100%); transition: transform 0.22s cubic-bezier(.32,.72,0,1);
+      border-radius: 18px; padding: 0 1.1rem 1.5rem; width: 300px;
+      transform: scale(0.95); opacity: 0; transition: transform 0.18s cubic-bezier(.32,.72,0,1), opacity 0.18s;
     }
-    .site-sheet-overlay.open .site-sheet { transform: translateY(0); }
+    .site-sheet-overlay.open .site-sheet { transform: scale(1); opacity: 1; }
     .site-sheet-handle { width: 32px; height: 3px; border-radius: 2px; background: rgba(255,255,255,0.12); margin: 0.75rem auto 1rem; }
     .site-sheet-title { font-size: 0.92rem; font-weight: 800; color: #fff; text-align: center; margin-bottom: 0.9rem; }
     .site-color-row { display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 1rem; flex-wrap: wrap; }
