@@ -572,45 +572,77 @@
       }
     });
 
-    /* ── AI Prompt (client-side — generates a prompt for Claude Code) ── */
+    /* ── Ask Claude (calls Edge Function) ── */
     function fillPrompt(text) {
       document.getElementById('aiInput').value = text;
       document.getElementById('aiInput').focus();
     }
 
-    function sendPrompt() {
+    function showToast(msg, color = 'var(--lavender)') {
+      const t = document.createElement('div');
+      t.style.cssText = `position:fixed;bottom:1rem;right:1rem;background:${color};color:#fff;font-size:0.78rem;font-weight:700;padding:0.5rem 1rem;border-radius:8px;z-index:9999;pointer-events:none;transition:opacity 0.4s;`;
+      t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 2800);
+    }
+
+    async function sendPrompt() {
       const input = document.getElementById('aiInput').value.trim();
       if (!input) return;
 
-      const currentHtml = document.getElementById('code-html').value.trim();
-      const contextNote = currentHtml
-        ? `\n\nMy current HTML:\n\`\`\`html\n${currentHtml.slice(0, 2000)}\n\`\`\``
-        : '';
+      const btn  = document.querySelector('.btn-ai');
+      const orig = btn.textContent;
+      btn.textContent = 'Thinking…';
+      btn.disabled = true;
 
-      const prompt = `I'm editing my personal Postmarq page. ${input}${contextNote}\n\nReturn only the complete HTML (include any CSS inside a <style> tag in the <head>). No explanation needed.`;
+      const html = document.getElementById('code-html').value;
+      const css  = document.getElementById('code-css').value;
+      const js   = document.getElementById('code-js').value;
 
-      document.getElementById('prContent').textContent = prompt;
-      document.getElementById('promptResult').classList.add('show');
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) { showToast('Not logged in', '#e05a5a'); return; }
 
-      // Copy to clipboard so user can paste into Claude Code
-      navigator.clipboard.writeText(prompt).catch(() => {});
+        const res = await fetch(
+          'https://udlbdccvspxqlzizpkda.supabase.co/functions/v1/ask-claude',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.access_token}`,
+            },
+            body: JSON.stringify({ prompt: input, html, css, js }),
+          }
+        );
+
+        if (!res.ok) {
+          const err = await res.text();
+          showToast('Error: ' + err.slice(0, 80), '#e05a5a');
+          return;
+        }
+
+        const result = await res.json();
+        if (result.error) { showToast('Claude error: ' + result.error.slice(0, 80), '#e05a5a'); return; }
+
+        if (result.html !== undefined) document.getElementById('code-html').value = result.html;
+        if (result.css  !== undefined) document.getElementById('code-css').value  = result.css;
+        if (result.js   !== undefined) document.getElementById('code-js').value   = result.js;
+
+        isDirty = true;
+        renderPreview();
+        showToast('Done! Preview updated.');
+        document.getElementById('aiInput').value = '';
+
+      } catch (e) {
+        showToast('Request failed: ' + e.message, '#e05a5a');
+      } finally {
+        btn.textContent = orig;
+        btn.disabled = false;
+      }
     }
 
-    function applyPromptResult() {
-      // User will paste result from Claude into the HTML editor
-      document.getElementById('promptResult').classList.remove('show');
-      switchTab('html');
-      document.getElementById('code-html').focus();
-      const hint = document.createElement('div');
-      hint.style.cssText = 'position:fixed;bottom:1rem;right:1rem;background:rgba(155,143,212,0.9);color:#fff;font-size:0.78rem;font-weight:700;padding:0.5rem 1rem;border-radius:8px;z-index:9999;pointer-events:none;';
-      hint.textContent = '← Paste Claude\'s code here';
-      document.body.appendChild(hint);
-      setTimeout(() => hint.remove(), 3000);
-    }
-
-    function discardPromptResult() {
-      document.getElementById('promptResult').classList.remove('show');
-    }
+    function applyPromptResult() { document.getElementById('promptResult').classList.remove('show'); }
+    function discardPromptResult() { document.getElementById('promptResult').classList.remove('show'); }
 
     /* ── Warn on unsaved changes ── */
     window.addEventListener('beforeunload', e => {
