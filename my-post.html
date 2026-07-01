@@ -1356,6 +1356,17 @@
       align-items: center; justify-content: center;
     }
     .modal-overlay.open { display: flex; }
+    /* These modals sit on a cream (#fef3d8) sheet, but the global --ink scale is
+       white (for glass cards over the backdrop) — re-darken text + inputs locally
+       with warm tones so labels, fields and buttons stay readable. Setting color
+       here makes even inputs that don't declare their own color inherit dark. */
+    .modal-box, .np-modal, .mshelf-modal {
+      --ink:   #26180e;
+      --ink-2: #5a3e28;
+      --ink-3: #7a5c42;
+      --ink-4: #b89a7e;
+      color: var(--ink);
+    }
     .modal-box {
       background: #fef3d8; border-radius: 20px; padding: 2rem;
       width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(38,24,14,0.25);
