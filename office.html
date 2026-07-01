@@ -1073,13 +1073,13 @@
         linksEl.innerHTML = '<span style="font-size:0.7rem;color:rgba(255,255,255,0.25);font-style:italic;">No links added yet</span>';
       }
 
-      const handle = currentProfileHandle;
+      const handle = (currentProfileHandle || 'me').replace(/\.postmarq$/i, '');
       const url = `${window.location.origin}/${handle}/office`;
       document.getElementById('bcardUrl').textContent = url;
     }
 
     function copyOfficeLink() {
-      const handle = currentProfileHandle;
+      const handle = (currentProfileHandle || 'me').replace(/\.postmarq$/i, '');
       const url = `${window.location.origin}/${handle}/office`;
       navigator.clipboard.writeText(url).then(() => {
         const btn = document.querySelector('#modalBcard .modal-btn-save');
@@ -1540,19 +1540,16 @@
 
       document.getElementById('bioName').textContent = currentUser.email.split('@')[0];
 
-      const { data: profile } = await sb.from('profiles')
-        .select('full_name, avatar_url, handle, resume_url, resume_downloadable')
+      // Use select('*') so a missing optional column (e.g. resume_url) can't
+      // 400 the whole query and silently null out `profile` — which dropped
+      // full_name and made the name fall back to the email username on refresh.
+      const { data: profile, error: profileErr } = await sb.from('profiles')
+        .select('*')
         .eq('id', currentUser.id)
         .single();
+      if (profileErr) console.warn('Profile load error:', profileErr.message);
 
-      // Fetch office_data separately so a missing column doesn't wipe the profile load
-      const { data: officeRow } = await sb.from('profiles')
-        .select('office_data')
-        .eq('id', currentUser.id)
-        .single();
-
-
-      officeData = officeRow?.office_data || {};
+      officeData = profile?.office_data || {};
       // office_avatar_url lives inside office_data; fall back to home avatar
       const officeAvatar = officeData.office_avatar_url || profile?.avatar_url || null;
       if (officeAvatar) {
