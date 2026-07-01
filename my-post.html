@@ -1183,6 +1183,13 @@
     #backdrop-btn:hover { box-shadow: 0 4px 18px rgba(0,0,0,0.18); }
 
     #backdrop-panel {
+      /* The global --ink scale is white (for glass cards over the backdrop),
+         but this panel is a near-solid white sheet — re-darken text + controls
+         locally so labels, inputs and buttons stay readable. */
+      --ink:   #1a1420;
+      --ink-2: rgba(26,20,32,0.82);
+      --ink-3: rgba(26,20,32,0.60);
+      --ink-4: rgba(26,20,32,0.42);
       display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 10001;
       background: rgba(255,255,255,0.96); backdrop-filter: blur(20px);
       border-top: 1px solid rgba(0,0,0,0.08);
