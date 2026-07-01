@@ -1579,5 +1579,159 @@
     init();
   </script>
 
+  <!-- ═══ XP Taskbar (global footer) ═══ -->
+  <style>
+    .pm-taskbar {
+      position: fixed; bottom: 0; left: 0; right: 0; height: 34px; z-index: 300;
+      display: flex; align-items: center; gap: 6px; padding: 0 4px;
+      background: linear-gradient(180deg,#2E6FBE 0%,#2361B8 3%,#1850A4 8%,#1850A4 88%,#2A62B4 94%,#5898D8 100%);
+      border-top: 1px solid #5898E8; box-shadow: 0 -1px 4px rgba(0,0,0,0.25);
+      font-family: Tahoma,'Segoe UI',Arial,sans-serif; user-select: none;
+    }
+    .pm-start {
+      height: 26px; padding: 0 14px 0 8px; display: flex; align-items: center; gap: 5px;
+      border: none; border-radius: 0 13px 13px 0;
+      background: linear-gradient(180deg,#5DB94E 0%,#4CA83C 8%,#3D9A2E 45%,#2E8B22 55%,#3D9A2E 80%,#5DB94E 100%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), inset -1px -1px 2px rgba(0,0,0,0.25);
+      color: #fff; font-size: 14px; font-weight: 700; font-style: italic; cursor: pointer;
+      text-shadow: 1px 1px 1px rgba(0,0,0,0.35);
+    }
+    .pm-start:hover { filter: brightness(1.08); }
+    .pm-winbtn {
+      height: 24px; max-width: 240px; display: flex; align-items: center; gap: 6px; padding: 0 10px;
+      font-size: 11px; font-weight: 700; color: #fff;
+      background: linear-gradient(180deg,#3E7FCE 0%,#1E56A8 50%,#194E9E 100%);
+      border: 1px solid; border-color: #5A90D8 #12336E #12336E #5A90D8; border-radius: 3px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .pm-win-globe, .pm-start-logo { font-style: normal; }
+    .pm-tray {
+      margin-left: auto; height: 26px; display: flex; align-items: center; gap: 2px; padding: 0 4px 0 8px;
+      background: linear-gradient(180deg,#159BD6 0%,#1387C8 12%,#0E6CB8 50%,#1387C8 88%,#3BB0E0 100%);
+      border-left: 1px solid #12457E; box-shadow: inset 1px 0 0 rgba(255,255,255,0.25);
+    }
+    .pm-tray-item {
+      background: none; border: none; cursor: pointer; color: #fff; height: 24px; padding: 0 7px;
+      display: flex; align-items: center; gap: 5px; font-family: inherit; font-size: 11px;
+      font-weight: 700; border-radius: 3px; transition: background 0.12s;
+    }
+    .pm-tray-item:hover { background: rgba(255,255,255,0.2); }
+    .pm-presence .pm-led {
+      width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; background: #37d067;
+      box-shadow: 0 0 5px rgba(55,208,103,0.9), inset 0 1px 1px rgba(255,255,255,0.6);
+    }
+    .pm-presence[data-status="away"] .pm-led { background:#f5c451; box-shadow:0 0 5px rgba(245,196,81,0.85), inset 0 1px 1px rgba(255,255,255,0.6); }
+    .pm-presence[data-status="offline"] .pm-led { background:#8fa0b0; box-shadow:none; }
+    .pm-clock { height: 24px; display: flex; align-items: center; padding: 0 6px 0 8px; font-size: 11px; font-weight: 700; color: #fff; }
+    .pm-startmenu {
+      display: none; position: fixed; left: 4px; bottom: 36px; z-index: 350; width: 240px;
+      border-radius: 8px 8px 6px 6px; overflow: hidden; background: #fff; border: 1px solid #0A3A8A;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4); font-family: Tahoma,'Segoe UI',Arial,sans-serif;
+    }
+    .pm-startmenu.open { display: block; }
+    .pm-sm-header {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      background: linear-gradient(180deg,#2E6FBE 0%,#1850A4 60%,#12448E 100%);
+      border-bottom: 2px solid #EA8B00; color: #fff;
+    }
+    .pm-sm-avatar {
+      width: 36px; height: 36px; border-radius: 6px; flex-shrink: 0; overflow: hidden;
+      background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5);
+      display: flex; align-items: center; justify-content: center; font-size: 18px;
+    }
+    .pm-sm-avatar img { width:100%; height:100%; object-fit:cover; }
+    .pm-sm-user { font-size: 13px; font-weight: 800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .pm-sm-body { padding: 6px; display: flex; flex-direction: column; }
+    .pm-sm-item {
+      display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: none; background: none;
+      text-align: left; cursor: pointer; font-family: inherit; font-size: 12.5px; font-weight: 600;
+      color: #10233f; text-decoration: none; border-radius: 4px;
+    }
+    .pm-sm-item:hover { background: #2f6fd0; color: #fff; }
+    .pm-sm-item.active { background: rgba(47,111,208,0.14); }
+    .pm-sm-ico { width: 18px; text-align: center; font-size: 14px; }
+    .pm-sm-divider { height: 1px; background: rgba(0,0,0,0.1); margin: 5px 8px; }
+    .pm-sm-logoff { color: #a11; }
+    .pm-sm-logoff:hover { background: #c0392b; color: #fff; }
+  </style>
+
+  <div class="pm-taskbar" id="pmTaskbar">
+    <button class="pm-start" id="pmStartBtn"><span class="pm-start-logo">&#129001;</span> start</button>
+    <div class="pm-winbtn" id="pmWinBtn"><span class="pm-win-globe">&#127760;</span> <span id="pmWinTitle">Postmarq</span></div>
+    <div class="pm-tray">
+      <button class="pm-tray-item pm-presence" id="pmPresence" data-status="online" title="Click to change your status"><span class="pm-led"></span><span id="pmPresenceLabel">Online</span></button>
+      <button class="pm-tray-item" id="pmBackdropBtn" title="Background editor">&#127912;</button>
+      <button class="pm-tray-item" id="pmLogoutBtn" title="Log off">&#9211;</button>
+      <div class="pm-clock" id="pmClock"></div>
+    </div>
+  </div>
+  <div class="pm-startmenu" id="pmStartMenu">
+    <div class="pm-sm-header">
+      <div class="pm-sm-avatar" id="pmSmAvatar">&#128578;</div>
+      <div class="pm-sm-user" id="pmSmUser">postmarq</div>
+    </div>
+    <div class="pm-sm-body">
+      <a class="pm-sm-item" data-nav="/home"       href="/home"><span class="pm-sm-ico">&#127968;</span> Home</a>
+      <a class="pm-sm-item" data-nav="/office"     href="/office"><span class="pm-sm-ico">&#128188;</span> Office</a>
+      <a class="pm-sm-item" data-nav="/playground" href="/playground"><span class="pm-sm-ico">&#129513;</span> Playground</a>
+      <a class="pm-sm-item" data-nav="/lounge"     href="/lounge"><span class="pm-sm-ico">&#128172;</span> Lounge</a>
+      <div class="pm-sm-divider"></div>
+      <button class="pm-sm-item pm-sm-logoff" id="pmSmLogoff"><span class="pm-sm-ico">&#9211;</span> Log Off</button>
+    </div>
+  </div>
+  <script>
+  (function(){
+    const tbSb = supabase.createClient('https://udlbdccvspxqlzizpkda.supabase.co','sb_publishable_co1yq79BF8oR9Mg651DG5w_ESuACdqn');
+    const $ = id => document.getElementById(id);
+    const PAGES = { '/home':'Home','/office':'Office','/playground':'Playground','/lounge':'Lounge' };
+    const path = (location.pathname.replace(/\/+$/,'') || '/home');
+    const pageName = PAGES[path] || 'Home';
+
+    function tickClock(){
+      const d = new Date(); let h = d.getHours(); const m = String(d.getMinutes()).padStart(2,'0');
+      const ap = h >= 12 ? 'PM':'AM'; h = h % 12 || 12; $('pmClock').textContent = h+':'+m+' '+ap;
+    }
+    tickClock(); setInterval(tickClock, 15000);
+
+    const startMenu = $('pmStartMenu'), startBtn = $('pmStartBtn');
+    startBtn.onclick = e => { e.stopPropagation(); startMenu.classList.toggle('open'); };
+    document.addEventListener('click', e => {
+      if (!startMenu.contains(e.target) && e.target !== startBtn) startMenu.classList.remove('open');
+    });
+    document.querySelectorAll('.pm-sm-item[data-nav]').forEach(a => {
+      if (a.getAttribute('data-nav') === path) a.classList.add('active');
+    });
+
+    const P_ORDER = ['online','away','offline'];
+    const P_LABEL = { online:'Online', away:'Away', offline:'Appear Offline' };
+    const presBtn = $('pmPresence');
+    function applyPresence(s){ presBtn.dataset.status = s; $('pmPresenceLabel').textContent = P_LABEL[s]; localStorage.setItem('pm_presence', s); }
+    applyPresence(localStorage.getItem('pm_presence') || 'online');
+    presBtn.onclick = () => applyPresence(P_ORDER[(P_ORDER.indexOf(presBtn.dataset.status)+1) % P_ORDER.length]);
+
+    $('pmBackdropBtn').onclick = () => {
+      if (typeof window.openBackdropPanel === 'function') window.openBackdropPanel();
+      else window.location.href = '/home?backdrop=1';
+    };
+
+    async function tbLogout(){ try { await tbSb.auth.signOut(); } catch(e){} window.location.href = '/login'; }
+    $('pmLogoutBtn').onclick = tbLogout; $('pmSmLogoff').onclick = tbLogout;
+
+    (async () => {
+      const { data:{ session } } = await tbSb.auth.getSession();
+      if (!session) { $('pmTaskbar').style.display='none'; startMenu.style.display='none'; return; }
+      let handle='postmarq', name=session.user.email.split('@')[0], avatar=null;
+      try {
+        const { data:p } = await tbSb.from('profiles').select('full_name, handle, avatar_url').eq('id', session.user.id).single();
+        if (p){ handle=(p.handle||handle).replace(/\.postmarq$/i,''); name=p.full_name||name; avatar=p.avatar_url||null; }
+      } catch(e){}
+      $('pmWinTitle').textContent = handle+'.postmarq — '+pageName;
+      $('pmSmUser').textContent = name;
+      if (avatar) $('pmSmAvatar').innerHTML = '<img src="'+avatar+'" alt="">';
+    })();
+  })();
+  </script>
+
 </body>
 </html>
