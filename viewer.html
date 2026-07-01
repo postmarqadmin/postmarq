@@ -195,6 +195,36 @@
     .stamp-btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.9rem; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.7); background: rgba(255,255,255,0.5); font-family: var(--font); font-size: 0.75rem; font-weight: 700; color: var(--ink-2); cursor: pointer; transition: all 0.18s cubic-bezier(0.34,1.56,0.64,1); }
     .stamp-btn:hover { background: rgba(255,255,255,0.75); transform: scale(1.04); }
     .stamp-btn.stamped { background: linear-gradient(135deg, rgba(232,153,42,0.18), rgba(245,196,98,0.22)); border-color: rgba(232,153,42,0.5); color: var(--amber); }
+
+    /* ── Replies / comments ── */
+    .reply-btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.9rem; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.7); background: rgba(255,255,255,0.5); font-family: var(--font); font-size: 0.75rem; font-weight: 700; color: var(--ink-2); cursor: pointer; transition: all 0.18s cubic-bezier(0.34,1.56,0.64,1); }
+    .reply-btn:hover { background: rgba(255,255,255,0.75); transform: scale(1.04); }
+    .reply-btn.active { background: linear-gradient(135deg, rgba(155,143,212,0.22), rgba(74,181,170,0.18)); border-color: rgba(155,143,212,0.5); color: var(--lavender); }
+    .reply-count { font-weight: 800; }
+    .comments { margin-top: 0.85rem; padding-top: 0.85rem; border-top: 1px solid rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 0.75rem; }
+    .comments-loading, .comments-empty { font-size: 0.75rem; color: var(--ink-4); font-style: italic; }
+    .comment { display: flex; gap: 0.55rem; align-items: flex-start; }
+    .comment-av { width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0; background: linear-gradient(135deg, var(--lavender), var(--teal)); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800; color: #fff; overflow: hidden; text-decoration: none; }
+    .comment-av img { width: 100%; height: 100%; object-fit: cover; }
+    .comment-main { flex: 1; min-width: 0; }
+    .comment-head { display: flex; align-items: center; gap: 0.45rem; }
+    .comment-author { font-size: 0.75rem; font-weight: 800; color: var(--ink); }
+    .comment-time { font-size: 0.65rem; color: var(--ink-4); }
+    .comment-del { background: none; border: none; color: var(--ink-4); cursor: pointer; font-size: 0.65rem; margin-left: auto; padding: 0 0.2rem; }
+    .comment-del:hover { color: var(--amber); }
+    .comment-body { font-size: 0.8rem; color: var(--ink-2); line-height: 1.5; margin-top: 0.1rem; overflow-wrap: anywhere; }
+    .comment-composer { display: flex; flex-direction: column; gap: 0.4rem; background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.7); border-radius: 12px; padding: 0.6rem 0.75rem; }
+    .comment-input { width: 100%; border: none; background: none; resize: none; font-family: var(--font); font-size: 0.8rem; color: var(--ink); outline: none; line-height: 1.5; max-height: 120px; }
+    .comment-input::placeholder { color: var(--ink-4); }
+    .comment-composer-foot { display: flex; align-items: center; justify-content: flex-end; gap: 0.6rem; }
+    .comment-counter { font-size: 0.65rem; font-weight: 700; color: var(--ink-4); }
+    .comment-counter.low { color: var(--amber); }
+    .comment-send { padding: 0.3rem 0.9rem; border-radius: 999px; border: none; background: linear-gradient(135deg, var(--amber-light), var(--amber)); color: #fff; font-family: var(--font); font-size: 0.72rem; font-weight: 800; cursor: pointer; }
+    .comment-send:hover { opacity: 0.9; }
+    .comment-send:disabled { opacity: 0.5; cursor: default; }
+    .comment-signin { font-size: 0.75rem; color: var(--ink-4); }
+    .comment-signin a { color: var(--lavender); font-weight: 700; text-decoration: none; }
+    .comment-signin a:hover { text-decoration: underline; }
     .stamp-count { font-size: 0.72rem; font-weight: 600; color: var(--ink-4); }
 
     /* ── Empty states ── */
@@ -656,7 +686,7 @@
 
   async function loadPosts() {
     const { data: posts } = await sb.from('posts')
-      .select('id, user_id, body, media, created_at, stamps(count)')
+      .select('id, user_id, body, media, created_at, stamps(count), comments(count)')
       .eq('user_id', profileUserId)
       .order('created_at', { ascending: false })
       .limit(50);
@@ -682,7 +712,8 @@
   function buildPostCard(p) {
     const name      = profileData?.full_name || username;
     const avatarUrl = profileData?.avatar_url || '';
-    const stampCount = p.stamps?.[0]?.count || 0;
+    const stampCount   = p.stamps?.[0]?.count || 0;
+    const commentCount = p.comments?.[0]?.count || 0;
     const stamped    = cachedMyStamps.has(p.id);
     const initial    = name.charAt(0).toUpperCase();
     const avHtml     = avatarUrl
@@ -708,7 +739,11 @@
             <span>⬡</span> Stamp
           </button>
           <span class="stamp-count">${stampCount} stamp${stampCount !== 1 ? 's' : ''}</span>
+          <button class="reply-btn" onclick="toggleComments('${p.id}', this)">
+            <span>💬</span> Reply<span class="reply-count"${commentCount ? '' : ' style="display:none"'}> · ${commentCount}</span>
+          </button>
         </div>
+        <div class="comments" id="comments-${p.id}" hidden></div>
       </div>`;
   }
 
@@ -747,6 +782,131 @@
       n++;
     }
     countEl.textContent = n + ' stamp' + (n !== 1 ? 's' : '');
+  }
+
+  // ── Replies / comments ──
+  const COMMENT_MAX = 140; // original Twitter limit
+
+  function toggleComments(postId, btn) {
+    const box = document.getElementById('comments-' + postId);
+    if (!box) return;
+    const isOpen = !box.hasAttribute('hidden');
+    if (isOpen) { box.setAttribute('hidden', ''); btn.classList.remove('active'); return; }
+    box.removeAttribute('hidden');
+    btn.classList.add('active');
+    if (box.dataset.loaded !== '1') loadComments(postId);
+  }
+
+  async function loadComments(postId) {
+    const box = document.getElementById('comments-' + postId);
+    if (!box) return;
+    box.dataset.loaded = '1';
+    box.innerHTML = '<div class="comments-loading">Loading…</div>';
+    const { data, error } = await sb.from('comments')
+      .select('id, user_id, body, created_at')
+      .eq('post_id', postId)
+      .order('created_at', { ascending: true });
+    if (error) { renderCommentsBox(postId, [], error.message); return; }
+    const rows = data || [];
+    const ids = [...new Set(rows.map(r => r.user_id))];
+    if (ids.length) {
+      const { data: profs } = await sb.from('profiles').select('id, full_name, avatar_url, handle').in('id', ids);
+      const map = {}; (profs || []).forEach(pr => { map[pr.id] = pr; });
+      rows.forEach(r => { r.profiles = map[r.user_id] || null; });
+    }
+    renderCommentsBox(postId, rows);
+  }
+
+  function renderCommentsBox(postId, comments, errorMsg) {
+    const box = document.getElementById('comments-' + postId);
+    if (!box) return;
+
+    const list = comments.map(c => {
+      const cName   = c.profiles?.full_name || 'Someone';
+      const cHandle = (c.profiles?.handle || '').replace('.postmarq', '');
+      const cAvatar = c.profiles?.avatar_url;
+      const avInner = cAvatar ? `<img src="${cAvatar}" alt="" />` : escHtml(cName.charAt(0).toUpperCase());
+      const avHtml  = cHandle
+        ? `<a class="comment-av" href="/${cHandle}" title="${escHtml(cName)}">${avInner}</a>`
+        : `<div class="comment-av">${avInner}</div>`;
+      const del = (viewerUserId && c.user_id === viewerUserId)
+        ? `<button class="comment-del" onclick="deleteComment('${c.id}','${postId}')" title="Delete reply">✕</button>` : '';
+      return `<div class="comment">
+          ${avHtml}
+          <div class="comment-main">
+            <div class="comment-head">
+              <span class="comment-author">${escHtml(cName)}</span>
+              <span class="comment-time">${timeAgo(c.created_at)}</span>
+              ${del}
+            </div>
+            <div class="comment-body">${escHtml(c.body).replace(/\n/g,'<br>')}</div>
+          </div>
+        </div>`;
+    }).join('');
+
+    const composer = viewerUserId
+      ? `<div class="comment-composer">
+          <textarea class="comment-input" id="ci-${postId}" maxlength="${COMMENT_MAX}" rows="1"
+            placeholder="Write a reply…" oninput="updateCommentCounter('${postId}')"
+            onkeydown="commentKey(event,'${postId}')"></textarea>
+          <div class="comment-composer-foot">
+            <span class="comment-counter" id="cc-${postId}">${COMMENT_MAX}</span>
+            <button class="comment-send" onclick="submitComment('${postId}')">Reply</button>
+          </div>
+        </div>`
+      : `<div class="comment-signin"><a href="/login">Sign in</a> to reply.</div>`;
+
+    const notice = errorMsg
+      ? `<div class="comments-empty">Couldn't load replies (${escHtml(errorMsg)}).${viewerUserId ? ' You can still post one.' : ''}</div>`
+      : (comments.length ? '' : '<div class="comments-empty">No replies yet.</div>');
+    box.innerHTML = list + notice + composer;
+
+    if (!errorMsg) {
+      const badge = document.querySelector(`.post-card[data-id="${postId}"] .reply-count`);
+      if (badge) {
+        if (comments.length) { badge.textContent = ' · ' + comments.length; badge.style.display = ''; }
+        else { badge.style.display = 'none'; }
+      }
+    }
+  }
+
+  function updateCommentCounter(postId) {
+    const ta = document.getElementById('ci-' + postId);
+    const el = document.getElementById('cc-' + postId);
+    if (!ta || !el) return;
+    const left = COMMENT_MAX - ta.value.length;
+    el.textContent = left;
+    el.classList.toggle('low', left <= 20);
+    ta.style.height = 'auto';
+    ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
+  }
+
+  function commentKey(e, postId) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitComment(postId); }
+  }
+
+  async function submitComment(postId) {
+    if (!viewerUserId) { window.location.href = '/login'; return; }
+    const ta = document.getElementById('ci-' + postId);
+    if (!ta) return;
+    const body = ta.value.trim();
+    if (!body || body.length > COMMENT_MAX) return;
+    const sendBtn = ta.closest('.comment-composer').querySelector('.comment-send');
+    ta.disabled = true; if (sendBtn) sendBtn.disabled = true;
+    const { error } = await sb.from('comments').insert({ post_id: postId, user_id: viewerUserId, body });
+    if (error) {
+      ta.disabled = false; if (sendBtn) sendBtn.disabled = false;
+      alert('Could not reply: ' + error.message);
+      return;
+    }
+    await loadComments(postId);
+  }
+
+  async function deleteComment(id, postId) {
+    if (!confirm('Delete this reply?')) return;
+    const { error } = await sb.from('comments').delete().eq('id', id).eq('user_id', viewerUserId);
+    if (error) { alert('Could not delete: ' + error.message); return; }
+    await loadComments(postId);
   }
 
   async function loadPickSix() {

@@ -3715,14 +3715,23 @@
       box.dataset.loaded = '1';
       box.innerHTML = '<div class="comments-loading">Loading…</div>';
       const { data, error } = await sb.from('comments')
-        .select('id, user_id, body, created_at, profiles:user_id(full_name, avatar_url, handle)')
+        .select('id, user_id, body, created_at')
         .eq('post_id', postId)
         .order('created_at', { ascending: true });
-      if (error) { box.innerHTML = `<div class="comments-empty">Couldn't load replies: ${escHtml(error.message)}</div>`; return; }
-      renderCommentsBox(postId, data || []);
+      if (error) { renderCommentsBox(postId, [], error.message); return; }
+      const rows = data || [];
+      // Fetch commenter profiles separately — comments.user_id references auth.users,
+      // not profiles, so PostgREST can't embed profiles directly.
+      const ids = [...new Set(rows.map(r => r.user_id))];
+      if (ids.length) {
+        const { data: profs } = await sb.from('profiles').select('id, full_name, avatar_url, handle').in('id', ids);
+        const map = {}; (profs || []).forEach(pr => { map[pr.id] = pr; });
+        rows.forEach(r => { r.profiles = map[r.user_id] || null; });
+      }
+      renderCommentsBox(postId, rows);
     }
 
-    function renderCommentsBox(postId, comments) {
+    function renderCommentsBox(postId, comments, errorMsg) {
       const box = document.getElementById('comments-' + postId);
       if (!box) return;
 
@@ -3759,13 +3768,18 @@
           </div>
         </div>`;
 
-      box.innerHTML = (list || '<div class="comments-empty">No replies yet. Be the first.</div>') + composer;
+      const notice = errorMsg
+        ? `<div class="comments-empty">Couldn't load replies (${escHtml(errorMsg)}). You can still post one.</div>`
+        : (comments.length ? '' : '<div class="comments-empty">No replies yet. Be the first.</div>');
+      box.innerHTML = list + notice + composer;
 
-      // keep the Reply button badge in sync
-      const badge = document.querySelector(`.post-card[data-id="${postId}"] .reply-count`);
-      if (badge) {
-        if (comments.length) { badge.textContent = ' · ' + comments.length; badge.style.display = ''; }
-        else { badge.style.display = 'none'; }
+      // keep the Reply button badge in sync (skip when the load errored — count is unknown)
+      if (!errorMsg) {
+        const badge = document.querySelector(`.post-card[data-id="${postId}"] .reply-count`);
+        if (badge) {
+          if (comments.length) { badge.textContent = ' · ' + comments.length; badge.style.display = ''; }
+          else { badge.style.display = 'none'; }
+        }
       }
     }
 
