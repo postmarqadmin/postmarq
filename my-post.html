@@ -2317,9 +2317,12 @@
     }
 
     async function initLoungeNotifications() {
-      // Request browser notification permission
+      // Request browser notification permission on first user gesture — browsers
+      // block permission prompts that aren't triggered by a real interaction.
       if ('Notification' in window && Notification.permission === 'default') {
-        Notification.requestPermission();
+        document.addEventListener('click', () => {
+          if (Notification.permission === 'default') Notification.requestPermission();
+        }, { once: true });
       }
 
       // Get rooms this user belongs to
@@ -2343,11 +2346,11 @@
 
           // Browser notification
           if ('Notification' in window && Notification.permission === 'granted' && document.hidden) {
-            const { data: prof } = await sb.from('profiles').select('full_name').eq('id', msg.from_user_id).single();
+            const { data: prof } = await sb.from('profiles').select('full_name, avatar_url').eq('id', msg.from_user_id).single();
             const sender = prof?.full_name || 'Someone';
             const n = new Notification(`${sender} sent you a message`, {
               body: msg.body || 'Sent a GIF',
-              icon: '/favicon.ico',
+              icon: prof?.avatar_url || undefined,
               tag: 'lounge-msg',
             });
             n.onclick = () => { openLounge(); window.focus(); n.close(); };

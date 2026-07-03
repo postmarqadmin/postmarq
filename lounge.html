@@ -967,7 +967,6 @@
 
     await loadMessages(id);
     renderSidebar();
-    subscribeToRoom(id);
   }
 
   async function loadMessages(roomId) {
@@ -981,38 +980,48 @@
     renderMessages(c);
   }
 
-  function subscribeToRoom(roomId) {
+  // ONE persistent subscription to every room this user belongs to.
+  // The previous per-room channel meant only the *active* room was live, so
+  // unread badges + notifications for background rooms never fired.
+  function subscribeToAllRooms() {
     if (realtimeChannel) sb.removeChannel(realtimeChannel);
-    realtimeChannel = sb.channel('room:' + roomId)
+    realtimeChannel = sb.channel('lounge-all')
       .on('postgres_changes', {
-        event: 'INSERT', schema: 'public',
-        table: 'lounge_messages', filter: `room_id=eq.${roomId}`,
+        event: 'INSERT', schema: 'public', table: 'lounge_messages',
       }, async (payload) => {
         const msg = payload.new;
-        if (msg.from_user_id === ME.id) return; // already added optimistically
+        if (msg.from_user_id === ME.id) return;              // own message (already optimistic)
+        const c = convos.find(x => x.id === msg.room_id);
+        if (!c) return;                                      // not one of my rooms
+        if (c.messages.some(m => m.id === msg.id)) return;   // dedupe
+
         const { data: prof } = await sb.from('profiles').select('full_name, avatar_url').eq('id', msg.from_user_id).single();
         msg.profiles = prof;
-        const c = convos.find(x => x.id === roomId);
-        if (!c) return;
         c.messages.push(msg);
-        if (activeConvoId === roomId) {
-          renderMessages(c);
+
+        const isActive = activeConvoId === msg.room_id;
+        if (isActive) {
+          renderMessages(c);                                 // keep the open thread current
+          if (document.hidden) notifyMessage(c, msg);        // still ping if tab is backgrounded
         } else {
           c.unread = (c.unread || 0) + 1;
           renderSidebar();
-          // Browser notification for message in background room
-          if ('Notification' in window && Notification.permission === 'granted') {
-            const sender = msg.profiles?.full_name || 'Someone';
-            const n = new Notification(`${sender} in ${c.name}`, {
-              body: msg.body || '🖼 GIF',
-              icon: '/favicon.ico',
-              tag: 'lounge-room-' + roomId,
-            });
-            n.onclick = () => { window.focus(); openConvo(roomId); n.close(); };
-          }
+          notifyMessage(c, msg);
         }
       })
-      .subscribe();
+      .subscribe((status, err) => console.log('[lounge-all] channel status:', status, err || ''));
+  }
+
+  function notifyMessage(c, msg) {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    const sender = msg.profiles?.full_name || 'Someone';
+    const title = c.type === 'group' ? `${sender} in ${c.name}` : sender;
+    const n = new Notification(title, {
+      body: msg.body || '🖼 GIF',
+      icon: msg.profiles?.avatar_url || undefined,
+      tag: 'lounge-room-' + c.id,
+    });
+    n.onclick = () => { window.focus(); openConvo(c.id); n.close(); };
   }
 
   /* ═══════════════════════════════════════════
@@ -1460,9 +1469,20 @@
 
     renderSidebar();
 
+    // Live subscription to all my rooms (unread badges + notifications)
+    subscribeToAllRooms();
+
     const hash = location.hash.slice(1);
     if (hash && convos.find(c => c.id === hash)) openConvo(hash);
   }
+
+  // Ask for notification permission on the first user gesture (Safari/Chrome
+  // both block permission prompts that aren't triggered by a real interaction).
+  document.addEventListener('click', () => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, { once: true });
 
   init();
   </script>
