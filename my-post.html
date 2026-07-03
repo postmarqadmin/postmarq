@@ -142,6 +142,9 @@
       border-bottom: 1px solid rgba(155,143,212,0.3); border-radius: 0 0 0 16px;
       box-shadow: -4px 8px 32px rgba(80,60,140,0.18);
       overflow-y: auto; flex-direction: column;
+      /* cream surface — needs locally-scoped dark ink (white ink scale is global) */
+      --ink: #26180e; --ink-2: rgba(38,24,14,0.8); --ink-3: rgba(38,24,14,0.6); --ink-4: rgba(38,24,14,0.42);
+      color: var(--ink); text-shadow: none;
     }
     .inbox-panel.open { display: flex; }
     .inbox-panel-header {
@@ -364,6 +367,12 @@
     .ms-contact-item:hover           { background: rgba(155,143,212,0.22); color: var(--ink); }
     .ms-contact-item i { font-size: 0.95rem; color: var(--lavender); flex-shrink: 0; }
     .ms-contact-item:nth-last-child(-n+2) { border-bottom: none; }
+    .contact-notif-count {
+      background: #e8992a; color: #fff;
+      font-size: 0.58rem; font-weight: 900; line-height: 1;
+      padding: 2px 5px; border-radius: 99px; min-width: 15px; text-align: center;
+      margin-left: 0.1rem;
+    }
 
     /* ── My Q ── */
     .myq-wrap {
@@ -1668,7 +1677,7 @@
           <div class="ms-contact-header" id="contactHeader">Contacting Dave</div>
           <div class="ms-contact-grid">
             <a class="ms-contact-item" href="#" onclick="openMessageModal();return false;"><i class="ti ti-message-2"></i> Send DM</a>
-            <a class="ms-contact-item" href="lounge.html"><i class="ti ti-sofa"></i> Lounge</a>
+            <a class="ms-contact-item" href="#" onclick="toggleInbox();return false;"><i class="ti ti-bell"></i> Notifications <span class="contact-notif-count" id="contactNotifCount" style="display:none"></span></a>
             <a class="ms-contact-item" href="#" onclick="sendFriendRequest();return false;"><i class="ti ti-user-plus"></i> Add to Friends</a>
             <a class="ms-contact-item" href="#" onclick="openBizCard();return false;"><i class="ti ti-id-badge-2"></i> My Business Card</a>
             <a class="ms-contact-item" href="#" onclick="openInviteModal();return false;"><i class="ti ti-send"></i> Send Invite</a>
@@ -4144,6 +4153,13 @@
       const total = (messages?.length || 0) + (requests?.length || 0);
       badge.textContent = total;
       badge.classList.toggle('has-items', total > 0);
+
+      // Contact-card "Notifications" count pill
+      const contactCount = document.getElementById('contactNotifCount');
+      if (contactCount) {
+        contactCount.textContent = total > 9 ? '9+' : total;
+        contactCount.style.display = total > 0 ? '' : 'none';
+      }
 
       renderInboxMessages(messages || []);
       renderInboxRequests(requests || []);
