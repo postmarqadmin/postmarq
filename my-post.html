@@ -4363,7 +4363,7 @@
       if (!value) { clearBackdropDisplay(); return; }
 
       if (value.startsWith('solid:')) {
-        const color = value.slice(7);
+        const color = value.slice(6); // 'solid:' is 6 chars — slice(7) ate the '#' and broke the color
         layer.style.backgroundImage = 'none';
         layer.style.background = color;
       } else if (value.startsWith('gradient:')) {
@@ -4482,7 +4482,7 @@
       const raw = layer.dataset.savedValue || '';
       if (raw.startsWith('solid:')) {
         bdpMode = 'solid';
-        document.getElementById('bdpSolidColor').value = raw.slice(7);
+        document.getElementById('bdpSolidColor').value = raw.slice(6); // keep the '#' — color inputs reject bare hex
       } else if (raw.startsWith('gradient:')) {
         bdpMode = 'gradient';
         const [c1, c2, ang] = raw.slice(9).split(',');

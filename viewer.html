@@ -934,7 +934,9 @@
   }
 
   async function loadMyQ() {
-    const { data: items } = await sb.from('myq').select('*').eq('user_id', profileUserId).order('created_at');
+    // NOTE: myq columns are title/cadence (what my-post.html writes) — label/when_text was the old schema
+    const { data: items, error } = await sb.from('myq').select('*').eq('user_id', profileUserId).order('created_at');
+    if (error) console.warn('[MyQ] load failed:', error.message);
     const list = document.getElementById('myqList');
     const pub = (items || []).filter(i => i.visibility !== 'private');
     if (!pub.length) return;
@@ -942,8 +944,8 @@
       <div class="myq-item">
         <div class="myq-accent ${i.type || 'loop'}"></div>
         <div class="myq-body">
-          <div class="myq-item-title">${escHtml(i.label)}</div>
-          ${i.when_text ? `<div class="myq-item-when">${escHtml(i.when_text)}</div>` : ''}
+          <div class="myq-item-title">${escHtml(i.title || '')}</div>
+          ${i.cadence ? `<div class="myq-item-when">${escHtml(i.cadence)}</div>` : ''}
         </div>
       </div>`).join('');
   }
