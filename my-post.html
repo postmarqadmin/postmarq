@@ -86,19 +86,22 @@
     }
     .search-results {
       display: none; position: absolute; top: calc(100% + 6px); left: 0;
-      width: 280px; background: #fef3d8;
-      border: 1px solid rgba(155,143,212,0.3); border-radius: 14px;
+      width: 280px;
+      background: linear-gradient(135deg, rgba(155,143,212,0.48) 0%, rgba(74,181,170,0.32) 100%);
+      backdrop-filter: blur(18px) saturate(1.6);
+      -webkit-backdrop-filter: blur(18px) saturate(1.6);
+      border: 1px solid rgba(255,255,255,0.65); border-radius: 14px;
       box-shadow: 0 12px 36px rgba(60,40,120,0.22); z-index: 500;
       overflow: hidden; max-height: 320px; overflow-y: auto;
     }
     .search-results.open { display: block; }
     .search-result-item {
       display: flex; align-items: center; gap: 0.7rem;
-      padding: 0.65rem 1rem; border-bottom: 1px solid rgba(155,143,212,0.12);
+      padding: 0.65rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.18);
       cursor: pointer; transition: background 0.12s;
     }
     .search-result-item:last-child { border-bottom: none; }
-    .search-result-item:hover { background: rgba(155,143,212,0.1); }
+    .search-result-item:hover { background: rgba(255,255,255,0.12); }
     .search-result-avatar {
       width: 34px; height: 34px; border-radius: 50%; object-fit: cover; flex-shrink: 0;
       background: rgba(155,143,212,0.2); border: 1px solid rgba(255,255,255,0.6);
@@ -138,27 +141,27 @@
     .inbox-panel {
       display: none; position: fixed; top: 44px; right: 0; z-index: 300;
       width: 340px; max-height: calc(100vh - 60px);
-      background: #fef3d8; border-left: 1px solid rgba(155,143,212,0.3);
-      border-bottom: 1px solid rgba(155,143,212,0.3); border-radius: 0 0 0 16px;
+      background: linear-gradient(135deg, rgba(155,143,212,0.48) 0%, rgba(74,181,170,0.32) 100%);
+      backdrop-filter: blur(18px) saturate(1.6);
+      -webkit-backdrop-filter: blur(18px) saturate(1.6);
+      border-left: 1px solid rgba(255,255,255,0.65);
+      border-bottom: 1px solid rgba(255,255,255,0.65); border-radius: 0 0 0 16px;
       box-shadow: -4px 8px 32px rgba(80,60,140,0.18);
       overflow-y: auto; flex-direction: column;
-      /* cream surface — needs locally-scoped dark ink (white ink scale is global) */
-      --ink: #26180e; --ink-2: rgba(38,24,14,0.8); --ink-3: rgba(38,24,14,0.6); --ink-4: rgba(38,24,14,0.42);
-      color: var(--ink); text-shadow: none;
     }
     .inbox-panel.open { display: flex; }
     .inbox-panel-header {
       padding: 0.9rem 1rem 0.6rem; font-size: 0.78rem; font-weight: 900;
-      color: var(--ink); border-bottom: 1px solid rgba(155,143,212,0.2);
+      color: var(--ink); border-bottom: 1px solid rgba(255,255,255,0.25);
       display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
     }
     .inbox-panel-close { background: none; border: none; cursor: pointer; font-size: 1rem; color: var(--ink-3); }
     .inbox-section-label {
       font-size: 0.58rem; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--lavender); padding: 0.65rem 1rem 0.25rem;
+      color: #ded6ff; padding: 0.65rem 1rem 0.25rem;
     }
     .inbox-item {
-      padding: 0.6rem 1rem; border-bottom: 1px solid rgba(155,143,212,0.12);
+      padding: 0.6rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.18);
       display: flex; flex-direction: column; gap: 0.2rem;
     }
     .inbox-item:last-child { border-bottom: none; }
@@ -172,7 +175,7 @@
     }
     .inbox-action-btn:hover { opacity: 0.8; }
     .inbox-btn-accept { background: var(--teal); color: white; }
-    .inbox-btn-decline { background: rgba(0,0,0,0.1); color: var(--ink-3); }
+    .inbox-btn-decline { background: rgba(255,255,255,0.18); color: var(--ink-2); }
     .inbox-empty { font-size: 0.72rem; color: var(--ink-4); font-style: italic; padding: 0.6rem 1rem 0.8rem; }
 
     .site-banner-nav a {
@@ -993,7 +996,11 @@
     }
     .widget-library-overlay.open { display: flex; }
     .widget-library-modal {
-      background: #fef3d8; border-radius: 18px; width: 100%; max-width: 480px;
+      background: linear-gradient(135deg, rgba(155,143,212,0.48) 0%, rgba(74,181,170,0.32) 100%);
+      backdrop-filter: blur(18px) saturate(1.6);
+      -webkit-backdrop-filter: blur(18px) saturate(1.6);
+      border: 1px solid rgba(255,255,255,0.65);
+      border-radius: 18px; width: 100%; max-width: 480px;
       max-height: 80vh; overflow-y: auto;
       box-shadow: 0 24px 64px rgba(0,0,0,0.35);
       padding: 1.5rem;
@@ -1007,17 +1014,17 @@
     .widget-type-card {
       display: flex; align-items: center; gap: 1rem;
       padding: 0.9rem 1rem; border-radius: 12px;
-      background: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.8);
+      background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.35);
       cursor: pointer; transition: background 0.15s, transform 0.15s;
     }
-    .widget-type-card:hover { background: rgba(255,255,255,0.9); transform: translateY(-1px); }
+    .widget-type-card:hover { background: rgba(255,255,255,0.26); transform: translateY(-1px); }
     .widget-type-icon { font-size: 1.8rem; line-height: 1; }
     .widget-type-info { flex: 1; }
     .widget-type-name { font-size: 0.9rem; font-weight: 800; color: var(--ink); margin-bottom: 0.2rem; }
     .widget-type-desc { font-size: 0.72rem; color: var(--ink-3); line-height: 1.4; }
     .widget-library-close {
       margin-top: 1.2rem; width: 100%; padding: 0.6rem;
-      background: none; border: 1px solid rgba(160,125,96,0.3);
+      background: none; border: 1px solid rgba(255,255,255,0.35);
       border-radius: 10px; cursor: pointer; font-family: var(--font);
       font-size: 0.78rem; color: var(--ink-3);
     }
@@ -1093,7 +1100,11 @@
     }
     .mshelf-modal-overlay.open { display: flex; }
     .mshelf-modal {
-      background: #fef3d8; border-radius: 18px; width: 100%; max-width: 360px;
+      background: linear-gradient(135deg, rgba(155,143,212,0.48) 0%, rgba(74,181,170,0.32) 100%);
+      backdrop-filter: blur(18px) saturate(1.6);
+      -webkit-backdrop-filter: blur(18px) saturate(1.6);
+      border: 1px solid rgba(255,255,255,0.65);
+      border-radius: 18px; width: 100%; max-width: 360px;
       padding: 1.5rem; box-shadow: 0 24px 64px rgba(0,0,0,0.35);
     }
     .mshelf-modal h3 { font-size: 1rem; font-weight: 900; color: var(--ink); margin-bottom: 1rem; }
@@ -1101,10 +1112,12 @@
     .mshelf-field label { font-size: 0.7rem; font-weight: 800; color: var(--ink-2); text-transform: uppercase; letter-spacing: 0.05em; }
     .mshelf-field input, .mshelf-field select {
       padding: 0.5rem 0.75rem; border-radius: 8px; font-family: var(--font);
-      border: 1px solid rgba(160,125,96,0.3); background: rgba(255,255,255,0.7);
+      border: 1px solid rgba(255,255,255,0.35); background: rgba(255,255,255,0.15);
       font-size: 0.82rem; color: var(--ink); outline: none;
     }
-    .mshelf-field input:focus, .mshelf-field select:focus { border-color: var(--lavender); }
+    .mshelf-field input::placeholder { color: rgba(255,255,255,0.5); }
+    .mshelf-field select option { color: #26180e; } /* native dropdown popup is white */
+    .mshelf-field input:focus, .mshelf-field select:focus { border-color: rgba(255,255,255,0.8); }
     .mshelf-modal-actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
     .mshelf-modal-save {
       flex: 1; padding: 0.55rem; border-radius: 10px; font-family: var(--font);
@@ -1114,7 +1127,7 @@
     .mshelf-modal-cancel {
       padding: 0.55rem 1rem; border-radius: 10px; font-family: var(--font);
       font-size: 0.82rem; cursor: pointer; background: none;
-      border: 1px solid rgba(160,125,96,0.3); color: var(--ink-3);
+      border: 1px solid rgba(255,255,255,0.35); color: var(--ink-3);
     }
 
     /* Now Playing widget */
@@ -1207,7 +1220,11 @@
     }
     .np-modal-overlay.open { display: flex; }
     .np-modal {
-      background: #fef3d8; border-radius: 18px; width: 100%; max-width: 360px;
+      background: linear-gradient(135deg, rgba(155,143,212,0.48) 0%, rgba(74,181,170,0.32) 100%);
+      backdrop-filter: blur(18px) saturate(1.6);
+      -webkit-backdrop-filter: blur(18px) saturate(1.6);
+      border: 1px solid rgba(255,255,255,0.65);
+      border-radius: 18px; width: 100%; max-width: 360px;
       padding: 1.5rem; box-shadow: 0 24px 64px rgba(0,0,0,0.35);
     }
     .np-modal h3 { font-size: 1rem; font-weight: 900; color: var(--ink); margin-bottom: 1rem; }
@@ -1365,19 +1382,14 @@
       align-items: center; justify-content: center;
     }
     .modal-overlay.open { display: flex; }
-    /* These modals sit on a cream (#fef3d8) sheet, but the global --ink scale is
-       white (for glass cards over the backdrop) — re-darken text + inputs locally
-       with warm tones so labels, fields and buttons stay readable. Setting color
-       here makes even inputs that don't declare their own color inherit dark. */
-    .modal-box, .np-modal, .mshelf-modal {
-      --ink:   #26180e;
-      --ink-2: #5a3e28;
-      --ink-3: #7a5c42;
-      --ink-4: #b89a7e;
-      color: var(--ink);
-    }
+    /* Modal sheets are frosted glass (same recipe as .glass cards), so the
+       global white --ink scale applies directly — no local dark override. */
     .modal-box {
-      background: #fef3d8; border-radius: 20px; padding: 2rem;
+      background: linear-gradient(135deg, rgba(155,143,212,0.48) 0%, rgba(74,181,170,0.32) 100%);
+      backdrop-filter: blur(18px) saturate(1.6);
+      -webkit-backdrop-filter: blur(18px) saturate(1.6);
+      border: 1px solid rgba(255,255,255,0.65);
+      border-radius: 20px; padding: 2rem;
       width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(38,24,14,0.25);
     }
     .modal-box h3 { font-size: 1rem; font-weight: 800; color: var(--ink); margin-bottom: 1.25rem; }
@@ -1387,15 +1399,16 @@
     }
     .modal-input, .modal-textarea {
       width: 100%; padding: 0.65rem 0.9rem; border-radius: 10px;
-      border: 1px solid rgba(232,153,42,0.35); background: rgba(255,255,255,0.75);
+      border: 1px solid rgba(255,255,255,0.35); background: rgba(255,255,255,0.15);
       font-family: var(--font); font-size: 0.88rem; color: var(--ink); outline: none;
     }
+    .modal-input::placeholder, .modal-textarea::placeholder { color: rgba(255,255,255,0.5); }
     .modal-textarea { resize: vertical; min-height: 80px; }
-    .modal-input:focus, .modal-textarea:focus { border-color: var(--amber); }
+    .modal-input:focus, .modal-textarea:focus { border-color: rgba(255,255,255,0.8); }
     .modal-actions { display: flex; gap: 0.75rem; margin-top: 1.25rem; }
     .modal-actions button { flex: 1; padding: 0.7rem; border-radius: 10px; font-family: var(--font); font-size: 0.88rem; font-weight: 700; cursor: pointer; border: none; }
     .btn-save   { background: linear-gradient(135deg, var(--amber-light), var(--amber)); color: white; }
-    .btn-cancel { background: rgba(0,0,0,0.08); color: var(--ink-2); }
+    .btn-cancel { background: rgba(255,255,255,0.18); color: var(--ink-2); }
 
     /* ── Stamp picker ── */
     .stamp-picker {
@@ -2742,7 +2755,7 @@
           grid.appendChild(card);
         });
         const divider = document.createElement('div');
-        divider.style.cssText = 'border-top:1px solid rgba(160,125,96,0.15);margin:0.8rem 0';
+        divider.style.cssText = 'border-top:1px solid rgba(255,255,255,0.25);margin:0.8rem 0';
         grid.appendChild(divider);
         const label2 = document.createElement('div');
         label2.style.cssText = 'font-size:0.68rem;font-weight:800;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.4rem';
