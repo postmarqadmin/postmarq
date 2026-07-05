@@ -746,7 +746,17 @@
       display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
       padding: 0 1rem 1.1rem;
     }
-    .pick-six-tile { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+    .pick-six-tile { display: flex; flex-direction: column; align-items: center; gap: 5px; position: relative; }
+    .pick-six-msg-badge {
+      position: absolute; top: -6px; right: -6px; z-index: 2;
+      background: #e8992a; color: #fff;
+      font-size: 0.58rem; font-weight: 900; line-height: 1;
+      min-width: 18px; height: 18px; padding: 0 5px; border-radius: 99px;
+      display: none; align-items: center; justify-content: center;
+      border: 2px solid rgba(255,255,255,0.9);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      pointer-events: none;
+    }
     .pick-six-slot {
       width: 100%; aspect-ratio: 3/4; border-radius: 10px;
       border: 2px dashed rgba(155,143,212,0.4);
@@ -3423,6 +3433,7 @@
       const grid = document.getElementById('pickSixGrid');
       grid.innerHTML = pickSixSlots.map((slot, i) => `
         <div class="pick-six-tile">
+          ${slot?.profileId ? `<span class="pick-six-msg-badge" data-msg-badge="${slot.profileId}"></span>` : ''}
           <div class="pick-six-slot" data-slot="${i}" data-handle="${slot?.handle || ''}" data-filled="${slot ? '1' : '0'}" onclick="pickSixTileClick(this)" title="${slot ? 'Visit ' + (slot.name || '') : 'Add friend'}">
             ${slot?.img ? `<img src="${slot.img}" alt="${slot.name || ''}" />` : '<span class="slot-plus">+</span>'}
           </div>
@@ -3432,6 +3443,7 @@
       const filled = pickSixSlots.filter(Boolean).length;
       const ybFriends = document.getElementById('ybFriends');
       if (ybFriends) ybFriends.textContent = filled;
+      updatePickSixMsgBadges();
     }
 
     let pendingPickSixIdx = -1;
@@ -4206,6 +4218,7 @@
 
     // ── Inbox ──
     let inboxOpen = false;
+    let unreadBySender = {};
 
     async function loadInbox() {
       const bell = document.getElementById('inboxBellBtn');
@@ -4217,7 +4230,18 @@
         sb.from('friend_requests').select('*, profiles:from_user_id(full_name, handle)').eq('to_user_id', currentUser.id).eq('status', 'pending').order('created_at', { ascending: false })
       ]);
 
-      const total = (messages?.length || 0) + (requests?.length || 0);
+      // Unread = messages newer than the last time the inbox was opened
+      const seenAt = parseInt(localStorage.getItem(`${localKey}_inboxSeenAt`) || '0');
+      unreadBySender = {};
+      (messages || []).forEach(m => {
+        if (m.from_user_id && new Date(m.created_at).getTime() > seenAt) {
+          unreadBySender[m.from_user_id] = (unreadBySender[m.from_user_id] || 0) + 1;
+        }
+      });
+      updatePickSixMsgBadges();
+
+      const unreadTotal = Object.values(unreadBySender).reduce((a, b) => a + b, 0);
+      const total = unreadTotal + (requests?.length || 0);
       badge.textContent = total;
       badge.classList.toggle('has-items', total > 0);
 
@@ -4274,6 +4298,21 @@
     function toggleInbox() {
       inboxOpen = !inboxOpen;
       document.getElementById('inboxPanel').classList.toggle('open', inboxOpen);
+      if (inboxOpen) {
+        // Opening the inbox marks everything seen — clear tile badges + bell
+        localStorage.setItem(`${localKey}_inboxSeenAt`, Date.now().toString());
+        unreadBySender = {};
+        updatePickSixMsgBadges();
+        loadInbox();
+      }
+    }
+
+    function updatePickSixMsgBadges() {
+      document.querySelectorAll('[data-msg-badge]').forEach(el => {
+        const n = unreadBySender[el.dataset.msgBadge] || 0;
+        el.style.display = n ? 'flex' : 'none';
+        el.textContent = n > 9 ? '9+' : n;
+      });
     }
 
     // ── Add to Friends ──
