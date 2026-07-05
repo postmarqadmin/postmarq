@@ -398,6 +398,19 @@
 
         <!-- Form -->
         <div class="xp-form-area">
+
+          <!-- Invite banner (shown when arriving via ?invite=CODE) -->
+          <div id="inviteBanner" style="display:none;background:#FFFFE1;border:1px solid #ACA899;padding:7px 9px;margin-bottom:10px;font-size:11px;color:#333;line-height:1.5;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <img id="inviteBannerAvatar" src="" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;border:1px solid #ACA899;display:none;" />
+              <div>
+                <b id="inviteBannerName">Someone</b> looped you in to Postmarq.
+                <div id="inviteBannerNote" style="display:none;font-style:italic;color:#555;margin-top:2px;"></div>
+              </div>
+            </div>
+            <div style="margin-top:5px;color:#006600;">Create your Post below and you'll be connected automatically.</div>
+          </div>
+
           <div class="xp-form-title" id="xpFormTitle">Sign in to your Post</div>
 
           <!-- Sign in form -->
@@ -519,6 +532,39 @@
     async function redirectToPost(userId) {
       window.location.replace('/home');
     }
+
+    // ── Invite link arrival (?invite=CODE) ──
+    // Store the code FIRST (synchronously) so it survives every path to /home:
+    // instant signup, email-confirm-then-login, or an already-signed-in user.
+    // my-post.html claims it in startApp() via claim_invite().
+    const _inviteCode = new URLSearchParams(location.search).get('invite');
+    if (_inviteCode) localStorage.setItem('pm_invite_code', _inviteCode);
+
+    async function initInviteBanner() {
+      if (!_inviteCode) return;
+      const { data, error } = await sb.rpc('get_invite', { invite_code: _inviteCode });
+      const inv = data && data[0];
+      if (error || !inv || inv.status !== 'pending') {
+        if (inv && inv.status !== 'pending') localStorage.removeItem('pm_invite_code');
+        return;
+      }
+      document.getElementById('inviteBannerName').textContent = inv.inviter_name || 'A friend';
+      if (inv.inviter_avatar) {
+        const av = document.getElementById('inviteBannerAvatar');
+        av.src = inv.inviter_avatar;
+        av.style.display = '';
+      }
+      if (inv.note) {
+        const noteEl = document.getElementById('inviteBannerNote');
+        noteEl.textContent = '“' + inv.note + '”';
+        noteEl.style.display = '';
+      }
+      document.getElementById('inviteBanner').style.display = '';
+      showSignup();
+      document.getElementById('xpFormTitle').textContent = 'Claim your Post';
+      document.getElementById('statusText').textContent = 'Invited by ' + (inv.inviter_name || 'a friend');
+    }
+    initInviteBanner();
 
     sb.auth.getSession().then(async function(r) {
       if (!r.data.session) return;

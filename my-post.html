@@ -2086,25 +2086,32 @@
     </div>
   </div>
 
-  <!-- ── Send Invite Modal ── -->
+  <!-- ── Loop Someone In (invite link) Modal ── -->
   <div class="modal-overlay" id="inviteModal">
     <div class="modal-box">
       <div id="inviteFormState">
-        <h3>Invite someone to Postmarq</h3>
-        <label class="modal-label" for="inviteEmail">Their email address</label>
-        <input class="modal-input" type="email" id="inviteEmail" placeholder="friend@example.com" />
-        <label class="modal-label" for="inviteNote" style="margin-top:0.6rem">Personal note <span style="opacity:0.4;font-weight:400">(optional)</span></label>
+        <h3>Loop someone in</h3>
+        <div style="font-size:0.85rem;line-height:1.5;opacity:0.75;margin-bottom:0.6rem">
+          Make a personal invite link and text it to a friend. When they sign up
+          through it, you two are automatically connected.
+        </div>
+        <label class="modal-label" for="inviteNote">Personal note <span style="opacity:0.4;font-weight:400">(optional — they'll see it when they arrive)</span></label>
         <textarea class="modal-textarea" id="inviteNote" maxlength="200" placeholder="Hey, I think you'd like this..." style="height:80px"></textarea>
         <div class="modal-actions">
           <button class="btn-cancel" onclick="closeModal('inviteModal')">Cancel</button>
-          <button class="btn-save" onclick="sendInvite()">Send Invite</button>
+          <button class="btn-save" onclick="createInviteLink()" id="inviteCreateBtn">Create Invite Link</button>
         </div>
       </div>
       <div id="inviteSentState" class="msg-sent-state" style="display:none">
-        <div class="msg-sent-icon"><i class="ti ti-send"></i></div>
-        <div class="msg-sent-title">Invite sent!</div>
-        <div class="msg-sent-sub">They'll get an email to join Postmarq.</div>
+        <div class="msg-sent-icon"><i class="ti ti-link"></i></div>
+        <div class="msg-sent-title">Your invite link is ready</div>
+        <div class="msg-sent-sub">Text it, DM it, write it on a napkin. One link, one friend.</div>
+        <div style="display:flex;gap:0.4rem;margin-top:0.8rem">
+          <input class="modal-input" id="inviteLinkOut" readonly style="flex:1;font-size:0.8rem" onclick="this.select()" />
+          <button class="btn-save" id="inviteCopyBtn" onclick="copyInviteLink()" style="white-space:nowrap">Copy</button>
+        </div>
         <div class="modal-actions" style="justify-content:center;margin-top:1rem">
+          <button class="btn-cancel" onclick="openInviteModal()">New Link</button>
           <button class="btn-save" onclick="closeModal('inviteModal')">Done</button>
         </div>
       </div>
@@ -2289,6 +2296,7 @@
 
       setDate();
       await loadProfile();
+      claimPendingInvite();
 
       await renderMyQ();
       initFeedControls();
@@ -4224,28 +4232,65 @@
       alert('Friend request sent! Dave will see it when he checks in. ✓');
     }
 
-    // ── Send Invite ──
+    // ── Loop Someone In (invite links) ──
     function openInviteModal() {
       if (!currentUser) { alert('You need to be logged in to send invites.'); return; }
-      document.getElementById('inviteEmail').value = '';
       document.getElementById('inviteNote').value = '';
       document.getElementById('inviteFormState').style.display = '';
       document.getElementById('inviteSentState').style.display = 'none';
       openModal('inviteModal');
     }
 
-    async function sendInvite() {
-      const email = document.getElementById('inviteEmail').value.trim();
-      if (!email || !email.includes('@')) { alert('Please enter a valid email.'); return; }
+    async function createInviteLink() {
+      const btn = document.getElementById('inviteCreateBtn');
+      btn.disabled = true; btn.textContent = 'Creating...';
       const note = document.getElementById('inviteNote').value.trim();
+      const code = Array.from(crypto.getRandomValues(new Uint8Array(9)))
+        .map(b => 'abcdefghjkmnpqrstuvwxyz23456789'[b % 31]).join('');
       const { error } = await sb.from('invites').insert({
         from_user_id: currentUser.id,
-        to_email: email,
+        code,
         note: note || null
       });
-      if (error) { alert('Failed to send invite: ' + error.message); return; }
+      btn.disabled = false; btn.textContent = 'Create Invite Link';
+      if (error) { alert('Failed to create invite: ' + error.message); return; }
+      document.getElementById('inviteLinkOut').value = `${location.origin}/login?invite=${code}`;
       document.getElementById('inviteFormState').style.display = 'none';
       document.getElementById('inviteSentState').style.display = '';
+    }
+
+    async function copyInviteLink() {
+      const link = document.getElementById('inviteLinkOut').value;
+      const btn = document.getElementById('inviteCopyBtn');
+      try {
+        await navigator.clipboard.writeText(link);
+      } catch (e) {
+        document.getElementById('inviteLinkOut').select();
+        document.execCommand('copy');
+      }
+      btn.textContent = 'Copied ✓';
+      setTimeout(() => { btn.textContent = 'Copy'; }, 1600);
+    }
+
+    // Claim a pending invite code (saved by login.html when someone arrives
+    // via an invite link). Creates the friendship server-side via claim_invite().
+    async function claimPendingInvite() {
+      const code = localStorage.getItem('pm_invite_code');
+      if (!code) return;
+      localStorage.removeItem('pm_invite_code');
+      const { data, error } = await sb.rpc('claim_invite', { invite_code: code });
+      if (error || !data?.ok) return; // invalid/used/own invite — silently drop
+      showInviteToast(`You're now connected with ${data.inviter_name || 'your friend'} ✓`);
+      loadInbox(); // friendship may affect counts
+    }
+
+    function showInviteToast(text) {
+      const t = document.createElement('div');
+      t.textContent = text;
+      t.style.cssText = 'position:fixed;left:50%;bottom:56px;transform:translateX(-50%);background:#1a9e74;color:#fff;font-weight:700;font-size:0.9rem;padding:0.7rem 1.2rem;border-radius:999px;box-shadow:0 6px 24px rgba(0,0,0,0.25);z-index:400;opacity:0;transition:opacity 0.3s';
+      document.body.appendChild(t);
+      requestAnimationFrame(() => { t.style.opacity = '1'; });
+      setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 4000);
     }
 
     // ── Block User ──
