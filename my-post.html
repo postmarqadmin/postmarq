@@ -698,6 +698,66 @@
     .yb-stat-num { font-size: 1.4rem; font-weight: 900; color: var(--amber); line-height: 1; }
     .yb-stat-lbl { font-size: 0.55rem; font-weight: 700; color: var(--ink-3); margin-top: 0.2rem; text-transform: uppercase; letter-spacing: 0.06em; }
 
+    /* ── Yearbook tile grid ── */
+    .yb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.5rem; }
+    .yb-tile {
+      position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden;
+      cursor: pointer; border: 1px solid rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.15);
+    }
+    .yb-tile img, .yb-tile video {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      transition: transform 0.2s;
+    }
+    .yb-tile:hover img, .yb-tile:hover video { transform: scale(1.05); }
+    .yb-tile-badge {
+      position: absolute; top: 6px; right: 6px;
+      background: rgba(0,0,0,0.55); color: #fff;
+      font-size: 0.58rem; font-weight: 800; padding: 2px 7px; border-radius: 99px;
+    }
+    .yb-tile-meta {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 1rem 0.55rem 0.4rem;
+      background: linear-gradient(transparent, rgba(0,0,0,0.6));
+      color: #fff; font-size: 0.58rem; font-weight: 700;
+      display: flex; gap: 0.7rem; pointer-events: none;
+    }
+
+    /* ── Yearbook viewer modal ── */
+    .yb-viewer-box {
+      background: linear-gradient(135deg, rgba(155,143,212,0.48) 0%, rgba(74,181,170,0.32) 100%);
+      backdrop-filter: blur(18px) saturate(1.6);
+      -webkit-backdrop-filter: blur(18px) saturate(1.6);
+      border: 1px solid rgba(255,255,255,0.65);
+      border-radius: 20px; padding: 1.25rem;
+      width: 100%; max-width: 540px; max-height: 86vh; overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(38,24,14,0.25);
+    }
+    .ybv-head {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 0.72rem; font-weight: 800; color: var(--ink-2); margin-bottom: 0.75rem;
+    }
+    .ybv-close { background: none; border: none; cursor: pointer; font-size: 1rem; color: var(--ink-3); padding: 0; }
+    .ybv-media img, .ybv-media video { width: 100%; border-radius: 12px; display: block; margin-bottom: 0.5rem; }
+    .ybv-body { font-size: 0.85rem; color: var(--ink); line-height: 1.5; margin: 0.5rem 0; }
+    .ybv-section-label {
+      font-size: 0.58rem; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase;
+      color: #ded6ff; margin: 0.9rem 0 0.35rem;
+    }
+    .ybv-person { display: flex; align-items: center; gap: 0.55rem; padding: 0.28rem 0; }
+    .ybv-av {
+      width: 26px; height: 26px; border-radius: 50%; object-fit: cover; flex-shrink: 0;
+      background: rgba(255,255,255,0.25); border: 1px solid rgba(255,255,255,0.5);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 900; color: #fff; text-decoration: none; overflow: hidden;
+    }
+    .ybv-av img { width: 100%; height: 100%; object-fit: cover; }
+    .ybv-person-name { font-size: 0.74rem; font-weight: 800; color: var(--ink); }
+    .ybv-person-sub { font-size: 0.68rem; color: var(--ink-2); line-height: 1.4; }
+    .ybv-person-time { font-size: 0.58rem; color: var(--ink-4); }
+    .ybv-stamp-emoji { font-size: 0.9rem; margin-left: auto; }
+    .ybv-empty { font-size: 0.7rem; color: var(--ink-4); font-style: italic; padding: 0.2rem 0 0.4rem; }
+
     /* ── Pick Six ── */
     .pick-six-card {
       border-radius: 14px; overflow: hidden;
@@ -1835,11 +1895,12 @@
             <div class="yb-stat"><div class="yb-stat-num" id="ybStamps">0</div><div class="yb-stat-lbl">Stamps<br>Sent</div></div>
             <div class="yb-stat"><div class="yb-stat-num" id="ybFriends">0</div><div class="yb-stat-lbl">My<br>Friends</div></div>
           </div>
-          <div class="glass" style="border-radius:var(--radius-lg)">
+          <div class="yb-grid" id="ybGrid" style="display:none"></div>
+          <div class="glass" id="ybEmpty" style="border-radius:var(--radius-lg)">
             <div class="empty-state">
               <div class="empty-icon">📖</div>
               <div>Your Yearbook is empty.</div>
-              <div class="empty-hint">Photos and posts you share will be archived here.</div>
+              <div class="empty-hint">Photos and videos you post will be archived here.</div>
             </div>
           </div>
         </div>
@@ -2121,6 +2182,11 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- ── Yearbook Viewer Modal ── -->
+  <div class="modal-overlay" id="ybViewerModal">
+    <div class="yb-viewer-box" id="ybViewerBox"></div>
   </div>
 
   <!-- ── Avatar Crop Modal ── -->
@@ -4101,6 +4167,111 @@
       document.getElementById('panel-' + name).classList.add('active');
       event.currentTarget.classList.add('active');
       if (name === 'weekly') renderWeekly();
+      if (name === 'yearbook') loadYearbook();
+    }
+
+    // ── Yearbook ──
+    let ybMediaPosts = [];
+
+    async function loadYearbook() {
+      const grid = document.getElementById('ybGrid');
+      const empty = document.getElementById('ybEmpty');
+      const { data, error } = await sb.from('posts')
+        .select('id, body, media, created_at, stamps(count), comments(count)')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false });
+      if (error) { console.warn('yearbook load failed:', error.message); return; }
+      ybMediaPosts = (data || []).filter(p => (p.media || []).length);
+
+      const cap = document.getElementById('ybCaptures');
+      if (cap) cap.textContent = ybMediaPosts.reduce((n, p) => n + p.media.length, 0);
+
+      if (!ybMediaPosts.length) { grid.style.display = 'none'; empty.style.display = ''; return; }
+      empty.style.display = 'none'; grid.style.display = '';
+      grid.innerHTML = ybMediaPosts.map(p => {
+        const m = p.media[0];
+        const thumb = m.kind === 'image'
+          ? `<img src="${m.src}" alt="" loading="lazy" />`
+          : `<video src="${m.src}" muted preload="metadata" playsinline></video>`;
+        const badge = p.media.length > 1
+          ? `<div class="yb-tile-badge">+${p.media.length - 1}</div>`
+          : (m.kind === 'video' ? `<div class="yb-tile-badge">▶</div>` : '');
+        const sc = p.stamps?.[0]?.count || 0;
+        const cc = p.comments?.[0]?.count || 0;
+        return `<div class="yb-tile" onclick="openYbViewer('${p.id}')">${thumb}${badge}
+          <div class="yb-tile-meta"><span>${sc} stamp${sc === 1 ? '' : 's'}</span><span>${cc} repl${cc === 1 ? 'y' : 'ies'}</span></div>
+        </div>`;
+      }).join('');
+    }
+
+    async function openYbViewer(postId) {
+      const p = ybMediaPosts.find(x => x.id === postId);
+      if (!p) return;
+      const box = document.getElementById('ybViewerBox');
+      const mediaHtml = p.media.map(m => m.kind === 'image'
+        ? `<img src="${m.src}" onclick="lbOpen('${m.src}')" style="cursor:zoom-in" />`
+        : `<video src="${m.src}" controls playsinline></video>`).join('');
+      const dateStr = new Date(p.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+      box.innerHTML = `
+        <div class="ybv-head"><span>${dateStr}</span><button class="ybv-close" onclick="closeModal('ybViewerModal')">✕</button></div>
+        <div class="ybv-media">${mediaHtml}</div>
+        ${p.body ? `<div class="ybv-body">${escHtml(p.body).replace(/\n/g, '<br>')}</div>` : ''}
+        <div class="ybv-section-label">Stamped by</div><div id="ybvStamps" class="ybv-empty">Loading…</div>
+        <div class="ybv-section-label">Replies</div><div id="ybvComments" class="ybv-empty">Loading…</div>`;
+      openModal('ybViewerModal');
+
+      const [{ data: stampRows }, { data: commentRows }] = await Promise.all([
+        sb.from('stamps').select('user_id').eq('post_id', postId),
+        sb.from('comments').select('user_id, body, created_at').eq('post_id', postId).order('created_at', { ascending: true })
+      ]);
+
+      // stamps.user_id / comments.user_id reference auth.users, not profiles —
+      // PostgREST can't embed, so fetch all involved profiles in one query
+      const ids = [...new Set([...(stampRows || []).map(r => r.user_id), ...(commentRows || []).map(r => r.user_id)])];
+      const profMap = {};
+      if (ids.length) {
+        const { data: profs } = await sb.from('profiles').select('id, full_name, avatar_url, handle, stamp').in('id', ids);
+        (profs || []).forEach(pr => { profMap[pr.id] = pr; });
+      }
+
+      const avHtml = (prof, name) => {
+        const inner = prof?.avatar_url ? `<img src="${prof.avatar_url}" alt="" />` : escHtml(name.charAt(0).toUpperCase());
+        const handle = (prof?.handle || '').replace('.postmarq', '');
+        return handle ? `<a class="ybv-av" href="/${handle}">${inner}</a>` : `<div class="ybv-av">${inner}</div>`;
+      };
+
+      const stampsEl = document.getElementById('ybvStamps');
+      if (!(stampRows || []).length) {
+        stampsEl.textContent = 'No stamps yet.';
+      } else {
+        stampsEl.className = '';
+        stampsEl.innerHTML = stampRows.map(r => {
+          const prof = profMap[r.user_id];
+          const name = prof?.full_name || 'Someone';
+          return `<div class="ybv-person">${avHtml(prof, name)}
+            <span class="ybv-person-name">${escHtml(name)}</span>
+            ${prof?.stamp ? `<span class="ybv-stamp-emoji">${prof.stamp}</span>` : ''}
+          </div>`;
+        }).join('');
+      }
+
+      const commentsEl = document.getElementById('ybvComments');
+      if (!(commentRows || []).length) {
+        commentsEl.textContent = 'No replies yet.';
+      } else {
+        commentsEl.className = '';
+        commentsEl.innerHTML = commentRows.map(c => {
+          const prof = profMap[c.user_id];
+          const name = prof?.full_name || 'Someone';
+          const when = new Date(c.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          return `<div class="ybv-person" style="align-items:flex-start">${avHtml(prof, name)}
+            <div>
+              <span class="ybv-person-name">${escHtml(name)}</span> <span class="ybv-person-time">${when}</span>
+              <div class="ybv-person-sub">${escHtml(c.body).replace(/\n/g, '<br>')}</div>
+            </div>
+          </div>`;
+        }).join('');
+      }
     }
 
     // ── Lightbox ──
