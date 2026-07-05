@@ -546,33 +546,6 @@
     @keyframes feed-angle {
       to { --feed-angle: 360deg; }
     }
-    .feed-controls-wrap {
-      border-radius: var(--radius-lg); width: 100%;
-    }
-    .feed-controls {
-      border-radius: var(--radius-lg); padding: 0.65rem 1rem;
-      background: var(--glass-white); backdrop-filter: blur(18px) saturate(1.6);
-      -webkit-backdrop-filter: blur(18px) saturate(1.6);
-      border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);
-      display: flex; align-items: center; gap: 0.5rem;
-    }
-    .fc-label { font-size: 0.62rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; color: #1a9e74; }
-    .fc-select {
-      background: none; border: none; font-family: var(--font);
-      font-size: 0.75rem; font-weight: 800; color: var(--ink); cursor: pointer;
-      padding: 0.2rem 0.3rem; border-radius: 6px; transition: background 0.15s;
-      -webkit-appearance: none; appearance: none;
-    }
-    .fc-select:focus { outline: none; background: rgba(0,180,120,0.08); }
-    .fc-divider { width: 1px; height: 14px; background: rgba(0,0,0,0.1); margin: 0 4px; }
-    .fc-spacer { flex: 1; }
-    .fc-refresh-btn {
-      background: none; border: 1px solid rgba(0,180,120,0.35); border-radius: 6px;
-      width: 26px; height: 26px; display: flex; align-items: center; justify-content: center;
-      color: #1a9e74; cursor: pointer; font-size: 0.85rem; transition: background 0.15s;
-      line-height: 1;
-    }
-    .fc-refresh-btn:hover { background: rgba(0,180,120,0.1); }
 
     /* ── Feed Tabs ── */
     .feed-tabs {
@@ -1842,19 +1815,6 @@
         </div>
 
         <!-- Feed Controls -->
-        <div class="feed-controls-wrap">
-        <div class="feed-controls">
-          <span class="fc-label">Showing</span>
-          <select class="fc-select" id="fcAudience" onchange="setFeedAudience(this.value)">
-            <option value="everyone">Everyone</option>
-            <option value="friends" selected>Friends</option>
-            <option value="me">Just Me</option>
-          </select>
-          <div class="fc-spacer"></div>
-          <button class="fc-refresh-btn" onclick="forceRefreshFeed()" title="Refresh feed">↻</button>
-        </div>
-        </div>
-
         <!-- Feed Tabs -->
         <div class="feed-tabs">
           <button class="feed-tab active" onclick="switchTab('daily')">Daily</button>
@@ -2306,8 +2266,8 @@
     let localKey = null;
     let cachedPosts = null;
     let cachedMyStamps = new Set();
-    let feedPrefs = { audience: 'friends', frequency: 'day' };
-    const FREQ_MS = { '1h': 3600000, '12h': 43200000, 'day': 86400000, 'week': 604800000 };
+    // Feed always shows friends + own posts (audience/frequency controls removed 2026-07-05)
+    let feedPrefs = { audience: 'friends' };
     let weeklyRendered = false;
 
     // ── Stamps palette ──
@@ -2370,9 +2330,7 @@
       claimPendingInvite();
 
       await renderMyQ();
-      initFeedControls();
       await renderFeed();
-      setInterval(updateLastUpdatedLabel, 60000);
       loadInbox();
       await loadWidgets(); // builds canvas → triggers renderPickSix, renderCandids, loadSites
       initLoungeNotifications();
@@ -3924,42 +3882,6 @@
       await loadComments(postId);
     }
 
-    function initFeedControls() {
-      const saved = localStorage.getItem(`${localKey}_feedPrefs`);
-      if (saved) feedPrefs = JSON.parse(saved);
-      const aud = document.getElementById('fcAudience');
-      if (aud) aud.value = feedPrefs.audience;
-      updateLastUpdatedLabel();
-    }
-
-    function setFeedAudience(val) {
-      feedPrefs.audience = val;
-      saveFeedPrefs();
-      forceRefreshFeed();
-    }
-
-    function saveFeedPrefs() {
-      localStorage.setItem(`${localKey}_feedPrefs`, JSON.stringify(feedPrefs));
-    }
-
-    function updateLastUpdatedLabel() {
-      const el = document.getElementById('fcLastUpdated');
-      if (!el) return;
-      const ts = parseInt(localStorage.getItem(`${localKey}_feedFetchedAt`) || '0');
-      if (!ts) { el.textContent = 'Not yet loaded'; return; }
-      el.textContent = 'Updated ' + timeAgo(ts);
-    }
-
-    function shouldRefreshFeed() {
-      const ts = parseInt(localStorage.getItem(`${localKey}_feedFetchedAt`) || '0');
-      return !ts || (Date.now() - ts) > FREQ_MS[feedPrefs.frequency];
-    }
-
-    async function forceRefreshFeed() {
-      localStorage.removeItem(`${localKey}_feedFetchedAt`);
-      await renderFeed();
-    }
-
     async function loadPosts() {
       let query = sb.from('posts').select('id, user_id, body, media, created_at, stamps(count), comments(count), profiles:user_id(full_name, avatar_url, handle)');
 
@@ -3981,10 +3903,6 @@
 
       const { data: posts, error: fetchError } = await query.order('created_at', { ascending: false }).limit(50);
       cachedPosts = posts || [];
-
-      const key = `${localKey}_feedFetchedAt`;
-      localStorage.setItem(key, Date.now().toString());
-      updateLastUpdatedLabel();
 
       const postIds = cachedPosts.map(p => p.id);
       if (postIds.length) {
