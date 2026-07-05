@@ -1790,14 +1790,6 @@
             <option value="friends" selected>Friends</option>
             <option value="me">Just Me</option>
           </select>
-          <div class="fc-divider"></div>
-          <span class="fc-label">Every</span>
-          <select class="fc-select" id="fcFrequency" onchange="setFeedFrequency(this.value)">
-            <option value="1h">Hour</option>
-            <option value="12h">12 Hours</option>
-            <option value="day">Day</option>
-            <option value="week">Week</option>
-          </select>
           <div class="fc-spacer"></div>
           <button class="fc-refresh-btn" onclick="forceRefreshFeed()" title="Refresh feed">↻</button>
         </div>
@@ -3870,9 +3862,7 @@
       const saved = localStorage.getItem(`${localKey}_feedPrefs`);
       if (saved) feedPrefs = JSON.parse(saved);
       const aud = document.getElementById('fcAudience');
-      const freq = document.getElementById('fcFrequency');
       if (aud) aud.value = feedPrefs.audience;
-      if (freq) freq.value = feedPrefs.frequency;
       updateLastUpdatedLabel();
     }
 
@@ -3880,11 +3870,6 @@
       feedPrefs.audience = val;
       saveFeedPrefs();
       forceRefreshFeed();
-    }
-
-    function setFeedFrequency(val) {
-      feedPrefs.frequency = val;
-      saveFeedPrefs();
     }
 
     function saveFeedPrefs() {
