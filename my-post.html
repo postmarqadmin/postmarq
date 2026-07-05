@@ -121,62 +121,6 @@
     .search-loop-btn.sent { background: rgba(74,181,170,0.15); border-color: rgba(74,181,170,0.4); color: var(--teal); cursor: default; }
     .search-empty { padding: 1rem; font-size: 0.72rem; color: var(--ink-4); font-style: italic; text-align: center; }
 
-    /* Inbox bell */
-    .inbox-bell-btn {
-      position: relative; background: none; border: none; cursor: pointer;
-      color: rgba(255,255,255,0.82); font-size: 1.1rem; display: flex; align-items: center;
-      padding: 0; transition: color 0.15s;
-    }
-    .inbox-bell-btn:hover { color: #fff; }
-    .inbox-badge {
-      position: absolute; top: -5px; right: -7px;
-      background: #e8992a; color: #fff;
-      font-size: 0.55rem; font-weight: 900; line-height: 1;
-      padding: 2px 4px; border-radius: 99px; min-width: 14px; text-align: center;
-      display: none;
-    }
-    .inbox-badge.has-items { display: block; }
-
-    /* Inbox panel */
-    .inbox-panel {
-      display: none; position: fixed; top: 44px; right: 0; z-index: 300;
-      width: 340px; max-height: calc(100vh - 60px);
-      background: linear-gradient(135deg, rgba(155,143,212,0.48) 0%, rgba(74,181,170,0.32) 100%);
-      backdrop-filter: blur(18px) saturate(1.6);
-      -webkit-backdrop-filter: blur(18px) saturate(1.6);
-      border-left: 1px solid rgba(255,255,255,0.65);
-      border-bottom: 1px solid rgba(255,255,255,0.65); border-radius: 0 0 0 16px;
-      box-shadow: -4px 8px 32px rgba(80,60,140,0.18);
-      overflow-y: auto; flex-direction: column;
-    }
-    .inbox-panel.open { display: flex; }
-    .inbox-panel-header {
-      padding: 0.9rem 1rem 0.6rem; font-size: 0.78rem; font-weight: 900;
-      color: var(--ink); border-bottom: 1px solid rgba(255,255,255,0.25);
-      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
-    }
-    .inbox-panel-close { background: none; border: none; cursor: pointer; font-size: 1rem; color: var(--ink-3); }
-    .inbox-section-label {
-      font-size: 0.58rem; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase;
-      color: #ded6ff; padding: 0.65rem 1rem 0.25rem;
-    }
-    .inbox-item {
-      padding: 0.6rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.18);
-      display: flex; flex-direction: column; gap: 0.2rem;
-    }
-    .inbox-item:last-child { border-bottom: none; }
-    .inbox-item-from { font-size: 0.72rem; font-weight: 800; color: var(--ink); }
-    .inbox-item-body { font-size: 0.7rem; color: var(--ink-2); line-height: 1.45; }
-    .inbox-item-time { font-size: 0.6rem; color: var(--ink-4); }
-    .inbox-item-actions { display: flex; gap: 0.4rem; margin-top: 0.3rem; }
-    .inbox-action-btn {
-      font-size: 0.62rem; font-weight: 700; padding: 0.18rem 0.5rem; border-radius: 6px;
-      border: none; cursor: pointer; font-family: var(--font); transition: opacity 0.15s;
-    }
-    .inbox-action-btn:hover { opacity: 0.8; }
-    .inbox-btn-accept { background: var(--teal); color: white; }
-    .inbox-btn-decline { background: rgba(255,255,255,0.18); color: var(--ink-2); }
-    .inbox-empty { font-size: 0.72rem; color: var(--ink-4); font-style: italic; padding: 0.6rem 1rem 0.8rem; }
 
     .site-banner-nav a {
       font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.82);
@@ -755,8 +699,9 @@
       display: none; align-items: center; justify-content: center;
       border: 2px solid rgba(255,255,255,0.9);
       box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-      pointer-events: none;
+      cursor: pointer;
     }
+    .pick-six-msg-badge:hover { background: #f0a840; transform: scale(1.1); }
     .pick-six-slot {
       width: 100%; aspect-ratio: 3/4; border-radius: 10px;
       border: 2px dashed rgba(155,143,212,0.4);
@@ -1639,22 +1584,8 @@
         <div class="search-results" id="searchResults"></div>
       </div>
 
-      <button class="inbox-bell-btn" id="inboxBellBtn" style="display:none" onclick="toggleInbox()">
-        <i class="ti ti-bell"></i>
-        <span class="inbox-badge" id="inboxBadge"></span>
-      </button>
       <a href="#" id="logoutBtn">logout</a>
     </nav>
-  </div>
-
-  <!-- Inbox Panel -->
-  <div class="inbox-panel" id="inboxPanel">
-    <div class="inbox-panel-header">
-      <span>Inbox</span>
-      <button class="inbox-panel-close" onclick="toggleInbox()">✕</button>
-    </div>
-    <div id="inboxMessages"></div>
-    <div id="inboxRequests"></div>
   </div>
 
   <div class="zone-feed">
@@ -1732,8 +1663,7 @@
           <!-- Contacting -->
           <div class="ms-contact-header" id="contactHeader">Contacting Dave</div>
           <div class="ms-contact-grid">
-            <a class="ms-contact-item" href="#" onclick="openMessageModal();return false;"><i class="ti ti-message-2"></i> Send DM</a>
-            <a class="ms-contact-item" href="#" onclick="toggleInbox();return false;"><i class="ti ti-bell"></i> Notifications <span class="contact-notif-count" id="contactNotifCount" style="display:none"></span></a>
+            <a class="ms-contact-item" href="#" onclick="openLounge();return false;"><i class="ti ti-messages"></i> Open Lounge</a>
             <a class="ms-contact-item" href="#" onclick="sendFriendRequest();return false;"><i class="ti ti-user-plus"></i> Add to Friends</a>
             <a class="ms-contact-item" href="#" onclick="openBizCard();return false;"><i class="ti ti-id-badge-2"></i> My Business Card</a>
             <a class="ms-contact-item" href="#" onclick="openInviteModal();return false;"><i class="ti ti-send"></i> Send Invite</a>
@@ -2097,31 +2027,6 @@
     </div>
   </div>
 
-  <!-- ── Send Message Modal ── -->
-  <div class="modal-overlay" id="messageModal">
-    <div class="modal-box">
-      <div id="msgFormState">
-        <h3>Send Dave a DM</h3>
-        <label class="modal-label" for="msgSubject">Subject</label>
-        <input class="modal-input" type="text" id="msgSubject" maxlength="80" placeholder="What's this about?" />
-        <label class="modal-label" for="msgBody" style="margin-top:0.6rem">Message</label>
-        <textarea class="modal-textarea" id="msgBody" maxlength="500" placeholder="What's on your mind?"></textarea>
-        <div class="modal-actions">
-          <button class="btn-cancel" onclick="closeModal('messageModal')">Cancel</button>
-          <button class="btn-save" onclick="sendMessage()">Send DM</button>
-        </div>
-      </div>
-      <div id="msgSentState" class="msg-sent-state" style="display:none">
-        <div class="msg-sent-icon">✉️</div>
-        <div class="msg-sent-title">Message sent!</div>
-        <div class="msg-sent-sub">Dave will see it when he checks in.</div>
-        <div class="modal-actions" style="justify-content:center; margin-top:1rem">
-          <button class="btn-save" onclick="closeModal('messageModal')">Done</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- ── Loop Someone In (invite link) Modal ── -->
   <div class="modal-overlay" id="inviteModal">
     <div class="modal-box">
@@ -2341,7 +2246,7 @@
 
       await renderMyQ();
       await renderFeed();
-      loadInbox();
+      loadFriendUnread();
       await loadWidgets(); // builds canvas → triggers renderPickSix, renderCandids, loadSites
       initLoungeNotifications();
     }
@@ -2353,6 +2258,16 @@
     function openLounge() {
       _loungeWin = window.open('lounge.html','postmarq-lounge','width=820,height=640,resizable=yes');
       clearLoungeBadge();
+    }
+
+    // Open the Lounge straight into a specific friend's DM (from a tile badge).
+    function openLoungeDM(userId) {
+      _loungeWin = window.open('lounge.html?dm=' + encodeURIComponent(userId), 'postmarq-lounge', 'width=820,height=640,resizable=yes');
+      if (_loungeWin) _loungeWin.focus();
+      clearLoungeBadge();
+      // Optimistically clear this friend's badge; visibilitychange will reconcile
+      delete unreadBySender[userId];
+      updatePickSixMsgBadges();
     }
 
     function clearLoungeBadge() {
@@ -2397,8 +2312,9 @@
           if (!roomIds.includes(msg.room_id)) return; // not my room
           if (msg.from_user_id === currentUser.id) return; // my own message
 
-          // Nav badge
+          // Nav badge + refresh friend-tile badges
           bumpLoungeBadge();
+          loadFriendUnread();
 
           // Browser notification
           if ('Notification' in window && Notification.permission === 'granted' && document.hidden) {
@@ -3433,7 +3349,7 @@
       const grid = document.getElementById('pickSixGrid');
       grid.innerHTML = pickSixSlots.map((slot, i) => `
         <div class="pick-six-tile">
-          ${slot?.profileId ? `<span class="pick-six-msg-badge" data-msg-badge="${slot.profileId}"></span>` : ''}
+          ${slot?.profileId ? `<span class="pick-six-msg-badge" data-msg-badge="${slot.profileId}" onclick="event.stopPropagation();openLoungeDM('${slot.profileId}')" title="Open your chat with ${(slot.name||'').replace(/'/g,'')}"></span>` : ''}
           <div class="pick-six-slot" data-slot="${i}" data-handle="${slot?.handle || ''}" data-filled="${slot ? '1' : '0'}" onclick="pickSixTileClick(this)" title="${slot ? 'Visit ' + (slot.name || '') : 'Add friend'}">
             ${slot?.img ? `<img src="${slot.img}" alt="${slot.name || ''}" />` : '<span class="slot-plus">+</span>'}
           </div>
@@ -4216,96 +4132,51 @@
     }
 
 
-    // ── Inbox ──
-    let inboxOpen = false;
+    // ── Friend message badges (sourced from the Lounge) ──
+    // The Lounge is the single communication hub now. This computes unread
+    // Lounge DM counts per friend so the My Friends tiles can badge them,
+    // WITHOUT the Lounge window being open. Clicking a badge opens that DM
+    // in the Lounge, which marks it read (lounge_reads) and clears the badge.
     let unreadBySender = {};
 
-    async function loadInbox() {
-      const bell = document.getElementById('inboxBellBtn');
-      const badge = document.getElementById('inboxBadge');
-      bell.style.display = '';
-
-      const [{ data: messages }, { data: requests }] = await Promise.all([
-        sb.from('messages').select('*').eq('to_user_id', currentUser.id).order('created_at', { ascending: false }),
-        sb.from('friend_requests').select('*, profiles:from_user_id(full_name, handle)').eq('to_user_id', currentUser.id).eq('status', 'pending').order('created_at', { ascending: false })
-      ]);
-
-      // Unread = messages newer than the last time the inbox was opened
-      const seenAt = parseInt(localStorage.getItem(`${localKey}_inboxSeenAt`) || '0');
+    async function loadFriendUnread() {
       unreadBySender = {};
-      (messages || []).forEach(m => {
-        if (m.from_user_id && new Date(m.created_at).getTime() > seenAt) {
-          unreadBySender[m.from_user_id] = (unreadBySender[m.from_user_id] || 0) + 1;
-        }
-      });
+      try {
+        const { data: memberRows } = await sb.from('lounge_members').select('room_id').eq('user_id', currentUser.id);
+        const myRoomIds = (memberRows || []).map(r => r.room_id);
+        if (!myRoomIds.length) { updatePickSixMsgBadges(); return; }
+
+        const { data: dmRooms } = await sb.from('lounge_rooms').select('id').in('id', myRoomIds).eq('type', 'dm');
+        const dmRoomIds = (dmRooms || []).map(r => r.id);
+        if (!dmRoomIds.length) { updatePickSixMsgBadges(); return; }
+
+        const [{ data: others }, { data: reads }, { data: msgs }] = await Promise.all([
+          sb.from('lounge_members').select('room_id, user_id').in('room_id', dmRoomIds).neq('user_id', currentUser.id),
+          sb.from('lounge_reads').select('room_id, last_read_at').eq('user_id', currentUser.id).in('room_id', dmRoomIds),
+          sb.from('lounge_messages').select('room_id, from_user_id, created_at').in('room_id', dmRoomIds).neq('from_user_id', currentUser.id),
+        ]);
+
+        const roomToOther = {};
+        (others || []).forEach(m => { roomToOther[m.room_id] = m.user_id; });
+        const readAt = {};
+        (reads || []).forEach(r => { readAt[r.room_id] = new Date(r.last_read_at).getTime(); });
+
+        (msgs || []).forEach(m => {
+          if (new Date(m.created_at).getTime() > (readAt[m.room_id] || 0)) {
+            const other = roomToOther[m.room_id];
+            if (other) unreadBySender[other] = (unreadBySender[other] || 0) + 1;
+          }
+        });
+      } catch (e) {
+        console.warn('loadFriendUnread failed', e);
+      }
       updatePickSixMsgBadges();
-
-      const unreadTotal = Object.values(unreadBySender).reduce((a, b) => a + b, 0);
-      const total = unreadTotal + (requests?.length || 0);
-      badge.textContent = total;
-      badge.classList.toggle('has-items', total > 0);
-
-      // Contact-card "Notifications" count pill
-      const contactCount = document.getElementById('contactNotifCount');
-      if (contactCount) {
-        contactCount.textContent = total > 9 ? '9+' : total;
-        contactCount.style.display = total > 0 ? '' : 'none';
-      }
-
-      renderInboxMessages(messages || []);
-      renderInboxRequests(requests || []);
     }
 
-    function renderInboxMessages(messages) {
-      const el = document.getElementById('inboxMessages');
-      if (!messages.length) {
-        el.innerHTML = '<div class="inbox-section-label">Messages</div><div class="inbox-empty">No messages yet.</div>';
-        return;
-      }
-      el.innerHTML = '<div class="inbox-section-label">Messages</div>' + messages.map(m => `
-        <div class="inbox-item">
-          <div class="inbox-item-from">${m.from_name || 'Someone'}${m.subject ? ` <span style="font-weight:500;color:var(--ink-3)">· ${m.subject}</span>` : ''}</div>
-          <div class="inbox-item-body">${m.body}</div>
-          <div class="inbox-item-time">${new Date(m.created_at).toLocaleDateString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })}</div>
-        </div>`).join('');
-    }
-
-    function renderInboxRequests(requests) {
-      const el = document.getElementById('inboxRequests');
-      if (!requests.length) {
-        el.innerHTML = '<div class="inbox-section-label">Friend Requests</div><div class="inbox-empty">No pending requests.</div>';
-        return;
-      }
-      el.innerHTML = '<div class="inbox-section-label">Friend Requests</div>' + requests.map(r => `
-        <div class="inbox-item" id="req-${r.id}">
-          <div class="inbox-item-from">${r.profiles?.full_name || r.profiles?.handle || 'Someone'}</div>
-          <div class="inbox-item-body">wants to add you as a friend</div>
-          <div class="inbox-item-time">${new Date(r.created_at).toLocaleDateString('en-US', { month:'short', day:'numeric' })}</div>
-          <div class="inbox-item-actions">
-            <button class="inbox-action-btn inbox-btn-accept" onclick="respondFriendRequest('${r.id}', 'accepted')">Accept</button>
-            <button class="inbox-action-btn inbox-btn-decline" onclick="respondFriendRequest('${r.id}', 'declined')">Decline</button>
-          </div>
-        </div>`).join('');
-    }
-
-    async function respondFriendRequest(id, status) {
-      await sb.from('friend_requests').update({ status }).eq('id', id);
-      const el = document.getElementById('req-' + id);
-      if (el) el.innerHTML = `<div class="inbox-item-body" style="color:var(--teal);font-weight:700">${status === 'accepted' ? '✓ Accepted' : 'Declined'}</div>`;
-      await loadInbox();
-    }
-
-    function toggleInbox() {
-      inboxOpen = !inboxOpen;
-      document.getElementById('inboxPanel').classList.toggle('open', inboxOpen);
-      if (inboxOpen) {
-        // Opening the inbox marks everything seen — clear tile badges + bell
-        localStorage.setItem(`${localKey}_inboxSeenAt`, Date.now().toString());
-        unreadBySender = {};
-        updatePickSixMsgBadges();
-        loadInbox();
-      }
-    }
+    // Refresh badges when returning to this tab (e.g. after reading in the Lounge)
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && currentUser) loadFriendUnread();
+    });
 
     function updatePickSixMsgBadges() {
       document.querySelectorAll('[data-msg-badge]').forEach(el => {
@@ -4379,7 +4250,6 @@
       const { data, error } = await sb.rpc('claim_invite', { invite_code: code });
       if (error || !data?.ok) return; // invalid/used/own invite — silently drop
       showInviteToast(`You're now connected with ${data.inviter_name || 'your friend'} ✓`);
-      loadInbox(); // friendship may affect counts
     }
 
     function showInviteToast(text) {
@@ -4440,42 +4310,6 @@
     });
 
     // ── Send Message ──
-    function openMessageModal() {
-      if (!currentUser) { alert('You need to be logged in to send a DM.'); return; }
-      document.getElementById('msgSubject').value = '';
-      document.getElementById('msgBody').value = '';
-      document.getElementById('msgFormState').style.display = '';
-      document.getElementById('msgSentState').style.display = 'none';
-      openModal('messageModal');
-    }
-
-    async function sendMessage() {
-      const body = document.getElementById('msgBody').value.trim();
-      if (!body) return;
-
-      const { data: dave } = await sb.from('profiles')
-        .select('id').eq('handle', 'davemichael.postmarq').single();
-      if (!dave) { alert('Could not find recipient.'); return; }
-
-      // Check if sender is blocked
-      const { data: block } = await sb.from('blocks')
-        .select('id').eq('blocker_id', dave.id).eq('blocked_id', currentUser.id).maybeSingle();
-      if (block) { alert('Unable to send message.'); return; }
-
-      const subject = document.getElementById('msgSubject').value.trim();
-      const { error } = await sb.from('messages').insert({
-        from_user_id: currentUser.id,
-        to_user_id: dave.id,
-        from_name: document.getElementById('profileName').textContent,
-        subject: subject || null,
-        body
-      });
-
-      if (error) { alert('Failed to send: ' + error.message); return; }
-      document.getElementById('msgFormState').style.display = 'none';
-      document.getElementById('msgSentState').style.display = '';
-    }
-
     // Cmd/Ctrl + Enter to post
     document.addEventListener('keydown', e => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') submitPost();

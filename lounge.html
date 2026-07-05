@@ -946,6 +946,7 @@
     const c = convos.find(x => x.id === id);
     if (!c) return;
     c.unread = 0;
+    markRoomRead(id);
 
     const isGroup = c.type === 'group';
     const hdrAvatar = document.getElementById('chatHeaderAvatar');
@@ -1003,6 +1004,7 @@
         if (isActive) {
           renderMessages(c);                                 // keep the open thread current
           if (document.hidden) notifyMessage(c, msg);        // still ping if tab is backgrounded
+          else markRoomRead(msg.room_id);                    // seen live → clear it everywhere
         } else {
           c.unread = (c.unread || 0) + 1;
           renderSidebar();
@@ -1437,7 +1439,7 @@
             const { data: fp } = await sb.from('profiles').select('full_name, avatar_url').eq('id', otherId).single();
             const friendName = fp?.full_name || 'Someone';
             convos.push({
-              id: room.id, type: 'dm', name: friendName,
+              id: room.id, type: 'dm', name: friendName, otherId,
               initials: friendName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(),
               avatarImg: fp?.avatar_url || null, color: getColor(otherId), messages: [], unread: 0,
             });
@@ -1467,13 +1469,46 @@
       // (otherId gets set when room is loaded above via the members query)
     }
 
+    // Persistent unread: count messages from others newer than my last-read
+    // marker for each room, so badges survive across sessions (not just live).
+    const allRoomIds = convos.map(c => c.id);
+    if (allRoomIds.length) {
+      const [{ data: reads }, { data: msgs }] = await Promise.all([
+        sb.from('lounge_reads').select('room_id, last_read_at').eq('user_id', ME.id).in('room_id', allRoomIds),
+        sb.from('lounge_messages').select('room_id, from_user_id, created_at').in('room_id', allRoomIds).neq('from_user_id', ME.id),
+      ]);
+      const readAt = {};
+      (reads || []).forEach(r => { readAt[r.room_id] = new Date(r.last_read_at).getTime(); });
+      (msgs || []).forEach(m => {
+        const c = convos.find(x => x.id === m.room_id);
+        if (c && new Date(m.created_at).getTime() > (readAt[m.room_id] || 0)) c.unread = (c.unread || 0) + 1;
+      });
+    }
+
     renderSidebar();
 
     // Live subscription to all my rooms (unread badges + notifications)
     subscribeToAllRooms();
 
-    const hash = location.hash.slice(1);
-    if (hash && convos.find(c => c.id === hash)) openConvo(hash);
+    // Deep-link: ?dm=<userId> opens that friend's DM (used by the friend-tile
+    // badge on my-post); #<roomId> opens a specific room directly.
+    const dmUser = new URLSearchParams(location.search).get('dm');
+    if (dmUser) {
+      dmFriend(dmUser);
+    } else {
+      const hash = location.hash.slice(1);
+      if (hash && convos.find(c => c.id === hash)) openConvo(hash);
+    }
+  }
+
+  // Persist that I've read this room up to now — clears its unread everywhere.
+  async function markRoomRead(roomId) {
+    try {
+      await sb.from('lounge_reads').upsert(
+        { user_id: ME.id, room_id: roomId, last_read_at: new Date().toISOString() },
+        { onConflict: 'user_id,room_id' }
+      );
+    } catch (e) { console.warn('markRoomRead failed', e); }
   }
 
   // Ask for notification permission on the first user gesture (Safari/Chrome
