@@ -4088,74 +4088,46 @@
         byDay[key].push(p);
       });
 
-      // Build the current week (Sun→Sat)
+      // Rolling window: today + the 6 days before it, newest first
       const today = new Date();
-      const startOfWeek = new Date(today);
-      startOfWeek.setDate(today.getDate() - today.getDay());
-      startOfWeek.setHours(0,0,0,0);
+      today.setHours(0,0,0,0);
 
       const name      = document.getElementById('profileName').textContent;
       const avatarImg = document.getElementById('avatarImg');
       const avatarUrl = avatarImg.dataset.url || '';
 
-      // Also collect all unique weeks from posts so we can show history
-      const allKeys = Object.keys(byDay).sort().reverse();
-
-      // Current week days
       const weekDays = Array.from({ length: 7 }, (_, i) => {
-        const d = new Date(startOfWeek);
-        d.setDate(startOfWeek.getDate() + i);
+        const d = new Date(today);
+        d.setDate(today.getDate() - i);
         return d;
       });
 
-      const weekLabel = MONTH_NAMES[startOfWeek.getMonth()] + ' ' + startOfWeek.getDate() +
-        ' – ' + MONTH_NAMES[weekDays[6].getMonth()] + ' ' + weekDays[6].getDate() + ', ' + weekDays[6].getFullYear();
+      const oldest = weekDays[6];
+      const weekLabel = MONTH_NAMES[oldest.getMonth()] + ' ' + oldest.getDate() +
+        ' – ' + MONTH_NAMES[today.getMonth()] + ' ' + today.getDate() + ', ' + today.getFullYear();
 
-      let html = `<div style="font-size:0.72rem;font-weight:700;color:var(--ink-3);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:0.75rem;padding-left:2px;">This week · ${weekLabel}</div>`;
+      let html = `<div style="font-size:0.72rem;font-weight:700;color:var(--ink-3);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:0.75rem;padding-left:2px;">Past 7 days · ${weekLabel}</div>`;
 
-      let thisWeekHasPost = false;
-      weekDays.forEach(d => {
+      weekDays.forEach((d, i) => {
         const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
         const posts = byDay[key] || [];
-        const isToday = key === (today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0'));
-        const isFuture = d > today;
+        const isToday = i === 0;
 
         html += `<div style="display:flex;gap:0.75rem;align-items:flex-start;margin-bottom:0.6rem;">
           <div style="flex-shrink:0;width:44px;text-align:center;padding-top:2px;">
-            <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;color:${isToday ? 'var(--amber)' : 'var(--ink-3)'};">${DAY_NAMES[d.getDay()].slice(0,3)}</div>
-            <div style="font-size:1.1rem;font-weight:800;color:${isToday ? 'var(--amber)' : isFuture ? 'var(--ink-4)' : 'var(--ink-2)'};">${d.getDate()}</div>
+            <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;color:${isToday ? 'var(--amber)' : 'var(--ink-3)'};">${isToday ? 'Today' : DAY_NAMES[d.getDay()].slice(0,3)}</div>
+            <div style="font-size:1.1rem;font-weight:800;color:${isToday ? 'var(--amber)' : 'var(--ink-2)'};">${d.getDate()}</div>
           </div>
           <div style="flex:1;min-width:0;">`;
 
-        if (isFuture) {
-          html += `<div class="glass" style="border-radius:var(--radius-md);padding:0.65rem 1rem;font-size:0.78rem;color:var(--ink-4);font-style:italic;">—</div>`;
-        } else if (!posts.length) {
+        if (!posts.length) {
           html += `<div class="glass" style="border-radius:var(--radius-md);padding:0.65rem 1rem;font-size:0.78rem;color:var(--ink-4);font-style:italic;">Quiet day.</div>`;
         } else {
-          thisWeekHasPost = true;
           html += posts.map(p => buildPostCard(p, name, avatarUrl, currentHandle)).join('');
         }
 
         html += `</div></div>`;
       });
-
-      // Past posts (outside current week)
-      const pastKeys = allKeys.filter(k => {
-        const d = new Date(k + 'T12:00:00');
-        return d < startOfWeek;
-      });
-
-      if (pastKeys.length) {
-        html += `<div style="font-size:0.72rem;font-weight:700;color:var(--ink-3);letter-spacing:0.06em;text-transform:uppercase;margin:1.25rem 0 0.75rem;padding-left:2px;">Earlier</div>`;
-        pastKeys.forEach(key => {
-          const d = new Date(key + 'T12:00:00');
-          const posts = byDay[key];
-          html += `<div style="margin-bottom:0.75rem;">
-            <div style="font-size:0.72rem;font-weight:700;color:var(--ink-3);margin-bottom:0.4rem;">${DAY_NAMES[d.getDay()]}, ${MONTH_NAMES[d.getMonth()]} ${d.getDate()}</div>
-            ${posts.map(p => buildPostCard(p, name, avatarUrl, currentHandle)).join('')}
-          </div>`;
-        });
-      }
 
       panel.innerHTML = html;
     }
