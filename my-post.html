@@ -151,11 +151,15 @@
       align-items: start;
     }
     /* Desktop: sidebar-col unwraps (display:contents) so left-col and
-       right-col act as independent grid items on either side of feed-col. */
+       right-col act as independent grid items on either side of feed-col.
+       grid-row:1 is set explicitly on all three — leaving it to auto-placement
+       is unreliable here: with display:contents unwrapping the sidebar,
+       Chrome's placement cursor can shove feed-col into an implicit row 2
+       even though nothing asked for one, collapsing it to an empty sliver. */
     .sidebar-col { display: contents; }
-    .left-col  { display: flex; flex-direction: column; gap: 1rem; grid-column: 1; }
-    .feed-col  { display: flex; flex-direction: column; gap: 1rem; grid-column: 2; }
-    .right-col { display: flex; flex-direction: column; gap: 1rem; grid-column: 3; }
+    .left-col  { display: flex; flex-direction: column; gap: 1rem; grid-column: 1; grid-row: 1; }
+    .feed-col  { display: flex; flex-direction: column; gap: 1rem; grid-column: 2; grid-row: 1; }
+    .right-col { display: flex; flex-direction: column; gap: 1rem; grid-column: 3; grid-row: 1; }
 
     @media (max-width: 1299px) {
       .main-grid { grid-template-columns: 280px 1fr; }
