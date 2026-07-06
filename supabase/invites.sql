@@ -8,13 +8,22 @@
 
 create table if not exists invites (
   id           uuid primary key default gen_random_uuid(),
-  code         text unique not null,
   from_user_id uuid not null references auth.users(id) on delete cascade,
-  note         text,
-  status       text not null default 'pending',   -- pending | accepted
-  used_by      uuid references auth.users(id),
   created_at   timestamptz not null default now()
 );
+
+-- `invites` already existed on this project from an OLDER, email-based invite
+-- feature (to_email) that predates "Loop Someone In" — create table if not
+-- exists was a no-op against it, so the code-link columns below never got
+-- added. Bring it up to date without touching existing rows. `code` is added
+-- as UNIQUE but nullable (not NOT NULL) since old rows have no code value and
+-- multiple NULLs are fine in a unique column; every new row the app inserts
+-- always supplies one (see createInviteLink() in my-post.html).
+alter table invites add column if not exists code text unique;
+alter table invites add column if not exists note text;
+alter table invites add column if not exists status text not null default 'pending';
+alter table invites add column if not exists used_by uuid references auth.users(id);
+-- to_email is unused by the current app code — left in place, harmless.
 
 alter table invites enable row level security;
 
