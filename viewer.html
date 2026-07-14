@@ -243,6 +243,82 @@
     .pick-six-name { font-size: 0.72rem; font-weight: 700; color: #3d2a0a; text-align: center; line-height: 1.2; text-shadow: 0 1px 2px rgba(255,255,255,0.6); }
     .pick-six-name.empty { color: var(--ink-4); font-weight: 400; font-style: italic; }
 
+    /* ── Visitor widgets ── */
+    #widgetsCol { display: flex; flex-direction: column; gap: 1rem; }
+    .vw-card { border-radius: 14px; overflow: hidden; background: linear-gradient(135deg, rgba(74,181,170,0.22) 0%, rgba(155,143,212,0.22) 100%); backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.55); box-shadow: 0 4px 24px rgba(80,60,140,0.10); }
+    .vw-card-header { padding: 1rem 1.1rem 0.5rem; }
+    .vw-card-title { font-size: 1.25rem; font-weight: 900; letter-spacing: -0.4px; color: #2d3a4a; }
+    .vw-card-body { padding: 0.25rem 1.1rem 1.1rem; }
+
+    /* Guestbook */
+    .gb-wrap { display: flex; flex-direction: column; gap: 0.7rem; }
+    .gb-hint { font-size: 0.82rem; font-style: italic; color: var(--ink-2); line-height: 1.35; }
+    .gb-empty { font-size: 0.78rem; color: var(--ink-3); padding: 0.5rem 0; line-height: 1.4; }
+    .gb-sign { display: flex; flex-direction: column; gap: 0.45rem; }
+    .gb-sign textarea {
+      width: 100%; resize: none; min-height: 54px; box-sizing: border-box;
+      background: rgba(255,255,255,0.55); color: var(--ink);
+      border: 1px solid rgba(120,90,60,0.25); border-radius: 9px;
+      padding: 0.5rem 0.6rem; font-family: inherit; font-size: 0.85rem; outline: none;
+    }
+    .gb-sign textarea:focus { border-color: rgba(120,90,60,0.45); }
+    .gb-sign textarea::placeholder { color: var(--ink-4); }
+    .gb-sign-row { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+    .gb-counter { font-size: 0.68rem; color: var(--ink-3); }
+    .gb-sign-btn {
+      border: none; cursor: pointer; border-radius: 8px;
+      padding: 0.4rem 1rem; font-size: 0.78rem; font-weight: 800; color: #fff;
+      background: linear-gradient(135deg, #9b8fd4, #4ab5aa); transition: filter 0.12s;
+    }
+    .gb-sign-btn:hover { filter: brightness(1.07); }
+    .gb-sign-btn:disabled { opacity: 0.5; cursor: default; }
+    .gb-signin-prompt { font-size: 0.78rem; color: var(--ink-3); line-height: 1.4; }
+    .gb-signin-prompt a { color: var(--ink); font-weight: 800; text-decoration: underline; }
+    .gb-list { display: flex; flex-direction: column; gap: 0.55rem; max-height: 340px; overflow-y: auto; }
+    .gb-list::-webkit-scrollbar { width: 4px; }
+    .gb-list::-webkit-scrollbar-thumb { background: rgba(120,90,60,0.3); border-radius: 2px; }
+    .gb-entry {
+      display: flex; gap: 0.55rem; align-items: flex-start;
+      padding: 0.55rem 0.6rem; border-radius: 10px;
+      background: rgba(255,255,255,0.45); border: 1px solid rgba(255,255,255,0.55);
+    }
+    .gb-avatar {
+      width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; text-decoration: none;
+      background: linear-gradient(135deg, #9b8fd4, #4ab5aa);
+      color: #fff; font-size: 0.68rem; font-weight: 800; overflow: hidden;
+    }
+    .gb-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .gb-body { flex: 1; min-width: 0; }
+    .gb-head { display: flex; align-items: baseline; gap: 0.4rem; margin-bottom: 0.12rem; }
+    .gb-name { font-size: 0.82rem; font-weight: 800; color: var(--ink); }
+    .gb-time { font-size: 0.66rem; color: var(--ink-4); }
+    .gb-text { font-size: 0.84rem; color: var(--ink-2); line-height: 1.4; word-wrap: break-word; }
+    .gb-del {
+      background: none; border: none; cursor: pointer; color: var(--ink-4);
+      font-size: 0.8rem; line-height: 1; padding: 0.1rem 0.2rem; flex-shrink: 0; transition: color 0.12s;
+    }
+    .gb-del:hover { color: #c0392b; }
+
+    /* Movie shelf (read-only) */
+    .vw-shelf { display: flex; gap: 0.6rem; overflow-x: auto; padding-bottom: 0.4rem; scrollbar-width: thin; }
+    .vw-shelf::-webkit-scrollbar { height: 3px; }
+    .vw-shelf::-webkit-scrollbar-thumb { background: rgba(120,90,60,0.3); border-radius: 2px; }
+    .vw-shelf-tile { flex-shrink: 0; width: 72px; position: relative; }
+    .vw-shelf-poster { width: 72px; height: 104px; object-fit: cover; border-radius: 8px; display: block; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+    .vw-shelf-poster.empty { display: flex; align-items: center; justify-content: center; background: rgba(120,90,60,0.14); color: var(--ink-4); font-size: 1.4rem; }
+    .vw-shelf-badge { position: absolute; top: 4px; right: 4px; background: rgba(20,20,26,0.82); color: #fff; font-size: 0.58rem; font-weight: 800; padding: 1px 5px; border-radius: 6px; }
+    .vw-shelf-title { font-size: 0.66rem; font-weight: 700; color: var(--ink-2); margin-top: 0.25rem; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* Now playing (read-only) */
+    .vw-np { display: flex; gap: 0.7rem; align-items: center; }
+    .vw-np-cover { width: 54px; height: 54px; border-radius: 8px; object-fit: cover; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+    .vw-np-cover.empty { display: flex; align-items: center; justify-content: center; background: rgba(120,90,60,0.14); color: var(--ink-4); font-size: 1.3rem; }
+    .vw-np-info { min-width: 0; }
+    .vw-np-track { font-size: 0.9rem; font-weight: 800; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .vw-np-artist { font-size: 0.78rem; color: var(--ink-2); }
+    .vw-np-album { font-size: 0.7rem; color: var(--ink-4); }
+
     /* ── Candids Wall ── */
     .candids-card { border-radius: 14px; overflow: hidden; background: linear-gradient(135deg, rgba(74,181,170,0.22) 0%, rgba(155,143,212,0.22) 100%); backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.55); box-shadow: 0 4px 24px rgba(80,60,140,0.10); }
     .candids-header { padding: 1.25rem 1.25rem 0.8rem; display: flex; justify-content: center; align-items: center; }
@@ -435,6 +511,9 @@
             </div>
           </div>
         </div>
+
+        <!-- Visitor-facing widgets (guestbook, shelves, etc.) -->
+        <div id="widgetsCol"></div>
       </div>
 
     </div>
@@ -594,7 +673,8 @@
       loadPickSix(),
       loadCandids(),
       loadMyQ(),
-      loadSites()
+      loadSites(),
+      loadWidgets()
     ]);
   }
 
@@ -959,6 +1039,159 @@
         <div class="site-btn-name">${escHtml(r.room_name)}</div>
         <div class="site-btn-url">postmarq.org/${username}/${r.room_name}</div>
       </a>`).join('');
+  }
+
+  // ── Visitor-facing widgets ────────────────────────────────────────
+  // viewer.html previously rendered NO widgets — this is the prerequisite
+  // for every visitor-facing widget (the Guestbook is the first).
+  const VIEWER_WIDGETS = {
+    'guestbook':    'Guestbook',
+    'movie-shelf':  'Movie & Show Shelf',
+    'now-playing':  'Now Playing',
+  };
+
+  async function loadWidgets() {
+    const col = document.getElementById('widgetsCol');
+    if (!col || !profileUserId) return;
+    const { data: widgets, error } = await sb.from('widgets')
+      .select('id, widget_type, data, position')
+      .eq('user_id', profileUserId).eq('page', 'profile')
+      .order('position');
+    if (error || !widgets?.length) return;
+
+    for (const w of widgets) {
+      const title = VIEWER_WIDGETS[w.widget_type];
+      if (!title) continue; // skip widget types the viewer can't render
+      const card = document.createElement('div');
+      card.className = 'vw-card';
+      card.innerHTML = `
+        <div class="vw-card-header"><div class="vw-card-title">${escHtml(title)}</div></div>
+        <div class="vw-card-body" id="vw-body-${w.id}"></div>`;
+      col.appendChild(card);
+      const body = card.querySelector('.vw-card-body');
+      if (w.widget_type === 'guestbook')        renderGuestbookViewer(body, w);
+      else if (w.widget_type === 'movie-shelf')  renderMovieShelfViewer(body, w);
+      else if (w.widget_type === 'now-playing')  renderNowPlayingViewer(body, w);
+    }
+  }
+
+  // ── Guestbook (the connection engine) ──
+  function renderGuestbookViewer(el, widget) {
+    const prompt = widget.data?.prompt || 'Leave a note before you go ✍️';
+    const isOwner = viewerUserId && viewerUserId === profileUserId;
+    let signBlock;
+    if (isOwner) {
+      signBlock = `<div class="gb-signin-prompt">This is your guestbook — you can remove notes here, or manage from <a href="/home">home</a>.</div>`;
+    } else if (viewerUserId) {
+      signBlock = `<div class="gb-sign">
+        <textarea id="gb-input-${widget.id}" maxlength="280" placeholder="Write something…"
+          oninput="document.getElementById('gb-count-${widget.id}').textContent = 280 - this.value.length"></textarea>
+        <div class="gb-sign-row">
+          <span class="gb-counter"><span id="gb-count-${widget.id}">280</span> left</span>
+          <button class="gb-sign-btn" id="gb-btn-${widget.id}" onclick="signGuestbook('${widget.id}')">Sign it</button>
+        </div>
+      </div>`;
+    } else {
+      signBlock = `<div class="gb-signin-prompt"><a href="/login">Sign in</a> to leave a note.</div>`;
+    }
+    el.innerHTML = `<div class="gb-wrap">
+      <div class="gb-hint">${escHtml(prompt)}</div>
+      ${signBlock}
+      <div class="gb-list" id="gb-list-${widget.id}"><div class="gb-empty">Loading notes…</div></div>
+    </div>`;
+    refreshGuestbookList(widget.id);
+  }
+
+  async function signGuestbook(widgetId) {
+    if (!viewerUserId) { window.location.href = '/login'; return; }
+    const ta = document.getElementById('gb-input-' + widgetId);
+    const body = (ta?.value || '').trim();
+    if (!body) return;
+    const btn = document.getElementById('gb-btn-' + widgetId);
+    if (btn) btn.disabled = true;
+    const { error } = await sb.from('guestbook').insert({
+      owner_user_id: profileUserId, author_user_id: viewerUserId, body
+    });
+    if (error) { if (btn) btn.disabled = false; alert('Could not sign: ' + error.message); return; }
+    ta.value = '';
+    const cnt = document.getElementById('gb-count-' + widgetId);
+    if (cnt) cnt.textContent = '280';
+    if (btn) btn.disabled = false;
+    await refreshGuestbookList(widgetId);
+  }
+
+  async function refreshGuestbookList(widgetId) {
+    const list = document.getElementById('gb-list-' + widgetId);
+    if (!list) return;
+    const { data: entries, error } = await sb.from('guestbook')
+      .select('id, author_user_id, body, created_at')
+      .eq('owner_user_id', profileUserId)
+      .order('created_at', { ascending: false }).limit(100);
+    if (error) { list.innerHTML = `<div class="gb-empty">Couldn't load notes.</div>`; return; }
+    if (!entries?.length) { list.innerHTML = `<div class="gb-empty">No one has signed yet. Be the first.</div>`; return; }
+    // author_user_id FKs auth.users — fetch author profiles separately.
+    const authors = {};
+    const ids = [...new Set(entries.map(e => e.author_user_id))];
+    if (ids.length) {
+      const { data: profs } = await sb.from('profiles').select('id, full_name, avatar_url, handle').in('id', ids);
+      (profs || []).forEach(p => { authors[p.id] = p; });
+    }
+    list.innerHTML = entries.map(e => {
+      const a = authors[e.author_user_id] || {};
+      const name = a.full_name || 'Someone';
+      const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || '?';
+      const handle = (a.handle || '').replace(/\.postmarq$/, '');
+      const av = a.avatar_url ? `<img src="${escHtml(a.avatar_url)}" alt="">` : escHtml(initials);
+      const avEl = handle
+        ? `<a class="gb-avatar" href="/${handle}" title="${escHtml(name)}">${av}</a>`
+        : `<div class="gb-avatar">${av}</div>`;
+      const canDelete = viewerUserId && (viewerUserId === e.author_user_id || viewerUserId === profileUserId);
+      return `<div class="gb-entry" id="gb-${e.id}">
+        ${avEl}
+        <div class="gb-body">
+          <div class="gb-head"><span class="gb-name">${escHtml(name)}</span><span class="gb-time">${timeAgo(e.created_at)}</span></div>
+          <div class="gb-text">${escHtml(e.body).replace(/\n/g,'<br>')}</div>
+        </div>
+        ${canDelete ? `<button class="gb-del" title="Remove" onclick="deleteGbEntry('${e.id}','${widgetId}')">✕</button>` : ''}
+      </div>`;
+    }).join('');
+  }
+
+  async function deleteGbEntry(id, widgetId) {
+    if (!confirm('Remove this note?')) return;
+    const { error } = await sb.from('guestbook').delete().eq('id', id);
+    if (error) { alert('Could not remove: ' + error.message); return; }
+    await refreshGuestbookList(widgetId);
+  }
+
+  // ── Read-only display widgets ──
+  function renderMovieShelfViewer(el, widget) {
+    const items = widget.data?.items || [];
+    if (!items.length) { el.innerHTML = `<div class="gb-empty">Nothing on the shelf yet.</div>`; return; }
+    const label = { seen: 'Seen', want: 'Want', watching: '▶' };
+    el.innerHTML = `<div class="vw-shelf">` + items.map(it => `
+      <div class="vw-shelf-tile" title="${escHtml(it.title || '')}${it.year ? ' (' + it.year + ')' : ''}">
+        ${it.poster_url
+          ? `<img class="vw-shelf-poster" src="${escHtml(it.poster_url)}" alt="${escHtml(it.title || '')}">`
+          : `<div class="vw-shelf-poster empty"><i class="ti ti-device-tv"></i></div>`}
+        ${it.status ? `<span class="vw-shelf-badge">${label[it.status] || ''}</span>` : ''}
+        <div class="vw-shelf-title">${escHtml(it.title || '')}</div>
+      </div>`).join('') + `</div>`;
+  }
+
+  function renderNowPlayingViewer(el, widget) {
+    const d = widget.data || {};
+    if (!d.track && !d.artist) { el.innerHTML = `<div class="gb-empty">Nothing playing right now.</div>`; return; }
+    el.innerHTML = `<div class="vw-np">
+      ${d.cover_url
+        ? `<img class="vw-np-cover" src="${escHtml(d.cover_url)}" alt="">`
+        : `<div class="vw-np-cover empty"><i class="ti ti-music"></i></div>`}
+      <div class="vw-np-info">
+        <div class="vw-np-track">${escHtml(d.track || 'Untitled')}</div>
+        <div class="vw-np-artist">${escHtml(d.artist || '')}</div>
+        ${d.album ? `<div class="vw-np-album">${escHtml(d.album)}</div>` : ''}
+      </div>
+    </div>`;
   }
 
   function switchTab(name, btn) {

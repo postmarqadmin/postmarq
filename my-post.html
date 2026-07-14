@@ -1047,6 +1047,66 @@
     }
     .widget-row-remove:hover { color: #c83030; }
 
+    /* Guestbook widget */
+    .gb-wrap { display: flex; flex-direction: column; gap: 0.7rem; }
+    .gb-hint {
+      font-size: 0.78rem; font-style: italic;
+      color: var(--ink-2); line-height: 1.35;
+    }
+    .gb-empty {
+      font-size: 0.75rem; color: var(--ink-3);
+      padding: 0.6rem 0; line-height: 1.4;
+    }
+    .gb-list { display: flex; flex-direction: column; gap: 0.55rem; max-height: 320px; overflow-y: auto; }
+    .gb-list::-webkit-scrollbar { width: 4px; }
+    .gb-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); border-radius: 2px; }
+    .gb-entry {
+      display: flex; gap: 0.55rem; align-items: flex-start;
+      padding: 0.55rem 0.6rem; border-radius: 10px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.14);
+      position: relative;
+    }
+    .gb-avatar {
+      width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, rgba(155,143,212,0.9), rgba(74,181,170,0.9));
+      color: #fff; font-size: 0.68rem; font-weight: 800; overflow: hidden;
+    }
+    .gb-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .gb-body { flex: 1; min-width: 0; }
+    .gb-head { display: flex; align-items: baseline; gap: 0.4rem; margin-bottom: 0.15rem; }
+    .gb-name { font-size: 0.8rem; font-weight: 800; color: var(--ink); }
+    .gb-time { font-size: 0.64rem; color: var(--ink-4); }
+    .gb-text { font-size: 0.82rem; color: var(--ink-2); line-height: 1.4; word-wrap: break-word; }
+    .gb-del {
+      background: none; border: none; cursor: pointer;
+      color: var(--ink-4); font-size: 0.8rem; line-height: 1;
+      padding: 0.1rem 0.2rem; flex-shrink: 0; transition: color 0.12s;
+    }
+    .gb-del:hover { color: #f87171; }
+    /* Guestbook — visitor sign form (used on this page's own preview + viewer) */
+    .gb-sign { display: flex; flex-direction: column; gap: 0.45rem; margin-top: 0.2rem; }
+    .gb-sign textarea {
+      width: 100%; resize: none; min-height: 52px;
+      background: rgba(255,255,255,0.12); color: var(--ink);
+      border: 1px solid rgba(255,255,255,0.28); border-radius: 9px;
+      padding: 0.5rem 0.6rem; font-family: inherit; font-size: 0.82rem; outline: none;
+    }
+    .gb-sign textarea::placeholder { color: rgba(255,255,255,0.45); }
+    .gb-sign-row { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+    .gb-counter { font-size: 0.66rem; color: var(--ink-4); }
+    .gb-sign-btn {
+      border: none; cursor: pointer; border-radius: 8px;
+      padding: 0.4rem 0.9rem; font-size: 0.76rem; font-weight: 800; color: #fff;
+      background: linear-gradient(135deg, rgba(155,143,212,0.95), rgba(74,181,170,0.95));
+      transition: filter 0.12s;
+    }
+    .gb-sign-btn:hover { filter: brightness(1.08); }
+    .gb-sign-btn:disabled { opacity: 0.5; cursor: default; }
+    .gb-signin-prompt { font-size: 0.75rem; color: var(--ink-3); }
+    .gb-signin-prompt a { color: var(--ink); font-weight: 800; text-decoration: underline; }
+
     /* Movie Shelf widget */
     .mshelf-grid {
       display: flex; gap: 0.6rem; overflow-x: auto; padding-bottom: 0.5rem;
@@ -2664,6 +2724,7 @@
         // render directly into the element (not yet in DOM, so getElementById won't find it)
         if (item.widget.widget_type === 'movie-shelf') renderMovieShelf(inner, item.widget);
         if (item.widget.widget_type === 'now-playing') renderNowPlaying(inner, item.widget);
+        if (item.widget.widget_type === 'guestbook') renderGuestbook(inner, item.widget);
       }
     }
 
@@ -2690,6 +2751,7 @@
       if (!el) return;
       if (w.widget_type === 'movie-shelf') renderMovieShelf(el, w);
       if (w.widget_type === 'now-playing') renderNowPlaying(el, w);
+      if (w.widget_type === 'guestbook') renderGuestbook(el, w);
     }
 
     // ── Widget Library ──
@@ -2754,6 +2816,7 @@
       const type = widgetTypes.find(t => t.id === typeId);
       const defaultData = typeId === 'movie-shelf' ? { items: [] }
         : typeId === 'now-playing' ? { track: '', artist: '', album: '', status: 'playing', cover_url: '', link: '' }
+        : typeId === 'guestbook' ? { prompt: 'Leave a note before you go ✍️' }
         : {};
       const { data, error } = await sb.from('widgets').insert({
         user_id: currentUser.id, widget_type: typeId, label: type?.name,
@@ -2793,6 +2856,57 @@
         <button class="mshelf-add-btn" onclick="openMshelfModal('${widget.id}')">+</button>
       </div></div>`;
       el.innerHTML = html;
+    }
+
+    // ── Guestbook renderer (owner view: read + remove any note) ──
+    async function renderGuestbook(el, widget) {
+      const prompt = widget.data?.prompt || 'Leave a note before you go ✍️';
+      el.innerHTML = `<div class="gb-wrap"><div class="gb-hint">${escHtml(prompt)}</div><div class="gb-empty">Loading notes…</div></div>`;
+      const { data: entries, error } = await sb.from('guestbook')
+        .select('id, author_user_id, body, created_at')
+        .eq('owner_user_id', currentUser.id)
+        .order('created_at', { ascending: false })
+        .limit(100);
+      if (error) {
+        el.innerHTML = `<div class="gb-wrap"><div class="gb-hint">${escHtml(prompt)}</div><div class="gb-empty">Couldn't load the guestbook.${error.message.includes('does not exist') ? ' (Run guestbook.sql in Supabase.)' : ''}</div></div>`;
+        return;
+      }
+      // author_user_id FKs auth.users, so fetch author profiles separately.
+      const authors = {};
+      const ids = [...new Set((entries || []).map(e => e.author_user_id))];
+      if (ids.length) {
+        const { data: profs } = await sb.from('profiles').select('id, full_name, avatar_url').in('id', ids);
+        (profs || []).forEach(p => { authors[p.id] = p; });
+      }
+      if (!entries?.length) {
+        el.innerHTML = `<div class="gb-wrap"><div class="gb-hint">${escHtml(prompt)}</div><div class="gb-empty">No one has signed yet. Share your Post and watch it fill up.</div></div>`;
+        return;
+      }
+      const rows = entries.map(e => {
+        const a = authors[e.author_user_id] || {};
+        const name = a.full_name || 'Someone';
+        const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || '?';
+        const av = a.avatar_url
+          ? `<img src="${escHtml(a.avatar_url)}" alt="">`
+          : escHtml(initials);
+        return `<div class="gb-entry" id="gb-${e.id}">
+          <div class="gb-avatar">${av}</div>
+          <div class="gb-body">
+            <div class="gb-head"><span class="gb-name">${escHtml(name)}</span><span class="gb-time">${timeAgo(new Date(e.created_at).getTime())}</span></div>
+            <div class="gb-text">${escHtml(e.body)}</div>
+          </div>
+          <button class="gb-del" title="Remove note" onclick="deleteGuestbookEntry('${e.id}')">✕</button>
+        </div>`;
+      }).join('');
+      el.innerHTML = `<div class="gb-wrap"><div class="gb-hint">${escHtml(prompt)}</div><div class="gb-list">${rows}</div></div>`;
+    }
+
+    async function deleteGuestbookEntry(id) {
+      if (!confirm('Remove this note from your guestbook?')) return;
+      const { error } = await sb.from('guestbook').delete().eq('id', id);
+      if (error) { alert('Could not remove: ' + error.message); return; }
+      const row = document.getElementById('gb-' + id);
+      if (row) row.remove();
     }
 
     // ── Movie Shelf modal ──

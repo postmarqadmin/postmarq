@@ -188,6 +188,44 @@
       transition: color 0.15s;
     }
     .section-label .btn-add:hover { color: var(--accent); }
+    .section-label .req-count {
+      background: var(--accent); color: #fff;
+      font-size: 0.62rem; font-weight: 800;
+      min-width: 16px; height: 16px; padding: 0 5px;
+      border-radius: 8px; display: inline-flex;
+      align-items: center; justify-content: center;
+      letter-spacing: 0;
+    }
+
+    /* ── Friend Requests ── */
+    .req-item {
+      display: flex; align-items: center; gap: 0.55rem;
+      padding: 0.45rem 0.6rem; border-radius: 8px;
+    }
+    .req-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.72rem; font-weight: 800; color: #fff;
+      flex-shrink: 0; overflow: hidden;
+    }
+    .req-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .req-info { flex: 1; min-width: 0; }
+    .req-name {
+      font-size: 0.82rem; font-weight: 700; color: var(--ink);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .req-sub { font-size: 0.66rem; color: var(--ink-4); }
+    .req-actions { display: flex; gap: 0.3rem; flex-shrink: 0; }
+    .req-btn {
+      border: none; cursor: pointer; border-radius: 6px;
+      width: 26px; height: 26px; display: flex;
+      align-items: center; justify-content: center;
+      font-size: 0.9rem; transition: transform 0.1s, filter 0.12s;
+    }
+    .req-btn:hover { transform: scale(1.1); }
+    .req-btn:disabled { opacity: 0.5; cursor: default; transform: none; }
+    .req-accept { background: rgba(74,222,128,0.18); color: #4ade80; }
+    .req-decline { background: rgba(248,113,113,0.16); color: #f87171; }
 
     .conv-list { list-style: none; margin-top: 0.3rem; }
     .conv-item {
@@ -666,6 +704,15 @@
       <!-- Scroll area -->
       <div class="sidebar-scroll">
 
+        <!-- Friend Requests (hidden when none) -->
+        <div class="sidebar-section" id="requestsSection" style="display:none;margin-bottom:0.15rem;">
+          <div class="section-label">
+            Requests
+            <span class="req-count" id="requestsCount">0</span>
+          </div>
+        </div>
+        <ul class="conv-list" id="requestsList"></ul>
+
         <!-- Top Friends -->
         <div class="sidebar-section">
           <div class="section-label">Top Friends</div>
@@ -845,10 +892,109 @@
   let activeConvoId = null;
   let pendingGif = null;
   let realtimeChannel = null;
+  let pendingRequests = [];
 
   /* ═══════════════════════════════════════════
      SIDEBAR
   ═══════════════════════════════════════════ */
+
+  // ── Friend requests ──────────────────────────────────────────────
+  // Pending requests where someone asked to connect with ME. The accept/
+  // decline UI used to live in the my-post inbox, which was removed when
+  // messaging moved into the Lounge — this is its new home.
+  async function loadFriendRequests() {
+    const { data: reqs } = await sb.from('friend_requests')
+      .select('id, from_user_id, created_at')
+      .eq('to_user_id', ME.id)
+      .eq('status', 'pending')
+      .order('created_at', { ascending: false });
+
+    pendingRequests = [];
+    for (const r of (reqs || [])) {
+      // from_user_id FKs auth.users, so PostgREST can't embed profiles —
+      // fetch the sender's profile in a separate query (same pattern as friends).
+      const { data: fp } = await sb.from('profiles')
+        .select('full_name, handle, avatar_url').eq('id', r.from_user_id).single();
+      const name = fp?.full_name || 'Someone';
+      pendingRequests.push({
+        id: r.id, fromId: r.from_user_id, name,
+        handle: (fp?.handle || '').replace(/\.postmarq$/, ''),
+        avatarImg: fp?.avatar_url || null,
+        initials: name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() || '?',
+      });
+    }
+    renderRequests();
+  }
+
+  function renderRequests() {
+    const section = document.getElementById('requestsSection');
+    const list = document.getElementById('requestsList');
+    const count = document.getElementById('requestsCount');
+    if (!pendingRequests.length) {
+      section.style.display = 'none';
+      list.innerHTML = '';
+      return;
+    }
+    section.style.display = '';
+    count.textContent = pendingRequests.length;
+    list.innerHTML = pendingRequests.map(r => `
+      <li class="req-item" id="req-${r.id}">
+        <div class="req-avatar" style="background:${getColor(r.fromId)}">
+          ${r.avatarImg ? `<img src="${escHtml(r.avatarImg)}" alt="">` : escHtml(r.initials)}
+        </div>
+        <div class="req-info">
+          <div class="req-name">${escHtml(r.name)}</div>
+          <div class="req-sub">${r.handle ? '@' + escHtml(r.handle) : 'wants to connect'}</div>
+        </div>
+        <div class="req-actions">
+          <button class="req-btn req-accept" title="Accept" onclick="acceptRequest('${r.id}')">
+            <i class="ti ti-check"></i>
+          </button>
+          <button class="req-btn req-decline" title="Decline" onclick="declineRequest('${r.id}')">
+            <i class="ti ti-x"></i>
+          </button>
+        </div>
+      </li>`).join('');
+  }
+
+  async function acceptRequest(reqId) {
+    const req = pendingRequests.find(r => r.id === reqId);
+    const btns = document.querySelectorAll(`#req-${reqId} .req-btn`);
+    btns.forEach(b => b.disabled = true);
+    const { error } = await sb.from('friend_requests')
+      .update({ status: 'accepted' })
+      .eq('id', reqId).eq('to_user_id', ME.id);
+    if (error) {
+      btns.forEach(b => b.disabled = false);
+      showToast('Could not accept — ' + error.message, 'err');
+      return;
+    }
+    // Drop from pending, add to the Top Friends strip immediately.
+    pendingRequests = pendingRequests.filter(r => r.id !== reqId);
+    if (req && !allFriends.find(f => f.id === req.fromId)) {
+      allFriends.push({ id: req.fromId, name: req.name, initials: req.initials, avatarImg: req.avatarImg });
+    }
+    renderRequests();
+    renderSidebar();
+    showToast(`You're connected with ${req ? req.name.split(' ')[0] : 'them'} ✓`);
+  }
+
+  async function declineRequest(reqId) {
+    const req = pendingRequests.find(r => r.id === reqId);
+    const btns = document.querySelectorAll(`#req-${reqId} .req-btn`);
+    btns.forEach(b => b.disabled = true);
+    const { error } = await sb.from('friend_requests')
+      .update({ status: 'declined' })
+      .eq('id', reqId).eq('to_user_id', ME.id);
+    if (error) {
+      btns.forEach(b => b.disabled = false);
+      showToast('Could not decline — ' + error.message, 'err');
+      return;
+    }
+    pendingRequests = pendingRequests.filter(r => r.id !== reqId);
+    renderRequests();
+    showToast(`Request from ${req ? req.name.split(' ')[0] : 'them'} dismissed`);
+  }
 
   function renderSidebar() {
     const query = document.querySelector('.search-input')?.value.toLowerCase() || '';
@@ -1486,6 +1632,9 @@
     }
 
     renderSidebar();
+
+    // Pending friend requests → the Requests section at the top of the sidebar
+    await loadFriendRequests();
 
     // Live subscription to all my rooms (unread badges + notifications)
     subscribeToAllRooms();
